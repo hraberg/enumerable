@@ -92,14 +92,6 @@ public class Enumerable {
 		return result;
 	}
 
-	public static <E1, E2, R> Fn1<E2, R> partial(final Fn2<E1, E2, R> lambda, final E1 arg1) {
-		return new Fn1<E2, R>() {
-			public R call(E2 arg2) {
-				return lambda.call(arg1, arg2);
-			}
-		};
-	}
-
 	public static <E> List<E> sort(Iterable<E> col, final Fn2<E, E, Integer> comparator) {
 		List<E> result = new ArrayList<E>();
 		for (E each : col)

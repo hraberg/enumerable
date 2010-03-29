@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import lambda.Fn1;
+import lambda.Lambda;
 
 public class EnumerableExample {
 	public static void main(String[] args) {
@@ -87,7 +88,7 @@ public class EnumerableExample {
 		String text = inject(ints, "", into(λ(s, n, s.length() > 0 ? s + ", " + n : s + n)));
 		out.println(text);
 
-		Fn1<Integer, Integer> add2 = partial(λ(n, m, n + m), 2);
+		Fn1<Integer, Integer> add2 = Lambda.partial(λ(n, m, n + m), 2);
 		out.println(add2.call(5));
 		out.println(add2.call(-5));
 
