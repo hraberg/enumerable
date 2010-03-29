@@ -2,7 +2,7 @@ package lambda.weaving;
 
 import java.lang.reflect.Method;
 
-class ClassInjetor {
+class ClassInjector {
 	static Method defineClass;
 	static Method resolveClass;
 	static {

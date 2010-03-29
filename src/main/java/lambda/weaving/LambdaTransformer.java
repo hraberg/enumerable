@@ -327,7 +327,7 @@ class LambdaTransformer implements Opcodes {
 						currentLambdaClass().substring(currentLambdaClass().indexOf('$') + 1), ACC_PUBLIC);
 
 				ClassLoader loader = ClassLoader.getSystemClassLoader();
-				new ClassInjetor().inject(loader, currentLambdaClass(), bs);
+				new ClassInjector().inject(loader, currentLambdaClass(), bs);
 
 				lambdaWriter = null;
 				paremeterNamesToIndex.clear();

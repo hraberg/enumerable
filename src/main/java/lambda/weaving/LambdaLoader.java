@@ -80,7 +80,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 		new File(resource).getParentFile().mkdirs();
 		FileOutputStream out = null;
 		try {
-			out = new FileOutputStream(resource);
+			out = new FileOutputStream("target/generated-classes/" + resource);
 			out.write(b);
 			out.close();
 		} catch (Exception e) {
