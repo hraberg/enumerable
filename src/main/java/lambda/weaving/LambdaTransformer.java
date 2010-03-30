@@ -196,6 +196,9 @@ class LambdaTransformer implements Opcodes {
 		Iterator<Integer> arities;
 		Iterator<Set<Integer>> lambdaLocals;
 		Map<String, Type> accessedLocals;
+		Map<String, MethodInfo> methodsByName;
+
+		int currentLambdaId;
 
 		class LambdaMethodVisitor extends GeneratorAdapter {
 			static final String LAMBDA_CLASS_PREFIX = "Fn";
@@ -207,20 +210,18 @@ class LambdaTransformer implements Opcodes {
 
 			int currentLine;
 
-			int currentLambdaId;
 			int currentArity;
 			Set<Integer> currentLambdaLocals;
 
 			Set<String> initializedLocals = new HashSet<String>();
 
-			String methodName;
-			String desc;
+			MethodInfo method;
 
 			private LambdaMethodVisitor(MethodVisitor mv, int access, String methodName, String desc) {
 				super(mv, access, methodName, desc);
+				method = methodsByName.get(methodName + desc);
+
 				this.originalMethodWriter = mv;
-				this.methodName = methodName;
-				this.desc = desc;
 			}
 
 			public void visitFieldInsn(int opcode, String owner, String name, String desc) {
@@ -277,7 +278,7 @@ class LambdaTransformer implements Opcodes {
 			}
 
 			public void visitVarInsn(int opcode, int operand) {
-				String key = methodName + desc + "." + operand;
+				String key = method.getFullName() + "." + operand;
 				if (accessedLocals.containsKey(key)) {
 					Type type = accessedLocals.get(key);
 
@@ -322,7 +323,7 @@ class LambdaTransformer implements Opcodes {
 			}
 
 			public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-				String key = methodName + desc + "." + index;
+				String key = method.getFullName() + "." + index;
 				if (accessedLocals.containsKey(key)) {
 					desc = getDescriptor(Object.class);
 				}
@@ -339,7 +340,7 @@ class LambdaTransformer implements Opcodes {
 				lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 				lambdaWriter.visit(V1_5, ACC_PUBLIC, currentLambdaClass(), null, getInternalName(Object.class), new String[] { "lambda/"
 						+ LAMBDA_CLASS_PREFIX + +currentArity });
-				lambdaWriter.visitOuterClass(className, methodName, desc);
+				lambdaWriter.visitOuterClass(className, method.name, method.desc);
 			}
 
 			void createCallMethodAndRedirectMethodVisitorToIt() {
@@ -449,6 +450,7 @@ class LambdaTransformer implements Opcodes {
 
 		SecondPassClassVisitor(ClassVisitor cv, FirstPassClassVisitor firstPass) {
 			super(cv);
+			this.methodsByName = firstPass.methodsByName;
 			this.accessedLocals = firstPass.accessedLocals;
 			this.lambdaLocals = firstPass.lambdaLocals.iterator();
 			this.arities = firstPass.arities.iterator();
