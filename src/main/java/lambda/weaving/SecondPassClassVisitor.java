@@ -120,6 +120,14 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			super.visitMethodInsn(opcode, owner, name, desc);
 		}
 
+		public void visitIincInsn(int var, int increment) {
+			if (method.isLocalAccessedFromLambda(var)) {
+				incrementInArray(var, increment);
+			} else {
+				super.visitIincInsn(var, increment);
+			}
+		}
+
 		public void visitVarInsn(int opcode, int operand) {
 			if (method.isLocalAccessedFromLambda(operand)) {
 				Type type = method.getTypeOfLocal(operand);
@@ -224,6 +232,21 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 				mv.visitInsn(ICONST_0);
 				mv.visitInsn(type.getOpcode(IALOAD));
 			}
+		}
+
+		void incrementInArray(int var, int increment) {
+			mv.visitVarInsn(ALOAD, var);
+			mv.visitInsn(ICONST_0);
+			mv.visitInsn(DUP2);
+			mv.visitInsn(IALOAD);
+			if (increment >= Byte.MIN_VALUE && increment <= Byte.MAX_VALUE)
+				mv.visitIntInsn(Opcodes.BIPUSH, increment);
+			else if (increment >= Short.MIN_VALUE && increment <= Short.MAX_VALUE)
+				mv.visitIntInsn(Opcodes.SIPUSH, increment);
+			else
+				mv.visitLdcInsn(increment);
+			mv.visitInsn(IADD);
+			mv.visitInsn(IASTORE);
 		}
 
 		boolean notAConstructor(String name) {

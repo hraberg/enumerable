@@ -61,6 +61,38 @@ public class ClosureTest {
 	}
 
 	@Test
+	public void closeOverLocalVaribleAndRunInDifferentMethod() throws Exception {
+		int i = 0;
+		Fn1<Integer, Integer> add = λ(n, i += n);
+		assertEquals(0, i);
+		otherMethod(add, 10);
+		assertEquals(10, i);
+	}
+
+	@Test
+	public void closingOverLocalPrimitveVaribleStillWorksLikeNormalVarible() throws Exception {
+		int i = 0;
+		λ(n, i += n);
+		i += 10;
+		assertEquals(10, i);
+	}
+
+	@Test
+	public void closingOverLocalReferenceVaribleStillWorksLikeNormalVarible() throws Exception {
+		String string = "hello";
+		Fn1<String, String> toUpCase = λ(s, s.toUpperCase());
+		string += " world";
+		assertEquals("hello world", string);
+		string = toUpCase.call(string);
+		assertEquals("HELLO WORLD", string);
+		assertEquals(String.class, string.getClass());
+	}
+
+	private void otherMethod(Fn1<Integer, Integer> add, int x) {
+		add.call(x);
+	}
+
+	@Test
 	public void callInstanceMethodOnThis() throws Exception {
 		assertEquals(hello(), λ(n, hello()).call(null));
 	}
