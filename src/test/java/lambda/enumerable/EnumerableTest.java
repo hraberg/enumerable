@@ -31,7 +31,7 @@ public class EnumerableTest {
 
 	@Test
 	public void eachReturnsNullForEmptyCollection() throws Exception {
-		assertNull(each(list(), λ(o, "hello")));
+		assertNull(each(list(), λ(obj, "hello")));
 	}
 
 	@Test

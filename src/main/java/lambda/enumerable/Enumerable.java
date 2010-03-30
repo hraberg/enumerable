@@ -15,7 +15,6 @@ import lambda.Fn2;
 import lambda.LambdaParameter;
 import lambda.NewLambda;
 
-
 public class Enumerable {
 	@LambdaParameter
 	public static Integer n;
@@ -38,7 +37,7 @@ public class Enumerable {
 	@LambdaParameter
 	public static Collection<?> col;
 	@LambdaParameter
-	public static Object o;
+	public static Object obj;
 
 	@NewLambda
 	public static <E, R> Fn1<E, R> λ(E n, R block) {

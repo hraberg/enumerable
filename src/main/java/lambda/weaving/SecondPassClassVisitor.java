@@ -150,7 +150,19 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			}
 		}
 
-		private boolean isThis(int operand) {
+		public void visitLineNumber(int line, Label start) {
+			currentLine = line;
+			super.visitLineNumber(line, start);
+		}
+
+		public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+			if (method.isLocalAccessedFromLambda(index)) {
+				desc = getDescriptor(Object.class);
+			}
+			super.visitLocalVariable(name, desc, signature, start, end, index);
+		}
+
+		boolean isThis(int operand) {
 			return operand == 0;
 		}
 
@@ -186,18 +198,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			return arrayOpcode;
 		}
 
-		public void visitLineNumber(int line, Label start) {
-			currentLine = line;
-			super.visitLineNumber(line, start);
-		}
-
-		public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-			if (method.isLocalAccessedFromLambda(index)) {
-				desc = getDescriptor(Object.class);
-			}
-			super.visitLocalVariable(name, desc, signature, start, end, index);
-		}
-
 		boolean notAConstructor(String name) {
 			return !name.startsWith("<");
 		}
@@ -206,8 +206,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			nextLambdaId();
 
 			lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-			lambdaWriter.visit(V1_5, ACC_PUBLIC, currentLambdaClass(), null, getInternalName(Object.class), new String[] { "lambda/"
-					+ LAMBDA_CLASS_PREFIX + currentLambda.arity });
+			String lambdaInterface = "lambda/" + LAMBDA_CLASS_PREFIX + currentLambda.arity;
+			lambdaWriter.visit(V1_5, ACC_PUBLIC, currentLambdaClass(), null, getInternalName(Object.class),
+					new String[] { lambdaInterface });
 			lambdaWriter.visitOuterClass(className, method.name, method.desc);
 			lambdaWriter.visitInnerClass(currentLambdaClass(), null, null, 0);
 		}
@@ -308,7 +309,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		}
 
 		String currentLambdaClass() {
-			return (className + "$" + LAMBDA_CLASS_PREFIX + currentLambda.arity + "_" + currentLambdaId);
+			return className + "$" + LAMBDA_CLASS_PREFIX + currentLambda.arity + "_" + currentLambdaId;
 		}
 
 		boolean inLambda() {
