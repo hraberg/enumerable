@@ -34,7 +34,7 @@ import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.util.AbstractVisitor;
 
 class LambdaTransformer implements Opcodes {
-	static boolean DEBUG = false;
+	static boolean DEBUG = true;
 
 	static Map<String, byte[]> lambdasByName = new HashMap<String, byte[]>();
 
@@ -69,6 +69,7 @@ class LambdaTransformer implements Opcodes {
 							lambdaLocals.add(new HashSet<Integer>());
 						}
 					} catch (NoSuchFieldException ignore) {
+						// debug(ignore);
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
@@ -98,6 +99,7 @@ class LambdaTransformer implements Opcodes {
 							inLambda = false;
 						}
 					} catch (NoSuchMethodException ignore) {
+						// debug(ignore);
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
@@ -110,12 +112,13 @@ class LambdaTransformer implements Opcodes {
 		}
 	}
 
-	class LambdaClassVisitor extends ClassAdapter {
+	static class SecondPassClassVisitor extends ClassAdapter {
 		String source;
-		Iterator<Integer> arities;
-		Map<String, Type> accessedLocals;
-		Iterator<Set<Integer>> lambdaLocals;
 		String className;
+
+		Iterator<Integer> arities;
+		Iterator<Set<Integer>> lambdaLocals;
+		Map<String, Type> accessedLocals;
 
 		class LambdaMethodVisitor extends GeneratorAdapter {
 			static final String LAMBDA_CLASS_PREFIX = "Fn";
@@ -151,7 +154,7 @@ class LambdaTransformer implements Opcodes {
 					if (!inLambda() && isLambdaParameter) {
 						currentArity = arities.next();
 						currentLambdaLocals = lambdaLocals.next();
-						debug("Starting new Lambda with arity " + currentArity + " locals " + currentLambdaLocals);
+						debug("starting new lambda with arity " + currentArity + " locals " + currentLambdaLocals);
 
 						createLambdaClass();
 						createLambdaConstructor();
@@ -163,7 +166,7 @@ class LambdaTransformer implements Opcodes {
 							initLambdaParameter(name);
 						} else {
 							int index = paremeterNamesToIndex.get(name);
-							debug("Accessing lambda parameter " + field + " with index " + index);
+							debug("accessing lambda parameter " + field + " with index " + index);
 							accessLambdaParameter(field, index);
 						}
 					} else {
@@ -179,8 +182,7 @@ class LambdaTransformer implements Opcodes {
 					if (inLambda() && notAConstructor(name)) {
 						Method method = findMethod(name, desc, getObjectType(owner).getClassName());
 						if (method.isAnnotationPresent(NewLambda.class)) {
-							debug("New lambda created by " + method + " in " + sourceAndLine());
-							debug();
+							debug("new lambda created by " + method + " in " + sourceAndLine());
 
 							returnFromCall();
 							endLambdaClass();
@@ -190,6 +192,7 @@ class LambdaTransformer implements Opcodes {
 						}
 					}
 				} catch (NoSuchMethodException ignore) {
+					// debug(ignore);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -216,23 +219,21 @@ class LambdaTransformer implements Opcodes {
 						mv.visitVarInsn(ALOAD, operand);
 					}
 
+					int arrayOpcode;
 					if (opcode >= ISTORE && opcode <= ASTORE) {
 						mv.visitInsn(SWAP);
 						mv.visitInsn(ICONST_0);
 						mv.visitInsn(SWAP);
-						mv.visitInsn(type.getOpcode(IASTORE));
+						arrayOpcode = type.getOpcode(IASTORE);
+						mv.visitInsn(arrayOpcode);
 					} else {
 						mv.visitInsn(ICONST_0);
-						mv.visitInsn(type.getOpcode(IALOAD));
+						arrayOpcode = type.getOpcode(IALOAD);
+						mv.visitInsn(arrayOpcode);
 					}
-					debug("Variable "
-							+ key
-							+ "("
-							+ type
-							+ ") was accessed using "
-							+ AbstractVisitor.OPCODES[opcode]
-							+ (inLambda() ? " from field in lambda: " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand)
-									: " boxed local array."));
+					debug("variable " + key + "(" + type + ") accessed using wrapped array " + AbstractVisitor.OPCODES[opcode] + " -> "
+							+ AbstractVisitor.OPCODES[arrayOpcode]
+							+ (inLambda() ? " field in " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
 				} else {
 					super.visitIntInsn(opcode, operand);
 				}
@@ -322,12 +323,15 @@ class LambdaTransformer implements Opcodes {
 			void endLambdaClass() {
 				lambdaWriter.visitEnd();
 				byte[] bs = lambdaWriter.toByteArray();
-				lambdasByName.put(currentLambdaClass() + ".class", bs);
+				String resource = currentLambdaClass() + ".class";
+				lambdasByName.put(resource, bs);
 				cv.visitInnerClass(currentLambdaClass(), className,
 						currentLambdaClass().substring(currentLambdaClass().indexOf('$') + 1), ACC_PUBLIC);
 
-				ClassLoader loader = ClassLoader.getSystemClassLoader();
-				new ClassInjector().inject(loader, currentLambdaClass(), bs);
+				ClassInjector injector = new ClassInjector();
+				if (DEBUG)
+					injector.dump(resource, bs);
+				injector.inject(ClassLoader.getSystemClassLoader(), currentLambdaClass().replace('/', '.'), bs);
 
 				lambdaWriter = null;
 				paremeterNamesToIndex.clear();
@@ -366,7 +370,7 @@ class LambdaTransformer implements Opcodes {
 			}
 		}
 
-		LambdaClassVisitor(ClassVisitor cv, FirstPassClassVisitor firstPass) {
+		SecondPassClassVisitor(ClassVisitor cv, FirstPassClassVisitor firstPass) {
 			super(cv);
 			this.accessedLocals = firstPass.accessedLocals;
 			this.lambdaLocals = firstPass.lambdaLocals.iterator();
@@ -385,33 +389,34 @@ class LambdaTransformer implements Opcodes {
 
 		public MethodVisitor visitMethod(int access, final String name, String desc, String signature, String[] exceptions) {
 			MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
+			debug("Second pass: processing method " + name + desc);
 			return new LambdaMethodVisitor(mv, access, name, desc);
 		}
 	}
 
 	byte[] transform(String resource, InputStream in) throws IOException {
-		if (lambdasByName.containsKey(resource))
-			return null;
-//			return lambdasByName.get(resource);
+		if (lambdasByName.containsKey(resource)) {
+			debug("generated lambda was requested by the class loader " + resource);
+			return lambdasByName.get(resource);
+		}
 
 		ClassReader cr = new ClassReader(in);
 
+		debug("First pass: alanyzing use of lambdas in " + resource);
 		FirstPassClassVisitor firstPass = new FirstPassClassVisitor();
 		cr.accept(firstPass, 0);
 
 		if (firstPass.hasNoLambdas()) {
+			debug("First pass: no lambdas in " + resource);
 			return null;
 		}
 
+		debug("Second pass: transforming lambdas and accessed locals in " + resource);
 		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		LambdaClassVisitor visitor = new LambdaClassVisitor(cw, firstPass);
+		SecondPassClassVisitor visitor = new SecondPassClassVisitor(cw, firstPass);
 		cr.accept(visitor, 0);
 
 		return cw.toByteArray();
-	}
-
-	static void debug() {
-		debug("");
 	}
 
 	static void debug(Object msg) {

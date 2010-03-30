@@ -5,8 +5,6 @@ import static java.util.Arrays.*;
 import static lambda.weaving.LambdaTransformer.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.instrument.ClassFileTransformer;
@@ -28,6 +26,10 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 	}
 
 	protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+		// try {
+		// return findClass(name);
+		// } catch (ClassNotFoundException ignore) {
+		// }
 		String resource = name.replace('.', '/') + ".class";
 		InputStream in = getResourceAsStream(resource);
 		try {
@@ -50,23 +52,22 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
 			byte[] classfileBuffer) throws IllegalClassFormatException {
-		try {
-			return transformClass(className + ".class", new ByteArrayInputStream(classfileBuffer));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return transformClass(className + ".class", new ByteArrayInputStream(classfileBuffer));
 	}
 
-	byte[] transformClass(String resource, InputStream in) throws IOException {
-		if (isNotToBeInstrumented(resource.replace('/', '.')))
-			return null;
-		byte[] b = new LambdaTransformer().transform(resource, in);
-		if (b != null && LambdaTransformer.DEBUG) {
-			debug("Load time weaver: " + resource);
-			dumpClass(resource, b);
+	byte[] transformClass(String resource, InputStream in) {
+		try {
+			if (isNotToBeInstrumented(resource.replace('/', '.')))
+				return null;
+			byte[] b = new LambdaTransformer().transform(resource, in);
+			if (b != null && LambdaTransformer.DEBUG) {
+				new ClassInjector().dump(resource, b);
+			}
+			return b;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-
-		return b;
 	}
 
 	boolean isNotToBeInstrumented(String name) {
@@ -74,26 +75,6 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 			if (name.startsWith(prefix))
 				return true;
 		return false;
-	}
-
-	void dumpClass(String resource, byte[] b) {
-		FileOutputStream out = null;
-		try {
-			String target = "target/generated-classes/" + resource;
-			new File(target).getParentFile().mkdirs();
-			out = new FileOutputStream(target);
-			out.write(b);
-			out.close();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		} finally {
-			if (out != null)
-				try {
-					out.close();
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-		}
 	}
 
 	static void addSkippedPackages(String agentArgs) {
@@ -124,8 +105,8 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 		}
 	}
 
-	public static Object launchApplication(String className, String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
-			InvocationTargetException {
+	public static Object launchApplication(String className, String[] args) throws ClassNotFoundException, NoSuchMethodException,
+			IllegalAccessException, InvocationTargetException {
 		addSkippedPackages(System.getProperty("lambda.skippedPackages"));
 		Class<?> c = new LambdaLoader().loadClass(className);
 		Method m = c.getMethod("main", String[].class);

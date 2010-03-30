@@ -1,5 +1,10 @@
 package lambda.weaving;
 
+import static lambda.weaving.LambdaTransformer.*;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 class ClassInjector {
@@ -18,10 +23,32 @@ class ClassInjector {
 
 	void inject(ClassLoader loader, String className, byte[] bs) {
 		try {
-			Class<?> c = (Class<?>) defineClass.invoke(loader, className.replace('/', '.'), bs, 0, bs.length);
+			debug("injecting " + className + " into " + loader);
+			Class<?> c = (Class<?>) defineClass.invoke(loader, className, bs, 0, bs.length);
 			resolveClass.invoke(loader, c);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	void dump(String resource, byte[] b) {
+		FileOutputStream out = null;
+		try {
+			String target = "target/generated-classes/" + resource;
+			debug("writing " + target + " (" + b.length + " bytes)");
+			new File(target).getParentFile().mkdirs();
+			out = new FileOutputStream(target);
+			out.write(b);
+			out.close();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (out != null)
+				try {
+					out.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 		}
 	}
 }
