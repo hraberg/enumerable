@@ -99,6 +99,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		public void visitMethodInsn(int opcode, String owner, String name, String desc) {
 			try {
 				if (inLambda() && notAConstructor(name)) {
+					if (owner.equals(className)) {
+						super.visitMethodInsn(opcode, owner, name, desc);
+						return;
+					}
 					Method method = findMethod(owner, name, desc);
 					if (method.isAnnotationPresent(NewLambda.class)) {
 						debug("new lambda created by " + method + " in " + sourceAndLine());
@@ -120,21 +124,34 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		public void visitVarInsn(int opcode, int operand) {
 			if (method.isLocalAccessedFromLambda(operand)) {
 				Type type = method.getTypeOfLocal(operand);
+				if (isThis(operand)) {
+					if (inLambda()) {
+						mv.visitVarInsn(ALOAD, operand);
+						mv.visitFieldInsn(GETFIELD, currentLambdaClass(), lambdaFieldNameForLocal(operand), getDescriptor(Object.class));
+						mv.visitTypeInsn(CHECKCAST, type.getInternalName());
+					} else {
+						super.visitIntInsn(opcode, operand);
+					}
+				} else {
+					if (!initializedLocals.contains(operand)) {
+						initArray(operand, type);
+						initializedLocals.add(operand);
+					}
+					loadArrayFromLocalOrLambda(operand, type);
+					int arrayOpcode = accessFirstArrayElement(opcode, type);
 
-				if (!initializedLocals.contains(operand)) {
-					initArray(operand, type);
-					initializedLocals.add(operand);
+					debug("variable " + operand + " (" + type + ") accessed using wrapped array " + AbstractVisitor.OPCODES[opcode]
+							+ " -> " + AbstractVisitor.OPCODES[arrayOpcode]
+							+ (inLambda() ? " field " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
 				}
-				loadArrayFromLocalOrLambda(operand, type);
-				int arrayOpcode = accessFirstArrayElement(opcode, type);
 
-				debug("variable " + operand + " (" + type + ") accessed using wrapped array " + AbstractVisitor.OPCODES[opcode]
-						+ " -> "
-						+ AbstractVisitor.OPCODES[arrayOpcode]
-						+ (inLambda() ? " field " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
 			} else {
 				super.visitIntInsn(opcode, operand);
 			}
+		}
+
+		private boolean isThis(int operand) {
+			return operand == 0;
 		}
 
 		void initArray(int operand, Type type) {
@@ -192,6 +209,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			lambdaWriter.visit(V1_5, ACC_PUBLIC, currentLambdaClass(), null, getInternalName(Object.class), new String[] { "lambda/"
 					+ LAMBDA_CLASS_PREFIX + currentLambda.arity });
 			lambdaWriter.visitOuterClass(className, method.name, method.desc);
+			lambdaWriter.visitInnerClass(currentLambdaClass(), null, null, 0);
 		}
 
 		void createCallMethodAndRedirectMethodVisitorToIt() {
@@ -206,8 +224,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			String parameters = "";
 			for (int local : currentLambda.accessedLocals) {
 				parameters += getDescriptor(Object.class);
-				lambdaWriter.visitField(ACC_PRIVATE + ACC_FINAL + ACC_SYNTHETIC, "val$" + local, getDescriptor(Object.class),
-						null,
+				lambdaWriter.visitField(ACC_FINAL + ACC_SYNTHETIC, lambdaFieldNameForLocal(local), getDescriptor(Object.class), null,
 						null).visitEnd();
 			}
 
@@ -228,7 +245,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		}
 
 		String lambdaFieldNameForLocal(int local) {
-			return "val$" + local;
+			return isThis(local) ? "this$0" : "val$" + local;
 		}
 
 		void returnFromCall() {
@@ -252,9 +269,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
 		void endLambdaClass() {
 			lambdaWriter.visitEnd();
-			cv.visitInnerClass(currentLambdaClass(), className,
- currentLambdaClass().substring(currentLambdaClass().indexOf('$') + 1),
-					ACC_PUBLIC);
+			cv.visitInnerClass(currentLambdaClass(), null, null, 0);
 
 			String resource = currentLambdaClass() + ".class";
 			byte[] bs = lambdaWriter.toByteArray();

@@ -1,22 +1,42 @@
 package lambda.enumerable;
 
-import static java.util.Arrays.*;
 import static lambda.enumerable.Enumerable.*;
+import static lambda.enumerable.Fixtures.*;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
 public class EachTest {
-	List<Integer> list = asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+	@Test
+	public void callsBlockOnceForEachElement() throws Exception {
+		List<Integer> actual = list();
+		each(oneToTen, λ(n, actual.add(n)));
+		assertEquals(oneToTen, actual);
+	}
 
 	@Test
-	public void eachCallsBlockOnceForEachElement() throws Exception {
-		List<Integer> actual = new ArrayList<Integer>();
-		List<Integer> expected = new ArrayList<Integer>(list);
-		each(list, λ(n, actual.add(n)));
-		assertEquals(expected, actual);
+	public void emptyCollectionDoesNotCallBlock() throws Exception {
+		List<Integer> actual = list();
+		each(list(int.class), λ(n, actual.add(n)));
+		assertTrue(actual.isEmpty());
+	}
+
+	@Test
+	public void returnsLastValue() throws Exception {
+		assertEquals(10, (int) each(oneToTen, λ(n, n)));
+	}
+
+	@Test
+	public void returnsNullForEmptyCollection() throws Exception {
+		assertNull(each(list(Object.class), λ(o, "hello")));
+	}
+
+	@Test
+	public void withIndexUsesZeroBasedIndex() throws Exception {
+		List<Integer> actual = list();
+		eachWithIndex(oneToTen, λ(n, idx, actual.add(idx + 1)));
+		assertEquals(oneToTen, actual);
 	}
 }
