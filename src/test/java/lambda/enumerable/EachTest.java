@@ -18,10 +18,6 @@ public class EachTest {
 	// }
 
 	public static void main(String... args) throws Exception {
-		method();
-	}
-
-	private static void method() {
 		List<Integer> list = asList(1, 2, 3, 4, 5);
 		List<Integer> actual = new ArrayList<Integer>();
 		List<Integer> expected = new ArrayList<Integer>(list);
@@ -29,4 +25,13 @@ public class EachTest {
 		assertEquals(expected, actual);
 		System.out.println(actual);
 	}
+
+	// private static void method() {
+	// List<Integer> list = asList(1, 2, 3, 4, 5);
+	// List<Integer> actual = new ArrayList<Integer>();
+	// List<Integer> expected = new ArrayList<Integer>(list);
+	// each(list, λ(n, actual.add(n)));
+	// assertEquals(expected, actual);
+	// System.out.println(actual);
+	// }
 }

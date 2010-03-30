@@ -38,10 +38,70 @@ class LambdaTransformer implements Opcodes {
 
 	static Map<String, byte[]> lambdasByName = new HashMap<String, byte[]>();
 
-	static Method findMethod(String name, String desc, String className) throws NoSuchMethodException, ClassNotFoundException {
+	static Method findMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
 		Class<?>[] argumentClasses = new Class[getArgumentTypes(desc).length];
 		Arrays.fill(argumentClasses, Object.class);
-		return Class.forName(className).getMethod(name, argumentClasses);
+		return Class.forName(getObjectType(owner).getClassName()).getMethod(name, argumentClasses);
+	}
+
+	static Field findField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
+		String className = getObjectType(owner).getClassName();
+		return Class.forName(className).getDeclaredField(name);
+	}
+
+
+	static class MethodInfo {
+		String name;
+		String desc;
+
+		public MethodInfo(String name, String desc) {
+			this.name = name;
+			this.desc = desc;
+		}
+
+		String getFullName() {
+			return name + desc;
+		}
+
+		Map<Integer, LocalInfo> accessedLocalsByIndex = new HashMap<Integer, LocalInfo>();
+		List<LambdaInfo> lambdas = new ArrayList<LambdaInfo>();
+
+		void accessLocalFromLambda(int operand) {
+			LocalInfo local = accessedLocalsByIndex.get(operand);
+			if (local == null) {
+				local = new LocalInfo();
+				accessedLocalsByIndex.put(operand, local);
+			}
+			currentLambda().accessedLocals.add(local);
+		}
+
+		void newLambda() {
+			lambdas.add(new LambdaInfo());
+		}
+
+		void setLambdaArity(int arity) {
+			currentLambda().arity = arity;
+		}
+
+		LambdaInfo currentLambda() {
+			return lambdas.get(lambdas.size() - 1);
+		}
+
+		void setTypeOfLocal(int index, Type type) {
+			LocalInfo localInfo = accessedLocalsByIndex.get(index);
+			if (localInfo != null)
+				localInfo.type = type;
+		}
+
+		static class LocalInfo {
+			int index;
+			Type type;
+		}
+
+		static class LambdaInfo {
+			int arity;
+			Set<LocalInfo> accessedLocals = new HashSet<LocalInfo>();
+		}
 	}
 
 	static class FirstPassClassVisitor extends ClassAdapter {
@@ -49,23 +109,28 @@ class LambdaTransformer implements Opcodes {
 		Map<String, Type> accessedLocals = new HashMap<String, Type>();
 		List<Set<Integer>> lambdaLocals = new ArrayList<Set<Integer>>();
 
+		Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
+
 		boolean inLambda;
-		String currentMethod;
+		MethodInfo currentMethod;
 
 		FirstPassClassVisitor() {
 			super(new EmptyVisitor());
 		}
 
 		public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-			currentMethod = name + desc;
+			currentMethod = new MethodInfo(name, desc);
+			methodsByName.put(currentMethod.getFullName(), currentMethod);
+			
 			MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
 			return new MethodAdapter(mv) {
 				public void visitFieldInsn(int opcode, String owner, String name, String desc) {
 					try {
-						String className = getObjectType(owner).getClassName();
-						Field field = Class.forName(className).getDeclaredField(name);
+						Field field = findField(owner, name);
 						if (!inLambda && field.isAnnotationPresent(LambdaParameter.class)) {
 							inLambda = true;
+							currentMethod.newLambda();
+
 							lambdaLocals.add(new HashSet<Integer>());
 						}
 					} catch (NoSuchFieldException ignore) {
@@ -77,7 +142,10 @@ class LambdaTransformer implements Opcodes {
 
 				public void visitVarInsn(int opcode, int operand) {
 					if (inLambda) {
-						String key = currentMethod + "." + operand;
+						String key = currentMethod.getFullName() + "." + operand;
+
+						currentMethod.accessLocalFromLambda(operand);
+
 						lambdaLocals.get(lambdaLocals.size() - 1).add(operand);
 						accessedLocals.put(key, getType(Object.class));
 					}
@@ -85,17 +153,22 @@ class LambdaTransformer implements Opcodes {
 				}
 
 				public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-					String key = currentMethod + "." + index;
+					String key = currentMethod.getFullName() + "." + index;
 					if (accessedLocals.containsKey(key))
 						accessedLocals.put(key, getType(desc));
+
+					currentMethod.setTypeOfLocal(index, getType(desc));
+
 					super.visitLocalVariable(name, desc, signature, start, end, index);
 				}
 
 				public void visitMethodInsn(int opcode, String owner, String name, String desc) {
 					try {
-						Method method = findMethod(name, desc, getObjectType(owner).getClassName());
+						Method method = findMethod(owner, name, desc);
 						if (method.isAnnotationPresent(NewLambda.class)) {
 							arities.add(method.getParameterTypes().length - 1);
+
+							currentMethod.setLambdaArity(method.getParameterTypes().length - 1);
 							inLambda = false;
 						}
 					} catch (NoSuchMethodException ignore) {
@@ -108,7 +181,11 @@ class LambdaTransformer implements Opcodes {
 		}
 
 		boolean hasNoLambdas() {
-			return arities.isEmpty();
+			for (MethodInfo method : methodsByName.values()) {
+				if (!method.lambdas.isEmpty())
+					return false;
+			}
+			return true;
 		}
 	}
 
@@ -180,7 +257,7 @@ class LambdaTransformer implements Opcodes {
 			public void visitMethodInsn(int opcode, String owner, String name, String desc) {
 				try {
 					if (inLambda() && notAConstructor(name)) {
-						Method method = findMethod(name, desc, getObjectType(owner).getClassName());
+						Method method = findMethod(owner, name, desc);
 						if (method.isAnnotationPresent(NewLambda.class)) {
 							debug("new lambda created by " + method + " in " + sourceAndLine());
 
