@@ -20,11 +20,10 @@ import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.GeneratorAdapter;
-import org.objectweb.asm.util.AbstractVisitor;
 
 class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 	Map<String, byte[]> lambdasByResourceName = new HashMap<String, byte[]>();
@@ -36,7 +35,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
 	int currentLambdaId;
 
-	class LambdaMethodVisitor extends GeneratorAdapter {
+	class LambdaMethodVisitor extends MethodAdapter {
 		static final String LAMBDA_CLASS_PREFIX = "Fn";
 
 		MethodVisitor originalMethodWriter;
@@ -51,8 +50,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		Iterator<LambdaInfo> lambdas;
 		LambdaInfo currentLambda;
 
-		private LambdaMethodVisitor(MethodVisitor mv, int access, MethodInfo method) {
-			super(mv, access, method.name, method.desc);
+		private LambdaMethodVisitor(MethodVisitor mv, MethodInfo method) {
+			super(mv);
 			this.method = method;
 			this.lambdas = method.lambdas();
 			this.originalMethodWriter = mv;
@@ -138,10 +137,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 						initializedLocals.add(operand);
 					}
 					loadArrayFromLocalOrLambda(operand, type);
-					int arrayOpcode = accessFirstArrayElement(opcode, type);
+					accessFirstArrayElement(opcode, type);
 
-					debug("variable " + operand + " (" + type + ") accessed using wrapped array " + AbstractVisitor.OPCODES[opcode]
-							+ " -> " + AbstractVisitor.OPCODES[arrayOpcode]
+					debug("variable " + operand + " (" + type + ") accessed using wrapped array "
 							+ (inLambda() ? " field " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
 				}
 
@@ -166,6 +164,40 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			return operand == 0;
 		}
 
+		public void newArray(final Type type) {
+			int typ;
+			switch (type.getSort()) {
+			case Type.BOOLEAN:
+				typ = Opcodes.T_BOOLEAN;
+				break;
+			case Type.CHAR:
+				typ = Opcodes.T_CHAR;
+				break;
+			case Type.BYTE:
+				typ = Opcodes.T_BYTE;
+				break;
+			case Type.SHORT:
+				typ = Opcodes.T_SHORT;
+				break;
+			case Type.INT:
+				typ = Opcodes.T_INT;
+				break;
+			case Type.FLOAT:
+				typ = Opcodes.T_FLOAT;
+				break;
+			case Type.LONG:
+				typ = Opcodes.T_LONG;
+				break;
+			case Type.DOUBLE:
+				typ = Opcodes.T_DOUBLE;
+				break;
+			default:
+				mv.visitTypeInsn(Opcodes.ANEWARRAY, type.getInternalName());
+				return;
+			}
+			mv.visitIntInsn(Opcodes.NEWARRAY, typ);
+		}
+
 		void initArray(int operand, Type type) {
 			mv.visitInsn(ICONST_1);
 			newArray(type);
@@ -182,20 +214,16 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			}
 		}
 
-		int accessFirstArrayElement(int opcode, Type type) {
-			int arrayOpcode;
+		void accessFirstArrayElement(int opcode, Type type) {
 			if (opcode >= ISTORE && opcode <= ASTORE) {
-				arrayOpcode = type.getOpcode(IASTORE);
 				mv.visitInsn(SWAP);
 				mv.visitInsn(ICONST_0);
 				mv.visitInsn(SWAP);
-				mv.visitInsn(arrayOpcode);
+				mv.visitInsn(type.getOpcode(IASTORE));
 			} else {
-				arrayOpcode = type.getOpcode(IALOAD);
 				mv.visitInsn(ICONST_0);
-				mv.visitInsn(arrayOpcode);
+				mv.visitInsn(type.getOpcode(IALOAD));
 			}
-			return arrayOpcode;
 		}
 
 		boolean notAConstructor(String name) {
@@ -339,6 +367,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			return mv;
 		}
 		debug("Second pass: processing method " + name + desc);
-		return new LambdaMethodVisitor(mv, access, methodsByName.get(name + desc));
+		return new LambdaMethodVisitor(mv, methodsByName.get(name + desc));
 	}
 }

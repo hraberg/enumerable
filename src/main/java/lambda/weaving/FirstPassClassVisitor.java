@@ -10,13 +10,14 @@ import java.util.Map;
 import lambda.LambdaParameter;
 import lambda.NewLambda;
 
-import org.objectweb.asm.ClassAdapter;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.commons.EmptyVisitor;
 
-class FirstPassClassVisitor extends ClassAdapter {
+class FirstPassClassVisitor implements ClassVisitor {
 	Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
 
 	boolean inLambda;
@@ -24,16 +25,11 @@ class FirstPassClassVisitor extends ClassAdapter {
 
 	private String className;
 
-	FirstPassClassVisitor() {
-		super(new EmptyVisitor());
-	}
-
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
 		currentMethod = new MethodInfo(name, desc);
 		methodsByName.put(currentMethod.getFullName(), currentMethod);
-		
-		MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
-		return new MethodAdapter(mv) {
+
+		return new MethodVisitor() {
 			public void visitFieldInsn(int opcode, String owner, String name, String desc) {
 				try {
 					if (owner.equals(className)) {
@@ -55,12 +51,10 @@ class FirstPassClassVisitor extends ClassAdapter {
 				if (inLambda) {
 					currentMethod.accessLocalFromLambda(operand);
 				}
-				super.visitIntInsn(opcode, operand);
 			}
 
 			public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
 				currentMethod.setTypeOfLocal(index, getType(desc));
-				super.visitLocalVariable(name, desc, signature, start, end, index);
 			}
 
 			public void visitMethodInsn(int opcode, String owner, String name, String desc) {
@@ -78,12 +72,73 @@ class FirstPassClassVisitor extends ClassAdapter {
 					throw new RuntimeException(e);
 				}
 			}
+
+			public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+				return null;
+			}
+
+			public AnnotationVisitor visitAnnotationDefault() {
+				return null;
+			}
+
+			public void visitAttribute(Attribute attr) {
+			}
+
+			public void visitCode() {
+			}
+
+			public void visitEnd() {
+			}
+
+			public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack) {
+			}
+
+			public void visitIincInsn(int var, int increment) {
+			}
+
+			public void visitInsn(int opcode) {
+			}
+
+			public void visitIntInsn(int opcode, int operand) {
+			}
+
+			public void visitJumpInsn(int opcode, Label label) {
+			}
+
+			public void visitLabel(Label label) {
+			}
+
+			public void visitLdcInsn(Object cst) {
+			}
+
+			public void visitLineNumber(int line, Label start) {
+			}
+
+			public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
+			}
+
+			public void visitMaxs(int maxStack, int maxLocals) {
+			}
+
+			public void visitMultiANewArrayInsn(String desc, int dims) {
+			}
+
+			public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
+				return null;
+			}
+
+			public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels) {
+			}
+
+			public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
+			}
+
+			public void visitTypeInsn(int opcode, String type) {
+			}
 		};
 	}
 
-
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-		super.visit(version, access, name, signature, superName, interfaces);
 		this.className = name;
 	}
 
@@ -93,5 +148,28 @@ class FirstPassClassVisitor extends ClassAdapter {
 				return false;
 		}
 		return true;
+	}
+
+	public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+		return null;
+	}
+
+	public void visitAttribute(Attribute attr) {
+	}
+
+	public void visitEnd() {
+	}
+
+	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+		return null;
+	}
+
+	public void visitInnerClass(String name, String outerName, String innerName, int access) {
+	}
+
+	public void visitOuterClass(String owner, String name, String desc) {
+	}
+
+	public void visitSource(String source, String debug) {
 	}
 }
