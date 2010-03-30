@@ -1,4 +1,4 @@
-package lambda.enumerable;
+package lambda;
 
 import static java.util.Arrays.*;
 

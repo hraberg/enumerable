@@ -51,12 +51,22 @@ public class Enumerable {
 	}
 
 	@NewLambda
+	public static <E, R> Fn1<E, R> fn(E n, R block) {
+		throw new UnsupportedOperationException();
+	}
+
+	@NewLambda
 	public static <E1, E2, R> Fn2<E1, E2, R> λ(E1 n, E2 m, R block) {
 		throw new UnsupportedOperationException();
 	}
 
 	@NewLambda
 	public static <E1, E2, R> Fn2<E1, E2, R> lambda(E1 n, E2 m, R block) {
+		throw new UnsupportedOperationException();
+	}
+
+	@NewLambda
+	public static <E1, E2, R> Fn2<E1, E2, R> fn(E1 n, E2 m, R block) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -219,16 +229,6 @@ public class Enumerable {
 		public R call(R arg1, E arg2) {
 			return block.call(arg1, arg2);
 		}
-	}
-
-	@NewLambda
-	public static <E, R> Fn1<E, R> fn(E n, R block) {
-		throw new UnsupportedOperationException();
-	}
-
-	@NewLambda
-	public static <E1, E2, R> Fn2<E1, E2, R> fn(E1 n, E2 m, R block) {
-		throw new UnsupportedOperationException();
 	}
 
 	public static <E, R> List<R> map(Iterable<E> col, Fn1<E, R> transformer) {

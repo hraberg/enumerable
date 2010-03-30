@@ -1,7 +1,6 @@
-package lambda.enumerable;
+package lambda;
 
 import static lambda.enumerable.Enumerable.*;
-import static lambda.enumerable.Fixtures.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -9,31 +8,31 @@ import org.junit.Test;
 public class ClosureTest {
 	@Test(expected = ArithmeticException.class)
 	public void exceptionInBlockPropagetsOut() throws Exception {
-		each(oneToTen, λ(n, n / 0));
+		λ(n, n / 0).call(0);
 	}
 
 	@Test
 	public void canCloseOverLocalPrimitiveVarible() throws Exception {
-		int s = 0;
-		each(oneToTen, λ(n, s += n));
-		assertEquals(55, s);
+		int i = 0;
+		λ(n, i += n).call(10);
+		assertEquals(10, i);
 	}
 
 	@Test
 	public void canCloseOverLocalReferenceVarible() throws Exception {
-		String s = "hello";
-		each(list(1), λ(n, s += " world"));
-		assertEquals("hello world", s);
+		String hello = "hello";
+		λ(s, hello += s).call(" world");
+		assertEquals("hello world", hello);
 	}
 
 	@Test
 	public void canCloseOverThis() throws Exception {
-		assertSame(this, each(oneToTen, λ(n, this)));
+		assertSame(this, λ(n, this).call(null));
 	}
 
 	@Test
 	public void canCallInstanceMethodOnThis() throws Exception {
-		assertEquals(hello(), each(oneToTen, λ(n, hello())));
+		assertEquals(hello(), λ(n, hello()).call(null));
 	}
 
 	public String hello() {
@@ -44,31 +43,31 @@ public class ClosureTest {
 
 	@Test
 	public void canCloseOverPrimitiveStaticField() throws Exception {
-		each(oneToTen, λ(n, staticInt += n));
-		assertEquals(55, staticInt);
+		λ(n, staticInt += n).call(10);
+		assertEquals(10, staticInt);
 	}
 
 	static String staticString = "world";
 
 	@Test
 	public void canCloseOverStaticField() throws Exception {
-		each(list(1), λ(n, staticString = "hello " + staticString));
+		λ(s, staticString = s + staticString).call("hello ");
 		assertEquals("hello world", staticString);
 	}
 
-	int instanceInt = 0;
+	double instanceDouble = 0;
 
 	@Test
 	public void canCloseOverPrimitveInstanceField() throws Exception {
-		each(oneToTen, λ(n, instanceInt += n));
-		assertEquals(55, instanceInt);
+		λ(d, instanceDouble += d).call(3.14);
+		assertEquals(3.14, instanceDouble, 0.0);
 	}
 
 	static String instanceString = "";
 
 	@Test
 	public void canCloseOverInstanceField() throws Exception {
-		each(list(1), λ(n, staticString = instanceString = "hello world"));
+		λ(s, instanceString = s).call("hello world");
 		assertEquals("hello world", instanceString);
 	}
 }

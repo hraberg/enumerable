@@ -1,7 +1,7 @@
 package lambda.enumerable;
 
+import static lambda.Fixtures.*;
 import static lambda.enumerable.Enumerable.*;
-import static lambda.enumerable.Fixtures.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
