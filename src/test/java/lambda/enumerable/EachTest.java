@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 
 public class EachTest {
-	List<Integer> list = asList(1, 2, 3, 4, 5);
+	List<Integer> list = asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
 	@Test
 	public void eachCallsBlockOnceForEachElement() throws Exception {

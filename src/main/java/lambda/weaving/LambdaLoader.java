@@ -25,11 +25,9 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 		packagesToSkip.add("$Proxy");
 	}
 
+	LambdaTransformer transformer = new LambdaTransformer();
+
 	protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-		// try {
-		// return findClass(name);
-		// } catch (ClassNotFoundException ignore) {
-		// }
 		String resource = name.replace('.', '/') + ".class";
 		InputStream in = getResourceAsStream(resource);
 		try {
@@ -65,7 +63,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 		try {
 			if (isNotToBeInstrumented(resource.replace('/', '.')))
 				return null;
-			byte[] b = new LambdaTransformer().transform(resource, in);
+			byte[] b = transformer.transform(resource, in);
 			if (b != null && LambdaTransformer.DEBUG) {
 				new ClassInjector().dump(resource, b);
 			}
