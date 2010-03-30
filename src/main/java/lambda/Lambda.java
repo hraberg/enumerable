@@ -22,7 +22,7 @@ public class Lambda {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <I> I wrap(final Fn2 lambda, Class<I> anInterface) {
+	public static <I> I as(Class<I> anInterface, final Fn2 lambda) {
 		return (I) Proxy.newProxyInstance(Lambda.class.getClassLoader(), new Class[] { anInterface }, new InvocationHandler() {
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				return lambda.call(args[0], args[1]);
@@ -31,7 +31,7 @@ public class Lambda {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <I> I wrap(final Fn1 lambda, Class<I> anInterface) {
+	public static <I> I as(Class<I> anInterface, final Fn1 lambda) {
 		return (I) Proxy.newProxyInstance(Lambda.class.getClassLoader(), new Class[] { anInterface }, new InvocationHandler() {
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 				return lambda.call(args[0]);

@@ -39,9 +39,9 @@ public class LambdaTest {
 	}
 
 	@Test
-	public void wrapOneArgumentLambdaInInterface() throws Exception {
+	public void oneArgumentLambdaAsInterface() throws Exception {
 		ActionEvent actual = null;
-		ActionListener a = wrap(λ(e, actual = e), ActionListener.class);
+		ActionListener a = as(ActionListener.class, λ(e, actual = e));
 		ActionEvent event = new ActionEvent(this, 1, "command");
 		a.actionPerformed(event);
 		assertSame(event, actual);
@@ -49,8 +49,8 @@ public class LambdaTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void wrapTwoArgumentLambdaInInterface() throws Exception {
-		Comparator<Integer> c = wrap(λ(n, m, m - n), Comparator.class);
+	public void twoArgumentLambdaAsInterface() throws Exception {
+		Comparator<Integer> c = as(Comparator.class, λ(n, m, m - n));
 		List<Integer> list = list(1, 2, 3);
 		Collections.sort(list, c);
 		assertEquals(list(3, 2, 1), list);
