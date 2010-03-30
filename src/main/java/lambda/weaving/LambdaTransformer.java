@@ -13,9 +13,8 @@ import java.util.Map;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 
-class LambdaTransformer implements Opcodes {
+class LambdaTransformer {
 	static boolean DEBUG = true;
 
 	static Method findMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
