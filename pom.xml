@@ -11,7 +11,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
   
-	<description>Ruby/Smalltalk style internal iterators for Java 5 using bytecode rewriting to capture expressions as closures.</description>
+	<description>Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.</description>
 
 	<build>
 		<finalName>enumerable</finalName>

@@ -61,11 +61,16 @@ public class ClosureTest {
 	}
 
 	@Test
+	public void closingOverLocalVaribleDoesNotChangeIt() throws Exception {
+		int i = 0;
+		λ(n, i += n);
+		assertEquals(0, i);
+	}
+
+	@Test
 	public void closeOverLocalVaribleAndRunInDifferentMethod() throws Exception {
 		int i = 0;
-		Fn1<Integer, Integer> add = λ(n, i += n);
-		assertEquals(0, i);
-		otherMethod(add, 10);
+		otherMethod(λ(n, i += n), 10);
 		assertEquals(10, i);
 	}
 

@@ -34,7 +34,7 @@ public class Lambda {
 	public static <I> I as(Class<I> anInterface, final Fn1 lambda) {
 		return (I) Proxy.newProxyInstance(Lambda.class.getClassLoader(), new Class[] { anInterface }, new InvocationHandler() {
 			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				return lambda.call(args[0]);
+				return lambda.call(args == null ? null : args[0]);
 			}
 		});
 	}

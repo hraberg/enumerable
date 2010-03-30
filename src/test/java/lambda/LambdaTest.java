@@ -55,4 +55,12 @@ public class LambdaTest {
 		Collections.sort(list, c);
 		assertEquals(list(3, 2, 1), list);
 	}
+
+	@Test
+	public void oneArgumentLambdaAsInterfaceWithZeroArgumentMethod() throws Exception {
+		String string = "";
+		Runnable runnable = as(Runnable.class, λ(_, string = "hello"));
+		runnable.run();
+		assertEquals("hello", string);
+	}
 }
