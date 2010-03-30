@@ -43,7 +43,7 @@ Becomes:
 
 
 Block parameters are defined using annotated static fields.
-The actual blocks are limited to one expression. For more examples, see: [EnumerableExampleAndRegressionTest](http://github.com/hraberg/enumerable/blob/master/src/test/java/lambda/enumerable/EnumerableExampleAndRegressionTest.java)
+**The actual blocks are limited to one expression.** For more examples see [EnumerableExampleAndRegressionTest](http://github.com/hraberg/enumerable/blob/master/src/test/java/lambda/enumerable/EnumerableExampleAndRegressionTest.java)
 
 
 ## Usage:
@@ -52,9 +52,6 @@ Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/
 
     java -javaagent:enumerable-jarjar.jar [...]
 
-You can also launch your application like this:
-
-    java -jar enumerable.jar my.company.MyClass [args...]
 
 Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/weaving/LambdaLoader.java) if you have different class loading needs.
 

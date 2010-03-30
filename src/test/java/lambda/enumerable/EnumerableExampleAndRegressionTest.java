@@ -21,10 +21,6 @@ public class EnumerableExampleAndRegressionTest {
 	}
 	@Test
 	public void regression() {
-		regression2("dummy");
-	}
-
-	public void regression2(String string) {
 		List<String> strings = asList("malaysia", "thailand", "india", "people's republic of china");
 
 		each(strings, λ(s, out.printf("Country: %s\n", s)));
