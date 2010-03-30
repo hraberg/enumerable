@@ -64,14 +64,14 @@ The API of lambda.enumerable.Enumerable is very similar to the Enumerabe module 
 
     http://ruby-doc.org/core/classes/Enumerable.html
 
-You will want to use the @LambdaParameter annotation to mark fields of your own types to be used as blocks via static imports:
+You will want to use the *@LambdaParameter* annotation to mark fields of your own types to be used as blocks via static imports:
 
     public class MyDomainLambdaParameters {
         @LambdaParameter
-	public static Money m;
+        public static Money m;
     }
 
-Accessing a field marked with @Lambdaparameter outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses will be redirected.
+Accessing a field marked with *@Lambdaparameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses will be redirected.
 
 
 ## Implementation
@@ -96,8 +96,8 @@ Take this block:
     each(strings, fn(s, out.printf("Country: %s\n", s)));
 
     
-The first pass starts by looking for any static fields marked with the @LambdaParameter annotation.
-Once it sees one, *s* in this case, it will start moving the code into a Fn1 (or Fn2) implementation. A block ends with a call to a static method marked with @NewLambda: *fn*.
+The first pass starts by looking for any static fields marked with the *@LambdaParameter annotation*.
+Once it sees one, *s* in this case, it will start moving the code into a *Fn1* (or *Fn2*) implementation. A block ends with a call to a static method marked with *@NewLambda*: *fn*.
 
 The first pass also keeps track of any local varible that is accessed from within a block, so that it can be wrapped in an array when initialized. This allows the block to properly close over local variables.
 
@@ -107,18 +107,23 @@ The Enumerable methods themselves are implemented using plain old Java. You can 
 ## Links
 
 Ruby Enumerable:
+
 http://ruby-doc.org/core/classes/Enumerable.html
 
-Closures for Java, which may come in JDK7:
-http://blogs.sun.com/mr/entry/closures
+Closures for JDK7, a Straw-Man Proposal:
+
+http://cr.openjdk.java.net/~mr/lambda/straw-man/
 
 BlocksInJava, old c2 wiki article about everyones favorite missing feature:
+
 http://c2.com/cgi/wiki?BlocksInJavaIntro
 
 My blog post which outlined my final try using Dynamic Proxies:
+
 http://www.jroller.com/ghettoJedi/entry/using_hamcrest_for_iterators
 
 A library that's quite close to what I suggested there is Lamba4j:
+
 http://code.google.com/p/lambdaj/
 
 
