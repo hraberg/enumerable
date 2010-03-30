@@ -31,7 +31,7 @@ public class EnumerableTest {
 
 	@Test
 	public void eachReturnsNullForEmptyCollection() throws Exception {
-		assertNull(each(list(Object.class), λ(o, "hello")));
+		assertNull(each(list(), λ(o, "hello")));
 	}
 
 	@Test
@@ -116,8 +116,8 @@ public class EnumerableTest {
 
 	@Test
 	public void sortByUsingBlock() throws Exception {
-		List<String> actual = sortBy(list("longer", "long"), λ(s, s.length()));
-		assertEquals(list("long", "longer"), actual);
+		List<String> actual = sortBy(list("10", "100", "1"), λ(s, s.length()));
+		assertEquals(list("1", "10", "100"), actual);
 	}
 
 	@Test

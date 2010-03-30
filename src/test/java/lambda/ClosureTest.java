@@ -26,6 +26,24 @@ public class ClosureTest {
 	}
 
 	@Test
+	public void closeOverLocalArrayVarible() throws Exception {
+		String[] hello = new String[] { "hello" };
+		String[] original = hello;
+		λ(s, hello[0] += s).call(" world");
+		assertEquals("hello world", hello[0]);
+		assertSame(original, hello);
+	}
+
+	@Test
+	public void closeOverLocalArrayVaribleWhichCanBeSet() throws Exception {
+		String[] hello = new String[] { "hello" };
+		String[] original = hello;
+		λ(s, hello = new String[] { "world" }).call(" world");
+		assertEquals("world", hello[0]);
+		assertNotSame(original, hello);
+	}
+
+	@Test
 	public void closeOverThis() throws Exception {
 		assertSame(this, λ(n, this).call(null));
 	}
@@ -62,7 +80,7 @@ public class ClosureTest {
 	static int staticInt = 0;
 
 	@Test
-	public void closeOverPrimitiveStaticField() throws Exception {
+	public void accessingPrimitiveStaticField() throws Exception {
 		λ(n, staticInt += n).call(10);
 		assertEquals(10, staticInt);
 	}
@@ -70,7 +88,7 @@ public class ClosureTest {
 	static String staticString = "world";
 
 	@Test
-	public void closeOverStaticField() throws Exception {
+	public void accessingStaticField() throws Exception {
 		λ(s, staticString = s + staticString).call("hello ");
 		assertEquals("hello world", staticString);
 	}
@@ -78,7 +96,7 @@ public class ClosureTest {
 	double instanceDouble = 0;
 
 	@Test
-	public void closeOverPrimitveInstanceField() throws Exception {
+	public void accessingPrimitveInstanceField() throws Exception {
 		λ(d, instanceDouble += d).call(3.14);
 		assertEquals(3.14, instanceDouble, 0.0);
 	}
@@ -86,7 +104,7 @@ public class ClosureTest {
 	static String instanceString = "";
 
 	@Test
-	public void closeOverInstanceField() throws Exception {
+	public void accessingInstanceField() throws Exception {
 		λ(s, instanceString = s).call("hello world");
 		assertEquals("hello world", instanceString);
 	}

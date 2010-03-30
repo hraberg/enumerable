@@ -1,8 +1,16 @@
 package lambda;
 
 import static lambda.Lambda.*;
+import static lambda.LambdaTest.LambdaParameters.*;
 import static lambda.enumerable.Enumerable.*;
+import static lambda.enumerable.EnumerableTest.*;
 import static org.junit.Assert.*;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -20,8 +28,31 @@ public class LambdaTest {
 	}
 	
 	@Test
-	public void lambdaCanBeUsedInLambda() throws Exception {
+	public void useLambdaInLambda() throws Exception {
 		Fn1<Integer, Integer> timesTwo = λ(n, n * 2);
 		assertEquals(6, (int) λ(n, m, timesTwo.call(n) + m).call(2, 2));
+	}
+
+	static class LambdaParameters {
+		@LambdaParameter
+		static ActionEvent e;
+	}
+
+	@Test
+	public void wrapOneArgumentLambdaInInterface() throws Exception {
+		ActionEvent actual = null;
+		ActionListener a = wrap(λ(e, actual = e), ActionListener.class);
+		ActionEvent event = new ActionEvent(this, 1, "command");
+		a.actionPerformed(event);
+		assertSame(event, actual);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void wrapTwoArgumentLambdaInInterface() throws Exception {
+		Comparator<Integer> c = wrap(λ(n, m, m - n), Comparator.class);
+		List<Integer> list = list(1, 2, 3);
+		Collections.sort(list, c);
+		assertEquals(list(3, 2, 1), list);
 	}
 }
