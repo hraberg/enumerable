@@ -89,7 +89,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 	public static void premain(String agentArgs, Instrumentation instrumentation) {
 		debug("Running premain " + LambdaLoader.class.getSimpleName());
 		addSkippedPackages(agentArgs);
-		instrumentation.addTransformer(new LambdaLoader(), true);
+		instrumentation.addTransformer(new LambdaLoader());
 	}
 
 	public static void main(String[] args) throws Throwable {
