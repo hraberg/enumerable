@@ -1,6 +1,6 @@
 # Enumerable.java
 
-Copyright 2010 Håkan Råberg
+Copyright 2010 HÃ¥kan RÃ¥berg
 
 
 Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
@@ -43,12 +43,12 @@ Becomes:
 
 
 Block parameters are defined using annotated static fields.
-The actual blocks are limited to one expression. For more examples, see: [EnumerableExampleAndRegressionTest.java](http://github.com/hraberg/enumerable/blob/master/src/test/java/lambda/enumerable/EnumerableExampleAndRegressionTest.java)
+The actual blocks are limited to one expression. For more examples, see: [EnumerableExampleAndRegressionTest](http://github.com/hraberg/enumerable/blob/master/src/test/java/lambda/enumerable/EnumerableExampleAndRegressionTest.java)
 
 
 ## Usage:
 
-Enumerable.java is packaged as a java agent. ASM has been moved to a local package (lambda.asm).
+Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (lambda.asm).
 
     java -javaagent:enumerable-jarjar.jar= ...
 
@@ -58,7 +58,7 @@ You can also launch your application like this:
 
 Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/weaving/LambdaLoader.java) if you have different class loading needs.
 
-The API of lambda.enumerable.Enumerable is very similar to the [Enumerabe](http://ruby-doc.org/core/classes/Enumerable.html) module in Ruby:
+The API of lambda.enumerable.Enumerable is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/core/classes/Enumerable.html). You will be mainly importing static methods and fields from [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java)
 
 
 You will want to use the *@LambdaParameter* annotation to mark fields of your own types to be used as blocks via static imports:
