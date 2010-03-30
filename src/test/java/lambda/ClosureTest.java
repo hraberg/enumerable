@@ -70,15 +70,19 @@ public class ClosureTest {
 	}
 
 	@Test
-	public void closingOverLocalPrimitveVaribleStillWorksLikeNormalVarible() throws Exception {
+	public void closingOverLocalPrimitveVaribleCanStillIncrementOutsideClosure() throws Exception {
 		int i = 0;
-		λ(n, i += n);
+		Fn1<Integer, Integer> add = λ(n, i += n);
 		i += 10;
 		assertEquals(10, i);
+		add.call((int) Short.MAX_VALUE);
+		assertEquals(Short.MAX_VALUE + 10, i);
+		i += Integer.MAX_VALUE / 2;
+		assertEquals(Short.MAX_VALUE + 10 + Integer.MAX_VALUE / 2, i);
 	}
 
 	@Test
-	public void closingOverLocalReferenceVaribleStillWorksLikeNormalVarible() throws Exception {
+	public void closingOverLocalReferenceVaribleWorksLikeNormalOutsideClosure() throws Exception {
 		String string = "hello";
 		Fn1<String, String> toUpCase = λ(s, s.toUpperCase());
 		string += " world";
