@@ -93,20 +93,27 @@ class LambdaTransformer implements Opcodes {
 				localInfo.type = type;
 		}
 
+		boolean isLocalAccessedFromLambda(int index) {
+			return accessedLocalsByIndex.containsKey(index);
+		}
+
+		Type getTypeOfLocal(int operand) {
+			return accessedLocalsByIndex.get(operand).type;
+		}
+
 		static class LocalInfo {
-			int index;
-			Type type;
+			private int index;
+			private Type type;
 		}
 
 		static class LambdaInfo {
-			int arity;
-			Set<LocalInfo> accessedLocals = new HashSet<LocalInfo>();
+			private int arity;
+			private Set<LocalInfo> accessedLocals = new HashSet<LocalInfo>();
 		}
 	}
 
 	static class FirstPassClassVisitor extends ClassAdapter {
 		List<Integer> arities = new ArrayList<Integer>();
-		Map<String, Type> accessedLocals = new HashMap<String, Type>();
 		List<Set<Integer>> lambdaLocals = new ArrayList<Set<Integer>>();
 
 		Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
@@ -142,23 +149,14 @@ class LambdaTransformer implements Opcodes {
 
 				public void visitVarInsn(int opcode, int operand) {
 					if (inLambda) {
-						String key = currentMethod.getFullName() + "." + operand;
-
 						currentMethod.accessLocalFromLambda(operand);
-
 						lambdaLocals.get(lambdaLocals.size() - 1).add(operand);
-						accessedLocals.put(key, getType(Object.class));
 					}
 					super.visitIntInsn(opcode, operand);
 				}
 
 				public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-					String key = currentMethod.getFullName() + "." + index;
-					if (accessedLocals.containsKey(key))
-						accessedLocals.put(key, getType(desc));
-
 					currentMethod.setTypeOfLocal(index, getType(desc));
-
 					super.visitLocalVariable(name, desc, signature, start, end, index);
 				}
 
@@ -167,7 +165,6 @@ class LambdaTransformer implements Opcodes {
 						Method method = findMethod(owner, name, desc);
 						if (method.isAnnotationPresent(NewLambda.class)) {
 							arities.add(method.getParameterTypes().length - 1);
-
 							currentMethod.setLambdaArity(method.getParameterTypes().length - 1);
 							inLambda = false;
 						}
@@ -195,7 +192,6 @@ class LambdaTransformer implements Opcodes {
 
 		Iterator<Integer> arities;
 		Iterator<Set<Integer>> lambdaLocals;
-		Map<String, Type> accessedLocals;
 		Map<String, MethodInfo> methodsByName;
 
 		int currentLambdaId;
@@ -213,7 +209,7 @@ class LambdaTransformer implements Opcodes {
 			int currentArity;
 			Set<Integer> currentLambdaLocals;
 
-			Set<String> initializedLocals = new HashSet<String>();
+			Set<Integer> initializedLocals = new HashSet<Integer>();
 
 			MethodInfo method;
 
@@ -278,12 +274,11 @@ class LambdaTransformer implements Opcodes {
 			}
 
 			public void visitVarInsn(int opcode, int operand) {
-				String key = method.getFullName() + "." + operand;
-				if (accessedLocals.containsKey(key)) {
-					Type type = accessedLocals.get(key);
+				if (method.isLocalAccessedFromLambda(operand)) {
+					Type type = method.getTypeOfLocal(operand);
 
-					if (!initializedLocals.contains(key)) {
-						initializedLocals.add(key);
+					if (!initializedLocals.contains(operand)) {
+						initializedLocals.add(operand);
 						mv.visitInsn(ICONST_1);
 						newArray(type);
 						mv.visitVarInsn(ASTORE, operand);
@@ -309,7 +304,8 @@ class LambdaTransformer implements Opcodes {
 						arrayOpcode = type.getOpcode(IALOAD);
 						mv.visitInsn(arrayOpcode);
 					}
-					debug("variable " + key + "(" + type + ") accessed using wrapped array " + AbstractVisitor.OPCODES[opcode] + " -> "
+					debug("variable " + operand + "(" + type + ") accessed using wrapped array " + AbstractVisitor.OPCODES[opcode]
+							+ " -> "
 							+ AbstractVisitor.OPCODES[arrayOpcode]
 							+ (inLambda() ? " field in " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
 				} else {
@@ -323,8 +319,7 @@ class LambdaTransformer implements Opcodes {
 			}
 
 			public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-				String key = method.getFullName() + "." + index;
-				if (accessedLocals.containsKey(key)) {
+				if (method.isLocalAccessedFromLambda(index)) {
 					desc = getDescriptor(Object.class);
 				}
 				super.visitLocalVariable(name, desc, signature, start, end, index);
@@ -451,7 +446,6 @@ class LambdaTransformer implements Opcodes {
 		SecondPassClassVisitor(ClassVisitor cv, FirstPassClassVisitor firstPass) {
 			super(cv);
 			this.methodsByName = firstPass.methodsByName;
-			this.accessedLocals = firstPass.accessedLocals;
 			this.lambdaLocals = firstPass.lambdaLocals.iterator();
 			this.arities = firstPass.arities.iterator();
 		}
@@ -502,5 +496,4 @@ class LambdaTransformer implements Opcodes {
 		if (DEBUG)
 			err.println(msg);
 	}
-
 }
