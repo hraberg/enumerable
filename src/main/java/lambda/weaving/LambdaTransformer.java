@@ -19,6 +19,7 @@ import java.util.Set;
 
 import lambda.LambdaParameter;
 import lambda.NewLambda;
+import lambda.weaving.LambdaTransformer.MethodInfo.LambdaInfo;
 
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
@@ -49,7 +50,6 @@ class LambdaTransformer implements Opcodes {
 		return Class.forName(className).getDeclaredField(name);
 	}
 
-
 	static class MethodInfo {
 		String name;
 		String desc;
@@ -72,7 +72,7 @@ class LambdaTransformer implements Opcodes {
 				local = new LocalInfo();
 				accessedLocalsByIndex.put(operand, local);
 			}
-			currentLambda().accessedLocals.add(local);
+			lastLambda().accessedLocals.add(operand);
 		}
 
 		void newLambda() {
@@ -80,11 +80,15 @@ class LambdaTransformer implements Opcodes {
 		}
 
 		void setLambdaArity(int arity) {
-			currentLambda().arity = arity;
+			lastLambda().arity = arity;
 		}
 
-		LambdaInfo currentLambda() {
+		LambdaInfo lastLambda() {
 			return lambdas.get(lambdas.size() - 1);
+		}
+
+		Iterator<LambdaInfo> lambdas() {
+			return lambdas.iterator();
 		}
 
 		void setTypeOfLocal(int index, Type type) {
@@ -93,29 +97,26 @@ class LambdaTransformer implements Opcodes {
 				localInfo.type = type;
 		}
 
-		boolean isLocalAccessedFromLambda(int index) {
-			return accessedLocalsByIndex.containsKey(index);
-		}
-
 		Type getTypeOfLocal(int operand) {
 			return accessedLocalsByIndex.get(operand).type;
 		}
 
+		boolean isLocalAccessedFromLambda(int index) {
+			return accessedLocalsByIndex.containsKey(index);
+		}
+
 		static class LocalInfo {
-			private int index;
-			private Type type;
+			int index;
+			Type type;
 		}
 
 		static class LambdaInfo {
-			private int arity;
-			private Set<LocalInfo> accessedLocals = new HashSet<LocalInfo>();
+			int arity;
+			Set<Integer> accessedLocals = new HashSet<Integer>();
 		}
 	}
 
 	static class FirstPassClassVisitor extends ClassAdapter {
-		List<Integer> arities = new ArrayList<Integer>();
-		List<Set<Integer>> lambdaLocals = new ArrayList<Set<Integer>>();
-
 		Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
 
 		boolean inLambda;
@@ -137,8 +138,6 @@ class LambdaTransformer implements Opcodes {
 						if (!inLambda && field.isAnnotationPresent(LambdaParameter.class)) {
 							inLambda = true;
 							currentMethod.newLambda();
-
-							lambdaLocals.add(new HashSet<Integer>());
 						}
 					} catch (NoSuchFieldException ignore) {
 						// debug(ignore);
@@ -150,7 +149,6 @@ class LambdaTransformer implements Opcodes {
 				public void visitVarInsn(int opcode, int operand) {
 					if (inLambda) {
 						currentMethod.accessLocalFromLambda(operand);
-						lambdaLocals.get(lambdaLocals.size() - 1).add(operand);
 					}
 					super.visitIntInsn(opcode, operand);
 				}
@@ -164,7 +162,6 @@ class LambdaTransformer implements Opcodes {
 					try {
 						Method method = findMethod(owner, name, desc);
 						if (method.isAnnotationPresent(NewLambda.class)) {
-							arities.add(method.getParameterTypes().length - 1);
 							currentMethod.setLambdaArity(method.getParameterTypes().length - 1);
 							inLambda = false;
 						}
@@ -190,8 +187,6 @@ class LambdaTransformer implements Opcodes {
 		String source;
 		String className;
 
-		Iterator<Integer> arities;
-		Iterator<Set<Integer>> lambdaLocals;
 		Map<String, MethodInfo> methodsByName;
 
 		int currentLambdaId;
@@ -202,22 +197,20 @@ class LambdaTransformer implements Opcodes {
 			MethodVisitor originalMethodWriter;
 			ClassWriter lambdaWriter;
 
+			int currentLine;
+			Set<Integer> initializedLocals = new HashSet<Integer>();
 			Map<String, Integer> paremeterNamesToIndex = new LinkedHashMap<String, Integer>();
 
-			int currentLine;
-
-			int currentArity;
-			Set<Integer> currentLambdaLocals;
-
-			Set<Integer> initializedLocals = new HashSet<Integer>();
-
 			MethodInfo method;
+			Iterator<LambdaInfo> lambdas;
+			LambdaInfo currentLambda;
 
 			private LambdaMethodVisitor(MethodVisitor mv, int access, String methodName, String desc) {
 				super(mv, access, methodName, desc);
 				method = methodsByName.get(methodName + desc);
-
+				lambdas = method.lambdas();
 				this.originalMethodWriter = mv;
+				debug("transforming " + method.getFullName());
 			}
 
 			public void visitFieldInsn(int opcode, String owner, String name, String desc) {
@@ -226,9 +219,8 @@ class LambdaTransformer implements Opcodes {
 					Field field = Class.forName(className).getDeclaredField(name);
 					boolean isLambdaParameter = field.isAnnotationPresent(LambdaParameter.class);
 					if (!inLambda() && isLambdaParameter) {
-						currentArity = arities.next();
-						currentLambdaLocals = lambdaLocals.next();
-						debug("starting new lambda with arity " + currentArity + " locals " + currentLambdaLocals);
+						currentLambda = lambdas.next();
+						debug("starting new lambda with arity " + currentLambda.arity + " locals " + currentLambda.accessedLocals);
 
 						createLambdaClass();
 						createLambdaConstructor();
@@ -304,10 +296,10 @@ class LambdaTransformer implements Opcodes {
 						arrayOpcode = type.getOpcode(IALOAD);
 						mv.visitInsn(arrayOpcode);
 					}
-					debug("variable " + operand + "(" + type + ") accessed using wrapped array " + AbstractVisitor.OPCODES[opcode]
+					debug("variable " + operand + " (" + type + ") accessed using wrapped array " + AbstractVisitor.OPCODES[opcode]
 							+ " -> "
 							+ AbstractVisitor.OPCODES[arrayOpcode]
-							+ (inLambda() ? " field in " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
+							+ (inLambda() ? " field " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
 				} else {
 					super.visitIntInsn(opcode, operand);
 				}
@@ -334,13 +326,13 @@ class LambdaTransformer implements Opcodes {
 
 				lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 				lambdaWriter.visit(V1_5, ACC_PUBLIC, currentLambdaClass(), null, getInternalName(Object.class), new String[] { "lambda/"
-						+ LAMBDA_CLASS_PREFIX + +currentArity });
+						+ LAMBDA_CLASS_PREFIX + currentLambda.arity });
 				lambdaWriter.visitOuterClass(className, method.name, method.desc);
 			}
 
 			void createCallMethodAndRedirectMethodVisitorToIt() {
 				String arguments = "";
-				for (int i = 0; i < currentArity; i++)
+				for (int i = 0; i < currentLambda.arity; i++)
 					arguments += getDescriptor(Object.class);
 				mv = lambdaWriter.visitMethod(ACC_PUBLIC, "call", "(" + arguments + ")" + getDescriptor(Object.class), null, null);
 				mv.visitCode();
@@ -348,16 +340,17 @@ class LambdaTransformer implements Opcodes {
 
 			void createLambdaConstructor() {
 				String parameters = "";
-				for (Integer local : currentLambdaLocals) {
+				for (int local : currentLambda.accessedLocals) {
 					parameters += getDescriptor(Object.class);
-					lambdaWriter.visitField(ACC_PRIVATE + ACC_FINAL + ACC_SYNTHETIC, "val$" + local, getDescriptor(Object.class), null,
+					lambdaWriter.visitField(ACC_PRIVATE + ACC_FINAL + ACC_SYNTHETIC, "val$" + local, getDescriptor(Object.class),
+							null,
 							null).visitEnd();
 				}
 
 				mv = lambdaWriter.visitMethod(ACC_PUBLIC, "<init>", "(" + parameters + ")V", null, null);
 				mv.visitCode();
 				int i = 1;
-				for (int local : currentLambdaLocals) {
+				for (int local : currentLambda.accessedLocals) {
 					mv.visitVarInsn(ALOAD, 0);
 					mv.visitVarInsn(ALOAD, i++);
 					mv.visitFieldInsn(PUTFIELD, currentLambdaClass(), lambdaFieldNameForLocal(local), getDescriptor(Object.class));
@@ -386,7 +379,7 @@ class LambdaTransformer implements Opcodes {
 				mv.visitInsn(DUP);
 
 				String parameters = "";
-				for (int local : currentLambdaLocals) {
+				for (int local : currentLambda.accessedLocals) {
 					parameters += getDescriptor(Object.class);
 					mv.visitVarInsn(ALOAD, local);
 				}
@@ -411,7 +404,7 @@ class LambdaTransformer implements Opcodes {
 			}
 
 			private void initLambdaParameter(String name) {
-				if (paremeterNamesToIndex.size() == currentArity) {
+				if (paremeterNamesToIndex.size() == currentLambda.arity) {
 					throw new IllegalArgumentException("Tried to access a unbound parameter [" + name + "] valid ones are "
 							+ paremeterNamesToIndex.keySet() + " " + sourceAndLine());
 				}
@@ -419,7 +412,7 @@ class LambdaTransformer implements Opcodes {
 			}
 
 			void accessLambdaParameter(Field field, int parameter) {
-				if (paremeterNamesToIndex.size() != currentArity) {
+				if (paremeterNamesToIndex.size() != currentLambda.arity) {
 					throw new IllegalArgumentException("Parameter already bound [" + field.getName() + "] " + sourceAndLine());
 				}
 				mv.visitVarInsn(ALOAD, parameter);
@@ -435,7 +428,7 @@ class LambdaTransformer implements Opcodes {
 			}
 
 			String currentLambdaClass() {
-				return (className + "$" + LAMBDA_CLASS_PREFIX + currentArity + "_" + currentLambdaId);
+				return (className + "$" + LAMBDA_CLASS_PREFIX + currentLambda.arity + "_" + currentLambdaId);
 			}
 
 			boolean inLambda() {
@@ -446,8 +439,6 @@ class LambdaTransformer implements Opcodes {
 		SecondPassClassVisitor(ClassVisitor cv, FirstPassClassVisitor firstPass) {
 			super(cv);
 			this.methodsByName = firstPass.methodsByName;
-			this.lambdaLocals = firstPass.lambdaLocals.iterator();
-			this.arities = firstPass.arities.iterator();
 		}
 
 		public void visitSource(String source, String debug) {
