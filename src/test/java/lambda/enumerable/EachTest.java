@@ -7,26 +7,16 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
 public class EachTest {
+	List<Integer> list = asList(1, 2, 3, 4, 5);
 
-	// @Test
-	// public void eachCallsBlockOnceForEachElement() throws Exception {
-	// List<Integer> actual = new ArrayList<Integer>();
-	// List<Integer> expected = new ArrayList<Integer>(list);
-	// each(list, λ(n, actual.add(n)));
-	// assertEquals(expected, actual);
-	// }
-
-	public static void main(String... args) throws Exception {
-		method();
-	}
-
-	public static void method() {
-		List<Integer> list = asList(1, 2, 3, 4, 5);
+	@Test
+	public void eachCallsBlockOnceForEachElement() throws Exception {
 		List<Integer> actual = new ArrayList<Integer>();
 		List<Integer> expected = new ArrayList<Integer>(list);
 		each(list, λ(n, actual.add(n)));
 		assertEquals(expected, actual);
-		System.out.println(actual);
 	}
 }

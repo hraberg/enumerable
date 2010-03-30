@@ -52,7 +52,13 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
 			byte[] classfileBuffer) throws IllegalClassFormatException {
-		return transformClass(className + ".class", new ByteArrayInputStream(classfileBuffer));
+		try {
+			return transformClass(className + ".class", new ByteArrayInputStream(classfileBuffer));
+		} catch (Throwable t) {
+			debug("Caught throwable in premain transform: ");
+			t.printStackTrace();
+			return null;
+		}
 	}
 
 	byte[] transformClass(String resource, InputStream in) {

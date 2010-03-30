@@ -121,6 +121,8 @@ class LambdaTransformer implements Opcodes {
 		boolean inLambda;
 		MethodInfo currentMethod;
 
+		private String className;
+
 		FirstPassClassVisitor() {
 			super(new EmptyVisitor());
 		}
@@ -133,13 +135,16 @@ class LambdaTransformer implements Opcodes {
 			return new MethodAdapter(mv) {
 				public void visitFieldInsn(int opcode, String owner, String name, String desc) {
 					try {
+						if (owner.equals(className)) {
+							return;
+						}
 						Field field = findField(owner, name);
 						if (!inLambda && field.isAnnotationPresent(LambdaParameter.class)) {
 							inLambda = true;
 							currentMethod.newLambda();
 						}
 					} catch (NoSuchFieldException ignore) {
-						// debug(ignore);
+						debug(ignore);
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
@@ -159,18 +164,26 @@ class LambdaTransformer implements Opcodes {
 
 				public void visitMethodInsn(int opcode, String owner, String name, String desc) {
 					try {
+						if (owner.equals(className) || !inLambda) {
+							return;
+						}
 						Method method = findMethod(owner, name, desc);
 						if (method.isAnnotationPresent(NewLambda.class)) {
 							currentMethod.setLambdaArity(method.getParameterTypes().length - 1);
 							inLambda = false;
 						}
 					} catch (NoSuchMethodException ignore) {
-						// debug(ignore);
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
 				}
 			};
+		}
+
+
+		public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+			super.visit(version, access, name, signature, superName, interfaces);
+			this.className = name;
 		}
 
 		boolean hasNoLambdas() {
@@ -214,6 +227,10 @@ class LambdaTransformer implements Opcodes {
 			}
 
 			public void visitFieldInsn(int opcode, String owner, String name, String desc) {
+				if (owner.equals(className)) {
+					super.visitFieldInsn(opcode, owner, name, desc);
+					return;
+				}
 				try {
 					String className = getObjectType(owner).getClassName();
 					Field field = Class.forName(className).getDeclaredField(name);
@@ -223,7 +240,6 @@ class LambdaTransformer implements Opcodes {
 						parameterNamesToIndex = new LinkedHashMap<String, Integer>();
 
 						debug("starting new lambda with arity " + currentLambda.arity + " locals " + currentLambda.accessedLocals);
-
 
 						createLambdaClass();
 						createLambdaConstructor();
@@ -238,6 +254,7 @@ class LambdaTransformer implements Opcodes {
 							debug("accessing lambda parameter " + field + " with index " + index);
 							accessLambdaParameter(field, index);
 						}
+						return;
 					} else {
 						super.visitFieldInsn(opcode, owner, name, desc);
 					}
@@ -261,7 +278,6 @@ class LambdaTransformer implements Opcodes {
 						}
 					}
 				} catch (NoSuchMethodException ignore) {
-					// debug(ignore);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -418,7 +434,7 @@ class LambdaTransformer implements Opcodes {
 				lambdaWriter = null;
 			}
 
-			private void initLambdaParameter(String name) {
+			void initLambdaParameter(String name) {
 				if (parameterNamesToIndex.size() == currentLambda.arity) {
 					throw new IllegalArgumentException("Tried to access a unbound parameter [" + name + "] valid ones are "
 							+ parameterNamesToIndex.keySet() + " " + sourceAndLine());
@@ -468,6 +484,10 @@ class LambdaTransformer implements Opcodes {
 
 		public MethodVisitor visitMethod(int access, final String name, String desc, String signature, String[] exceptions) {
 			MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
+			if (methodsByName.get(name + desc).lambdas.isEmpty()) {
+				debug("Second pass: skipping method " + name + desc);
+				return mv;
+			}
 			debug("Second pass: processing method " + name + desc);
 			return new LambdaMethodVisitor(mv, access, name, desc);
 		}
@@ -481,12 +501,11 @@ class LambdaTransformer implements Opcodes {
 
 		ClassReader cr = new ClassReader(in);
 
-		debug("First pass: alanyzing use of lambdas in " + resource);
+		debug("First pass: analyzing use of lambdas in " + resource);
 		FirstPassClassVisitor firstPass = new FirstPassClassVisitor();
 		cr.accept(firstPass, 0);
 
 		if (firstPass.hasNoLambdas()) {
-			debug("First pass: no lambdas in " + resource);
 			return null;
 		}
 
