@@ -38,15 +38,6 @@
 							<descriptorRefs>
 								<descriptorRef>jar-with-dependencies</descriptorRef>
 							</descriptorRefs>
-							<archive>
-								<manifest>
-									<mainClass>lambda.weaving.LambdaLoader</mainClass>
-								</manifest>
-								<manifestEntries>
-									<Premain-Class>lambda.weaving.LambdaLoader</Premain-Class>
-									<Can-Retransform-Classes>true</Can-Retransform-Classes>
-								</manifestEntries>
-							</archive>
 						</configuration>
 					</execution>
 				</executions>
