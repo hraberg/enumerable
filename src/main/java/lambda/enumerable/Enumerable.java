@@ -163,21 +163,21 @@ public class Enumerable {
 		return ifNone.call();
 	}
 
-	public static <E> Boolean any(Iterable<E> col, Fn1<E, Boolean> predicate) {
+	public static <E> boolean any(Iterable<E> col, Fn1<E, Boolean> predicate) {
 		for (E each : col)
 			if (predicate.call(each))
 				return true;
 		return false;
 	}
 
-	public static <E> Boolean all(Iterable<E> col, Fn1<E, Boolean> predicate) {
+	public static <E> boolean all(Iterable<E> col, Fn1<E, Boolean> predicate) {
 		for (E each : col)
 			if (!predicate.call(each))
 				return false;
 		return true;
 	}
 
-	public static <E> Integer count(Iterable<E> col, Fn1<E, Boolean> predicate) {
+	public static <E> int count(Iterable<E> col, Fn1<E, Boolean> predicate) {
 		int result = 0;
 		for (E each : col)
 			if (predicate.call(each))

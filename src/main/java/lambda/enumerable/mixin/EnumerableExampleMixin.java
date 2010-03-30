@@ -1,4 +1,4 @@
-package lambda.enumerable.examples;
+package lambda.enumerable.mixin;
 
 
 public class EnumerableExampleMixin {

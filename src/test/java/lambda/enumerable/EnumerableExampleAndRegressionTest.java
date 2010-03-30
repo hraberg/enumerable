@@ -1,4 +1,4 @@
-package lambda.enumerable.examples;
+package lambda.enumerable;
 
 import static java.lang.Math.*;
 import static java.lang.System.*;
@@ -12,8 +12,15 @@ import java.util.Map;
 import lambda.Fn1;
 import lambda.Lambda;
 
-public class EnumerableExample {
+import org.junit.Test;
+
+public class EnumerableExampleAndRegressionTest {
 	public static void main(String[] args) {
+		new EnumerableExampleAndRegressionTest().regressionTest();
+	}
+
+	@Test
+	public void regressionTest() {
 		List<String> strings = asList("malaysia", "thailand", "india", "people's republic of china");
 
 		each(strings, λ(s, out.printf("Country: %s\n", s)));
@@ -110,7 +117,5 @@ public class EnumerableExample {
 
 		λ(n, x = n).call(2);
 		out.println(x);
-
-		out.println(λ(n, n / 0).call(3));
 	}
 }
