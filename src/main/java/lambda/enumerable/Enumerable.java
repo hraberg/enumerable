@@ -104,6 +104,14 @@ public class Enumerable {
 		return result;
 	}
 
+	public static <E> List<E> reject(Iterable<E> col, Fn1<E, Boolean> predicate) {
+		List<E> result = new ArrayList<E>();
+		for (E each : col)
+			if (!predicate.call(each))
+				result.add(each);
+		return result;
+	}
+
 	public static <E> List<E> sort(Iterable<E> col, final Fn2<E, E, Integer> comparator) {
 		List<E> result = new ArrayList<E>();
 		for (E each : col)
@@ -125,14 +133,6 @@ public class Enumerable {
 				return transformer.call(o1).compareTo(transformer.call(o2));
 			}
 		});
-		return result;
-	}
-
-	public static <E> List<E> reject(Iterable<E> col, Fn1<E, Boolean> predicate) {
-		List<E> result = new ArrayList<E>();
-		for (E each : col)
-			if (!predicate.call(each))
-				result.add(each);
 		return result;
 	}
 

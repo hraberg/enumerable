@@ -12,26 +12,26 @@ public class ClosureTest {
 	}
 
 	@Test
-	public void canCloseOverLocalPrimitiveVarible() throws Exception {
+	public void closeOverLocalPrimitiveVarible() throws Exception {
 		int i = 0;
 		λ(n, i += n).call(10);
 		assertEquals(10, i);
 	}
 
 	@Test
-	public void canCloseOverLocalReferenceVarible() throws Exception {
+	public void closeOverLocalReferenceVarible() throws Exception {
 		String hello = "hello";
 		λ(s, hello += s).call(" world");
 		assertEquals("hello world", hello);
 	}
 
 	@Test
-	public void canCloseOverThis() throws Exception {
+	public void closeOverThis() throws Exception {
 		assertSame(this, λ(n, this).call(null));
 	}
 
 	@Test
-	public void canCallInstanceMethodOnThis() throws Exception {
+	public void callInstanceMethodOnThis() throws Exception {
 		assertEquals(hello(), λ(n, hello()).call(null));
 	}
 
@@ -39,10 +39,30 @@ public class ClosureTest {
 		return "hello";
 	}
 
+	@Test
+	public void callStaticMethod() throws Exception {
+		assertEquals(ClosureTest.world(), λ(n, ClosureTest.world()).call(null));
+	}
+
+	public static String world() {
+		return "hello";
+	}
+
+	@Test
+	public void callInstanceMethodOnArgument() throws Exception {
+		assertEquals("HELLO", λ(s, s.toUpperCase()).call(hello()));
+	}
+
+	@Test
+	public void returnSameArgument() throws Exception {
+		String hello = hello();
+		assertSame(hello, λ(s, s).call(hello));
+	}
+
 	static int staticInt = 0;
 
 	@Test
-	public void canCloseOverPrimitiveStaticField() throws Exception {
+	public void closeOverPrimitiveStaticField() throws Exception {
 		λ(n, staticInt += n).call(10);
 		assertEquals(10, staticInt);
 	}
@@ -50,7 +70,7 @@ public class ClosureTest {
 	static String staticString = "world";
 
 	@Test
-	public void canCloseOverStaticField() throws Exception {
+	public void closeOverStaticField() throws Exception {
 		λ(s, staticString = s + staticString).call("hello ");
 		assertEquals("hello world", staticString);
 	}
@@ -58,7 +78,7 @@ public class ClosureTest {
 	double instanceDouble = 0;
 
 	@Test
-	public void canCloseOverPrimitveInstanceField() throws Exception {
+	public void closeOverPrimitveInstanceField() throws Exception {
 		λ(d, instanceDouble += d).call(3.14);
 		assertEquals(3.14, instanceDouble, 0.0);
 	}
@@ -66,7 +86,7 @@ public class ClosureTest {
 	static String instanceString = "";
 
 	@Test
-	public void canCloseOverInstanceField() throws Exception {
+	public void closeOverInstanceField() throws Exception {
 		λ(s, instanceString = s).call("hello world");
 		assertEquals("hello world", instanceString);
 	}

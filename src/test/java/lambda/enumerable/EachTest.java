@@ -34,7 +34,7 @@ public class EachTest {
 	}
 
 	@Test
-	public void withIndexUsesZeroBasedIndex() throws Exception {
+	public void indexIsZeroBased() throws Exception {
 		List<Integer> actual = list();
 		eachWithIndex(oneToTen, λ(n, idx, actual.add(idx + 1)));
 		assertEquals(oneToTen, actual);
