@@ -1,5 +1,6 @@
 package lambda;
 
+import static java.lang.Math.*;
 import static lambda.enumerable.Enumerable.*;
 import static org.junit.Assert.*;
 
@@ -49,6 +50,17 @@ public class ClosureTest {
 	}
 
 	@Test
+	public void closeOverMethodParameter() throws Exception {
+		methodCall("Hello");
+	}
+
+	void methodCall(String string) {
+		assertSame(string, λ(n, string).call(null));
+		λ(n, string = "world").call(null);
+		assertEquals("world", string);
+	}
+
+	@Test
 	public void callInstanceMethodOnThis() throws Exception {
 		assertEquals(hello(), λ(n, hello()).call(null));
 	}
@@ -69,6 +81,11 @@ public class ClosureTest {
 	@Test
 	public void callInstanceMethodOnArgument() throws Exception {
 		assertEquals("HELLO", λ(s, s.toUpperCase()).call(hello()));
+	}
+
+	@Test
+	public void callStaticMethodOnDifferentClass() throws Exception {
+		assertTrue(λ(c, Character.isUpperCase(c)).call('C'));
 	}
 
 	@Test
@@ -107,5 +124,10 @@ public class ClosureTest {
 	public void accessingInstanceField() throws Exception {
 		λ(s, instanceString = s).call("hello world");
 		assertEquals("hello world", instanceString);
+	}
+
+	@Test
+	public void accessStaticFieldOnDifferentClass() throws Exception {
+		assertEquals(PI, λ(d, PI).call(0.0), 0.0);
 	}
 }

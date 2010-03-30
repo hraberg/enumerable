@@ -16,11 +16,15 @@ import org.junit.Test;
 
 public class EnumerableExampleAndRegressionTest {
 	public static void main(String[] args) {
-		new EnumerableExampleAndRegressionTest().regressionTest();
+		EnumerableExampleAndRegressionTest test = new EnumerableExampleAndRegressionTest();
+		test.regression();
+	}
+	@Test
+	public void regression() {
+		regression2("dummy");
 	}
 
-	@Test
-	public void regressionTest() {
+	public void regression2(String string) {
 		List<String> strings = asList("malaysia", "thailand", "india", "people's republic of china");
 
 		each(strings, λ(s, out.printf("Country: %s\n", s)));
