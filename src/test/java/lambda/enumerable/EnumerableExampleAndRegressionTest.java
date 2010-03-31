@@ -67,26 +67,26 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(ints);
 
 		/*
-		 * Squares a list of integers. The @LambdaParameter n is access a total
-		 * of 3 times during block construction. The first time is to define a
-		 * block argument, the two next times to access the first parameter to
-		 * Fn1#call(arg) While actually executing n is not accessed at all, the
-		 * arg parameter of the new Fn1 is.
+		 * Squares a list of integers. The @LambdaParameter n is accessed a
+		 * total of 3 times during block construction. The first time is to
+		 * define a block argument, the two next times to access the first
+		 * parameter to Fn1#call(arg) While actually executing n is not accessed
+		 * at all, the arg parameter of the new Fn1 is.
 		 */
 		List<Integer> squares = collect(ints, λ(n, n * n));
 		out.println(squares);
 
 		/*
 		 * Special case of wrapping a block in a java interface
-		 * (java.util.Comparator). For a general, proxy based solution, the see
-		 * Lambda.as methods.
+		 * (java.util.Comparator). For a general, proxy based solution, see the
+		 * lambda.Lambda.as methods.
 		 */
 		List<Integer> sortedDescending = sort(ints, λ(n, m, m - n));
 		out.println(sortedDescending);
 
 		/*
 		 * Sorts the collection based on the natural order of the result of an
-		 * element expression.
+		 * expression.
 		 */
 		List<String> sortedAscending = sortBy(strings, λ(s, s.length()));
 		out.println(sortedAscending);
@@ -99,7 +99,7 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(odd);
 
 		/*
-		 * Example of different primitives than int. Demonstrates call to statc
+		 * Example of different primitives than int. Demonstrates call to static
 		 * method Math.sqrt.
 		 */
 		List<Double> squareRoots = collect(ints, λ(n, sqrt(n)));
