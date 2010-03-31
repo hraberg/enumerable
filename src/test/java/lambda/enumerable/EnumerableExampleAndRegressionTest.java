@@ -1,11 +1,12 @@
 package lambda.enumerable;
 
 import static java.lang.Math.*;
-import static java.lang.System.*;
 import static java.util.Arrays.*;
 import static lambda.Lambda.*;
 import static lambda.enumerable.Enumerable.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,18 @@ import org.junit.Test;
 public class EnumerableExampleAndRegressionTest {
 	public static void main(String[] args) {
 		EnumerableExampleAndRegressionTest test = new EnumerableExampleAndRegressionTest();
-		test.regression();
+		test.example(System.out);
+	}
+
+	@Test
+	public void regression() {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			example(new PrintStream(out));
+		} catch (RuntimeException e) {
+			System.out.print(out.toString());
+			throw e;
+		}
 	}
 
 	/*
@@ -29,13 +41,12 @@ public class EnumerableExampleAndRegressionTest {
 	 * 
 	 * @NewLambda and all do the same thing: λ, fn and lambda.
 	 */
-	@Test
-	public void regression() {
+	public void example(PrintStream out) {
 		List<String> strings = asList("malaysia", "thailand", "india", "people's republic of china");
 
 		/*
 		 * each will evaluate the block for every element in the array. The
-		 * block has to be an expression, printf returns a PrintWriter which we
+		 * block has to be an expression, printf returns a PrintStream which we
 		 * ignore.
 		 */
 		each(strings, λ(s, out.printf("Country: %s\n", s)));

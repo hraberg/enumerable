@@ -6,11 +6,9 @@ import static org.objectweb.asm.Type.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import lambda.LambdaParameter;
 import lambda.NewLambda;
@@ -44,7 +42,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		Map<String, Integer> parameterNamesToIndex;
 
 		int currentLine;
-		Set<Integer> initializedLocals = new HashSet<Integer>();
 
 		MethodInfo method;
 		Iterator<LambdaInfo> lambdas;
@@ -140,19 +137,28 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 						super.visitIntInsn(opcode, operand);
 					}
 				} else {
-					if (!initializedLocals.contains(operand)) {
-						initArray(operand, type);
-						initializedLocals.add(operand);
-					}
 					loadArrayFromLocalOrLambda(operand, type);
 					accessFirstArrayElement(opcode, type);
 
 					debug("variable " + operand + " (" + type + ") accessed using wrapped array "
 							+ (inLambda() ? " field " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
 				}
-
 			} else {
 				super.visitIntInsn(opcode, operand);
+			}
+		}
+
+		public void visitCode() {
+			super.visitCode();
+			initAccessedLocalsAndParametersAsArrays();
+		}
+
+		private void initAccessedLocalsAndParametersAsArrays() {
+			for (int local : method.accessedLocalsByIndex.keySet()) {
+				if (!isThis(local)) {
+					Type type = method.getTypeOfLocal(local);
+					initArray(local, type);
+				}
 			}
 		}
 
