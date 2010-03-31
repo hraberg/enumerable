@@ -42,7 +42,7 @@ Becomes:
     assert i[0] == 10;
 
 
-Block parameters are defined using annotated static fields. For more examples see [EnumerableExampleAndRegressionTest](http://github.com/hraberg/enumerable/blob/master/src/test/java/lambda/enumerable/EnumerableExampleAndRegressionTest.java)
+Block parameters are defined using annotated static fields. For more examples see [EnumerableExampleAndRegressionTest](http://github.com/hraberg/enumerable/blob/master/src/test/java/lambda/enumerable/EnumerableExampleAndRegressionTest.java) which has plenty of comments.
 
 **Note: The actual blocks are limited to one expression.** 
 
