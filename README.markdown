@@ -72,7 +72,7 @@ Accessing a field marked with *@LambdaParameter* outside of a block will either 
 
 ## Implementation
 
-Enumerable.java uses [Maven 2](http://maven.apache.org/) to build. You need to run `mvn package -DskipTests` the first time to get the java agent jar required to run the tests, `mvn test`. The class loader will pick up your changes over the ones in the jar, so there's no need to rebuild the jar all the time while developing.
+Enumerable.java uses Ant to build. Run `ant tests` or `ant agent-jar`.
 
 The transformation is implemented in two passes. The first pass identifies all blocks and their arities and which local variables they access, if any. The second pass does the actual transformation, which has three main elements:
 

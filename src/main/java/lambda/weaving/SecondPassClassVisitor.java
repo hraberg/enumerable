@@ -181,7 +181,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			}
 		}
 
-		void newArray(final Type type) {
+		void newArray(Type type) {
 			int typ;
 			switch (type.getSort()) {
 			case Type.BOOLEAN:
@@ -252,7 +252,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		}
 
 		void incrementInArray(int var, int increment) {
-			// mv.visitVarInsn(ALOAD, var);
 			loadArrayFromLocalOrLambda(var, method.getTypeOfLocal(var));
 			mv.visitInsn(ICONST_0);
 			mv.visitInsn(DUP2);
@@ -346,8 +345,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			lambdasByResourceName.put(resource, bs);
 
 			ClassInjector injector = new ClassInjector();
-			if (DEBUG)
-				injector.dump(resource, bs);
+			injector.dump(resource, bs);
 			injector.inject(getClass().getClassLoader(), currentLambdaClass().replace('/', '.'), bs);
 
 			lambdaWriter = null;
@@ -370,7 +368,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		}
 
 		String sourceAndLine() {
-			return ("(" + source + ":" + currentLine + ")");
+			return source != null ? "(" + source + ":" + currentLine + ")" : "";
 		}
 
 		void nextLambdaId() {

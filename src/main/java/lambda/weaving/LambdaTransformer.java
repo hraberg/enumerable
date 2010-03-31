@@ -15,7 +15,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
 class LambdaTransformer {
-	static boolean DEBUG = true;
+	static boolean DEBUG = Boolean.valueOf(getProperty("lambda.weaving.debug"));
 
 	static Method findMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
 		Class<?>[] argumentClasses = new Class[getArgumentTypes(desc).length];
@@ -25,7 +25,7 @@ class LambdaTransformer {
 
 	static Field findField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
 		String className = getObjectType(owner).getClassName();
-		return Class.forName(className).getDeclaredField(name);
+		return Class.forName(className).getField(name);
 	}
 
 	Map<String, byte[]> lambdasByResourceName = new HashMap<String, byte[]>();
@@ -54,7 +54,7 @@ class LambdaTransformer {
 		return cw.toByteArray();
 	}
 
-	static void debug(Object msg) {
+	static void debug(String msg) {
 		if (DEBUG)
 			err.println(msg);
 	}

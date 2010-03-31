@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="enumerable">
+    <path id="jarjar.classpath">
+        <pathelement location="lib/jarjar-0.6.jar"/>
+    </path>
+    <path id="enumerable.classpath">
+        <pathelement location="target/classes"/>
+        <pathelement location="lib/asm-3.2.jar"/>
+    </path>
+    <path id="enumerable.test.classpath">
+        <pathelement location="target/test-classes"/>
+        <pathelement location="lib/junit-4.7.jar"/>
+        <path refid="enumerable.classpath"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="target"/>
+    </target>
+	
+    <target name="build">
+        <mkdir dir="target/classes"/>
+        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
+            <src path="src/main/java"/>
+            <exclude name="test/java/"/>
+            <classpath refid="enumerable.classpath"/>
+        </javac>
+        <mkdir dir="target/test-classes"/>
+        <javac debug="true" destdir="target/test-classes" source="1.5" target="1.5"  encoding="UTF-8">
+            <src path="src/test/java"/>
+            <classpath refid="enumerable.test.classpath"/>
+        </javac>
+    </target>
+    
+    <target name="agent-jar-uptodate">
+        <uptodate property="jarjar.notRequired" targetfile="target/enumerable-jar-with-dependencies.jar">
+            <srcfiles dir="target/classes" includes="**/*"/>
+            <srcfiles dir="." includes="build.xml"/>
+        </uptodate>
+    </target>
+    
+    <target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
+        <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpathref="jarjar.classpath"/>
+        <jarjar jarfile="target/enumerable-jar-with-dependencies.jar">
+            <fileset dir="target/classes"/>
+            <zipfileset src="lib/asm-3.2.jar"/>
+            <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1"/>
+            <manifest>
+                <attribute name="Main-Class" value="lambda.weaving.LambdaLoader"/>
+                <attribute name="Premain-Class" value="lambda.weaving.LambdaLoader"/>
+                <attribute name="Can-Retransform-Classes" value="true"/>
+            </manifest>
+        </jarjar>
+    </target>
+    
+    <target name="tests" depends="agent-jar">
+        <mkdir dir="target/junit"/>
+        <junit fork="yes" forkMode="once" printsummary="withOutAndErr" failureproperty="test.failed">
+            <jvmarg value="-javaagent:target/enumerable-jar-with-dependencies.jar=org.apache.tools.ant"/>
+            <classpath refid="enumerable.test.classpath"/>
+            <batchtest todir="target/junit">
+                <fileset dir="src/test/java">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+            <formatter type="xml"/>
+            <formatter type="plain"/>
+        </junit>
+		<fail if="test.failed"/>
+    </target>
+
+    <target name="junitreport">
+        <junitreport todir="target/junit">
+            <fileset dir="target/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="noframes" todir="target/junit"/>
+        </junitreport>
+    </target>
+</project>

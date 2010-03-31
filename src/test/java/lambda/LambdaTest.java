@@ -34,7 +34,7 @@ public class LambdaTest {
 
 	static class LambdaParameters {
 		@LambdaParameter
-		static ActionEvent e;
+		public static ActionEvent e;
 	}
 
 	@Test

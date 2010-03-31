@@ -16,6 +16,7 @@ import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.Set;
 
+
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 	static Set<String> packagesToSkip = new HashSet<String>();
 
@@ -23,6 +24,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 		packagesToSkip.add("java");
 		packagesToSkip.add("sun");
 		packagesToSkip.add("$Proxy");
+		packagesToSkip.add("org.apache.tools.ant");
 	}
 
 	LambdaTransformer transformer = new LambdaTransformer();
@@ -53,7 +55,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 		try {
 			return transformClass(className + ".class", new ByteArrayInputStream(classfileBuffer));
 		} catch (Throwable t) {
-			debug("Caught throwable in premain transform: ");
+			debug("Caught throwable in premain transform:");
 			t.printStackTrace();
 			return null;
 		}
@@ -64,7 +66,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 			if (isNotToBeInstrumented(resource.replace('/', '.')))
 				return null;
 			byte[] b = transformer.transform(resource, in);
-			if (b != null && LambdaTransformer.DEBUG) {
+			if (b != null) {
 				new ClassInjector().dump(resource, b);
 			}
 			return b;

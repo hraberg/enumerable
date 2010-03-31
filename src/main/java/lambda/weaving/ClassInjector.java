@@ -32,6 +32,9 @@ class ClassInjector {
 	}
 
 	void dump(String resource, byte[] b) {
+		if (!DEBUG) {
+			return;
+		}
 		FileOutputStream out = null;
 		try {
 			String target = "target/generated-classes/" + resource;
