@@ -33,8 +33,8 @@ Closure works as expected, by trasforming local variables to arrays:
     
 Becomes:
 
-    int[] i = new int[] { 0 };
-    Fn1 square = new Fn1(i) {
+    final int[] i = new int[] { 0 };
+    Fn1 square = new Fn1() {
         public Object call(Object arg) {
             return i[0] += (Integer) arg;
         }
@@ -65,7 +65,7 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
         public static Money m;
     }
 
-Accessing a field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses is redirected. Due to class loading, you cannot define a @LambdaParameter in the same class it's used. You can use inner static classes as an alternative if you want the definitions close to their usage.
+Accessing a field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses is redirected. Due to class loading, you cannot define a *@LambdaParameter* in the same class it's used. You can use inner static classes as an alternative if you want the definitions close to their usage.
 
 
 ## Implementation
