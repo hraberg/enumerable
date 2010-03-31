@@ -39,9 +39,9 @@ public class EnumerableExampleAndRegressionTest {
 		each(strings, λ(s, out.printf("Country: %s\n", s)));
 
 		/*
-		 * eachWithIndex bind the second parameter to the current index, we use
-		 * idx here. The local variable map is wrapped in an array to enable
-		 * closure.
+		 * eachWithIndex binds the second parameter to the current index, we use
+		 * the int @LambdaParameter idx here. The local variable map is wrapped
+		 * in an array to enable closure.
 		 */
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		eachWithIndex(strings, λ(s, idx, map.put(s, idx)));
@@ -68,36 +68,39 @@ public class EnumerableExampleAndRegressionTest {
 
 		/*
 		 * Squares a list of integers. The @LambdaParameter n is access a total
-		 * of 3 times. The first time is to define a block argument, the two
-		 * next times to access the first parameter to Fn1#call(arg)
+		 * of 3 times during block construction. The first time is to define a
+		 * block argument, the two next times to access the first parameter to
+		 * Fn1#call(arg) While actually executing n is not accessed at all, the
+		 * arg parameter of the new Fn1 is.
 		 */
 		List<Integer> squares = collect(ints, λ(n, n * n));
 		out.println(squares);
 
 		/*
-		 * Special case of wrapping a block in a java interface. For a general,
-		 * proxy based solution, the see Lambda.as methods.
+		 * Special case of wrapping a block in a java interface
+		 * (java.util.Comparator). For a general, proxy based solution, the see
+		 * Lambda.as methods.
 		 */
 		List<Integer> sortedDescending = sort(ints, λ(n, m, m - n));
 		out.println(sortedDescending);
 
 		/*
-		 * Sorts the collection based on the natural order of an element
-		 * expression.
+		 * Sorts the collection based on the natural order of the result of an
+		 * element expression.
 		 */
 		List<String> sortedAscending = sortBy(strings, λ(s, s.length()));
 		out.println(sortedAscending);
 
 		/*
-		 * Closing over the variable 'two'.
+		 * Closing over the variable two.
 		 */
 		int two = 2;
 		List<Integer> odd = select(ints, λ(n, n % two == 1));
 		out.println(odd);
 
 		/*
-		 * Example of different primitives than int. Demonstrates call to
-		 * Math.sqrt.
+		 * Example of different primitives than int. Demonstrates call to statc
+		 * method Math.sqrt.
 		 */
 		List<Double> squareRoots = collect(ints, λ(n, sqrt(n)));
 		out.println(squareRoots);
@@ -123,7 +126,7 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(largerThanFive);
 
 		/*
-		 * Detect using ifNone, returns a constant value.
+		 * Detect using ifNone, which returns a constant default value.
 		 */
 		int defaultValue = detect(ints, λ(n, n > 10), ifNone(-1));
 		out.println(defaultValue);
@@ -147,17 +150,17 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(divisableByThree);
 
 		/*
-		 * Partition is select and reject rolled into one, returning two
-		 * collections.
+		 * Partition is select and reject rolled into one, returning a list with
+		 * two collections, [selected, rejected].
 		 */
 		List<List<Integer>> partitioned = partition(ints, λ(n, n % 2 == 0));
 		out.println(partitioned);
 
 		/*
-		 * Inject accumulates a value over the collection. into is from
-		 * Smalltalk, and is syntactic sugar here. n is the accumulator, 0 is
-		 * the value for the first call. It is set to the result of the
-		 * expression after each evaluation.
+		 * Inject accumulates a value over a collection. into is from Smalltalk,
+		 * and is syntactic sugar here. n is the accumulator and 0 is the value
+		 * for the first call. n is set to the result of the expression after
+		 * each evaluation. m is the current element.
 		 */
 		int sum = inject(ints, 0, into(λ(n, m, n + m)));
 		out.println(sum);
@@ -176,10 +179,8 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(factorialNoMemo);
 
 		/*
-		 * Inject without an initial value, requires the collection to be at
-		 * least two elements. The ternary operator can be used to evaluate two
-		 * expressions in certain cases. You can chain more than one,
-		 * sacrificing readability.
+		 * The ternary operator can be used to evaluate more expressions in
+		 * certain cases. You can chain more than one, sacrificing readability.
 		 */
 		String longest = inject(strings, into(λ(s, t, s.length() > t.length() ? s : t)));
 		out.println(longest);
@@ -213,22 +214,23 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(absolutes);
 
 		/*
-		 * You cannot nest lambda constructs, but you can use more than one in
-		 * the same larger expression like this.
+		 * You cannot nest lambda constructs (the weaver doesn't support it),
+		 * but you can use more than one in the same larger expression like
+		 * this.
 		 */
 		List<Integer> oddTimesSum = select(collect(ints, λ(n, n * sum)), λ(n, n % 2 == 1));
 		out.println(oddTimesSum);
 
 		/*
-		 * Another example of closure, the Fn1 can still read and write the
-		 * local variable x if we would to pass it along to another scope.
+		 * Another example of closure, the Fn1 instance can still read and write
+		 * the local variable x if we would to pass it along to another scope.
 		 */
 		int x = 3;
 		Fn1<Integer, Integer> closure = λ(n, x + n);
 		out.println(collect(ints, closure));
 
 		/*
-		 * Shows that local changes are visible inside the closure.
+		 * Shows that local variable changes are visible inside the closure.
 		 */
 		x = 6;
 		out.println(collect(ints, closure));
