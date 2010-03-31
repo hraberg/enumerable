@@ -2,7 +2,6 @@ package lambda;
 
 import static lambda.Lambda.*;
 import static lambda.LambdaTest.LambdaParameters.*;
-import static lambda.enumerable.Enumerable.*;
 import static lambda.enumerable.EnumerableTest.*;
 import static org.junit.Assert.*;
 

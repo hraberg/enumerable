@@ -1,7 +1,7 @@
 package lambda;
 
 import static java.lang.Math.*;
-import static lambda.enumerable.Enumerable.*;
+import static lambda.Lambda.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;

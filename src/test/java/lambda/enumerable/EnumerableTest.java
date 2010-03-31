@@ -1,6 +1,7 @@
 package lambda.enumerable;
 
 import static java.util.Arrays.*;
+import static lambda.Lambda.*;
 import static lambda.enumerable.Enumerable.*;
 import static org.junit.Assert.*;
 

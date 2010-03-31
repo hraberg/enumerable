@@ -3,8 +3,64 @@ package lambda;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collection;
 
 public class Lambda {
+	@LambdaParameter
+	public static Integer n;
+	@LambdaParameter
+	public static Integer m;
+	@LambdaParameter
+	public static Integer i;
+	@LambdaParameter
+	public static Integer idx;
+	@LambdaParameter
+	public static String s;
+	@LambdaParameter
+	public static CharSequence cs;
+	@LambdaParameter
+	public static String t;
+	@LambdaParameter
+	public static Double d;
+	@LambdaParameter
+	public static Character c;
+	@LambdaParameter
+	public static Collection<?> col;
+	@LambdaParameter
+	public static Object obj;
+	@LambdaParameter
+	public static Object _;
+
+	@NewLambda
+	public static <E, R> Fn1<E, R> λ(E n, R block) {
+		throw new UnsupportedOperationException();
+	}
+
+	@NewLambda
+	public static <E, R> Fn1<E, R> lambda(E n, R block) {
+		throw new UnsupportedOperationException();
+	}
+
+	@NewLambda
+	public static <E, R> Fn1<E, R> fn(E n, R block) {
+		throw new UnsupportedOperationException();
+	}
+
+	@NewLambda
+	public static <E1, E2, R> Fn2<E1, E2, R> λ(E1 n, E2 m, R block) {
+		throw new UnsupportedOperationException();
+	}
+
+	@NewLambda
+	public static <E1, E2, R> Fn2<E1, E2, R> lambda(E1 n, E2 m, R block) {
+		throw new UnsupportedOperationException();
+	}
+
+	@NewLambda
+	public static <E1, E2, R> Fn2<E1, E2, R> fn(E1 n, E2 m, R block) {
+		throw new UnsupportedOperationException();
+	}
+
 	public static <E1, E2, R> Fn1<E2, R> partial(final Fn2<E1, E2, R> lambda, final E1 arg1) {
 		return new Fn1<E2, R>() {
 			public R call(E2 arg2) {

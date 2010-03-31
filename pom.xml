@@ -54,8 +54,10 @@
                         <configuration>
                             <tasks>
                                 <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpathref="maven.plugin.classpath" />
-                                <jarjar jarfile="${project.build.directory}${file.separator}${project.build.finalName}-jarjar.jar">
-                                    <zipfileset src="${project.build.directory}${file.separator}${project.build.finalName}-jar-with-dependencies.jar" />
+								<property name="jar.with.dependencies" value="${project.build.directory}${file.separator}${project.build.finalName}-jar-with-dependencies.jar"/>
+								<property name="jarjar.jar" value="${project.build.directory}${file.separator}${project.build.finalName}-jarjar.jar"/>
+                                <jarjar jarfile="${jarjar.jar}">
+                                    <zipfileset src="${jar.with.dependencies}" />
                                     <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
 									<manifest>
 								        <attribute name="Main-Class" value="lambda.weaving.LambdaLoader"/>
@@ -63,6 +65,7 @@
 								        <attribute name="Can-Retransform-Classes" value="true"/>
 									</manifest>
                                 </jarjar>
+								<move file="${jarjar.jar}" tofile="${jar.with.dependencies}"/>
                             </tasks>
                         </configuration>
                     </execution>
@@ -80,7 +83,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.5</version>
 				<configuration>
-					<argLine>-javaagent:target/enumerable-jarjar.jar</argLine>
+					<argLine>-javaagent:target/enumerable-jar-with-dependencies.jar</argLine>
 				</configuration>
 			</plugin>
 		</plugins>

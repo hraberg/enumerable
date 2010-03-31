@@ -50,12 +50,12 @@ Block parameters are defined using annotated static fields. For more examples se
 
 Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (lambda.asm).
 
-    java -javaagent:enumerable-jarjar.jar [...]
+    java -javaagent:enumerable-jar-with-dependencies.jar [...]
 
 
 Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/weaving/LambdaLoader.java) if you have different class loading needs.
 
-The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/core/classes/Enumerable.html). You will be mainly importing static methods and fields from [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java)
+The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/core/classes/Enumerable.html). You will be mainly importing static methods and fields from [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java) and [Lambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Lambda.java)
 
 
 You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
@@ -65,7 +65,7 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
         public static Money m;
     }
 
-Accessing a field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses is redirected. Due to class loading, you cannot define a *@LambdaParameter* in the same class it's used. You can use inner static classes as an alternative if you want the definitions close to their usage.
+Accessing a field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses are redirected. Due to class loading, you cannot define a *@LambdaParameter* in the same class it's used. You can use inner static classes as an alternative if you want the definitions close to their usage.
 
 
 ## Implementation

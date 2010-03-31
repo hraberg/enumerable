@@ -3,7 +3,6 @@ package lambda.enumerable;
 import static java.util.Arrays.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -12,65 +11,8 @@ import java.util.List;
 import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
-import lambda.LambdaParameter;
-import lambda.NewLambda;
 
 public class Enumerable {
-	@LambdaParameter
-	public static Integer n;
-	@LambdaParameter
-	public static Integer m;
-	@LambdaParameter
-	public static Integer i;
-	@LambdaParameter
-	public static Integer idx;
-	@LambdaParameter
-	public static String s;
-	@LambdaParameter
-	public static CharSequence cs;
-	@LambdaParameter
-	public static String t;
-	@LambdaParameter
-	public static Double d;
-	@LambdaParameter
-	public static Character c;
-	@LambdaParameter
-	public static Collection<?> col;
-	@LambdaParameter
-	public static Object obj;
-	@LambdaParameter
-	public static Object _;
-
-	@NewLambda
-	public static <E, R> Fn1<E, R> λ(E n, R block) {
-		throw new UnsupportedOperationException();
-	}
-
-	@NewLambda
-	public static <E, R> Fn1<E, R> lambda(E n, R block) {
-		throw new UnsupportedOperationException();
-	}
-
-	@NewLambda
-	public static <E, R> Fn1<E, R> fn(E n, R block) {
-		throw new UnsupportedOperationException();
-	}
-
-	@NewLambda
-	public static <E1, E2, R> Fn2<E1, E2, R> λ(E1 n, E2 m, R block) {
-		throw new UnsupportedOperationException();
-	}
-
-	@NewLambda
-	public static <E1, E2, R> Fn2<E1, E2, R> lambda(E1 n, E2 m, R block) {
-		throw new UnsupportedOperationException();
-	}
-
-	@NewLambda
-	public static <E1, E2, R> Fn2<E1, E2, R> fn(E1 n, E2 m, R block) {
-		throw new UnsupportedOperationException();
-	}
-
 	public static <E, R> R each(Iterable<E> col, Fn1<E, R> block) {
 		R result = null;
 		for (E each : col)

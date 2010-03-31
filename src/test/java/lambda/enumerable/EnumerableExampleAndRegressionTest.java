@@ -3,6 +3,7 @@ package lambda.enumerable;
 import static java.lang.Math.*;
 import static java.lang.System.*;
 import static java.util.Arrays.*;
+import static lambda.Lambda.*;
 import static lambda.enumerable.Enumerable.*;
 
 import java.util.HashMap;
