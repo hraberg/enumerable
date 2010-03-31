@@ -32,7 +32,7 @@
     </target>
     
     <target name="agent-jar-uptodate">
-        <uptodate property="jarjar.notRequired" targetfile="target/enumerable-jar-with-dependencies.jar">
+        <uptodate property="jarjar.notRequired" targetfile="target/enumerable-agent.jar">
             <srcfiles dir="target/classes" includes="**/*"/>
             <srcfiles dir="." includes="build.xml"/>
         </uptodate>
@@ -40,7 +40,7 @@
     
     <target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
         <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpathref="jarjar.classpath"/>
-        <jarjar jarfile="target/enumerable-jar-with-dependencies.jar">
+        <jarjar jarfile="target/enumerable-agent.jar">
             <fileset dir="target/classes"/>
             <zipfileset src="lib/asm-3.2.jar"/>
             <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1"/>
@@ -55,7 +55,7 @@
     <target name="tests" depends="agent-jar">
         <mkdir dir="target/junit"/>
         <junit fork="yes" forkMode="once" printsummary="withOutAndErr" failureproperty="test.failed">
-            <jvmarg value="-javaagent:target/enumerable-jar-with-dependencies.jar=org.apache.tools.ant"/>
+            <jvmarg value="-javaagent:target/enumerable-agent.jar=org.apache.tools.ant"/>
             <classpath refid="enumerable.test.classpath"/>
             <batchtest todir="target/junit">
                 <fileset dir="src/test/java">
