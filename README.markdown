@@ -1,6 +1,6 @@
 # Enumerable.java
 
-Copyright 2010 Håkan Råberg
+Copyright 2010 HÃ¥kan RÃ¥berg
 
 
 Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
