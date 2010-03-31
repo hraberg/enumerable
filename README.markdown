@@ -55,7 +55,7 @@ Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/
 
 Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/weaving/LambdaLoader.java) if you have different class loading needs.
 
-The API of lambda.enumerable.Enumerable is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/core/classes/Enumerable.html). You will be mainly importing static methods and fields from [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java)
+The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/core/classes/Enumerable.html). You will be mainly importing static methods and fields from [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java)
 
 
 You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
