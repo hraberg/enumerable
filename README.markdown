@@ -57,6 +57,8 @@ Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/
 
 The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/core/classes/Enumerable.html). You will be mainly importing static methods and fields from [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java) and [Lambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Lambda.java)
 
+If you're using Eclipse, you can add the agent as a default VM argument under Installed JREs. You can also add Lambda and Enumerable as Favorites in the Java Content Assist settings.
+
 
 You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
 

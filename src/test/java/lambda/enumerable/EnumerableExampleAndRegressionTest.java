@@ -37,7 +37,7 @@ public class EnumerableExampleAndRegressionTest {
 	 * assert Character.isJavaIdentifierStart(λ) == true;
 	 * 
 	 * While λ looks good, it is cumbersome to insert. There are three (ignoring
-	 * arity versions) static methods in Enumerable that all are marked with
+	 * arity versions) static methods in Lambda that all are marked with
 	 * 
 	 * @NewLambda and all do the same thing: λ, fn and lambda.
 	 */
@@ -159,7 +159,7 @@ public class EnumerableExampleAndRegressionTest {
 		/*
 		 * Count is the same as select(..).size()
 		 */
-		int divisableByThree = count(ints, λ(n, n % 3 == 0));
+		int divisableByThree = select(ints, λ(n, n % 3 == 0)).size();
 		out.println(divisableByThree);
 
 		/*
@@ -170,12 +170,11 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(partitioned);
 
 		/*
-		 * Inject accumulates a value over a collection. into is from Smalltalk,
-		 * and is syntactic sugar here. n is the accumulator and 0 is the value
-		 * for the first call. n is set to the result of the expression after
-		 * each evaluation. m is the current element.
+		 * Inject accumulates a value over a collection. n is the accumulator
+		 * and 0 is the initial value. n is set to the result of the expression
+		 * after each evaluation. m is the current element.
 		 */
-		int sum = inject(ints, 0, into(λ(n, m, n + m)));
+		int sum = inject(ints, 0, λ(n, m, n + m));
 		out.println(sum);
 
 		/*
@@ -185,24 +184,24 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(factorial);
 
 		/*
-		 * Inject without an initial value (called memo in Ruby), requires the
-		 * collection to be at least two elements.
+		 * Inject without an initial value,, requires the collection to be at
+		 * least two elements.
 		 */
-		int factorialNoMemo = inject(ints, into(λ(n, m, n * m)));
+		int factorialNoMemo = inject(ints, λ(n, m, n * m));
 		out.println(factorialNoMemo);
 
 		/*
 		 * The ternary operator can be used to evaluate more expressions in
 		 * certain cases. You can chain more than one, sacrificing readability.
 		 */
-		String longest = inject(strings, into(λ(s, t, s.length() > t.length() ? s : t)));
+		String longest = inject(strings, λ(s, t, s.length() > t.length() ? s : t));
 		out.println(longest);
 
 		/*
 		 * A more complex example of using the ternary operator to evaluate
 		 * different expressions based on the input.
 		 */
-		String text = inject(ints, "", into(λ(s, n, s.length() > 0 ? s + ", " + n : s + n)));
+		String text = inject(ints, "", λ(s, n, s.length() > 0 ? s + ", " + n : s + n));
 		out.println(text);
 
 		/*

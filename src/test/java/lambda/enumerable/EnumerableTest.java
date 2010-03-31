@@ -106,11 +106,6 @@ public class EnumerableTest {
 	}
 
 	@Test
-	public void countMatchingPredicate() throws Exception {
-		assertEquals(5, (int) count(oneToTen, λ(n, n > 5)));
-	}
-
-	@Test
 	public void sortUsingBlock() throws Exception {
 		assertEquals(list(5, 4, 3, 2, 1), sort(oneToFive, λ(n, m, m - n)));
 	}
@@ -122,13 +117,13 @@ public class EnumerableTest {
 	}
 
 	@Test
-	public void injectUsingMemo() throws Exception {
-		assertEquals(55, (int) inject(oneToTen, 0, into(λ(n, m, n + m))));
+	public void injectUsingInitialValue() throws Exception {
+		assertEquals(55, (int) inject(oneToTen, 0, λ(n, m, n + m)));
 	}
 
 	@Test
-	public void injectWithoutMemo() throws Exception {
-		assertEquals(3628800, (int) inject(oneToTen, into(λ(n, m, n * m))));
+	public void injectWithoutInitialValue() throws Exception {
+		assertEquals(3628800, (int) inject(oneToTen, λ(n, m, n * m)));
 	}
 
 	public static List<Integer> oneToTen = asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);

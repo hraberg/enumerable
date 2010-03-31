@@ -32,47 +32,47 @@ public class Lambda {
 	public static Object _;
 
 	@NewLambda
-	public static <E, R> Fn1<E, R> λ(E n, R block) {
+	public static <E, R> Fn1<E, R> λ(E obj, R block) {
 		throw new UnsupportedOperationException();
 	}
 
 	@NewLambda
-	public static <E, R> Fn1<E, R> lambda(E n, R block) {
+	public static <E, R> Fn1<E, R> lambda(E obj, R block) {
 		throw new UnsupportedOperationException();
 	}
 
 	@NewLambda
-	public static <E, R> Fn1<E, R> fn(E n, R block) {
+	public static <E, R> Fn1<E, R> fn(E obj, R block) {
 		throw new UnsupportedOperationException();
 	}
 
 	@NewLambda
-	public static <E1, E2, R> Fn2<E1, E2, R> λ(E1 n, E2 m, R block) {
+	public static <E1, E2, R> Fn2<E1, E2, R> λ(E1 obj1, E2 obj2, R block) {
 		throw new UnsupportedOperationException();
 	}
 
 	@NewLambda
-	public static <E1, E2, R> Fn2<E1, E2, R> lambda(E1 n, E2 m, R block) {
+	public static <E1, E2, R> Fn2<E1, E2, R> lambda(E1 obj1, E2 obj2, R block) {
 		throw new UnsupportedOperationException();
 	}
 
 	@NewLambda
-	public static <E1, E2, R> Fn2<E1, E2, R> fn(E1 n, E2 m, R block) {
+	public static <E1, E2, R> Fn2<E1, E2, R> fn(E1 obj1, E2 obj2, R block) {
 		throw new UnsupportedOperationException();
 	}
 
-	public static <E1, E2, R> Fn1<E2, R> partial(final Fn2<E1, E2, R> lambda, final E1 arg1) {
+	public static <E1, E2, R> Fn1<E2, R> partial(final Fn2<E1, E2, R> lambda, final E1 obj1) {
 		return new Fn1<E2, R>() {
-			public R call(E2 arg2) {
-				return lambda.call(arg1, arg2);
+			public R call(E2 obj2) {
+				return lambda.call(obj1, obj2);
 			}
 		};
 	}
 
-	public static <E, R> Fn0<R> partial(final Fn1<E, R> lambda, final E arg1) {
+	public static <E, R> Fn0<R> partial(final Fn1<E, R> lambda, final E obj) {
 		return new Fn0<R>() {
 			public R call() {
-				return lambda.call(arg1);
+				return lambda.call(obj);
 			}
 		};
 	}
