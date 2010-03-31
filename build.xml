@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="enumerable">
-    <path id="jarjar.classpath">
-        <pathelement location="lib/jarjar-0.6.jar"/>
-    </path>
     <path id="enumerable.classpath">
         <pathelement location="target/classes"/>
         <pathelement location="lib/asm-3.2.jar"/>
@@ -13,6 +10,8 @@
         <path refid="enumerable.classpath"/>
     </path>
 
+    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-0.6.jar"/>
+
     <target name="clean">
         <delete dir="target"/>
     </target>
@@ -21,7 +20,6 @@
         <mkdir dir="target/classes"/>
         <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
             <src path="src/main/java"/>
-            <exclude name="test/java/"/>
             <classpath refid="enumerable.classpath"/>
         </javac>
         <mkdir dir="target/test-classes"/>
@@ -34,12 +32,10 @@
     <target name="agent-jar-uptodate">
         <uptodate property="jarjar.notRequired" targetfile="target/enumerable-agent.jar">
             <srcfiles dir="target/classes" includes="**/*"/>
-            <srcfiles dir="." includes="build.xml"/>
         </uptodate>
     </target>
     
     <target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
-        <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpathref="jarjar.classpath"/>
         <jarjar jarfile="target/enumerable-agent.jar">
             <fileset dir="target/classes"/>
             <zipfileset src="lib/asm-3.2.jar"/>
@@ -54,8 +50,9 @@
     
     <target name="tests" depends="agent-jar">
         <mkdir dir="target/junit"/>
-        <junit fork="yes" forkMode="once" printsummary="withOutAndErr" failureproperty="test.failed">
+        <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
             <jvmarg value="-javaagent:target/enumerable-agent.jar=org.apache.tools.ant"/>
+			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
             <classpath refid="enumerable.test.classpath"/>
             <batchtest todir="target/junit">
                 <fileset dir="src/test/java">
@@ -65,15 +62,6 @@
             <formatter type="xml"/>
             <formatter type="plain"/>
         </junit>
-		<fail if="test.failed"/>
-    </target>
-
-    <target name="junitreport">
-        <junitreport todir="target/junit">
-            <fileset dir="target/junit">
-                <include name="TEST-*.xml"/>
-            </fileset>
-            <report format="noframes" todir="target/junit"/>
-        </junitreport>
+		<fail if="tests.failed"/>
     </target>
 </project>

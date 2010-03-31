@@ -111,7 +111,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 		}
 	}
 
-	public static Object launchApplication(String className, String[] args) throws ClassNotFoundException, NoSuchMethodException,
+	static Object launchApplication(String className, String[] args) throws ClassNotFoundException, NoSuchMethodException,
 			IllegalAccessException, InvocationTargetException {
 		addSkippedPackages(System.getProperty("lambda.skippedPackages"));
 		Class<?> c = new LambdaLoader().loadClass(className);

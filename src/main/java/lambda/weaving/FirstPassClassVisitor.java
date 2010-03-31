@@ -1,6 +1,5 @@
 package lambda.weaving;
 
-import static lambda.weaving.LambdaTransformer.*;
 import static org.objectweb.asm.Type.*;
 
 import java.lang.reflect.Field;
@@ -43,7 +42,7 @@ class FirstPassClassVisitor implements ClassVisitor, MethodVisitor {
 				currentMethod.newLambda();
 			}
 		} catch (NoSuchFieldException ignore) {
-			debug(ignore.toString());
+			// debug(ignore.toString());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

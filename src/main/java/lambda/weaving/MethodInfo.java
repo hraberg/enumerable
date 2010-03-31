@@ -14,7 +14,7 @@ class MethodInfo {
 	String name;
 	String desc;
 
-	public MethodInfo(String name, String desc) {
+	MethodInfo(String name, String desc) {
 		this.name = name;
 		this.desc = desc;
 	}
