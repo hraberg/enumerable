@@ -1,6 +1,6 @@
 # Enumerable.java
 
-Copyright 2010 HÃ¥kan RÃ¥berg
+Copyright 2010 Håkan Råberg
 
 
 Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
@@ -20,7 +20,7 @@ Which is expanded using the [ASM Toolkit for Bytecode Manipulation](http://asm.o
         public Object call(Object arg) {
             return ((Integer) arg) * 2;
         }
-    }));
+    };
     List<Integer> result = select(integers, square));
 
 
@@ -38,13 +38,13 @@ Becomes:
         public Object call(Object arg) {
             return i[0] += (Integer) arg;
         }
-    })).call(10);
+    }.call(10);
     assert i[0] == 10;
 
 
-Block parameters are defined using annotated static fields.
-**The actual blocks are limited to one expression.** For more examples see [EnumerableExampleAndRegressionTest](http://github.com/hraberg/enumerable/blob/master/src/test/java/lambda/enumerable/EnumerableExampleAndRegressionTest.java)
+Block parameters are defined using annotated static fields. For more examples see [EnumerableExampleAndRegressionTest](http://github.com/hraberg/enumerable/blob/master/src/test/java/lambda/enumerable/EnumerableExampleAndRegressionTest.java)
 
+**Note: The actual blocks are limited to one expression.** 
 
 ## Usage:
 
@@ -65,12 +65,12 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
         public static Money m;
     }
 
-Accessing a field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses is be redirected.
+Accessing a field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses is redirected.
 
 
 ## Implementation
 
-Enumerable.java uses [Maven 2](http://maven.apache.org/) to build. You need to run mvn package -DskipTests the first time to get the java agent jar required to run the tests. Then run mvn test. The class loader will pick up your changes over the ones in the jar, so there's no need to rebuild the jar all the time.
+Enumerable.java uses [Maven 2](http://maven.apache.org/) to build. You need to run `mvn package -DskipTests` the first time to get the java agent jar required to run the tests, `mvn test`. The class loader will pick up your changes over the ones in the jar, so there's no need to rebuild the jar all the time while developing.
 
 The transformation is implemented in two passes. The first pass identifies all blocks and their arities and which local variables they access, if any. The second pass does the actual transformation, which has three main elements:
 

@@ -19,6 +19,7 @@ public class EnumerableExampleAndRegressionTest {
 		EnumerableExampleAndRegressionTest test = new EnumerableExampleAndRegressionTest();
 		test.regression();
 	}
+
 	@Test
 	public void regression() {
 		List<String> strings = asList("malaysia", "thailand", "india", "people's republic of china");
