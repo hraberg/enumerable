@@ -34,7 +34,7 @@ Closure works as expected, by trasforming local variables to arrays:
 Becomes:
 
     final int[] i = new int[] { 0 };
-    Fn1 square = new Fn1() {
+    new Fn1() {
         public Object call(Object arg) {
             return i[0] += (Integer) arg;
         }
