@@ -25,6 +25,13 @@ public class EnumerableExampleAndRegressionTest {
 		List<String> strings = asList("malaysia", "thailand", "india", "people's republic of china");
 
 		/*
+		 * assert Character.isJavaIdentifierStart(λ) == true;
+		 * 
+		 * While λ looks good, it is cumbersome to insert. There are three
+		 * (ignoring arity versions) static methods in Enumerable that all are
+		 * marked with @NewLambda and all do the same thing: λ, fn and lambda.
+		 * 
+		 * 
 		 * each will evaluate the block for every element in the array. The
 		 * block has to be an expression, printf returns a PrintWriter which we
 		 * ignore.
