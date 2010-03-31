@@ -25,6 +25,7 @@ public class EnumerableExampleAndRegressionTest {
 	 * 
 	 * While λ looks good, it is cumbersome to insert. There are three (ignoring
 	 * arity versions) static methods in Enumerable that all are marked with
+	 * 
 	 * @NewLambda and all do the same thing: λ, fn and lambda.
 	 */
 	@Test
@@ -138,13 +139,13 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(hasSmallerThanFive);
 
 		/*
-		 * All returns true if all element matches the boolean expression.
+		 * All returns true if all elements match the boolean expression.
 		 */
 		boolean allSmallerThanEleven = all(ints, λ(n, n < 11));
 		out.println(allSmallerThanEleven);
 
 		/*
-		 * Count is the same as select(..).size();
+		 * Count is the same as select(..).size()
 		 */
 		int divisableByThree = count(ints, λ(n, n % 3 == 0));
 		out.println(divisableByThree);
@@ -194,8 +195,8 @@ public class EnumerableExampleAndRegressionTest {
 
 		/*
 		 * Partial application, very limited support as the blocks of this
-		 * library is primarily meant to support the Enumerable operations. Also
-		 * shows that the blocks are compiled into normal Java classes, an
+		 * library are primarily meant to support the Enumerable operations.
+		 * Also shows that the blocks are compiled into normal Java classes, an
 		 * instance of Fn1 here. These can be passed around like any other
 		 * instance.
 		 */
@@ -214,7 +215,7 @@ public class EnumerableExampleAndRegressionTest {
 		out.println(absolutes);
 
 		/*
-		 * You cannot nest lambda constructs (the weaver doesn't support it),
+		 * You cannot nest lambda constructs as the weaver doesn't support it,
 		 * but you can use more than one in the same larger expression like
 		 * this.
 		 */
