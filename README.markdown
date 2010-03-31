@@ -84,6 +84,7 @@ The transformation is implemented in two passes. The first pass identifies all b
 Take this block:
 
     import static lambda.enumerable.Enumerable.*;
+    import static lambda.Lambda.*;
 
     // ...
 

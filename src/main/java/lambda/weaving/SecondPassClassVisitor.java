@@ -168,6 +168,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			super.visitLocalVariable(name, desc, signature, start, end, index);
 		}
 
+		boolean isMethodParameter(int operand) {
+			return operand <= getArgumentTypes(method.desc).length;
+		}
+
 		boolean isThis(int operand) {
 			return operand == 0;
 		}
@@ -209,6 +213,14 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		void initArray(int operand, Type type) {
 			mv.visitInsn(ICONST_1);
 			newArray(type);
+
+			if (isMethodParameter(operand)) {
+				mv.visitInsn(DUP);
+				mv.visitInsn(ICONST_0);
+				mv.visitVarInsn(type.getOpcode(ILOAD), operand);
+				mv.visitInsn(type.getOpcode(IASTORE));
+			}
+
 			mv.visitVarInsn(ASTORE, operand);
 		}
 

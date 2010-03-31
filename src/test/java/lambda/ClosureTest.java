@@ -142,6 +142,26 @@ public class ClosureTest {
 	}
 
 	@Test
+	public void accessingEnclosingMethodArgument() throws Exception {
+		instanceArgumentMethodCall("Hello");
+	}
+
+	void instanceArgumentMethodCall(String string) {
+		assertEquals("Hello", string);
+		assertEquals(string.toUpperCase(), λ(n, string.toUpperCase()).call(null));
+	}
+
+	@Test
+	public void accessingEnclosingMethodPrimitiveArgument() throws Exception {
+		primitiveArgumentMethodCall(10);
+	}
+
+	void primitiveArgumentMethodCall(int x) {
+		assertEquals(10, x);
+		assertEquals(x, (int) λ(n, x).call(0));
+	}
+
+	@Test
 	public void returnSameArgument() throws Exception {
 		String hello = hello();
 		assertSame(hello, λ(s, s).call(hello));
