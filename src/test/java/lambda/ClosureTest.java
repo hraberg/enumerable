@@ -30,6 +30,7 @@ public class ClosureTest {
 		String hello = "hello";
 		λ(s, hello += s).call(" world");
 		assertEquals("hello world", hello);
+		assertEquals(String.class, hello.getClass());
 	}
 
 	@Test
@@ -172,11 +173,16 @@ public class ClosureTest {
 	@Test
 	public void accessingEnclosingMethodPrimitiveArgument() throws Exception {
 		primitiveArgumentMethodCall(10);
+		primitiveArgumentIncMethodCall(10);
 	}
 
 	void primitiveArgumentMethodCall(int x) {
 		assertEquals(10, x);
 		assertEquals(x, (int) λ(n, x).call(0));
+	}
+
+	void primitiveArgumentIncMethodCall(int x) {
+		λ(n, x++).call(0);
 	}
 
 	@Test

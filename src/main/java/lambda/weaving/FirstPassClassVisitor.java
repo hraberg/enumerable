@@ -48,6 +48,12 @@ class FirstPassClassVisitor implements ClassVisitor, MethodVisitor {
 		}
 	}
 
+	public void visitIincInsn(int var, int increment) {
+		if (inLambda) {
+			currentMethod.accessLocalFromLambda(var);
+		}
+	}
+
 	public void visitVarInsn(int opcode, int operand) {
 		if (inLambda) {
 			currentMethod.accessLocalFromLambda(operand);
@@ -94,9 +100,6 @@ class FirstPassClassVisitor implements ClassVisitor, MethodVisitor {
 	}
 
 	public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack) {
-	}
-
-	public void visitIincInsn(int var, int increment) {
 	}
 
 	public void visitInsn(int opcode) {

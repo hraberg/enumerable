@@ -153,15 +153,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			initAccessedLocalsAndParametersAsArrays();
 		}
 
-		private void initAccessedLocalsAndParametersAsArrays() {
-			for (int local : method.accessedLocalsByIndex.keySet()) {
-				if (!isThis(local)) {
-					Type type = method.getTypeOfLocal(local);
-					initArray(local, type);
-				}
-			}
-		}
-
 		public void visitLineNumber(int line, Label start) {
 			currentLine = line;
 			super.visitLineNumber(line, start);
@@ -182,7 +173,15 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 			return operand == 0;
 		}
 
-		public void newArray(final Type type) {
+		void initAccessedLocalsAndParametersAsArrays() {
+			for (int local : method.accessedLocalsByIndex.keySet()) {
+				if (!isThis(local)) {
+					initArray(local, method.getTypeOfLocal(local));
+				}
+			}
+		}
+
+		void newArray(final Type type) {
 			int typ;
 			switch (type.getSort()) {
 			case Type.BOOLEAN:
@@ -253,7 +252,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 		}
 
 		void incrementInArray(int var, int increment) {
-			mv.visitVarInsn(ALOAD, var);
+			// mv.visitVarInsn(ALOAD, var);
+			loadArrayFromLocalOrLambda(var, method.getTypeOfLocal(var));
 			mv.visitInsn(ICONST_0);
 			mv.visitInsn(DUP2);
 			mv.visitInsn(IALOAD);
