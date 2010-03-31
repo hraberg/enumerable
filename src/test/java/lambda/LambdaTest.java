@@ -59,7 +59,7 @@ public class LambdaTest {
 	@Test
 	public void oneArgumentLambdaAsInterfaceWithZeroArgumentMethod() throws Exception {
 		String string = "";
-		Runnable runnable = as(Runnable.class, λ(_, string = "hello"));
+		Runnable runnable = as(Runnable.class, λ(obj, string = "hello"));
 		runnable.run();
 		assertEquals("hello", string);
 	}

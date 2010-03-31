@@ -38,6 +38,8 @@ public class Enumerable {
 	public static Collection<?> col;
 	@LambdaParameter
 	public static Object obj;
+	@LambdaParameter
+	public static Object _;
 
 	@NewLambda
 	public static <E, R> Fn1<E, R> λ(E n, R block) {

@@ -79,7 +79,7 @@ The transformation is implemented in two passes. The first pass identifies all b
 * Replacing the original expression with code that constructs the new block.
 
 
-# How expressions are transformed into blocks
+### How expressions are transformed into blocks
 
 Take this block:
 
