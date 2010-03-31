@@ -11,7 +11,7 @@ Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation
 Enumarable allows you to write blocks in valid Java like this:
 
     Fn1 square = fn(n, n * n);
-    List<Integer> result = collect(integers, square));
+    List<Integer> result = collect(integers, square);
 
   
 Which is expanded using the [ASM Toolkit for Bytecode Manipulation](http://asm.ow2.org/) into this:
@@ -21,7 +21,7 @@ Which is expanded using the [ASM Toolkit for Bytecode Manipulation](http://asm.o
             return ((Integer) arg) * n;
         }
     };
-    List<Integer> result = collect(integers, square));
+    List<Integer> result = collect(integers, square);
 
 
 Closure works as expected, by trasforming local variables to arrays:
