@@ -79,7 +79,7 @@ public class EnumerableExampleAndRegressionTest {
 		/*
 		 * Special case of wrapping a block in a java interface
 		 * (java.util.Comparator). For a general, proxy based solution, see the
-		 * lambda.Lambda.as methods.
+		 * Lambda.as methods.
 		 */
 		List<Integer> sortedDescending = sort(ints, λ(n, m, m - n));
 		out.println(sortedDescending);

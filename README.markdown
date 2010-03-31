@@ -65,7 +65,7 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
         public static Money m;
     }
 
-Accessing a field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses is redirected.
+Accessing a field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses is redirected. Due to class loading, you cannot define a @LambdaParameter in the same class it's used. You can use inner static classes as an alternative if you want the definitions close to their usage.
 
 
 ## Implementation
@@ -91,7 +91,7 @@ Take this block:
 
     
 The first pass starts by looking for any static fields marked with the *@LambdaParameter* annotation.
-Once it sees access to one, *s* in this case, it will start moving the code into a new *Fn1* (or *Fn2*) implementation. A block ends with a call to a static method marked with *@NewLambda*: *fn*.
+Once it sees access to one, *s* in this case, it will start moving the code into a new *Fn1* (or *Fn2*) implementation. A block ends with a call to a static method marked with *@NewLambda*: *fn*. (Remember when reading the code that all arguments are (obviously) evaluated before the method call, so *s* is accessed first, and *fn* called last.)
 
 The first pass also keeps track of any local varible that is accessed from within a block, so that it can be wrapped in an array when initialized. This allows the block to properly close over local variables.
 
