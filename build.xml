@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="enumerable">
-    <property name="lambda.weaving.debug" value="false"/>
-    <property name="lambda.weaving.skipped.packages" value="org.apache.tools.ant"/>
+	<property file="lambda.weaving.properties"/>
     
     <path id="enumerable.classpath">
         <pathelement location="target/classes"/>
