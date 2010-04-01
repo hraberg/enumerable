@@ -160,17 +160,11 @@ public class EnumerableExample {
         out.println(sum);
 
         /*
-         * Inject without the into call, works the same.
-         */
-        int factorial = inject(ints, 1, λ(n, m, n * m));
-        out.println(factorial);
-
-        /*
          * Inject without an initial value,, requires the collection to be at
          * least two elements.
          */
-        int factorialNoMemo = inject(ints, λ(n, m, n * m));
-        out.println(factorialNoMemo);
+        int factorial = inject(ints, λ(n, m, n * m));
+        out.println(factorial);
 
         /*
          * The ternary operator can be used to evaluate more expressions in

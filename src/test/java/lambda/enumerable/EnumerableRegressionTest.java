@@ -34,7 +34,6 @@ public class EnumerableRegressionTest {
             + "[[8, 4, 6, 10, 2], [5, 1, 3, 7, 9]]\n"
             + "55\n"
             + "3628800\n"
-            + "3628800\n"
             + "people's republic of china\n"
             + "5, 1, 8, 4, 6, 3, 10, 2, 7, 9\n"
             + "7\n"
