@@ -20,151 +20,151 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 class FirstPassClassVisitor implements ClassVisitor, MethodVisitor, Opcodes {
-	Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
+    Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
 
-	boolean inLambda;
-	MethodInfo currentMethod;
+    boolean inLambda;
+    MethodInfo currentMethod;
 
-	private String className;
+    private String className;
 
-	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-		currentMethod = new MethodInfo(name, desc);
-		methodsByName.put(currentMethod.getFullName(), currentMethod);
-		return this;
-	}
+    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        currentMethod = new MethodInfo(name, desc);
+        methodsByName.put(currentMethod.getFullName(), currentMethod);
+        return this;
+    }
 
-	public void visitFieldInsn(int opcode, String owner, String name, String desc) {
-		try {
-			if (owner.equals(className)) {
-				return;
-			}
-			if (opcode == GETSTATIC || opcode == PUTSTATIC) {
-				Field field = LambdaTransformer.findField(owner, name);
-				if (!inLambda && field.isAnnotationPresent(LambdaParameter.class)) {
-					inLambda = true;
-					currentMethod.newLambda();
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public void visitFieldInsn(int opcode, String owner, String name, String desc) {
+        try {
+            if (owner.equals(className)) {
+                return;
+            }
+            if (opcode == GETSTATIC || opcode == PUTSTATIC) {
+                Field field = LambdaTransformer.findField(owner, name);
+                if (!inLambda && field.isAnnotationPresent(LambdaParameter.class)) {
+                    inLambda = true;
+                    currentMethod.newLambda();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	public void visitIincInsn(int var, int increment) {
-		if (inLambda) {
-			currentMethod.accessLocalFromLambda(var);
-		}
-	}
+    public void visitIincInsn(int var, int increment) {
+        if (inLambda) {
+            currentMethod.accessLocalFromLambda(var);
+        }
+    }
 
-	public void visitVarInsn(int opcode, int operand) {
-		if (inLambda) {
-			currentMethod.accessLocalFromLambda(operand);
-		}
-	}
+    public void visitVarInsn(int opcode, int operand) {
+        if (inLambda) {
+            currentMethod.accessLocalFromLambda(operand);
+        }
+    }
 
-	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-		currentMethod.setTypeOfLocal(index, getType(desc));
-	}
+    public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+        currentMethod.setTypeOfLocal(index, getType(desc));
+    }
 
-	public void visitMethodInsn(int opcode, String owner, String name, String desc) {
-		try {
-			if (owner.equals(className)) {
-				return;
-			}
-			if (inLambda && opcode == INVOKESTATIC) {
-				Method method = findMethod(owner, name, desc);
-				if (method.isAnnotationPresent(NewLambda.class)) {
-					currentMethod.setLambdaArity(method.getParameterTypes().length - 1);
-					inLambda = false;
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+    public void visitMethodInsn(int opcode, String owner, String name, String desc) {
+        try {
+            if (owner.equals(className)) {
+                return;
+            }
+            if (inLambda && opcode == INVOKESTATIC) {
+                Method method = findMethod(owner, name, desc);
+                if (method.isAnnotationPresent(NewLambda.class)) {
+                    currentMethod.setLambdaArity(method.getParameterTypes().length - 1);
+                    inLambda = false;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-		this.className = name;
-	}
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        this.className = name;
+    }
 
-	boolean hasNoLambdas() {
-		for (MethodInfo method : methodsByName.values()) {
-			if (!method.lambdas.isEmpty())
-				return false;
-		}
-		return true;
-	}
+    boolean hasNoLambdas() {
+        for (MethodInfo method : methodsByName.values()) {
+            if (!method.lambdas.isEmpty())
+                return false;
+        }
+        return true;
+    }
 
-	public AnnotationVisitor visitAnnotationDefault() {
-		return null;
-	}
+    public AnnotationVisitor visitAnnotationDefault() {
+        return null;
+    }
 
-	public void visitCode() {
-	}
+    public void visitCode() {
+    }
 
-	public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack) {
-	}
+    public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack) {
+    }
 
-	public void visitInsn(int opcode) {
-	}
+    public void visitInsn(int opcode) {
+    }
 
-	public void visitIntInsn(int opcode, int operand) {
-	}
+    public void visitIntInsn(int opcode, int operand) {
+    }
 
-	public void visitJumpInsn(int opcode, Label label) {
-	}
+    public void visitJumpInsn(int opcode, Label label) {
+    }
 
-	public void visitLabel(Label label) {
-	}
+    public void visitLabel(Label label) {
+    }
 
-	public void visitLdcInsn(Object cst) {
-	}
+    public void visitLdcInsn(Object cst) {
+    }
 
-	public void visitLineNumber(int line, Label start) {
-	}
+    public void visitLineNumber(int line, Label start) {
+    }
 
-	public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
-	}
+    public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
+    }
 
-	public void visitMaxs(int maxStack, int maxLocals) {
-	}
+    public void visitMaxs(int maxStack, int maxLocals) {
+    }
 
-	public void visitMultiANewArrayInsn(String desc, int dims) {
-	}
+    public void visitMultiANewArrayInsn(String desc, int dims) {
+    }
 
-	public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
-		return null;
-	}
+    public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible) {
+        return null;
+    }
 
-	public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels) {
-	}
+    public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels) {
+    }
 
-	public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
-	}
+    public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
+    }
 
-	public void visitTypeInsn(int opcode, String type) {
-	}
+    public void visitTypeInsn(int opcode, String type) {
+    }
 
-	public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-		return null;
-	}
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        return null;
+    }
 
-	public void visitAttribute(Attribute attr) {
-	}
+    public void visitAttribute(Attribute attr) {
+    }
 
-	public void visitEnd() {
-	}
+    public void visitEnd() {
+    }
 
-	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-		return null;
-	}
+    public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+        return null;
+    }
 
-	public void visitInnerClass(String name, String outerName, String innerName, int access) {
-	}
+    public void visitInnerClass(String name, String outerName, String innerName, int access) {
+    }
 
-	public void visitOuterClass(String owner, String name, String desc) {
-	}
+    public void visitOuterClass(String owner, String name, String desc) {
+    }
 
-	public void visitSource(String source, String debug) {
-	}
+    public void visitSource(String source, String debug) {
+    }
 }
