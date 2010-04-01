@@ -6,7 +6,7 @@ Copyright 2010 Håkan Råberg - Released under the [EPL license](http://www.ecli
 Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
 
 
-## Introduction:
+## Introduction
 
 Enumarable allows you to write blocks in valid Java like this:
 
@@ -46,7 +46,7 @@ Block parameters are defined using annotated static fields. For more examples se
 
 **Note: The actual blocks are limited to one expression.** 
 
-## Usage:
+## Usage
 
 Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (lambda.asm).
 
@@ -59,7 +59,7 @@ The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/co
 
 If you're using Eclipse, you can add the agent as a default VM argument under Installed JREs. You can also add Lambda and Enumerable as Favorites in the Java Content Assist settings.
 
-### System Properties:
+### System Properties
 
 * `lambda.weaving.debug` - will log to System.err and write all generated classes to disk if set to true.
 * `lambda.weaving.debug.classes.dir` - where to write the classes. Defaults to `target/generated-classes`.
@@ -68,7 +68,7 @@ If you're using Eclipse, you can add the agent as a default VM argument under In
 
 You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
 
-### LambdaParameter:
+### LambdaParameter
 
     public class MyDomainLambdaParameters {
         @LambdaParameter
@@ -76,7 +76,6 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
     }
 
 Accessing a static field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses are redirected.
-
 
 ## Implementation
 
@@ -130,5 +129,3 @@ http://www.jroller.com/ghettoJedi/entry/using_hamcrest_for_iterators
 
 A library that's quite close to what I suggested there is LambdaJ:
 http://code.google.com/p/lambdaj/
-
-
