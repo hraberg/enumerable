@@ -38,9 +38,9 @@ class FirstPassClassVisitor implements ClassVisitor, MethodVisitor, Opcodes {
             if (owner.equals(className)) {
                 return;
             }
-            if (opcode == GETSTATIC || opcode == PUTSTATIC) {
-                Field field = LambdaTransformer.findField(owner, name);
-                if (!inLambda && field.isAnnotationPresent(LambdaParameter.class)) {
+            if (!inLambda && opcode == GETSTATIC || opcode == PUTSTATIC) {
+                Field field = findField(owner, name);
+                if (field.isAnnotationPresent(LambdaParameter.class)) {
                     inLambda = true;
                     currentMethod.newLambda();
                 }
@@ -74,7 +74,7 @@ class FirstPassClassVisitor implements ClassVisitor, MethodVisitor, Opcodes {
             if (inLambda && opcode == INVOKESTATIC) {
                 Method method = findMethod(owner, name, desc);
                 if (method.isAnnotationPresent(NewLambda.class)) {
-                    currentMethod.setLambdaArity(method.getParameterTypes().length - 1);
+                    currentMethod.setLambdaArity(getArgumentTypes(desc).length - 1);
                     inLambda = false;
                 }
             }

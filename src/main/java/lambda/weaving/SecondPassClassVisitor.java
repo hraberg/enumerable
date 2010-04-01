@@ -79,8 +79,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                         initLambdaParameter(name);
                     } else {
                         int index = parameterNamesToIndex.get(name);
-                        debug("accessing lambda parameter " + field + " with index " + index);
-                        accessLambdaParameter(field, index);
+                        debug("lambda parameter " + desc + " " + owner + "." + name + " accessed with index " + index);
+                        accessLambdaParameter(name, desc, index);
                     }
                 } else {
                     super.visitFieldInsn(opcode, owner, name, desc);
@@ -95,7 +95,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 if (inLambda() && opcode == INVOKESTATIC && !owner.equals(className)) {
                     Method method = findMethod(owner, name, desc);
                     if (method.isAnnotationPresent(NewLambda.class)) {
-                        debug("new lambda created by " + method + " in " + sourceAndLine());
+                        debug("new lambda created by " + owner + "." + name + desc
+                                + " in " + sourceAndLine());
 
                         returnFromCall();
                         endLambdaClass();
@@ -133,7 +134,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     loadArrayFromLocalOrLambda(operand, type);
                     accessFirstArrayElement(opcode, type);
 
-                    debug("variable " + operand + " (" + type + ") accessed using wrapped array "
+                    debug("variable " + operand + " " + type + " accessed using wrapped array"
                             + (inLambda() ? " field " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
                 }
             } else {
@@ -352,12 +353,12 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             parameterNamesToIndex.put(name, parameterNamesToIndex.size() + 1);
         }
 
-        void accessLambdaParameter(Field field, int parameter) {
+        void accessLambdaParameter(String name, String desc, int parameter) {
             if (parameterNamesToIndex.size() != currentLambda.arity) {
-                throw new IllegalArgumentException("Parameter already bound [" + field.getName() + "] " + sourceAndLine());
+                throw new IllegalArgumentException("Parameter already bound [" + name + "] " + sourceAndLine());
             }
             mv.visitVarInsn(ALOAD, parameter);
-            mv.visitTypeInsn(CHECKCAST, getInternalName(field.getType()));
+            mv.visitTypeInsn(CHECKCAST, getType(desc).getInternalName());
         }
 
         String sourceAndLine() {
