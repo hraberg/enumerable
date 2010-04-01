@@ -61,9 +61,9 @@ If you're using Eclipse, you can add the agent as a default VM argument under In
 
 ### System Properties:
 
-* `lambda.weaving.debug` will log to System.err and write all generated classes if set to true.
-* `lambda.weaving.debug.classes.dir`  where to write the classes. Defaults to target/generated-classes
-* `lambda.weaving.skipped.packages` is a comma separeted list of package prefixes to skip.
+* `lambda.weaving.debug` - will log to System.err and write all generated classes to disk if set to true.
+* `lambda.weaving.debug.classes.dir` - where to write the classes. Defaults to `target/generated-classes`.
+* `lambda.weaving.skipped.packages` - is a comma separeted list of package prefixes to skip.
 
 
 You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
@@ -99,8 +99,7 @@ Take this block:
     each(strings, fn(s, out.printf("Country: %s\n", s)));
 
     
-The first pass starts by looking for any static fields marked with the *@LambdaParameter* annotation.
-Once it sees access to one, *s* in this case, it will start moving the code into a new *Fn1* (or *Fn2*) implementation. A block ends with a call to a static method marked with *@NewLambda*: *fn*. (Remember when reading the code that all arguments are (obviously) evaluated before the method call, so *s* is accessed first, and *fn* called last.)
+The first pass starts by looking for any static fields marked with the *@LambdaParameter* annotation. Once it sees access to one, *s* in this case, it will start moving the code into a new *Fn1* (or *Fn2*) implementation. A block ends with a call to a static method marked with *@NewLambda*: *fn*. (Remember when reading the code that all arguments are (obviously) evaluated before the method call, so *s* is accessed first, and *fn* called last.)
 
 The first pass also keeps track of any local varible that is accessed from within a block, so that it can be wrapped in an array when initialized. This allows the block to properly close over local variables.
 
@@ -125,7 +124,7 @@ My blog post which outlined my final try using Dynamic Proxies:
 http://www.jroller.com/ghettoJedi/entry/using_hamcrest_for_iterators
 
 
-A library that's quite close to what I suggested there is Lamba4j:
+A library that's quite close to what I suggested there is LambaJ:
 http://code.google.com/p/lambdaj/
 
 
