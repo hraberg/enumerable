@@ -20,8 +20,8 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     static Set<String> packagesToSkip = new HashSet<String>();
 
     static {
-        packagesToSkip.add("java");
-        packagesToSkip.add("sun");
+        packagesToSkip.add("java.");
+        packagesToSkip.add("sun.");
         packagesToSkip.add("$Proxy");
     }
 
