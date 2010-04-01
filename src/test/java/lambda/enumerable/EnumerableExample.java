@@ -109,7 +109,7 @@ public class EnumerableExample {
         /*
          * Rejects elements based on a boolean expression.
          */
-        List<Integer> smallerThanFive = reject(ints, λ(n, n < 5));
+        List<Integer> smallerThanFive = reject(ints, λ(n, n >= 5));
         out.println(smallerThanFive);
 
         /*
