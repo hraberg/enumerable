@@ -68,7 +68,7 @@ If you're using Eclipse, you can add the agent as a default VM argument under In
 
 You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
 
-### LambdaParameter
+### LambdaParameter:
 
     public class MyDomainLambdaParameters {
         @LambdaParameter
