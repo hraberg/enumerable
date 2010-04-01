@@ -3,13 +3,11 @@ package lambda.weaving;
 import static lambda.weaving.LambdaTransformer.*;
 import static org.objectweb.asm.Type.*;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import lambda.NewLambda;
 import lambda.weaving.MethodInfo.LambdaInfo;
 
 import org.objectweb.asm.ClassAdapter;
@@ -89,8 +87,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         public void visitMethodInsn(int opcode, String owner, String name, String desc) {
             try {
                 if (inLambda() && opcode == INVOKESTATIC && !owner.equals(className)) {
-                    Method method = findMethod(owner, name, desc);
-                    if (method.isAnnotationPresent(NewLambda.class)) {
+                    if (isNewLambdaMethod(owner, name, desc)) {
                         debug("new lambda created by " + owner + "." + name + desc
                                 + " in " + sourceAndLine());
 

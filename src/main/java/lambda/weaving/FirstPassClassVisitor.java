@@ -3,11 +3,8 @@ package lambda.weaving;
 import static lambda.weaving.LambdaTransformer.*;
 import static org.objectweb.asm.Type.*;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
-import lambda.NewLambda;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
@@ -69,8 +66,7 @@ class FirstPassClassVisitor implements ClassVisitor, MethodVisitor, Opcodes {
                 return;
             }
             if (inLambda && opcode == INVOKESTATIC) {
-                Method method = findMethod(owner, name, desc);
-                if (method.isAnnotationPresent(NewLambda.class)) {
+                if (isNewLambdaMethod(owner, name, desc)) {
                     currentMethod.setLambdaArity(getArgumentTypes(desc).length - 1);
                     inLambda = false;
                 }
