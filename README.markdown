@@ -59,6 +59,12 @@ The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/co
 
 If you're using Eclipse, you can add the agent as a default VM argument under Installed JREs. You can also add Lambda and Enumerable as Favorites in the Java Content Assist settings.
 
+### System Properties:
+
+*`lambda.weaving.debug`* will log to System.err and write all generated classes if set to true.
+*`lambda.weaving.debug.classes.dir`*  where to write the classes. Defaults to target/generated-classes
+*`lambda.weaving.skipped.packages` is a comma separeted list of package prefixes to skip.
+
 
 You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
 
