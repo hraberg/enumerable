@@ -1,6 +1,6 @@
 package lambda.weaving;
 
-import static java.lang.System.*;
+import static lambda.weaving.Debug.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +14,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
 class LambdaTransformer {
-    static boolean DEBUG = Boolean.valueOf(getProperty("lambda.weaving.debug"));
-
     Map<String, byte[]> lambdasByResourceName = new HashMap<String, byte[]>();
 
     AnnotationCache lambdaParameterFields = new AnnotationCache(LambdaParameter.class);
@@ -49,21 +47,6 @@ class LambdaTransformer {
         lambdasByResourceName.putAll(visitor.lambdasByResourceName);
 
         return cw.toByteArray();
-    }
-
-    static String debugIndentation = "";
-
-    static void debugIndent() {
-        debugIndentation += " ";
-    }
-
-    static void debugDedent() {
-        debugIndentation = debugIndentation.substring(0, debugIndentation.length() - 1);
-    }
-
-    static void debug(String msg) {
-        if (DEBUG)
-            err.println(debugIndentation + msg);
     }
 
     void newLambdaClass(String internalName, byte[] bs) {

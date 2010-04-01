@@ -8,13 +8,13 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-final class AnnotationFinder extends EmptyVisitor {
+class AnnotationFinder extends EmptyVisitor {
     String name;
     String desc;
     boolean found;
     Class<? extends Annotation> annotation;
 
-    public AnnotationFinder(Class<? extends Annotation> annotation, String name, String desc) {
+    AnnotationFinder(Class<? extends Annotation> annotation, String name, String desc) {
         this.annotation = annotation;
         this.name = name;
         this.desc = desc;

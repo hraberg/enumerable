@@ -21,15 +21,15 @@ class MethodInfo {
         this.desc = desc;
     }
 
-    String getFullName() {
+    String getNameAndDesc() {
         return name + desc;
     }
 
-    Map<Integer, MethodInfo.LocalInfo> accessedLocalsByIndex = new HashMap<Integer, MethodInfo.LocalInfo>();
+    Map<Integer, LocalInfo> accessedLocalsByIndex = new HashMap<Integer, LocalInfo>();
     List<MethodInfo.LambdaInfo> lambdas = new ArrayList<MethodInfo.LambdaInfo>();
 
     void accessLocalFromLambda(int operand) {
-        MethodInfo.LocalInfo local = accessedLocalsByIndex.get(operand);
+        LocalInfo local = accessedLocalsByIndex.get(operand);
         if (local == null) {
             local = new LocalInfo();
             accessedLocalsByIndex.put(operand, local);
@@ -54,7 +54,7 @@ class MethodInfo {
     }
 
     void setInfoForLocal(int index, String name, Type type) {
-        MethodInfo.LocalInfo localInfo = accessedLocalsByIndex.get(index);
+        LocalInfo localInfo = accessedLocalsByIndex.get(index);
         if (localInfo != null) {
             localInfo.name = name;
             localInfo.type = type;

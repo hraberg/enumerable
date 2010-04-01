@@ -2,7 +2,7 @@ package lambda.weaving;
 
 import static java.lang.System.*;
 import static java.util.Arrays.*;
-import static lambda.weaving.LambdaTransformer.*;
+import static lambda.weaving.Debug.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -22,7 +22,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
 
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         currentMethod = new MethodInfo(name, desc);
-        methodsByName.put(currentMethod.getFullName(), currentMethod);
+        methodsByName.put(currentMethod.getNameAndDesc(), currentMethod);
         return this;
     }
 

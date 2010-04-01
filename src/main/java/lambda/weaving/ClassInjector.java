@@ -1,6 +1,6 @@
 package lambda.weaving;
 
-import static lambda.weaving.LambdaTransformer.*;
+import static lambda.weaving.Debug.*;
 
 import java.io.File;
 import java.io.FileOutputStream;

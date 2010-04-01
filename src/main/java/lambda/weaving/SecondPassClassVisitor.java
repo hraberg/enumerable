@@ -1,6 +1,6 @@
 package lambda.weaving;
 
-import static lambda.weaving.LambdaTransformer.*;
+import static lambda.weaving.Debug.*;
 import static org.objectweb.asm.Type.*;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     String source;
     String className;
 
-    Map<String, MethodInfo> methodsByName;
+    Map<String, MethodInfo> methodsByNameAndDesc;
 
     int currentLambdaId;
 
@@ -393,7 +393,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     SecondPassClassVisitor(ClassVisitor cv, FirstPassClassVisitor firstPass, LambdaTransformer transformer) {
         super(cv);
         this.transformer = transformer;
-        this.methodsByName = firstPass.methodsByName;
+        this.methodsByNameAndDesc = firstPass.methodsByName;
     }
 
     public void visitSource(String source, String debug) {
@@ -409,12 +409,12 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
     public MethodVisitor visitMethod(int access, final String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
-        MethodInfo method = methodsByName.get(name + desc);
+        MethodInfo method = methodsByNameAndDesc.get(name + desc);
         if (method.lambdas.isEmpty()) {
             debug("skipping method " + name + desc);
             return mv;
         }
-        debug("processing method " + method.getFullName());
+        debug("processing method " + method.getNameAndDesc());
         return new LambdaMethodVisitor(mv, method);
     }
 }
