@@ -8,14 +8,21 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 class ClassInjector {
+    static File classDir;
+
     static Method defineClass;
     static Method resolveClass;
+
     static {
         try {
             defineClass = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, Integer.TYPE, Integer.TYPE);
             defineClass.setAccessible(true);
             resolveClass = ClassLoader.class.getDeclaredMethod("resolveClass", Class.class);
             resolveClass.setAccessible(true);
+            
+            classDir = new File(System.getProperty("lambda.weaving.debug.classes.dir", "target/generated-classes/"));
+            
+            debug("writing generated classes to " + classDir.getAbsolutePath());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -35,10 +42,8 @@ class ClassInjector {
         if (!DEBUG)
             return;
 
-        String parent = System.getProperty("lambda.weaving.debug.classes.dir", "target/generated-classes/");
-        File file = new File(parent, resource);
+        File file = new File(classDir, resource);
 
-        debug("writing " + file + " (" + b.length + " bytes)");
         FileOutputStream out = null;
         try {
             file.getParentFile().mkdirs();

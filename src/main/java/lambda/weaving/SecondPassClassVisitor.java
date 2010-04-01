@@ -46,12 +46,17 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         Iterator<LambdaInfo> lambdas;
         LambdaInfo currentLambda;
 
-        private LambdaMethodVisitor(MethodVisitor mv, MethodInfo method) {
+        LambdaMethodVisitor(MethodVisitor mv, MethodInfo method) {
             super(mv);
             this.method = method;
             this.lambdas = method.lambdas();
             this.originalMethodWriter = mv;
-            debug("transforming " + method.getFullName());
+            debugIndent();
+        }
+
+        public void visitEnd() {
+            debugDedent();
+            super.visitEnd();
         }
 
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
@@ -59,12 +64,16 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 if (!inLambda() && transformer.isLambdaParameterField(owner, name)) {
                     currentLambda = lambdas.next();
                     parameterNamesToIndex = new LinkedHashMap<String, Integer>();
+                    nextLambdaId();
 
                     String locals = "";
                     if (!currentLambda.accessedLocals.isEmpty()) {
-                        locals = " closing over " + method.getAccessedArgumentsAndLocalsString(currentLambda.accessedLocals);
+                        locals = " closing over [" + method.getAccessedLocalsString(currentLambda.accessedLocals) + "]";
                     }
+
                     debug("starting new lambda with arity " + currentLambda.arity + locals);
+
+                    debugIndent();
 
                     createLambdaClass();
                     createLambdaConstructor();
@@ -76,8 +85,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                         initLambdaParameter(name);
                     } else {
                         int index = parameterNamesToIndex.get(name);
-                        debug("lambda parameter " + getType(desc).getClassName() + " " + getObjectType(owner).getClassName() + "." + name
-                                + " accessed as argument "
+                        debug("lambda parameter " + getObjectType(owner).getClassName() + "." + name + " "
+                                + getType(desc).getClassName() + " accessed as argument "
                                 + index);
                         accessLambdaParameter(name, desc, index);
                     }
@@ -93,12 +102,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             try {
                 if (inLambda() && opcode == INVOKESTATIC) {
                     if (transformer.isNewLambdaMethod(owner, name, desc)) {
-                        debug("new lambda created by at " + sourceAndLine());
+                        debug("new lambda created at " + sourceAndLine());
 
                         returnFromCall();
                         endLambdaClass();
 
                         restoreOriginalMethodWriterAndInstantiateTheLambda();
+                        debugDedent();
                         return;
                     }
                 }
@@ -274,7 +284,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void createLambdaClass() {
-            nextLambdaId();
 
             lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             String lambdaInterface = "lambda/" + LAMBDA_CLASS_PREFIX + currentLambda.arity;
@@ -396,15 +405,17 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces);
         this.className = name;
+        debug("transforming lambdas and accessed locals in " + getObjectType(name).getClassName());
     }
 
     public MethodVisitor visitMethod(int access, final String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
-        if (methodsByName.get(name + desc).lambdas.isEmpty()) {
-            debug("second pass: skipping method " + name + desc);
+        MethodInfo method = methodsByName.get(name + desc);
+        if (method.lambdas.isEmpty()) {
+            debug("skipping method " + name + desc);
             return mv;
         }
-        debug("second pass: processing method " + name + desc);
-        return new LambdaMethodVisitor(mv, methodsByName.get(name + desc));
+        debug("processing method " + method.getFullName());
+        return new LambdaMethodVisitor(mv, method);
     }
 }

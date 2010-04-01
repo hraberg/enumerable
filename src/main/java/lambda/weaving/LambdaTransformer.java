@@ -43,7 +43,6 @@ class LambdaTransformer {
             return null;
         }
 
-        debug("second pass: transforming lambdas and accessed locals in " + resource);
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         SecondPassClassVisitor visitor = new SecondPassClassVisitor(cw, firstPass, this);
         cr.accept(visitor, 0);
@@ -52,9 +51,19 @@ class LambdaTransformer {
         return cw.toByteArray();
     }
 
+    static String debugIndentation = "";
+
+    static void debugIndent() {
+        debugIndentation += " ";
+    }
+
+    static void debugDedent() {
+        debugIndentation = debugIndentation.substring(0, debugIndentation.length() - 1);
+    }
+
     static void debug(String msg) {
         if (DEBUG)
-            err.println(msg);
+            err.println(debugIndentation + msg);
     }
 
     void newLambdaClass(String internalName, byte[] bs) {
