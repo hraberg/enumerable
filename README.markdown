@@ -124,7 +124,7 @@ My blog post which outlined my final try using Dynamic Proxies:
 http://www.jroller.com/ghettoJedi/entry/using_hamcrest_for_iterators
 
 
-A library that's quite close to what I suggested there is LambaJ:
+A library that's quite close to what I suggested there is LambdaJ:
 http://code.google.com/p/lambdaj/
 
 
