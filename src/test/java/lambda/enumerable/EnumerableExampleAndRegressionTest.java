@@ -17,22 +17,6 @@ import lambda.Lambda;
 import org.junit.Test;
 
 public class EnumerableExampleAndRegressionTest {
-	public static void main(String[] args) {
-		EnumerableExampleAndRegressionTest test = new EnumerableExampleAndRegressionTest();
-		test.example(System.out);
-	}
-
-	@Test
-	public void regression() {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			example(new PrintStream(out));
-		} catch (RuntimeException e) {
-			System.out.print(out.toString());
-			throw e;
-		}
-	}
-
 	/*
 	 * assert Character.isJavaIdentifierStart(λ) == true;
 	 * 
@@ -252,5 +236,21 @@ public class EnumerableExampleAndRegressionTest {
 		 */
 		λ(n, x = n).call(2);
 		out.println(x);
+	}
+
+	@Test
+	public void regression() {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			example(new PrintStream(out));
+		} catch (RuntimeException e) {
+			System.out.print(out.toString());
+			throw e;
+		}
+	}
+
+	public static void main(String[] args) {
+		EnumerableExampleAndRegressionTest test = new EnumerableExampleAndRegressionTest();
+		test.example(System.out);
 	}
 }

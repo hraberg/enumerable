@@ -24,7 +24,6 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 		packagesToSkip.add("java");
 		packagesToSkip.add("sun");
 		packagesToSkip.add("$Proxy");
-		packagesToSkip.add("org.apache.tools.ant");
 	}
 
 	LambdaTransformer transformer = new LambdaTransformer();

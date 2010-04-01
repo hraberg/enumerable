@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="enumerable">
+	<property name="lambda.weaving.debug" value="false"/>
+    <property name="lambda.weaving.skipped.packages" value="org.apache.tools.ant"/>
+
     <path id="enumerable.classpath">
         <pathelement location="target/classes"/>
         <pathelement location="lib/asm-3.2.jar"/>
@@ -51,7 +54,7 @@
     <target name="tests" depends="agent-jar">
         <mkdir dir="target/junit"/>
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
-            <jvmarg value="-javaagent:target/enumerable-agent.jar=org.apache.tools.ant"/>
+            <jvmarg value="-javaagent:target/enumerable-agent.jar=${lambda.weaving.skipped.packages}"/>
 			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
             <classpath refid="enumerable.test.classpath"/>
             <batchtest todir="target/junit">

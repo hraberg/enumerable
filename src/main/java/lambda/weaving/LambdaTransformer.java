@@ -7,25 +7,49 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Type;
 
 class LambdaTransformer {
 	static boolean DEBUG = Boolean.valueOf(getProperty("lambda.weaving.debug"));
 
 	static Method findMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
 		Class<?>[] argumentClasses = new Class[getArgumentTypes(desc).length];
-		Arrays.fill(argumentClasses, Object.class);
-		return Class.forName(getObjectType(owner).getClassName()).getMethod(name, argumentClasses);
+		int i = 0;
+		for (Type type : getArgumentTypes(desc)) {
+			argumentClasses[i++] = getClassFromType(type);
+		}
+		return getClassFromType(getObjectType(owner)).getMethod(name, argumentClasses);
 	}
 
 	static Field findField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
-		String className = getObjectType(owner).getClassName();
-		return Class.forName(className).getField(name);
+		return getClassFromType(getObjectType(owner)).getDeclaredField(name);
+	}
+
+	static Class<?> getClassFromType(Type type) throws ClassNotFoundException {
+		switch (type.getSort()) {
+		case Type.BYTE:
+			return Byte.TYPE;
+		case Type.BOOLEAN:
+			return Boolean.TYPE;
+		case Type.SHORT:
+			return Short.TYPE;
+		case Type.CHAR:
+			return Character.TYPE;
+		case Type.INT:
+			return Integer.TYPE;
+		case Type.FLOAT:
+			return Float.TYPE;
+		case Type.LONG:
+			return Long.TYPE;
+		case Type.DOUBLE:
+			return Double.TYPE;
+		}
+		return Class.forName(type.getClassName());
 	}
 
 	Map<String, byte[]> lambdasByResourceName = new HashMap<String, byte[]>();

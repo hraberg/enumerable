@@ -61,8 +61,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 				return;
 			}
 			try {
-				String className = getObjectType(owner).getClassName();
-				Field field = Class.forName(className).getDeclaredField(name);
+				Field field = findField(owner, name);
 				boolean isLambdaParameter = field.isAnnotationPresent(LambdaParameter.class);
 				if (!inLambda() && isLambdaParameter) {
 					currentLambda = lambdas.next();
@@ -83,7 +82,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 						debug("accessing lambda parameter " + field + " with index " + index);
 						accessLambdaParameter(field, index);
 					}
-					return;
 				} else {
 					super.visitFieldInsn(opcode, owner, name, desc);
 				}
@@ -94,11 +92,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
 		public void visitMethodInsn(int opcode, String owner, String name, String desc) {
 			try {
-				if (inLambda() && notAConstructor(name)) {
-					if (owner.equals(className)) {
-						super.visitMethodInsn(opcode, owner, name, desc);
-						return;
-					}
+				if (inLambda() && opcode == INVOKESTATIC && !owner.equals(className)) {
 					Method method = findMethod(owner, name, desc);
 					if (method.isAnnotationPresent(NewLambda.class)) {
 						debug("new lambda created by " + method + " in " + sourceAndLine());
@@ -110,11 +104,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 						return;
 					}
 				}
-			} catch (NoSuchMethodException ignore) {
+				super.visitMethodInsn(opcode, owner, name, desc);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			super.visitMethodInsn(opcode, owner, name, desc);
 		}
 
 		public void visitIincInsn(int var, int increment) {

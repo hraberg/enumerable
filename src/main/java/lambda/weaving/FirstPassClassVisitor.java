@@ -1,5 +1,6 @@
 package lambda.weaving;
 
+import static lambda.weaving.LambdaTransformer.*;
 import static org.objectweb.asm.Type.*;
 
 import java.lang.reflect.Field;
@@ -16,8 +17,9 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
-class FirstPassClassVisitor implements ClassVisitor, MethodVisitor {
+class FirstPassClassVisitor implements ClassVisitor, MethodVisitor, Opcodes {
 	Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
 
 	boolean inLambda;
@@ -36,13 +38,13 @@ class FirstPassClassVisitor implements ClassVisitor, MethodVisitor {
 			if (owner.equals(className)) {
 				return;
 			}
-			Field field = LambdaTransformer.findField(owner, name);
-			if (!inLambda && field.isAnnotationPresent(LambdaParameter.class)) {
-				inLambda = true;
-				currentMethod.newLambda();
+			if (opcode == GETSTATIC || opcode == PUTSTATIC) {
+				Field field = LambdaTransformer.findField(owner, name);
+				if (!inLambda && field.isAnnotationPresent(LambdaParameter.class)) {
+					inLambda = true;
+					currentMethod.newLambda();
+				}
 			}
-		} catch (NoSuchFieldException ignore) {
-			// debug(ignore.toString());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -66,15 +68,16 @@ class FirstPassClassVisitor implements ClassVisitor, MethodVisitor {
 
 	public void visitMethodInsn(int opcode, String owner, String name, String desc) {
 		try {
-			if (owner.equals(className) || !inLambda) {
+			if (owner.equals(className)) {
 				return;
 			}
-			Method method = LambdaTransformer.findMethod(owner, name, desc);
-			if (method.isAnnotationPresent(NewLambda.class)) {
-				currentMethod.setLambdaArity(method.getParameterTypes().length - 1);
-				inLambda = false;
+			if (inLambda && opcode == INVOKESTATIC) {
+				Method method = findMethod(owner, name, desc);
+				if (method.isAnnotationPresent(NewLambda.class)) {
+					currentMethod.setLambdaArity(method.getParameterTypes().length - 1);
+					inLambda = false;
+				}
 			}
-		} catch (NoSuchMethodException ignore) {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
