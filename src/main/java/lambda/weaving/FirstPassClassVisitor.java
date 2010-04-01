@@ -1,6 +1,5 @@
 package lambda.weaving;
 
-import static lambda.weaving.LambdaTransformer.*;
 import static org.objectweb.asm.Type.*;
 
 import java.util.HashMap;
@@ -12,8 +11,14 @@ import org.objectweb.asm.MethodVisitor;
 class FirstPassClassVisitor extends EmptyVisitor {
     Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
 
+    LambdaTransformer transformer;
+
     boolean inLambda;
     MethodInfo currentMethod;
+
+    FirstPassClassVisitor(LambdaTransformer transformer) {
+        this.transformer = transformer;
+    }
 
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         currentMethod = new MethodInfo(name, desc);
@@ -24,7 +29,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
     public void visitFieldInsn(int opcode, String owner, String name, String desc) {
         try {
             if (!inLambda && opcode == GETSTATIC || opcode == PUTSTATIC) {
-                if (isLambdaParameterField(owner, name)) {
+                if (transformer.isLambdaParameterField(owner, name)) {
                     inLambda = true;
                     currentMethod.newLambda();
                 }
@@ -53,7 +58,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
     public void visitMethodInsn(int opcode, String owner, String name, String desc) {
         try {
             if (inLambda && opcode == INVOKESTATIC) {
-                if (isNewLambdaMethod(owner, name, desc)) {
+                if (transformer.isNewLambdaMethod(owner, name, desc)) {
                     currentMethod.setLambdaArity(getArgumentTypes(desc).length - 1);
                     inLambda = false;
                 }

@@ -16,18 +16,18 @@ import org.objectweb.asm.ClassWriter;
 class LambdaTransformer {
     static boolean DEBUG = Boolean.valueOf(getProperty("lambda.weaving.debug"));
 
-    static AnnotationCache lambdaParameterFields = new AnnotationCache(LambdaParameter.class);
-    static AnnotationCache newLambdaMethods = new AnnotationCache(NewLambda.class);
+    Map<String, byte[]> lambdasByResourceName = new HashMap<String, byte[]>();
 
-    static boolean isLambdaParameterField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
+    AnnotationCache lambdaParameterFields = new AnnotationCache(LambdaParameter.class);
+    AnnotationCache newLambdaMethods = new AnnotationCache(NewLambda.class);
+
+    boolean isLambdaParameterField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
         return lambdaParameterFields.hasAnnotation(owner, name, "");
     }
 
-    static boolean isNewLambdaMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
+    boolean isNewLambdaMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
         return newLambdaMethods.hasAnnotation(owner, name, desc);
     }
-
-    Map<String, byte[]> lambdasByResourceName = new HashMap<String, byte[]>();
 
     byte[] transform(String resource, InputStream in) throws IOException {
         if (lambdasByResourceName.containsKey(resource)) {
@@ -35,18 +35,17 @@ class LambdaTransformer {
             return lambdasByResourceName.get(resource);
         }
 
-        // debug("First pass: analyzing " + resource);
         ClassReader cr = new ClassReader(in);
 
-        FirstPassClassVisitor firstPass = new FirstPassClassVisitor();
+        FirstPassClassVisitor firstPass = new FirstPassClassVisitor(this);
         cr.accept(firstPass, 0);
         if (firstPass.hasNoLambdas()) {
             return null;
         }
 
-        debug("Second pass: transforming lambdas and accessed locals in " + resource);
+        debug("second pass: transforming lambdas and accessed locals in " + resource);
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        SecondPassClassVisitor visitor = new SecondPassClassVisitor(cw, firstPass);
+        SecondPassClassVisitor visitor = new SecondPassClassVisitor(cw, firstPass, this);
         cr.accept(visitor, 0);
         lambdasByResourceName.putAll(visitor.lambdasByResourceName);
 
@@ -56,5 +55,14 @@ class LambdaTransformer {
     static void debug(String msg) {
         if (DEBUG)
             err.println(msg);
+    }
+
+    void newLambdaClass(String internalName, byte[] bs) {
+        String resource = internalName + ".class";
+        lambdasByResourceName.put(resource, bs);
+
+        ClassInjector injector = new ClassInjector();
+        injector.dump(resource, bs);
+        injector.inject(getClass().getClassLoader(), internalName.replace('/', '.'), bs);
     }
 }

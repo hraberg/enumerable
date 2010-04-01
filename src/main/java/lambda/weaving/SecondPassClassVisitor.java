@@ -29,6 +29,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
     int currentLambdaId;
 
+    private final LambdaTransformer transformer;
+
     class LambdaMethodVisitor extends MethodAdapter {
         static final String LAMBDA_CLASS_PREFIX = "Fn";
 
@@ -53,23 +55,23 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
             try {
-                if (!inLambda() && isLambdaParameterField(owner, name)) {
+                if (!inLambda() && transformer.isLambdaParameterField(owner, name)) {
                     currentLambda = lambdas.next();
                     parameterNamesToIndex = new LinkedHashMap<String, Integer>();
 
-                    debug("starting new lambda with arity " + currentLambda.arity + " locals " + currentLambda.accessedLocals);
+                    debug("starting new lambda with arity " + currentLambda.arity + " accessing locals " + currentLambda.accessedLocals);
 
                     createLambdaClass();
                     createLambdaConstructor();
 
                     createCallMethodAndRedirectMethodVisitorToIt();
                 }
-                if (isLambdaParameterField(owner, name)) {
+                if (transformer.isLambdaParameterField(owner, name)) {
                     if (!parameterNamesToIndex.containsKey(name)) {
                         initLambdaParameter(name);
                     } else {
                         int index = parameterNamesToIndex.get(name);
-                        debug("lambda parameter " + desc + " " + owner + "." + name + " accessed with index " + index);
+                        debug("lambda parameter " + desc + " " + owner + "." + name + " accessed as argument " + index);
                         accessLambdaParameter(name, desc, index);
                     }
                 } else {
@@ -83,7 +85,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         public void visitMethodInsn(int opcode, String owner, String name, String desc) {
             try {
                 if (inLambda() && opcode == INVOKESTATIC) {
-                    if (isNewLambdaMethod(owner, name, desc)) {
+                    if (transformer.isNewLambdaMethod(owner, name, desc)) {
                         debug("new lambda created by " + owner + "." + name + desc
                                 + " in " + sourceAndLine());
 
@@ -157,6 +159,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void initAccessedLocalsAndParametersAsArrays() {
+            debug("wrapping locals accessed by lambdas in arrays " + method.accessedLocalsByIndex.keySet());
             for (int local : method.accessedLocalsByIndex.keySet()) {
                 if (!isThis(local)) {
                     initArray(local, method.getTypeOfLocal(local));
@@ -323,13 +326,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             lambdaWriter.visitEnd();
             cv.visitInnerClass(currentLambdaClass(), null, null, 0);
 
-            String resource = currentLambdaClass() + ".class";
             byte[] bs = lambdaWriter.toByteArray();
-            lambdasByResourceName.put(resource, bs);
-
-            ClassInjector injector = new ClassInjector();
-            injector.dump(resource, bs);
-            injector.inject(getClass().getClassLoader(), currentLambdaClass().replace('/', '.'), bs);
+            transformer.newLambdaClass(currentLambdaClass(), bs);
 
             lambdaWriter = null;
         }
@@ -367,8 +365,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
     }
 
-    SecondPassClassVisitor(ClassVisitor cv, FirstPassClassVisitor firstPass) {
+    SecondPassClassVisitor(ClassVisitor cv, FirstPassClassVisitor firstPass, LambdaTransformer transformer) {
         super(cv);
+        this.transformer = transformer;
         this.methodsByName = firstPass.methodsByName;
     }
 
@@ -385,10 +384,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     public MethodVisitor visitMethod(int access, final String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
         if (methodsByName.get(name + desc).lambdas.isEmpty()) {
-            debug("Second pass: skipping method " + name + desc);
+            debug("second pass: skipping method " + name + desc);
             return mv;
         }
-        debug("Second pass: processing method " + name + desc);
+        debug("second pass: processing method " + name + desc);
         return new LambdaMethodVisitor(mv, methodsByName.get(name + desc));
     }
 }

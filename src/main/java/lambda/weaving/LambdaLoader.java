@@ -53,7 +53,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         try {
             return transformClass(className + ".class", new ByteArrayInputStream(classfileBuffer));
         } catch (Throwable t) {
-            debug("Caught throwable in premain transform:");
+            debug("caught throwable in premain transform:");
             t.printStackTrace();
             return null;
         }
@@ -91,7 +91,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     }
 
     public static void premain(String agentArgs, Instrumentation instrumentation) {
-        debug("Running premain " + LambdaLoader.class.getSimpleName());
+        debug("running premain " + LambdaLoader.class.getSimpleName());
         addSkippedPackages(agentArgs);
         addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages"));
         instrumentation.addTransformer(new LambdaLoader());
@@ -103,7 +103,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                 out.println("Usage: class [args...]");
                 return;
             }
-            debug("Running main " + LambdaLoader.class.getSimpleName());
+            debug("running main " + LambdaLoader.class.getSimpleName());
             addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages"));
             launchApplication(args[0], copyOfRange(args, 1, args.length));
         } catch (InvocationTargetException e) {

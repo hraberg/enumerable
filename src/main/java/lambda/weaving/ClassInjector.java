@@ -32,9 +32,9 @@ class ClassInjector {
     }
 
     void dump(String resource, byte[] b) {
-        if (!DEBUG) {
+        if (!DEBUG)
             return;
-        }
+
         String parent = System.getProperty("lambda.weaving.debug.classes.dir", "target/generated-classes/");
         File file = new File(parent, resource);
 
@@ -47,12 +47,13 @@ class ClassInjector {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            if (out != null)
+            if (out != null) {
                 try {
                     out.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
         }
     }
 }
