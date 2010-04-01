@@ -35,14 +35,15 @@ class ClassInjector {
         if (!DEBUG) {
             return;
         }
+        String parent = System.getProperty("lambda.weaving.debug.classes.dir", "target/generated-classes/");
+        File file = new File(parent, resource);
+
+        debug("writing " + file + " (" + b.length + " bytes)");
         FileOutputStream out = null;
         try {
-            String target = "target/generated-classes/" + resource;
-            debug("writing " + target + " (" + b.length + " bytes)");
-            new File(target).getParentFile().mkdirs();
-            out = new FileOutputStream(target);
+            file.getParentFile().mkdirs();
+            out = new FileOutputStream(file);
             out.write(b);
-            out.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {

@@ -55,6 +55,7 @@
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
             <jvmarg value="-javaagent:target/enumerable-agent.jar"/>
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
             <classpath refid="enumerable.test.classpath"/>
             <batchtest todir="target/junit">
@@ -74,6 +75,7 @@
 		<java fork="yes" classname="lambda.enumerable.EnumerableExample">
             <jvmarg value="-javaagent:target/enumerable-agent.jar"/>
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
             <classpath refid="enumerable.test.classpath"/>
 		</java>
@@ -83,6 +85,7 @@
         <java fork="yes" classname="lambda.weaving.LambdaLoader">
             <arg value="lambda.enumerable.EnumerableExample"/>
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
             <classpath refid="enumerable.test.classpath"/>
         </java>
