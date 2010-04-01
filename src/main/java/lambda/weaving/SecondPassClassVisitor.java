@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import lambda.weaving.MethodInfo.LambdaInfo;
 
@@ -59,7 +60,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     currentLambda = lambdas.next();
                     parameterNamesToIndex = new LinkedHashMap<String, Integer>();
 
-                    debug("starting new lambda with arity " + currentLambda.arity + " accessing locals " + currentLambda.accessedLocals);
+                    String locals = "";
+                    if (!currentLambda.accessedLocals.isEmpty()) {
+                        locals = " closing over " + method.getAccessedArgumentsAndLocalsString(currentLambda.accessedLocals);
+                    }
+                    debug("starting new lambda with arity " + currentLambda.arity + locals);
 
                     createLambdaClass();
                     createLambdaConstructor();
@@ -125,8 +130,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     loadArrayFromLocalOrLambda(operand, type);
                     accessFirstArrayElement(opcode, type);
 
-                    debug("variable " + operand + " " + type + " accessed using wrapped array"
-                            + (inLambda() ? " field " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local"));
+                    debug("variable "
+                            + method.getNameOfLocal(operand)
+                            + " "
+                            + type
+                            + " accessed using wrapped array"
+                            + (inLambda() ? " field " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local "
+                            + operand));
                 }
             } else {
                 super.visitIntInsn(opcode, operand);
@@ -159,8 +169,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void initAccessedLocalsAndParametersAsArrays() {
-            debug("wrapping locals accessed by lambdas in arrays " + method.accessedLocalsByIndex.keySet());
-            for (int local : method.accessedLocalsByIndex.keySet()) {
+            Set<Integer> accessedLocals = method.getAccessedLocals();
+            if (!accessedLocals.isEmpty()) {
+                debug("wrapping locals accessed by lambdas in arrays " + method.getAccessedArgumentsAndLocalsString(accessedLocals));
+            } else {
+                debug("no locals accessed by lambdas");
+            }
+            for (int local : method.getAccessedLocals()) {
                 if (!isThis(local)) {
                     initArray(local, method.getTypeOfLocal(local));
                 }

@@ -1,5 +1,7 @@
 package lambda.weaving;
 
+import static org.objectweb.asm.Type.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,21 +53,56 @@ class MethodInfo {
         return lambdas.iterator();
     }
 
-    void setTypeOfLocal(int index, Type type) {
+    void setInfoForLocal(int index, String name, Type type) {
         MethodInfo.LocalInfo localInfo = accessedLocalsByIndex.get(index);
-        if (localInfo != null)
+        if (localInfo != null) {
+            localInfo.name = name;
             localInfo.type = type;
+        }
     }
 
     Type getTypeOfLocal(int operand) {
         return accessedLocalsByIndex.get(operand).type;
     }
 
+    String getNameOfLocal(int operand) {
+        return accessedLocalsByIndex.get(operand).name;
+    }
+
     boolean isLocalAccessedFromLambda(int index) {
         return accessedLocalsByIndex.containsKey(index);
     }
 
+    Set<Integer> getAccessedArguments() {
+        Set<Integer> accessedArguments = new HashSet<Integer>();
+        for (int i = 1; i <= getArgumentTypes(desc).length; i++) {
+            if (accessedLocalsByIndex.keySet().contains(i)) {
+                accessedArguments.add(i);
+            }
+        }
+        return accessedArguments;
+    }
+
+    String getAccessedArgumentsAndLocalsString(Set<Integer> accessedLocals) {
+        accessedLocals = new HashSet<Integer>(accessedLocals);
+        Set<Integer> accessedArguments = getAccessedArguments();
+        accessedArguments.retainAll(accessedLocals);
+        accessedLocals.removeAll(accessedArguments);
+        return "(" + getAccessedLocalsString(accessedArguments) + ")" + "[" + getAccessedLocalsString(accessedLocals) + "]";
+    }
+
+    String getAccessedLocalsString(Set<Integer> accessedLocals) {
+        String s = "";
+        for (Iterator<Integer> i = accessedLocals.iterator(); i.hasNext();) {
+            s += getNameOfLocal(i.next());
+            if (i.hasNext())
+                s += ", ";
+        }
+        return s;
+    }
+
     static class LocalInfo {
+        String name;
         int index;
         Type type;
     }
@@ -73,5 +110,9 @@ class MethodInfo {
     static class LambdaInfo {
         int arity;
         Set<Integer> accessedLocals = new HashSet<Integer>();
+    }
+
+    Set<Integer> getAccessedLocals() {
+        return accessedLocalsByIndex.keySet();
     }
 }

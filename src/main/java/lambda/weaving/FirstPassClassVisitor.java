@@ -52,7 +52,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
     }
 
     public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-        currentMethod.setTypeOfLocal(index, getType(desc));
+        currentMethod.setInfoForLocal(index, name, getType(desc));
     }
 
     public void visitMethodInsn(int opcode, String owner, String name, String desc) {
