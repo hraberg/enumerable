@@ -13,6 +13,7 @@ import java.util.Map;
 import lambda.LambdaParameter;
 import lambda.NewLambda;
 
+import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -34,6 +35,13 @@ class LambdaTransformer {
     }
 
     static boolean isLambdaParameterField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
+        try {
+            new ClassReader(getType(owner).getClassName()).accept(new ClassAdapter(null) {
+
+            }, 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return findField(owner, name).isAnnotationPresent(LambdaParameter.class);
     }
 
