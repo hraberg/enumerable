@@ -8,13 +8,11 @@ import java.util.Map;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 
-class FirstPassClassVisitor implements ClassVisitor, MethodVisitor, Opcodes {
+class FirstPassClassVisitor extends EmptyVisitor {
     Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
 
     boolean inLambda;

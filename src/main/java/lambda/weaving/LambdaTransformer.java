@@ -1,74 +1,30 @@
 package lambda.weaving;
 
 import static java.lang.System.*;
-import static org.objectweb.asm.Type.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import lambda.LambdaParameter;
 import lambda.NewLambda;
 
-import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Type;
 
 class LambdaTransformer {
     static boolean DEBUG = Boolean.valueOf(getProperty("lambda.weaving.debug"));
 
-    static Method findMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
-        Class<?>[] argumentClasses = new Class[getArgumentTypes(desc).length];
-        int i = 0;
-        for (Type type : getArgumentTypes(desc)) {
-            argumentClasses[i++] = getClassFromType(type);
-        }
-        return getClassFromType(getObjectType(owner)).getMethod(name, argumentClasses);
-    }
-
-    static Field findField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
-        return getClassFromType(getObjectType(owner)).getDeclaredField(name);
-    }
+    static AnnotationCache lambdaParameterFields = new AnnotationCache(LambdaParameter.class);
+    static AnnotationCache newLambdaMethods = new AnnotationCache(NewLambda.class);
 
     static boolean isLambdaParameterField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
-        try {
-            new ClassReader(getType(owner).getClassName()).accept(new ClassAdapter(null) {
-
-            }, 0);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return findField(owner, name).isAnnotationPresent(LambdaParameter.class);
+        return lambdaParameterFields.hasAnnotation(owner, name, "");
     }
 
     static boolean isNewLambdaMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
-        return findMethod(owner, name, desc).isAnnotationPresent(NewLambda.class);
-    }
-
-    static Class<?> getClassFromType(Type type) throws ClassNotFoundException {
-        switch (type.getSort()) {
-        case Type.BYTE:
-            return Byte.TYPE;
-        case Type.BOOLEAN:
-            return Boolean.TYPE;
-        case Type.SHORT:
-            return Short.TYPE;
-        case Type.CHAR:
-            return Character.TYPE;
-        case Type.INT:
-            return Integer.TYPE;
-        case Type.FLOAT:
-            return Float.TYPE;
-        case Type.LONG:
-            return Long.TYPE;
-        case Type.DOUBLE:
-            return Double.TYPE;
-        }
-        return Class.forName(type.getClassName());
+        return newLambdaMethods.hasAnnotation(owner, name, desc);
     }
 
     Map<String, byte[]> lambdasByResourceName = new HashMap<String, byte[]>();
