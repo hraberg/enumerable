@@ -15,8 +15,6 @@ import lambda.Lambda;
 
 public class EnumerableExample {
     public void example(PrintStream out) {
-        assert Character.isJavaIdentifierStart('λ');
-
         /*
          * While λ looks good, it is cumbersome to insert. There are three
          * (ignoring arity versions) static methods in Lambda that all are
@@ -24,6 +22,7 @@ public class EnumerableExample {
          * 
          * @NewLambda and all do the same thing: λ, fn and lambda.
          */
+        assert Character.isJavaIdentifierStart('λ');
 
         List<String> strings = asList("malaysia", "thailand", "india", "people's republic of china");
 
