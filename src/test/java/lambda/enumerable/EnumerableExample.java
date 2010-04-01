@@ -18,9 +18,7 @@ public class EnumerableExample {
         /*
          * While λ looks good, it is cumbersome to insert. There are three
          * (ignoring arity versions) static methods in Lambda that all are
-         * marked with
-         * 
-         * @NewLambda and all do the same thing: λ, fn and lambda.
+         * marked with @NewLambda and all do the same thing: λ, fn and lambda.
          */
         assert Character.isJavaIdentifierStart('λ');
 

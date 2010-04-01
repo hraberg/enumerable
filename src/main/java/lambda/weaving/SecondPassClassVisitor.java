@@ -76,7 +76,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                         initLambdaParameter(name);
                     } else {
                         int index = parameterNamesToIndex.get(name);
-                        debug("lambda parameter " + desc + " " + owner + "." + name + " accessed as argument " + index);
+                        debug("lambda parameter " + getType(desc).getClassName() + " " + getObjectType(owner).getClassName() + "." + name
+                                + " accessed as argument "
+                                + index);
                         accessLambdaParameter(name, desc, index);
                     }
                 } else {
@@ -91,8 +93,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             try {
                 if (inLambda() && opcode == INVOKESTATIC) {
                     if (transformer.isNewLambdaMethod(owner, name, desc)) {
-                        debug("new lambda created by " + owner + "." + name + desc
-                                + " in " + sourceAndLine());
+                        debug("new lambda created by at " + sourceAndLine());
 
                         returnFromCall();
                         endLambdaClass();
@@ -133,9 +134,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     debug("variable "
                             + method.getNameOfLocal(operand)
                             + " "
-                            + type
+                            + type.getClassName()
                             + " accessed using wrapped array"
-                            + (inLambda() ? " field " + currentLambdaClass() + "." + lambdaFieldNameForLocal(operand) : " local "
+                            + (inLambda() ? " field " + getObjectType(currentLambdaClass()).getClassName() + "."
+                                    + lambdaFieldNameForLocal(operand) : " local "
                             + operand));
                 }
             } else {
