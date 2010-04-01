@@ -3,12 +3,10 @@ package lambda.weaving;
 import static lambda.weaving.LambdaTransformer.*;
 import static org.objectweb.asm.Type.*;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import lambda.LambdaParameter;
 import lambda.NewLambda;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -39,8 +37,7 @@ class FirstPassClassVisitor implements ClassVisitor, MethodVisitor, Opcodes {
                 return;
             }
             if (!inLambda && opcode == GETSTATIC || opcode == PUTSTATIC) {
-                Field field = findField(owner, name);
-                if (field.isAnnotationPresent(LambdaParameter.class)) {
+                if (isLambdaParameterField(owner, name)) {
                     inLambda = true;
                     currentMethod.newLambda();
                 }

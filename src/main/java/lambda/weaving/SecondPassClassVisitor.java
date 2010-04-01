@@ -3,14 +3,12 @@ package lambda.weaving;
 import static lambda.weaving.LambdaTransformer.*;
 import static org.objectweb.asm.Type.*;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import lambda.LambdaParameter;
 import lambda.NewLambda;
 import lambda.weaving.MethodInfo.LambdaInfo;
 
@@ -61,9 +59,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 return;
             }
             try {
-                Field field = findField(owner, name);
-                boolean isLambdaParameter = field.isAnnotationPresent(LambdaParameter.class);
-                if (!inLambda() && isLambdaParameter) {
+                if (!inLambda() && isLambdaParameterField(owner, name)) {
                     currentLambda = lambdas.next();
                     parameterNamesToIndex = new LinkedHashMap<String, Integer>();
 
@@ -74,7 +70,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     createCallMethodAndRedirectMethodVisitorToIt();
                 }
-                if (isLambdaParameter) {
+                if (isLambdaParameterField(owner, name)) {
                     if (!parameterNamesToIndex.containsKey(name)) {
                         initLambdaParameter(name);
                     } else {

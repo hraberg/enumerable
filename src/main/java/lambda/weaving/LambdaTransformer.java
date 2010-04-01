@@ -10,6 +10,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import lambda.LambdaParameter;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -28,6 +30,10 @@ class LambdaTransformer {
 
     static Field findField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
         return getClassFromType(getObjectType(owner)).getDeclaredField(name);
+    }
+
+    static boolean isLambdaParameterField(String owner, String name) throws NoSuchFieldException, ClassNotFoundException {
+        return findField(owner, name).isAnnotationPresent(LambdaParameter.class);
     }
 
     static Class<?> getClassFromType(Type type) throws ClassNotFoundException {
