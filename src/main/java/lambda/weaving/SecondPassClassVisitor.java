@@ -52,10 +52,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
-            if (owner.equals(className)) {
-                super.visitFieldInsn(opcode, owner, name, desc);
-                return;
-            }
             try {
                 if (!inLambda() && isLambdaParameterField(owner, name)) {
                     currentLambda = lambdas.next();
@@ -86,7 +82,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         public void visitMethodInsn(int opcode, String owner, String name, String desc) {
             try {
-                if (inLambda() && opcode == INVOKESTATIC && !owner.equals(className)) {
+                if (inLambda() && opcode == INVOKESTATIC) {
                     if (isNewLambdaMethod(owner, name, desc)) {
                         debug("new lambda created by " + owner + "." + name + desc
                                 + " in " + sourceAndLine());

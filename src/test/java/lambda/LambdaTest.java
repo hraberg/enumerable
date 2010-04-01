@@ -1,7 +1,6 @@
 package lambda;
 
 import static lambda.Lambda.*;
-import static lambda.LambdaTest.LambdaParameters.*;
 import static lambda.enumerable.EnumerableTest.*;
 import static org.junit.Assert.*;
 
@@ -32,10 +31,8 @@ public class LambdaTest {
         assertEquals(6, (int) λ(n, m, timesTwo.call(n) + m).call(2, 2));
     }
 
-    static class LambdaParameters {
-        @LambdaParameter
-        public static ActionEvent e;
-    }
+    @LambdaParameter
+    static ActionEvent e;
 
     @Test
     public void oneArgumentLambdaAsInterface() throws Exception {

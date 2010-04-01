@@ -67,7 +67,7 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
         public static Money m;
     }
 
-Accessing a field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses are redirected. Due to class loading, you cannot define a *@LambdaParameter* in the same class it's used. You can use inner static classes as an alternative if you want the definitions close to their usage.
+Accessing a static field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses are redirected.
 
 
 ## Implementation
