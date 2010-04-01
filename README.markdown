@@ -72,7 +72,7 @@ Accessing a field marked with *@LambdaParameter* outside of a block will either 
 
 ## Implementation
 
-Enumerable.java uses Ant to build. Run `ant tests` or `ant agent-jar`.
+Enumerable.java uses Ant to build. Run `ant tests`, `ant example` or `ant agent-jar`.
 
 The transformation is implemented in two passes. The first pass identifies all blocks and their arities and which local variables they access, if any. The second pass does the actual transformation, which has three main elements:
 

@@ -93,6 +93,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     public static void premain(String agentArgs, Instrumentation instrumentation) {
         debug("Running premain " + LambdaLoader.class.getSimpleName());
         addSkippedPackages(agentArgs);
+        addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages"));
         instrumentation.addTransformer(new LambdaLoader());
     }
 
@@ -103,6 +104,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                 return;
             }
             debug("Running main " + LambdaLoader.class.getSimpleName());
+            addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages"));
             launchApplication(args[0], copyOfRange(args, 1, args.length));
         } catch (InvocationTargetException e) {
             throw e.getCause();
@@ -111,7 +113,6 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
     static Object launchApplication(String className, String[] args) throws ClassNotFoundException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
-        addSkippedPackages(System.getProperty("lambda.skippedPackages"));
         Class<?> c = new LambdaLoader().loadClass(className);
         Method m = c.getMethod("main", String[].class);
         return m.invoke(null, new Object[] { args });
