@@ -38,11 +38,11 @@ class ClassInjector {
         }
     }
 
-    void dump(String resource, byte[] b) {
-        if (!DEBUG)
+    void dump(String name, byte[] b) {
+        if (!debug)
             return;
 
-        File file = new File(classDir, resource);
+        File file = new File(classDir, name.replace('.', '/') + ".class");
 
         FileOutputStream out = null;
         try {

@@ -28,10 +28,9 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     LambdaTransformer transformer = new LambdaTransformer();
 
     protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        String resource = name.replace('.', '/') + ".class";
-        InputStream in = getResourceAsStream(resource);
+        InputStream in = getResourceAsStream(name.replace('.', '/') + ".class");
         try {
-            byte[] b = transformClass(resource, in);
+            byte[] b = transformClass(name, in);
             if (b == null) {
                 return super.loadClass(name, resolve);
             }
@@ -51,7 +50,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
             byte[] classfileBuffer) throws IllegalClassFormatException {
         try {
-            return transformClass(className + ".class", new ByteArrayInputStream(classfileBuffer));
+            return transformClass(className.replace('/', '.'), new ByteArrayInputStream(classfileBuffer));
         } catch (Throwable t) {
             debug("caught throwable in premain transform:");
             t.printStackTrace();
@@ -59,13 +58,13 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         }
     }
 
-    byte[] transformClass(String resource, InputStream in) {
+    byte[] transformClass(String name, InputStream in) {
         try {
-            if (isNotToBeInstrumented(resource.replace('/', '.')))
+            if (isNotToBeInstrumented(name))
                 return null;
-            byte[] b = transformer.transform(resource, in);
+            byte[] b = transformer.transform(name, in);
             if (b != null) {
-                new ClassInjector().dump(resource, b);
+                new ClassInjector().dump(name, b);
             }
             return b;
         } catch (Exception e) {

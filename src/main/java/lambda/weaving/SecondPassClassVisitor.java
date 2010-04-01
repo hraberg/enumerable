@@ -3,7 +3,6 @@ package lambda.weaving;
 import static lambda.weaving.Debug.*;
 import static org.objectweb.asm.Type.*;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,8 +20,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
-    Map<String, byte[]> lambdasByResourceName = new HashMap<String, byte[]>();
-
     String source;
     String className;
 
@@ -352,7 +349,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             cv.visitInnerClass(currentLambdaClass(), null, null, 0);
 
             byte[] bs = lambdaWriter.toByteArray();
-            transformer.newLambdaClass(currentLambdaClass(), bs);
+            transformer.newLambdaClass(getObjectType(currentLambdaClass()).getClassName(), bs);
 
             lambdaWriter = null;
         }

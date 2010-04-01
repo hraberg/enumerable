@@ -14,7 +14,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
 class LambdaTransformer {
-    Map<String, byte[]> lambdasByResourceName = new HashMap<String, byte[]>();
+    Map<String, byte[]> lambdasByClassName = new HashMap<String, byte[]>();
 
     AnnotationCache lambdaParameterFields = new AnnotationCache(LambdaParameter.class);
     AnnotationCache newLambdaMethods = new AnnotationCache(NewLambda.class);
@@ -27,10 +27,10 @@ class LambdaTransformer {
         return newLambdaMethods.hasAnnotation(owner, name, desc);
     }
 
-    byte[] transform(String resource, InputStream in) throws IOException {
-        if (lambdasByResourceName.containsKey(resource)) {
-            debug("generated lambda was requested by the class loader " + resource);
-            return lambdasByResourceName.get(resource);
+    byte[] transform(String name, InputStream in) throws IOException {
+        if (lambdasByClassName.containsKey(name)) {
+            debug("generated lambda requested by the class loader " + name);
+            return lambdasByClassName.get(name);
         }
 
         ClassReader cr = new ClassReader(in);
@@ -44,17 +44,15 @@ class LambdaTransformer {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         SecondPassClassVisitor visitor = new SecondPassClassVisitor(cw, firstPass, this);
         cr.accept(visitor, 0);
-        lambdasByResourceName.putAll(visitor.lambdasByResourceName);
 
         return cw.toByteArray();
     }
 
-    void newLambdaClass(String internalName, byte[] bs) {
-        String resource = internalName + ".class";
-        lambdasByResourceName.put(resource, bs);
+    void newLambdaClass(String name, byte[] bs) {
+        lambdasByClassName.put(name, bs);
 
         ClassInjector injector = new ClassInjector();
-        injector.dump(resource, bs);
-        injector.inject(getClass().getClassLoader(), internalName.replace('/', '.'), bs);
+        injector.dump(name, bs);
+        injector.inject(getClass().getClassLoader(), name.replace('/', '.'), bs);
     }
 }

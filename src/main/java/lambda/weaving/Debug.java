@@ -3,7 +3,7 @@ package lambda.weaving;
 import static java.lang.System.*;
 
 class Debug {
-    static boolean DEBUG = Boolean.valueOf(getProperty("lambda.weaving.debug"));
+    static boolean debug = Boolean.valueOf(getProperty("lambda.weaving.debug"));
 
     static String debugIndentation = "";
 
@@ -16,7 +16,7 @@ class Debug {
     }
 
     static void debug(String msg) {
-        if (DEBUG)
+        if (debug)
             err.println(debugIndentation + msg);
     }
 }
