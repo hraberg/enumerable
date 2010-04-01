@@ -86,6 +86,8 @@ The transformation is implemented in two passes. The first pass identifies all b
 * Wrapping any accessed local variables in arrays which are passed into the block constructor.
 * Replacing the original expression with code that constructs the new block.
 
+To understand the transformation better, a good point to start is running `ant example -Dlambda.weaving.debug=true`.
+
 
 ### How expressions are transformed into blocks
 
