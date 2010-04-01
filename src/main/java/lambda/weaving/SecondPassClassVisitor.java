@@ -70,7 +70,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     if (!currentLambda.accessedLocals.isEmpty()) {
                         locals = " closing over [" + method.getAccessedLocalsString(currentLambda.accessedLocals) + "]";
                     }
-
                     debug("starting new lambda with arity " + currentLambda.arity + locals);
 
                     debugIndent();
