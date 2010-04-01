@@ -61,9 +61,9 @@ If you're using Eclipse, you can add the agent as a default VM argument under In
 
 ### System Properties:
 
-*`lambda.weaving.debug`* will log to System.err and write all generated classes if set to true.
-*`lambda.weaving.debug.classes.dir`*  where to write the classes. Defaults to target/generated-classes
-*`lambda.weaving.skipped.packages` is a comma separeted list of package prefixes to skip.
+* `lambda.weaving.debug`* will log to System.err and write all generated classes if set to true.
+* `lambda.weaving.debug.classes.dir`*  where to write the classes. Defaults to target/generated-classes
+* `lambda.weaving.skipped.packages` is a comma separeted list of package prefixes to skip.
 
 
 You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
