@@ -6,7 +6,7 @@ import java.lang.reflect.Proxy;
 
 public abstract class Fn0<R> implements Runnable {
     public abstract R call();
-
+    
     public void run() {
         call();
     }

@@ -21,6 +21,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
     static {
         packagesToSkip.add("java.");
+        packagesToSkip.add("javax.");
         packagesToSkip.add("sun.");
         packagesToSkip.add("$Proxy");
     }
