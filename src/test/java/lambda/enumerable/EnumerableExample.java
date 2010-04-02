@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import lambda.Fn1;
-import lambda.Lambda;
 
 public class EnumerableExample {
     public void example(PrintStream out) {
@@ -185,7 +184,7 @@ public class EnumerableExample {
          * instance of Fn1 here. These can be passed around like any other
          * instance.
          */
-        Fn1<Integer, Integer> add2 = Lambda.partial(λ(n, m, n + m), 2);
+        Fn1<Integer, Integer> add2 = λ(n, m, n + m).partial(2);
         out.println(add2.call(5));
         out.println(add2.call(-5));
 

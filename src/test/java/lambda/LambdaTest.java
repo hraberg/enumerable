@@ -19,11 +19,31 @@ public class LambdaTest {
         Fn2<Integer, Integer, Integer> add = λ(n, m, n + m);
         assertEquals(2, (int) add.call(1, 1));
 
-        Fn1<Integer, Integer> add2 = partial(add, 2);
+        Fn1<Integer, Integer> add2 = add.partial(2);
         assertEquals(4, (int) add2.call(2));
 
-        Fn0<Integer> six = partial(add2, 4);
+        Fn0<Integer> six = add2.partial(4);
         assertEquals(6, (int) six.call());
+    }
+
+    @Test
+    public void applyWithOneArgument() throws Exception {
+        Fn1<Integer, Integer> nTimesTwo = λ(n, n * 2);
+        assertEquals(4, (int) nTimesTwo.apply(2));
+        assertEquals(8, (int) nTimesTwo.apply(new Object[] { 4 }));
+    }
+
+    @Test
+    public void applyWithTwoArguments() throws Exception {
+        Fn2<Integer, Integer, Integer> nTimesMtimesTwo = λ(n, m, n * m * 2);
+        assertEquals(8, (int) nTimesMtimesTwo.apply(2, 2));
+        assertEquals(64, (int) nTimesMtimesTwo.apply(new Object[] { 4, 8 }));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void applyWithOneArgumentWhenTwoIsNeededMayThrowException() throws Exception {
+        Fn2<Integer, Integer, Integer> nTimesMtimesTwo = λ(n, m, n * m * 2);
+        assertEquals(8, (int) nTimesMtimesTwo.apply(2));
     }
 
     @Test
@@ -50,7 +70,7 @@ public class LambdaTest {
     @Test
     public void oneArgumentLambdaAsInterface() throws Exception {
         ActionEvent actual;
-        ActionListener a = as(ActionListener.class, λ(e, actual = e));
+        ActionListener a = λ(e, actual = e).as(ActionListener.class);
         ActionEvent event = new ActionEvent(this, 1, "command");
         a.actionPerformed(event);
         assertSame(event, actual);
@@ -59,7 +79,7 @@ public class LambdaTest {
     @SuppressWarnings("unchecked")
     @Test
     public void twoArgumentLambdaAsInterface() throws Exception {
-        Comparator<Integer> c = as(Comparator.class, λ(n, m, m - n));
+        Comparator<Integer> c = λ(n, m, m - n).as(Comparator.class);
         List<Integer> list = list(1, 2, 3);
         Collections.sort(list, c);
         assertEquals(list(3, 2, 1), list);
@@ -68,7 +88,7 @@ public class LambdaTest {
     @Test
     public void oneArgumentLambdaAsInterfaceWithZeroArgumentMethod() throws Exception {
         String string = "";
-        Runnable runnable = as(Runnable.class, λ(_, string = "hello"));
+        Runnable runnable = λ(_, string = "hello").as(Runnable.class);
         runnable.run();
         assertEquals("hello", string);
     }
