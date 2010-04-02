@@ -132,6 +132,18 @@ public class ClosureTest {
     }
 
     @Test
+    public void closingOverLocalVaribleAfterMethodReturn() throws Exception {
+        Fn1<Integer, Integer> plus = methodReturn();
+        assertEquals(2, (int) plus.call(1));
+        assertEquals(3, (int) plus.call(1));
+    }
+
+    public Fn1<Integer, Integer> methodReturn() throws Exception {
+        int i = 1;
+        return λ(n, i += n);
+    }
+
+    @Test
     public void callInstanceMethodOnThis() throws Exception {
         assertEquals(hello(), λ(n, hello()).call(null));
     }
