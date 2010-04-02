@@ -6,7 +6,9 @@ import static lambda.enumerable.Enumerable.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.junit.Test;
 
@@ -16,6 +18,27 @@ public class EnumerableTest {
         List<Integer> actual = list();
         each(oneToTen, λ(n, actual.add(n)));
         assertEquals(oneToTen, actual);
+    }
+
+    @Test
+    public void callsBlockOnceForEachKeyValuePairInMap() throws Exception {
+        String result = "";
+        each(stringsToInts, λ(s, n, result += n + ": " + s + "\n"));
+        assertEquals("1: hello\n2: world\n", result);
+    }
+
+    @Test
+    public void callsBlockOnceForEachKey() throws Exception {
+        List<String> actual = list();
+        eachKey(stringsToInts, λ(s, actual.add(s)));
+        assertEquals(list("hello", "world"), actual);
+    }
+
+    @Test
+    public void callsBlockOnceForEachValue() throws Exception {
+        List<Integer> actual = list();
+        eachValue(stringsToInts, λ(n, actual.add(n)));
+        assertEquals(list(1, 2), actual);
     }
 
     @Test
@@ -50,6 +73,14 @@ public class EnumerableTest {
     @Test
     public void collectElementsToDifferentType() throws Exception {
         assertEquals(list("#1", "#2", "#3", "#4", "#5"), collect(oneToFive, λ(n, "#" + n)));
+    }
+
+    @Test
+    public void selectMatchingMapEntries() throws Exception {
+        List<Entry<String, Integer>> selected = select(stringsToInts, λ(s, n, n % 2 == 0));
+        assertEquals(1, selected.size());
+        assertEquals(2, (int) selected.get(0).getValue());
+        assertEquals("world", selected.get(0).getKey());
     }
 
     @Test
@@ -208,6 +239,12 @@ public class EnumerableTest {
 
     public static List<Integer> oneToTen = asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     public static List<Integer> oneToFive = oneToTen.subList(0, 5);
+    static HashMap<String, Integer> stringsToInts = new HashMap<String, Integer>();
+
+    static {
+        stringsToInts.put("hello", 1);
+        stringsToInts.put("world", 2);
+    }
 
     public static <E> List<E> list(E... elements) {
         return new ArrayList<E>(asList(elements));

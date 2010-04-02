@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import lambda.Fn1;
 import lambda.Fn2;
@@ -30,6 +32,31 @@ public class Enumerable {
     }
 
     /**
+     * Calls block once for each key in map, passing the key and value to the
+     * block as parameters.
+     */
+    public static <K, V, R> R each(Map<K, V> map, Fn2<K, V, R> block) {
+        R result = null;
+        for (Entry<K, V> each : map.entrySet())
+            result = block.call(each.getKey(), each.getValue());
+        return result;
+    }
+
+    /**
+     * Calls block once for each key in map, passing the key as parameter.
+     */
+    public static <K, V, R> R eachKey(Map<K, V> map, Fn1<K, R> block) {
+        return each(map.keySet(), block);
+    }
+
+    /**
+     * Calls block once for each value in map, passing the key as parameter.
+     */
+    public static <K, V, R> R eachValue(Map<K, V> map, Fn1<V, R> block) {
+        return each(map.values(), block);
+    }
+
+    /**
      * Calls block with two arguments, the item and its index, for each item in
      * collection.
      */
@@ -42,7 +69,7 @@ public class Enumerable {
     }
 
     /**
-     * Returns a new array with the results of running block once for every
+     * Returns a new list with the results of running block once for every
      * element in collection.
      */
     public static <E, R> List<R> collect(Iterable<E> col, Fn1<E, R> block) {
@@ -60,7 +87,19 @@ public class Enumerable {
     }
 
     /**
-     * Returns an array containing all elements of collection for which block is
+     * Returns an list containing all Map.Entry pairs for which the block
+     * returns true.
+     */
+    public static <K, V> List<Map.Entry<K, V>> select(Map<K, V> map, Fn2<K, V, Boolean> block) {
+        List<Map.Entry<K, V>> result = new ArrayList<Map.Entry<K, V>>();
+        for (Map.Entry<K, V> each : map.entrySet())
+            if (block.call(each.getKey(), each.getValue()))
+                result.add(each);
+        return result;
+    }
+
+    /**
+     * Returns an list containing all elements of collection for which block is
      * not false.
      */
     public static <E> List<E> select(Iterable<E> col, Fn1<E, Boolean> block) {
@@ -72,7 +111,7 @@ public class Enumerable {
     }
 
     /**
-     * Returns an array containing all elements of collection for which block is
+     * Returns an list containing all elements of collection for which block is
      * false.
      */
     public static <E> List<E> reject(Iterable<E> col, Fn1<E, Boolean> block) {
