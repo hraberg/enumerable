@@ -139,8 +139,18 @@ public class LambdaTest {
     @Test
     public void oneArgumentLambdaAsInterfaceWithZeroArgumentMethod() throws Exception {
         String string = "";
-        Runnable runnable = λ(_, string = "hello").as(Runnable.class);
-        runnable.run();
+        Callable<?> callable = λ(_, string = "hello").as(Callable.class);
+        assertEquals("hello", callable.call());
+        assertEquals("hello", string);
+    }
+
+    @Test
+    public void lambdaIsRunnable() throws Exception {
+        String string = "";
+        Thread thread = new Thread(λ(_, string = "hello"));
+        assertEquals("", string);
+        thread.start();
+        thread.join();
         assertEquals("hello", string);
     }
 }
