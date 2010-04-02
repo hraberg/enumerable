@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public class Lambda {
     @LambdaParameter
-    public static Integer n;
+    public static Integer n = 0;
     @LambdaParameter
     public static Integer m;
     @LambdaParameter

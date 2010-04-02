@@ -28,12 +28,13 @@ class FirstPassClassVisitor extends EmptyVisitor {
 
     public void visitFieldInsn(int opcode, String owner, String name, String desc) {
         try {
-            if (!inLambda && opcode == GETSTATIC || opcode == PUTSTATIC) {
+            if (!inLambda && opcode == GETSTATIC) {
                 if (transformer.isLambdaParameterField(owner, name)) {
                     inLambda = true;
                     currentMethod.newLambda();
                 }
             }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

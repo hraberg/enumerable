@@ -79,10 +79,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                         initLambdaParameter(name);
                     } else {
                         int index = parameterNamesToIndex.get(name);
+                        boolean write = opcode == PUTSTATIC;
                         debug("lambda parameter " + getObjectType(owner).getClassName() + "." + name + " "
-                                + getType(desc).getClassName() + " accessed as argument "
+                                + getType(desc).getClassName() + (write ? " assigned" : " accessed") + " as argument "
                                 + index);
-                        accessLambdaParameter(name, desc, index);
+                        accessLambdaParameter(write, name, desc, index);
                     }
                 } else {
                     super.visitFieldInsn(opcode, owner, name, desc);
@@ -358,12 +359,17 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             parameterNamesToIndex.put(name, parameterNamesToIndex.size() + 1);
         }
 
-        void accessLambdaParameter(String name, String desc, int parameter) {
+        void accessLambdaParameter(boolean write, String name, String desc, int parameter) {
             if (parameterNamesToIndex.size() != currentLambda.arity) {
                 throw new IllegalArgumentException("Parameter already bound [" + name + "] " + sourceAndLine());
             }
-            mv.visitVarInsn(ALOAD, parameter);
-            mv.visitTypeInsn(CHECKCAST, getType(desc).getInternalName());
+            if (write) {
+                mv.visitTypeInsn(CHECKCAST, getType(desc).getInternalName());
+                mv.visitVarInsn(ASTORE, parameter);
+            } else {
+                mv.visitVarInsn(ALOAD, parameter);
+                mv.visitTypeInsn(CHECKCAST, getType(desc).getInternalName());
+            }
         }
 
         String sourceAndLine() {

@@ -41,9 +41,37 @@ public class LambdaTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void applyWithOneArgumentWhenTwoIsNeededMayThrowException() throws Exception {
+    public void applyWithOneArgumentWhenTwoAreUsedMayThrowException() throws Exception {
         Fn2<Integer, Integer, Integer> nTimesMtimesTwo = λ(n, m, n * m * 2);
         assertEquals(8, (int) nTimesMtimesTwo.apply(2));
+    }
+
+    @Test
+    public void applyWithOneArgumentWhenSecondArgumentIsNotUsed() throws Exception {
+        Fn2<Integer, Integer, Integer> firstArgument = λ(n, m, n);
+        assertEquals(2, (int) firstArgument.apply(2));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void applyWithNoArgumentWhenOneIsUsedMayThrowException() throws Exception {
+        Fn1<Integer, Integer> inc = λ(n, n + 1);
+        inc.apply();
+    }
+
+    @Test
+    public void applyWithNoArgumentWhenArgumentIsNotUsed() throws Exception {
+        Fn1<Integer, Integer> firstArgument = λ(n, 2);
+        assertEquals(2, (int) firstArgument.apply());
+    }
+
+    @Test
+    public void assignLambdaParameter() throws Exception {
+        assertEquals(1, (int) λ(n, n = 1).call());
+    }
+
+    @Test
+    public void incrementLambdaParameter() throws Exception {
+        assertEquals(1, (int) λ(n, ++n).call(0));
     }
 
     @Test
