@@ -20,6 +20,8 @@ public class Lambda {
     @LambdaParameter
     public static Character c;
     @LambdaParameter
+    public static Boolean b;
+    @LambdaParameter
     public static Collection<?> col;
     @LambdaParameter
     public static Object obj;

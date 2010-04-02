@@ -96,6 +96,46 @@ public class EnumerableTest {
     }
 
     @Test
+    public void anyNotNull() throws Exception {
+        assertTrue(any(list("hello", null), λ(s, s)));
+    }
+
+    @Test
+    public void anyNull() throws Exception {
+        assertFalse(any(list((Object) null), λ(obj, obj)));
+    }
+
+    @Test
+    public void anyFalse() throws Exception {
+        assertFalse(any(list(false), λ(b, b)));
+    }
+
+    @Test
+    public void anyTrue() throws Exception {
+        assertTrue(any(list(false, true), λ(b, b)));
+    }
+
+    @Test
+    public void anyFalseAndNull() throws Exception {
+        assertFalse(any(list((Object) null, false), λ(obj, obj)));
+    }
+
+    @Test
+    public void anyNotNullAndFalse() throws Exception {
+        assertTrue(any(asList(new Object[] { "hello", false }), λ(obj, obj)));
+    }
+
+    @Test
+    public void anyNotNullAndTrue() throws Exception {
+        assertTrue(any(asList(new Object[] { "hello", true }), λ(obj, obj)));
+    }
+
+    @Test
+    public void anyNullAndTrue() throws Exception {
+        assertTrue(any(asList(new Object[] { null, true }), λ(obj, obj)));
+    }
+
+    @Test
     public void allMatchingPredicate() throws Exception {
         assertTrue(all(oneToTen, λ(n, n > 0)));
     }
@@ -103,6 +143,46 @@ public class EnumerableTest {
     @Test
     public void allNotMatchingPredicate() throws Exception {
         assertFalse(all(oneToTen, λ(n, n > 1)));
+    }
+
+    @Test
+    public void allNotNull() throws Exception {
+        assertTrue(all(list("hello", "world"), λ(s, s)));
+    }
+
+    @Test
+    public void allNotNullAndTrue() throws Exception {
+        assertTrue(all(asList(new Object[] { "hello", true }), λ(obj, obj)));
+    }
+
+    @Test
+    public void allNotNullAndFalse() throws Exception {
+        assertFalse(all(asList(new Object[] { "hello", false }), λ(obj, obj)));
+    }
+
+    @Test
+    public void allWithNull() throws Exception {
+        assertFalse(all(list("hello", null), λ(s, s)));
+    }
+
+    @Test
+    public void allWithFalse() throws Exception {
+        assertFalse(all(list(false, true), λ(b, b)));
+    }
+
+    @Test
+    public void allTrueOnly() throws Exception {
+        assertTrue(all(list(true), λ(b, b)));
+    }
+
+    @Test
+    public void allTrue() throws Exception {
+        assertTrue(all(list(true, true), λ(b, b)));
+    }
+
+    @Test
+    public void allFalseAndNullOnly() throws Exception {
+        assertFalse(all(list((Object) null, false), λ(obj, obj)));
     }
 
     @Test

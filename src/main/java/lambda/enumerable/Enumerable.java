@@ -1,5 +1,6 @@
 package lambda.enumerable;
 
+import static java.lang.Boolean.*;
 import static java.util.Arrays.*;
 
 import java.util.ArrayList;
@@ -174,23 +175,27 @@ public class Enumerable {
 
     /**
      * Passes each element of the collection to the given block. The method
-     * returns true if the block ever returns a value other than false or nil.
+     * returns true if the block ever returns a value other than false or null.
      */
-    public static <E> boolean any(Iterable<E> col, Fn1<E, Boolean> block) {
-        for (E each : col)
-            if (block.call(each))
+    public static <E> boolean any(Iterable<E> col, Fn1<E, ?> block) {
+        for (E each : col) {
+            Object result = block.call(each);
+            if (result != FALSE && result != null)
                 return true;
+        }
         return false;
     }
 
     /**
      * Passes each element of the collection to the given block. The method
-     * returns true if the block never returns false or nil.
+     * returns true if the block never returns false or null.
      */
-    public static <E> boolean all(Iterable<E> col, Fn1<E, Boolean> block) {
-        for (E each : col)
-            if (!block.call(each))
+    public static <E> boolean all(Iterable<E> col, Fn1<E, ?> block) {
+        for (E each : col) {
+            Object result = block.call(each);
+            if (result == FALSE || result == null)
                 return false;
+        }
         return true;
     }
 
