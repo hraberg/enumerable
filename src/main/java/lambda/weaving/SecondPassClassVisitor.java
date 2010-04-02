@@ -274,10 +274,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitInsn(IASTORE);
         }
 
-        boolean notAConstructor(String name) {
-            return !name.startsWith("<");
-        }
-
         void createLambdaClass() {
             lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             lambdaWriter.visit(V1_5, ACC_PUBLIC, currentLambdaClass(), null, currentLambda.type.getInternalName(),

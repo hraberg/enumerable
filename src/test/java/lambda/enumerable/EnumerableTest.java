@@ -42,6 +42,13 @@ public class EnumerableTest {
     }
 
     @Test
+    public void callsBlockOnceForEachLine() throws Exception {
+        List<String> actual = list();
+        eachLine("hello\nworld", λ(s, actual.add(s)));
+        assertEquals(list("hello", "world"), actual);
+    }
+
+    @Test
     public void eachOnEmptyCollectionDoesNotCallBlock() throws Exception {
         List<Integer> actual = list();
         each(list(int.class), λ(n, actual.add(n)));

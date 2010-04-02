@@ -3,6 +3,13 @@ package lambda.enumerable;
 import static java.lang.Boolean.*;
 import static java.util.Arrays.*;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -66,6 +73,51 @@ public class Enumerable {
         for (E each : col)
             result = block.call(each, i++);
         return result;
+    }
+
+    /**
+     * Executes the block for every line in string.
+     */
+    public static <R> String eachLine(String string, Fn1<String, R> block) {
+        eachLine(new StringReader(string), block);
+        return string;
+    }
+
+    /**
+     * Executes the block for every line in file.
+     */
+    public static <R> File eachLine(File file, Fn1<String, R> block) {
+        try {
+            eachLine(new FileReader(file), block);
+            return file;
+        } catch (FileNotFoundException e1) {
+            throw new RuntimeException(e1);
+        }
+    }
+
+    /**
+     * Executes the block for every line in reader.
+     */
+    public static <R> Reader eachLine(Reader reader, Fn1<String, R> block) {
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(reader);
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                block.call(line);
+            }
+            return reader;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 
     /**
