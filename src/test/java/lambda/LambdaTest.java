@@ -36,7 +36,7 @@ public class LambdaTest {
 
     @Test
     public void oneArgumentLambdaAsInterface() throws Exception {
-        ActionEvent actual = null;
+        ActionEvent actual;
         ActionListener a = as(ActionListener.class, λ(e, actual = e));
         ActionEvent event = new ActionEvent(this, 1, "command");
         a.actionPerformed(event);

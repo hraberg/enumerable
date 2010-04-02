@@ -14,8 +14,15 @@ import org.junit.Test;
 
 public class ClosureTest {
     @Test(expected = ArithmeticException.class)
-    public void exceptionInBlockPropagetsOut() throws Exception {
+    public void uncheckedExceptionInBlockPropagetsOut() throws Exception {
         λ(n, n / 0).call(0);
+    }
+
+    @Test(expected = ClassNotFoundException.class)
+    public void checkedExceptionInBlockPropagetsOut() throws Exception {
+        Fn1<String, ? extends Class<?>> classForName = λ(s, Class.forName(s));
+        assertEquals(String.class, classForName.call(String.class.getName()));
+        classForName.call("class.not.Found");
     }
 
     @Test
