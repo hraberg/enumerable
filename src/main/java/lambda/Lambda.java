@@ -17,8 +17,6 @@ public class Lambda {
     @LambdaParameter
     public static String s;
     @LambdaParameter
-    public static CharSequence cs;
-    @LambdaParameter
     public static String t;
     @LambdaParameter
     public static Double d;
@@ -32,65 +30,65 @@ public class Lambda {
     public static Object _;
 
     @NewLambda
-    public static <E, R> Fn1<E, R> λ(E obj, R block) {
+    public static <A1, R> Fn1<A1, R> λ(A1 a1, R block) {
         throw new UnsupportedOperationException();
     }
 
     @NewLambda
-    public static <E, R> Fn1<E, R> lambda(E obj, R block) {
+    public static <A1, R> Fn1<A1, R> lambda(A1 a1, R block) {
         throw new UnsupportedOperationException();
     }
 
     @NewLambda
-    public static <E, R> Fn1<E, R> fn(E obj, R block) {
+    public static <A1, R> Fn1<A1, R> fn(A1 a1, R block) {
         throw new UnsupportedOperationException();
     }
 
     @NewLambda
-    public static <E1, E2, R> Fn2<E1, E2, R> λ(E1 obj1, E2 obj2, R block) {
+    public static <A1, A2, R> Fn2<A1, A2, R> λ(A1 a1, A2 a2, R block) {
         throw new UnsupportedOperationException();
     }
 
     @NewLambda
-    public static <E1, E2, R> Fn2<E1, E2, R> lambda(E1 obj1, E2 obj2, R block) {
+    public static <A1, A2, R> Fn2<A1, A2, R> lambda(A1 a1, A2 a2, R block) {
         throw new UnsupportedOperationException();
     }
 
     @NewLambda
-    public static <E1, E2, R> Fn2<E1, E2, R> fn(E1 obj1, E2 obj2, R block) {
+    public static <A1, A2, R> Fn2<A1, A2, R> fn(A1 a1, A2 a2, R block) {
         throw new UnsupportedOperationException();
     }
 
-    public static <E1, E2, R> Fn1<E2, R> partial(final Fn2<E1, E2, R> lambda, final E1 obj1) {
-        return new Fn1<E2, R>() {
-            public R call(E2 obj2) {
-                return lambda.call(obj1, obj2);
+    public static <A1, A2, R> Fn1<A2, R> partial(final Fn2<A1, A2, R> f, final A1 a1) {
+        return new Fn1<A2, R>() {
+            public R call(A2 a2) {
+                return f.call(a1, a2);
             }
         };
     }
 
-    public static <E, R> Fn0<R> partial(final Fn1<E, R> lambda, final E obj) {
+    public static <A1, R> Fn0<R> partial(final Fn1<A1, R> f, final A1 a1) {
         return new Fn0<R>() {
             public R call() {
-                return lambda.call(obj);
+                return f.call(a1);
             }
         };
     }
 
     @SuppressWarnings("unchecked")
-    public static <I> I as(Class<I> anInterface, final Fn2 lambda) {
+    public static <I> I as(Class<I> anInterface, final Fn2 f) {
         return (I) Proxy.newProxyInstance(Lambda.class.getClassLoader(), new Class[] { anInterface }, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                return lambda.call(args[0], args[1]);
+                return f.call(args[0], args[1]);
             }
         });
     }
 
     @SuppressWarnings("unchecked")
-    public static <I> I as(Class<I> anInterface, final Fn1 lambda) {
+    public static <I> I as(Class<I> anInterface, final Fn1 f) {
         return (I) Proxy.newProxyInstance(Lambda.class.getClassLoader(), new Class[] { anInterface }, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                return lambda.call(args == null ? null : args[0]);
+                return f.call(args == null ? null : args[0]);
             }
         });
     }

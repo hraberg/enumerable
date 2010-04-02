@@ -18,6 +18,10 @@ public class ClosureTest {
         λ(n, n / 0).call(0);
     }
 
+    public static <R, A> Fn1<R, A> block(A arg, Object statement, R result) {
+        throw new UnsupportedOperationException();
+    }
+
     @Test(expected = ClassNotFoundException.class)
     public void checkedExceptionInBlockPropagetsOut() throws Exception {
         Fn1<String, ? extends Class<?>> classForName = λ(s, Class.forName(s));
