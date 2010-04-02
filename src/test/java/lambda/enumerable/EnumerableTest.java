@@ -17,7 +17,7 @@ public class EnumerableTest {
         each(oneToTen, λ(n, actual.add(n)));
         assertEquals(oneToTen, actual);
     }
-    
+
     @Test
     public void eachOnEmptyCollectionDoesNotCallBlock() throws Exception {
         List<Integer> actual = list();
@@ -125,7 +125,7 @@ public class EnumerableTest {
     public void injectWithoutInitialValue() throws Exception {
         assertEquals(3628800, (int) inject(oneToTen, λ(n, m, n * m)));
     }
-    
+
     public static List<Integer> oneToTen = asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     public static List<Integer> oneToFive = oneToTen.subList(0, 5);
 

@@ -98,15 +98,12 @@ public class Enumerable {
      * Returns a list containing the items in collection sorted by using the
      * results of the supplied block.
      */
+    @SuppressWarnings("unchecked")
     public static <E> List<E> sort(Iterable<E> col, final Fn2<E, E, Integer> block) {
         List<E> result = new ArrayList<E>();
         for (E each : col)
             result.add(each);
-        Collections.sort(result, new Comparator<E>() {
-            public int compare(E o1, E o2) {
-                return block.call(o1, o2);
-            }
-        });
+        Collections.sort(result, block.as(Comparator.class));
         return result;
     }
 

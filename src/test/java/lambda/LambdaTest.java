@@ -52,6 +52,12 @@ public class LambdaTest {
         assertEquals(2, (int) firstArgument.apply(2));
     }
 
+    @Test
+    public void applyWithOneArgumentSetsSecondArgumentToNull() throws Exception {
+        Fn2<String, String, String> secondArgument = λ(s, t, t);
+        assertNull(secondArgument.apply("hello"));
+    }
+
     @Test(expected = NullPointerException.class)
     public void applyWithNoArgumentWhenOneIsUsedMayThrowException() throws Exception {
         Fn1<Integer, Integer> inc = λ(n, n + 1);
@@ -62,6 +68,14 @@ public class LambdaTest {
     public void applyWithNoArgumentWhenArgumentIsNotUsed() throws Exception {
         Fn1<Integer, Integer> firstArgument = λ(n, 2);
         assertEquals(2, (int) firstArgument.apply());
+    }
+
+    @Test
+    public void applyWithNoArgumentSetsArgumentsToNull() throws Exception {
+        Fn1<String, String> firstArgument = λ(s, s);
+        assertNull(firstArgument.apply());
+        Fn2<String, String, String> secondArgument = λ(s, t, t);
+        assertNull(secondArgument.apply());
     }
 
     @Test
@@ -80,16 +94,25 @@ public class LambdaTest {
         assertEquals(6, (int) λ(n, m, timesTwo.call(n) + m).call(2, 2));
     }
 
+    @LambdaParameter
+    static Fn1<Integer, Integer> intToInt;
+
+    @Test
+    public void callLambdaWithLambdaArgument() throws Exception {
+        Fn1<Integer, Integer> timesTwo = λ(n, n * 2);
+        assertEquals(4, (int) λ(intToInt, intToInt.call(2)).call(timesTwo));
+    }
+
     @Test
     public <R> void returnAnonymousInnerClassFromLambda() throws Exception {
-        Fn1<?, ? extends Callable<String>> returningCallable = λ(_, new Callable<String>() {
+        Fn1<?, ? extends Callable<String>> returnsCallable = λ(_, new Callable<String>() {
             public String call() throws Exception {
                 return "hello";
             }
         });
-        Callable<String> callable = returningCallable.call();
+        Callable<String> callable = returnsCallable.call();
         assertEquals("hello", callable.call());
-        assertNotSame(callable, returningCallable.call());
+        assertNotSame(callable, returnsCallable.call());
     }
 
     @LambdaParameter
