@@ -53,7 +53,7 @@ public class ClosureTest {
     public void closeOverLocalArrayVaribleWhichCanBeSet() throws Exception {
         String[] hello = new String[] { "hello" };
         String[] original = hello;
-        λ(s, hello = new String[] { "world" }).call(" world");
+        λ(s, hello = new String[] { s }).call("world");
         assertEquals("world", hello[0]);
         assertNotSame(original, hello);
     }

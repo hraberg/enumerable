@@ -66,9 +66,9 @@ If you're using Eclipse, you can add the agent as a default VM argument under In
 * `lambda.weaving.skipped.packages` - is a comma separeted list of package prefixes to skip.
 
 
-You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
-
 ### LambdaParameter
+
+You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
 
     public class MyDomainLambdaParameters {
         @LambdaParameter
