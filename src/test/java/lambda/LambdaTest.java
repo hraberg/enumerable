@@ -39,7 +39,9 @@ public class LambdaTest {
                 return "hello";
             }
         });
-        assertEquals("hello", returningCallable.call().call());
+        Callable<String> callable = returningCallable.call();
+        assertEquals("hello", callable.call());
+        assertNotSame(callable, returningCallable);
     }
 
     @LambdaParameter
