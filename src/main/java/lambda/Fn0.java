@@ -1,5 +1,5 @@
 package lambda;
 
-public interface Fn0<R> {
-    public R call();
+public abstract class Fn0<R> {
+    public abstract R call();
 }

@@ -9,7 +9,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 class FirstPassClassVisitor extends EmptyVisitor {
-    Map<String, MethodInfo> methodsByName = new HashMap<String, MethodInfo>();
+    Map<String, MethodInfo> methodsByNameAndDesc = new HashMap<String, MethodInfo>();
 
     LambdaTransformer transformer;
 
@@ -22,7 +22,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
 
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         currentMethod = new MethodInfo(name, desc);
-        methodsByName.put(currentMethod.getNameAndDesc(), currentMethod);
+        methodsByNameAndDesc.put(currentMethod.getNameAndDesc(), currentMethod);
         return this;
     }
 
@@ -59,7 +59,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
         try {
             if (inLambda && opcode == INVOKESTATIC) {
                 if (transformer.isNewLambdaMethod(owner, name, desc)) {
-                    currentMethod.setLambdaArity(getArgumentTypes(desc).length - 1);
+                    currentMethod.setLambdaInfo(getReturnType(desc), getArgumentTypes(desc).length - 1);
                     inLambda = false;
                 }
             }
@@ -69,7 +69,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
     }
 
     boolean hasNoLambdas() {
-        for (MethodInfo method : methodsByName.values()) {
+        for (MethodInfo method : methodsByNameAndDesc.values()) {
             if (!method.lambdas.isEmpty())
                 return false;
         }

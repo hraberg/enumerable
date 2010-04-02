@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
@@ -26,9 +27,19 @@ public class LambdaTest {
     }
 
     @Test
-    public void useLambdaInLambda() throws Exception {
+    public void callLambdaInLambda() throws Exception {
         Fn1<Integer, Integer> timesTwo = λ(n, n * 2);
         assertEquals(6, (int) λ(n, m, timesTwo.call(n) + m).call(2, 2));
+    }
+
+    @Test
+    public <R> void returnAnonymousInnerClassFromLambda() throws Exception {
+        Fn1<?, ? extends Callable<String>> returningCallable = λ(_, new Callable<String>() {
+            public String call() throws Exception {
+                return "hello";
+            }
+        });
+        assertEquals("hello", returningCallable.call().call());
     }
 
     @LambdaParameter

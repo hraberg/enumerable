@@ -41,8 +41,9 @@ class MethodInfo {
         lambdas.add(new LambdaInfo());
     }
 
-    void setLambdaArity(int arity) {
+    void setLambdaInfo(Type type, int arity) {
         lastLambda().arity = arity;
+        lastLambda().type = type;
     }
 
     MethodInfo.LambdaInfo lastLambda() {
@@ -110,6 +111,7 @@ class MethodInfo {
     static class LambdaInfo {
         int arity;
         Set<Integer> accessedLocals = new HashSet<Integer>();
+        Type type;
     }
 
     Set<Integer> getAccessedLocals() {

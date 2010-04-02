@@ -30,8 +30,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     private final LambdaTransformer transformer;
 
     class LambdaMethodVisitor extends MethodAdapter {
-        static final String LAMBDA_CLASS_PREFIX = "Fn";
-
         MethodVisitor originalMethodWriter;
 
         ClassWriter lambdaWriter;
@@ -143,7 +141,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                             + type.getClassName()
                             + " accessed using wrapped array"
                             + (inLambda() ? " field " + getObjectType(currentLambdaClass()).getClassName() + "."
-                                    + lambdaFieldNameForLocal(operand) : " local "
+                            + lambdaFieldNameForLocal(operand) : " local "
                             + operand));
                 }
             } else {
@@ -280,11 +278,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void createLambdaClass() {
-
             lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-            String lambdaInterface = "lambda/" + LAMBDA_CLASS_PREFIX + currentLambda.arity;
-            lambdaWriter.visit(V1_5, ACC_PUBLIC, currentLambdaClass(), null, getInternalName(Object.class),
-                    new String[] { lambdaInterface });
+            lambdaWriter.visit(V1_5, ACC_PUBLIC, currentLambdaClass(), null, currentLambda.type.getInternalName(),
+                    null);
             lambdaWriter.visitOuterClass(className, method.name, method.desc);
             lambdaWriter.visitInnerClass(currentLambdaClass(), null, null, 0);
         }
@@ -315,7 +311,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             }
 
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKESPECIAL, getInternalName(Object.class), "<init>", "()V");
+            mv.visitMethodInsn(INVOKESPECIAL, currentLambda.type.getInternalName(), "<init>", "()V");
             mv.visitInsn(RETURN);
             mv.visitMaxs(0, 0);
             mv.visitEnd();
@@ -379,7 +375,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         String currentLambdaClass() {
-            return className + "$" + LAMBDA_CLASS_PREFIX + currentLambda.arity + "_" + currentLambdaId;
+            String lambdaClass = currentLambda.type.getInternalName();
+            lambdaClass = lambdaClass.substring(lambdaClass.lastIndexOf("/") + 1, lambdaClass.length());
+            return className + "$" + lambdaClass + "_" + currentLambdaId;
         }
 
         boolean inLambda() {
@@ -390,7 +388,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     SecondPassClassVisitor(ClassVisitor cv, FirstPassClassVisitor firstPass, LambdaTransformer transformer) {
         super(cv);
         this.transformer = transformer;
-        this.methodsByNameAndDesc = firstPass.methodsByName;
+        this.methodsByNameAndDesc = firstPass.methodsByNameAndDesc;
     }
 
     public void visitSource(String source, String debug) {
