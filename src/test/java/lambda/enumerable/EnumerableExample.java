@@ -239,12 +239,6 @@ public class EnumerableExample {
          */
         λ(n, x = n).call(2);
         out.println(x);
-
-        System.out.println(new Fn1() {
-            public Object call(Object arg) {
-                return (Integer) arg * (Integer) arg;
-            }
-        }.call(10));
     }
 
     public static void main(String[] args) {
