@@ -20,9 +20,8 @@ class ClassInjector {
             defineClass.setAccessible(true);
             resolveClass = ClassLoader.class.getDeclaredMethod("resolveClass", Class.class);
             resolveClass.setAccessible(true);
-            
+
             classDir = new File(System.getProperty("lambda.weaving.debug.classes.dir", "target/generated-classes/"));
-            
             debug("writing generated classes to " + classDir.getAbsolutePath());
         } catch (Exception e) {
             throw uncheck(e);

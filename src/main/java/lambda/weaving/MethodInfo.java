@@ -3,6 +3,7 @@ package lambda.weaving;
 import static org.objectweb.asm.Type.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,6 +25,25 @@ class MethodInfo {
 
     String getNameAndDesc() {
         return name + desc;
+    }
+
+    public String toString() {
+        String arguments = "(";
+        Type[] argumentTypes = getArgumentTypes(desc);
+        for (int i = 0; i < argumentTypes.length; i++) {
+            arguments += getSimpleClassName(argumentTypes[i]);
+            if (i < argumentTypes.length - 1)
+                arguments += ", ";
+        }
+        arguments += ")";
+        return getSimpleClassName(getReturnType(desc)) + " " + name + arguments;
+    }
+
+    static String getSimpleClassName(Type type) {
+        String name = type.getClassName();
+        if (!name.contains("."))
+            return name;
+        return name.substring(name.lastIndexOf('.') + 1, name.length());
     }
 
     Map<Integer, LocalInfo> accessedLocalsByIndex = new HashMap<Integer, LocalInfo>();
@@ -83,17 +103,13 @@ class MethodInfo {
         Set<Integer> accessedArguments = getAccessedArguments();
         accessedArguments.retainAll(accessedLocals);
         accessedLocals.removeAll(accessedArguments);
-        return "(" + getAccessedLocalsString(accessedArguments) + ")" + getAccessedLocalNames(accessedLocals);
+        List<String> arguments = getAccessedLocalNames(accessedArguments);
+        List<String> locals = getAccessedLocalNames(accessedLocals);
+        return (arguments.isEmpty() ? "" : toParameterString(arguments)) + (locals.isEmpty() ? "" : locals);
     }
 
-    String getAccessedLocalsString(Set<Integer> accessedLocals) {
-        String s = "";
-        for (Iterator<Integer> i = accessedLocals.iterator(); i.hasNext();) {
-            s += getNameOfLocal(i.next());
-            if (i.hasNext())
-                s += ", ";
-        }
-        return s;
+    String toParameterString(Collection<String> parameters) {
+        return parameters.toString().replace('[', '(').replace(']', ')');
     }
 
     List<String> getAccessedLocalNames(Set<Integer> accessedLocals) {
@@ -103,13 +119,13 @@ class MethodInfo {
         return result;
     }
 
-    static class LocalInfo {
+    class LocalInfo {
         String name;
         int index;
         Type type;
     }
 
-    static class LambdaInfo {
+    class LambdaInfo {
         int arity;
         Set<Integer> accessedLocals = new HashSet<Integer>();
         Set<String> parameters = new LinkedHashSet<String>();
@@ -125,7 +141,7 @@ class MethodInfo {
         }
 
         String getParametersString() {
-            return parameters.toString().replace('[', '(').replace(']', ')');
+            return toParameterString(parameters);
         }
     }
 

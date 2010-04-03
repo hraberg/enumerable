@@ -16,6 +16,12 @@ import org.objectweb.asm.ClassWriter;
 class LambdaTransformer {
     Map<String, byte[]> lambdasByClassName = new HashMap<String, byte[]>();
 
+    ClassInjector injector = new ClassInjector();
+
+    public LambdaTransformer() {
+        debug("current class loader is " + getClass().getClassLoader());
+    }
+
     AnnotationCache lambdaParameterFields = new AnnotationCache(LambdaParameter.class);
     AnnotationCache newLambdaMethods = new AnnotationCache(NewLambda.class);
 
@@ -49,8 +55,6 @@ class LambdaTransformer {
 
     void newLambdaClass(String name, byte[] bs) {
         lambdasByClassName.put(name, bs);
-
-        ClassInjector injector = new ClassInjector();
         injector.dump(name, bs);
         injector.inject(getClass().getClassLoader(), name.replace('/', '.'), bs);
     }

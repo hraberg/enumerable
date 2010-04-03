@@ -64,7 +64,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     String locals = "";
                     if (!currentLambda.accessedLocals.isEmpty()) {
-                        locals = " closing over [" + method.getAccessedLocalsString(currentLambda.accessedLocals) + "]";
+                        locals = " closing over " + method.getAccessedLocalNames(currentLambda.accessedLocals);
                     }
                     debug("starting lambda" + currentLambda.getParametersString() + locals + " at " + sourceAndLine());
 
@@ -81,8 +81,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     } else {
                         int index = parameterNamesToIndex.get(name);
                         boolean write = opcode == PUTSTATIC;
-                        debug("argument " + index + " " + getObjectType(owner).getClassName() + "." + name + " "
-                                + getType(desc).getClassName() + (write ? " assigned" : " read"));
+                        debug("argument " + name + " "
+                                + MethodInfo.getSimpleClassName(getType(desc)) + (write ? " assigned" : " read"));
                         accessLambdaParameter(write, name, desc, index);
                     }
                 } else {
@@ -137,11 +137,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     debug("variable "
                             + method.getNameOfLocal(operand)
                             + " "
-                            + type.getClassName()
-                            + (write ? " assigned to" : " read from") + " wrapped array"
-                            + (inLambda() ? " field " + getObjectType(currentLambdaClass()).getClassName() + "."
-                            + lambdaFieldNameForLocal(operand) : " local "
-                            + operand));
+                            + MethodInfo.getSimpleClassName(type)
+                            + (write ? " stored in" : " read from")
+                            + (inLambda() ? " lambda field " + lambdaFieldNameForLocal(operand)
+                            : " local " + operand));
                 }
             } else {
                 super.visitIntInsn(opcode, operand);
@@ -395,18 +394,18 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         super.visit(version, access, name, signature, superName, interfaces);
         this.className = name;
-        debug("transforming lambdas and accessed locals in " + getObjectType(name).getClassName());
-        debug("current class loader is " + getClass().getClassLoader());
+        debug("transforming " + getObjectType(name).getClassName());
     }
 
     public MethodVisitor visitMethod(int access, final String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
         MethodInfo method = methodsByNameAndDesc.get(name + desc);
+
         if (method.lambdas.isEmpty()) {
-            debug("skipping method " + name + desc);
+            debug("skipping " + method);
             return mv;
         }
-        debug("processing method " + method.getNameAndDesc());
+        debug("processing " + method);
         return new LambdaMethodVisitor(mv, method);
     }
 }
