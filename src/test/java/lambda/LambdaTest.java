@@ -145,12 +145,21 @@ public class LambdaTest {
     }
 
     @Test
-    public void lambdaIsRunnable() throws Exception {
+    public void lambdaAsRunnable() throws Exception {
         String string = "";
-        Thread thread = new Thread(λ(_, string = "hello"));
+        Thread thread = new Thread(λ(_, string = "hello").as(Runnable.class));
         assertEquals("", string);
         thread.start();
         thread.join();
         assertEquals("hello", string);
+    }
+
+    @Test
+    public void functionComposition() throws Exception {
+        Fn1<Boolean, Boolean> not = λ(b, !b);
+        Fn1<Integer, Boolean> even = λ(n, n % 2 == 0);
+
+        Fn1<Integer, Boolean> notEven = not.compose(even);
+        assertTrue(notEven.call(3));
     }
 }
