@@ -31,7 +31,7 @@ class ClassInjector {
 
     void inject(ClassLoader loader, String className, byte[] bs) {
         try {
-            debug("injecting " + className + " into " + loader);
+            debug("defining class " + className);
             Class<?> c = (Class<?>) defineClass.invoke(loader, className, bs, 0, bs.length);
             resolveClass.invoke(loader, c);
         } catch (Exception e) {

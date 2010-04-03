@@ -66,7 +66,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     if (!currentLambda.accessedLocals.isEmpty()) {
                         locals = " closing over [" + method.getAccessedLocalsString(currentLambda.accessedLocals) + "]";
                     }
-                    debug("starting new lambda with arity " + currentLambda.arity + locals);
+                    debug("starting lambda" + currentLambda.getParametersString() + locals + " at " + sourceAndLine());
 
                     debugIndent();
 
@@ -81,9 +81,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     } else {
                         int index = parameterNamesToIndex.get(name);
                         boolean write = opcode == PUTSTATIC;
-                        debug("lambda parameter " + getObjectType(owner).getClassName() + "." + name + " "
-                                + getType(desc).getClassName() + (write ? " assigned" : " accessed") + " as argument "
-                                + index);
+                        debug("argument " + index + " " + getObjectType(owner).getClassName() + "." + name + " "
+                                + getType(desc).getClassName() + (write ? " assigned" : " read"));
                         accessLambdaParameter(write, name, desc, index);
                     }
                 } else {
@@ -98,8 +97,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             try {
                 if (inLambda() && opcode == INVOKESTATIC) {
                     if (transformer.isNewLambdaMethod(owner, name, desc)) {
-                        debug("new lambda created at " + sourceAndLine());
-
                         returnFromCall();
                         endLambdaClass();
 
@@ -134,13 +131,14 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     }
                 } else {
                     loadArrayFromLocalOrLambda(operand, type);
-                    accessFirstArrayElement(opcode, type);
+                    boolean write = opcode >= ISTORE && opcode <= ASTORE;
+                    accessFirstArrayElement(opcode, type, write);
 
                     debug("variable "
                             + method.getNameOfLocal(operand)
                             + " "
                             + type.getClassName()
-                            + " accessed using wrapped array"
+                            + (write ? " assigned to" : " read from") + " wrapped array"
                             + (inLambda() ? " field " + getObjectType(currentLambdaClass()).getClassName() + "."
                             + lambdaFieldNameForLocal(operand) : " local "
                             + operand));
@@ -243,8 +241,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             }
         }
 
-        void accessFirstArrayElement(int opcode, Type type) {
-            if (opcode >= ISTORE && opcode <= ASTORE) {
+        void accessFirstArrayElement(int opcode, Type type, boolean write) {
+            if (write) {
                 mv.visitInsn(SWAP);
                 mv.visitInsn(ICONST_0);
                 mv.visitInsn(SWAP);
@@ -398,6 +396,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         super.visit(version, access, name, signature, superName, interfaces);
         this.className = name;
         debug("transforming lambdas and accessed locals in " + getObjectType(name).getClassName());
+        debug("current class loader is " + getClass().getClassLoader());
     }
 
     public MethodVisitor visitMethod(int access, final String name, String desc, String signature, String[] exceptions) {

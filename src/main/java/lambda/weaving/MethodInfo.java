@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,11 +40,6 @@ class MethodInfo {
 
     void newLambda() {
         lambdas.add(new LambdaInfo());
-    }
-
-    void setLambdaInfo(Type type, int arity) {
-        lastLambda().arity = arity;
-        lastLambda().type = type;
     }
 
     MethodInfo.LambdaInfo lastLambda() {
@@ -100,6 +96,13 @@ class MethodInfo {
         return s;
     }
 
+    List<String> getAccessedLocalNames(Set<Integer> accessedLocals) {
+        List<String> result = new ArrayList<String>();
+        for (Iterator<Integer> i = accessedLocals.iterator(); i.hasNext();)
+            result.add(getNameOfLocal(i.next()));
+        return result;
+    }
+
     static class LocalInfo {
         String name;
         int index;
@@ -109,7 +112,21 @@ class MethodInfo {
     static class LambdaInfo {
         int arity;
         Set<Integer> accessedLocals = new HashSet<Integer>();
+        Set<String> parameters = new LinkedHashSet<String>();
         Type type;
+
+        void setInfo(Type type, int arity) {
+            this.arity = arity;
+            this.type = type;
+        }
+
+        void setParameterInfo(String name, Type type) {
+            parameters.add(name);
+        }
+
+        String getParametersString() {
+            return parameters.toString().replace('[', '(').replace(']', ')');
+        }
     }
 
     Set<Integer> getAccessedLocals() {

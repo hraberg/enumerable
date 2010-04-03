@@ -29,13 +29,15 @@ class FirstPassClassVisitor extends EmptyVisitor {
 
     public void visitFieldInsn(int opcode, String owner, String name, String desc) {
         try {
-            if (!inLambda && opcode == GETSTATIC) {
+            if (!inLambda && transformer.isLambdaParameterField(owner, name)) {
                 if (transformer.isLambdaParameterField(owner, name)) {
                     inLambda = true;
                     currentMethod.newLambda();
                 }
             }
-
+            if (transformer.isLambdaParameterField(owner, name)) {
+                currentMethod.lastLambda().setParameterInfo(name, getType(desc));
+            }
         } catch (Exception e) {
             throw uncheck(e);
         }
@@ -59,7 +61,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
         try {
             if (inLambda && opcode == INVOKESTATIC) {
                 if (transformer.isNewLambdaMethod(owner, name, desc)) {
-                    currentMethod.setLambdaInfo(getReturnType(desc), getArgumentTypes(desc).length - 1);
+                    currentMethod.lastLambda().setInfo(getReturnType(desc), getArgumentTypes(desc).length - 1);
                     inLambda = false;
                 }
             }
