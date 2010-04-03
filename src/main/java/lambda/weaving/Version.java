@@ -12,7 +12,7 @@ public class Version {
     public static Properties buildProperties = new Properties();
     static {
         ClassLoader loader = Enumerable.class.getClassLoader();
-        InputStream in = loader.getResourceAsStream("lambda/enumerable.version.properties");
+        InputStream in = loader.getResourceAsStream(Version.class.getName().toLowerCase().replace('.', '/') + ".properties");
         try {
             if (in != null)
                 buildProperties.load(in);
@@ -27,7 +27,7 @@ public class Version {
     }
 
     public static String getVersionString() {
-        return "Enumerable.java version " + buildProperties.get("enumerable.version") + " (built at "
+        return "Enumerable.java version " + buildProperties.get("enumerable.version") + " (built on "
                 + buildProperties.getProperty("enumerable.build.date") + " from "
                 + buildProperties.getProperty("enumerable.git.commit") + ")";
     }

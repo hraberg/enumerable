@@ -37,7 +37,7 @@
         </exec>
         <property name="enumerable.git.commit" value="&lt;git commit info not available&gt;" />
 
-        <echo file="target/classes/lambda/enumerable.version.properties">
+        <echo file="target/classes/lambda/weaving/version.properties">
         	enumerable.version=${enumerable.version}
         	enumerable.build.date=${DSTAMP}
         	enumerable.git.commit=${enumerable.git.commit}
