@@ -76,11 +76,9 @@ class MethodInfo {
 
     Set<Integer> getAccessedArguments() {
         Set<Integer> accessedArguments = new HashSet<Integer>();
-        for (int i = 1; i <= getArgumentTypes(desc).length; i++) {
-            if (accessedLocalsByIndex.keySet().contains(i)) {
+        for (int i = 1; i <= getArgumentTypes(desc).length; i++)
+            if (accessedLocalsByIndex.keySet().contains(i))
                 accessedArguments.add(i);
-            }
-        }
         return accessedArguments;
     }
 

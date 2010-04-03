@@ -115,11 +115,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         public void visitIincInsn(int var, int increment) {
-            if (method.isLocalAccessedFromLambda(var)) {
+            if (method.isLocalAccessedFromLambda(var))
                 incrementInArray(var, increment);
-            } else {
+            else
                 super.visitIincInsn(var, increment);
-            }
         }
 
         public void visitVarInsn(int opcode, int operand) {
@@ -162,9 +161,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-            if (method.isLocalAccessedFromLambda(index)) {
+            if (method.isLocalAccessedFromLambda(index))
                 desc = getDescriptor(Object.class);
-            }
             super.visitLocalVariable(name, desc, signature, start, end, index);
         }
 
@@ -178,16 +176,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void initAccessedLocalsAndParametersAsArrays() {
             Set<Integer> accessedLocals = method.getAccessedLocals();
-            if (!accessedLocals.isEmpty()) {
+            if (!accessedLocals.isEmpty())
                 debug("wrapping locals accessed by lambdas in arrays " + method.getAccessedArgumentsAndLocalsString(accessedLocals));
-            } else {
+            else
                 debug("no locals accessed by lambdas");
-            }
-            for (int local : method.getAccessedLocals()) {
-                if (!isThis(local)) {
+            for (int local : method.getAccessedLocals())
+                if (!isThis(local))
                     initArray(local, method.getTypeOfLocal(local));
-                }
-            }
         }
 
         void newArray(Type type) {
@@ -349,17 +344,17 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void initLambdaParameter(String name) {
-            if (parameterNamesToIndex.size() == currentLambda.arity) {
+            if (parameterNamesToIndex.size() == currentLambda.arity)
                 throw new IllegalArgumentException("Tried to access a unbound parameter [" + name + "] valid ones are "
                         + parameterNamesToIndex.keySet() + " " + sourceAndLine());
-            }
+
             parameterNamesToIndex.put(name, parameterNamesToIndex.size() + 1);
         }
 
         void accessLambdaParameter(boolean write, String name, String desc, int parameter) {
-            if (parameterNamesToIndex.size() != currentLambda.arity) {
+            if (parameterNamesToIndex.size() != currentLambda.arity)
                 throw new IllegalArgumentException("Parameter already bound [" + name + "] " + sourceAndLine());
-            }
+
             if (write) {
                 mv.visitTypeInsn(CHECKCAST, getType(desc).getInternalName());
                 mv.visitVarInsn(ASTORE, parameter);

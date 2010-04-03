@@ -35,9 +35,8 @@ class AnnotationFinder extends EmptyVisitor {
     }
 
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        if (annotation.getName().equals(getType(desc).getClassName())) {
+        if (annotation.getName().equals(getType(desc).getClassName()))
             found = true;
-        }
         return null;
     }
 }

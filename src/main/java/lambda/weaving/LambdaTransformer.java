@@ -37,9 +37,8 @@ class LambdaTransformer {
 
         FirstPassClassVisitor firstPass = new FirstPassClassVisitor(this);
         cr.accept(firstPass, 0);
-        if (firstPass.hasNoLambdas()) {
+        if (firstPass.hasNoLambdas())
             return null;
-        }
 
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         SecondPassClassVisitor visitor = new SecondPassClassVisitor(cw, firstPass, this);

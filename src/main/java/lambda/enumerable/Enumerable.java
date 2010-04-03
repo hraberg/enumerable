@@ -104,9 +104,8 @@ public class Enumerable {
         try {
             in = new BufferedReader(reader);
             String line = null;
-            while ((line = in.readLine()) != null) {
+            while ((line = in.readLine()) != null)
                 block.call(line);
-            }
             return reader;
         } catch (IOException e) {
             throw uncheck(e);

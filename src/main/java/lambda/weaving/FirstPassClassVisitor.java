@@ -42,15 +42,13 @@ class FirstPassClassVisitor extends EmptyVisitor {
     }
 
     public void visitIincInsn(int var, int increment) {
-        if (inLambda) {
+        if (inLambda)
             currentMethod.accessLocalFromLambda(var);
-        }
     }
 
     public void visitVarInsn(int opcode, int operand) {
-        if (inLambda) {
+        if (inLambda)
             currentMethod.accessLocalFromLambda(operand);
-        }
     }
 
     public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
@@ -71,10 +69,9 @@ class FirstPassClassVisitor extends EmptyVisitor {
     }
 
     boolean hasNoLambdas() {
-        for (MethodInfo method : methodsByNameAndDesc.values()) {
+        for (MethodInfo method : methodsByNameAndDesc.values())
             if (!method.lambdas.isEmpty())
                 return false;
-        }
         return true;
     }
 }

@@ -33,9 +33,8 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         InputStream in = getResourceAsStream(name.replace('.', '/') + ".class");
         try {
             byte[] b = transformClass(name, in);
-            if (b == null) {
+            if (b == null)
                 return super.loadClass(name, resolve);
-            }
             return defineClass(name, b, 0, b.length);
         } catch (Exception e) {
             throw new ClassNotFoundException(name, e);
@@ -64,12 +63,10 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
             if (isNotToBeInstrumented(name))
                 return null;
             byte[] b = transformer.transform(name, in);
-            if (b != null) {
+            if (b != null)
                 new ClassInjector().dump(name, b);
-            }
             return b;
         } catch (Exception e) {
-            e.printStackTrace();
             throw uncheck(e);
         }
     }
@@ -82,17 +79,16 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     }
 
     static void addSkippedPackages(String agentArgs) {
-        if (agentArgs != null)
-            for (String prefix : agentArgs.split(",")) {
-                String trim = prefix.trim();
-                if (trim.length() > 0)
-                    packagesToSkip.add(trim);
-            }
+        for (String prefix : agentArgs.split(",")) {
+            String trim = prefix.trim();
+            if (trim.length() > 0)
+                packagesToSkip.add(trim);
+        }
     }
 
     public static void premain(String agentArgs, Instrumentation instrumentation) {
         debug("running premain " + LambdaLoader.class.getSimpleName());
-        addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages"));
+        addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
         instrumentation.addTransformer(new LambdaLoader());
     }
 
@@ -103,7 +99,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                 return;
             }
             debug("running main " + LambdaLoader.class.getSimpleName());
-            addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages"));
+            addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
             launchApplication(args[0], copyOfRange(args, 1, args.length));
         } catch (InvocationTargetException e) {
             throw e.getCause();
