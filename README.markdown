@@ -83,7 +83,7 @@ Enumerable.java uses Ant to build. Run `ant tests`, `ant example` or `ant agent-
 
 The transformation is implemented in two passes. The first pass identifies all blocks and their arities and which local variables they access, if any. The second pass does the actual transformation, which has three main elements:
 
-* Moving the actual block expression into a new inner class implementing Fn1 or Fn2.
+* Moving the actual block expression into a new inner class implementing Fn1, Fn2 or F3.
 * Wrapping any accessed local variables in arrays which are passed into the block constructor.
 * Replacing the original expression with code that constructs the new block.
 

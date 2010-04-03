@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
+    public static boolean tranformationFailed;
+
     static Set<String> packagesToSkip = new HashSet<String>();
 
     static {
@@ -37,7 +39,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                 return super.loadClass(name, resolve);
             return defineClass(name, b, 0, b.length);
         } catch (Exception e) {
-            throw new ClassNotFoundException(name, e);
+            throw uncheck(e);
         } finally {
             try {
                 if (in != null)
@@ -52,7 +54,6 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         try {
             return transformClass(className.replace('/', '.'), new ByteArrayInputStream(classfileBuffer));
         } catch (Throwable t) {
-            debug("caught throwable in premain transform:");
             t.printStackTrace();
             return null;
         }
@@ -60,14 +61,17 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
     byte[] transformClass(String name, InputStream in) {
         try {
-            if (isNotToBeInstrumented(name))
+            if (isNotToBeInstrumented(name) || tranformationFailed)
                 return null;
             byte[] b = transformer.transform(name, in);
             if (b != null)
                 new ClassInjector().dump(name, b);
             return b;
-        } catch (Exception e) {
-            throw uncheck(e);
+        } catch (Throwable t) {
+            tranformationFailed = true;
+            err.println("caught throwable while transforming " + name
+                    + " lambda transformation disabled from here on");
+            throw uncheck(t);
         }
     }
 

@@ -19,7 +19,7 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
 
     /**
      * Partial application, returns a {@link Fn0} which calls this function with
-     * a1.
+     * a1 as the argument.
      */
     public Fn0<R> partial(final A1 a1) {
         return new Fn0<R>() {

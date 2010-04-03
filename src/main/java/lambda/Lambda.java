@@ -4,6 +4,11 @@ import java.util.Collection;
 
 import lambda.exception.LambdaWeavingNotEnabledException;
 
+/**
+ * This class acts as a placeholder during compile time and is used to direct
+ * the transformation process in LambdaLoader. No fields or methods in this
+ * class are meant to be used at runtime.
+ */
 public class Lambda {
     @LambdaParameter
     public static Integer n;
@@ -27,6 +32,20 @@ public class Lambda {
     public static Collection<?> col;
     @LambdaParameter
     public static Object obj;
+
+    /**
+     * This LambdaParameter is a convention used to to create a lambda
+     * {@link #fn(Object, Object)} that takes no parameters.
+     * 
+     * <p>
+     * For example, this function will always return 1, ignoring the argument:
+     * </p>
+     * 
+     * <pre>
+     * fn(_, 1);
+     * </pre>
+     * 
+     */
     @LambdaParameter
     public static Object _;
 
