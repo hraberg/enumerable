@@ -1,5 +1,6 @@
 package lambda.weaving;
 
+import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
 import static org.objectweb.asm.Type.*;
 
@@ -89,7 +90,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     super.visitFieldInsn(opcode, owner, name, desc);
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw uncheck(e);
             }
         }
 
@@ -109,7 +110,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 }
                 super.visitMethodInsn(opcode, owner, name, desc);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw uncheck(e);
             }
         }
 

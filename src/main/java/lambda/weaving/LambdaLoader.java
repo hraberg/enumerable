@@ -2,6 +2,7 @@ package lambda.weaving;
 
 import static java.lang.System.*;
 import static java.util.Arrays.*;
+import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
 
 import java.io.ByteArrayInputStream;
@@ -42,8 +43,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
             try {
                 if (in != null)
                     in.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (IOException silent) {
             }
         }
     }
@@ -70,7 +70,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
             return b;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            throw uncheck(e);
         }
     }
 

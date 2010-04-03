@@ -2,6 +2,7 @@ package lambda.enumerable;
 
 import static java.lang.Boolean.*;
 import static java.util.Arrays.*;
+import static lambda.exception.UncheckedException.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -90,8 +91,8 @@ public class Enumerable {
         try {
             eachLine(new FileReader(file), block);
             return file;
-        } catch (FileNotFoundException e1) {
-            throw new RuntimeException(e1);
+        } catch (FileNotFoundException e) {
+            throw uncheck(e);
         }
     }
 
@@ -108,13 +109,12 @@ public class Enumerable {
             }
             return reader;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw uncheck(e);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (IOException silent) {
                 }
             }
         }

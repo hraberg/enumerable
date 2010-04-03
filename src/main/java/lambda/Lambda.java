@@ -2,6 +2,8 @@ package lambda;
 
 import java.util.Collection;
 
+import lambda.exception.LambdaWeavingNotEnabledException;
+
 public class Lambda {
     @LambdaParameter
     public static Integer n;
@@ -30,31 +32,31 @@ public class Lambda {
 
     @NewLambda
     public static <A1, R> Fn1<A1, R> λ(A1 a1, R block) {
-        throw new UnsupportedOperationException();
+        throw new LambdaWeavingNotEnabledException();
     }
 
     @NewLambda
     public static <A1, R> Fn1<A1, R> lambda(A1 a1, R block) {
-        throw new UnsupportedOperationException();
+        throw new LambdaWeavingNotEnabledException();
     }
 
     @NewLambda
     public static <A1, R> Fn1<A1, R> fn(A1 a1, R block) {
-        throw new UnsupportedOperationException();
+        throw new LambdaWeavingNotEnabledException();
     }
 
     @NewLambda
     public static <A1, A2, R> Fn2<A1, A2, R> λ(A1 a1, A2 a2, R block) {
-        throw new UnsupportedOperationException();
+        throw new LambdaWeavingNotEnabledException();
     }
 
     @NewLambda
     public static <A1, A2, R> Fn2<A1, A2, R> lambda(A1 a1, A2 a2, R block) {
-        throw new UnsupportedOperationException();
+        throw new LambdaWeavingNotEnabledException();
     }
 
     @NewLambda
     public static <A1, A2, R> Fn2<A1, A2, R> fn(A1 a1, A2 a2, R block) {
-        throw new UnsupportedOperationException();
+        throw new LambdaWeavingNotEnabledException();
     }
 }

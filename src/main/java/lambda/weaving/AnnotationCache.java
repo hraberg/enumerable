@@ -1,5 +1,6 @@
 package lambda.weaving;
 
+import static lambda.exception.UncheckedException.*;
 import static org.objectweb.asm.Type.*;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ class AnnotationCache {
             elementsToHasAnnotation.put(key, finder.found);
             return finder.found;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw uncheck(e);
         }
     }
 }

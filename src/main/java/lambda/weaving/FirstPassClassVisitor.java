@@ -1,5 +1,6 @@
 package lambda.weaving;
 
+import static lambda.exception.UncheckedException.*;
 import static org.objectweb.asm.Type.*;
 
 import java.util.HashMap;
@@ -36,7 +37,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw uncheck(e);
         }
     }
 
@@ -65,7 +66,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw uncheck(e);
         }
     }
 

@@ -1,5 +1,6 @@
 package lambda.weaving;
 
+import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
 
 import java.io.File;
@@ -24,7 +25,7 @@ class ClassInjector {
             
             debug("writing generated classes to " + classDir.getAbsolutePath());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw uncheck(e);
         }
     }
 
@@ -34,7 +35,7 @@ class ClassInjector {
             Class<?> c = (Class<?>) defineClass.invoke(loader, className, bs, 0, bs.length);
             resolveClass.invoke(loader, c);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw uncheck(e);
         }
     }
 
@@ -50,13 +51,12 @@ class ClassInjector {
             out = new FileOutputStream(file);
             out.write(b);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw uncheck(e);
         } finally {
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (IOException silent) {
                 }
             }
         }
