@@ -106,7 +106,7 @@
 
     <target name="jars" depends="agent-jar, source-jar, javadoc-jar"/>
 
-    <target name="dist" depends="jars, tests">
+    <target name="dist" depends="tests, jars">
         <tar destfile="target/enumerable-java-${enumerable.version}.tgz" compression="gzip">
             <tarfileset dir="target"
              fullpath="enumerable-java-${enumerable.version}/enumerable-${enumerable.version}-agent.jar">
