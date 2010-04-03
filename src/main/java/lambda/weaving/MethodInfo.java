@@ -83,7 +83,7 @@ class MethodInfo {
         Set<Integer> accessedArguments = getAccessedArguments();
         accessedArguments.retainAll(accessedLocals);
         accessedLocals.removeAll(accessedArguments);
-        return "(" + getAccessedLocalsString(accessedArguments) + ")" + "[" + getAccessedLocalsString(accessedLocals) + "]";
+        return "(" + getAccessedLocalsString(accessedArguments) + ")" + getAccessedLocalNames(accessedLocals);
     }
 
     String getAccessedLocalsString(Set<Integer> accessedLocals) {
