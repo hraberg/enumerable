@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="enumerable">
-	<property file="lambda.weaving.properties"/>
+    <property file="lambda.weaving.properties"/>
     
     <path id="enumerable.classpath">
         <pathelement location="target/classes"/>
@@ -68,19 +68,19 @@
         </junit>
         <fail if="tests.failed" message="unit tests failed"/>
     </target>
-	
-	<target name="example" depends="example-with-agent"/>
-
-	<target name="example-with-agent" depends="agent-jar">
-		<java fork="yes" classname="lambda.enumerable.EnumerableExample">
+    
+    <target name="example" depends="example-with-agent"/>
+    
+    <target name="example-with-agent" depends="agent-jar">
+        <java fork="yes" classname="lambda.enumerable.EnumerableExample">
             <jvmarg value="-javaagent:target/enumerable-agent.jar"/>
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
             <classpath refid="enumerable.test.classpath"/>
-		</java>
-	</target>
-
+        </java>
+    </target>
+    
     <target name="example-with-loader" depends="agent-jar">
         <java fork="yes" classname="lambda.weaving.LambdaLoader">
             <arg value="lambda.enumerable.EnumerableExample"/>
@@ -89,5 +89,55 @@
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
             <classpath refid="enumerable.test.classpath"/>
         </java>
+    </target>
+    
+    <target name="source-jar">
+        <jar jarfile="target/enumerable-src.jar">
+            <fileset dir="src/main/java"/>
+        </jar>
+    </target>
+    
+    <target name="javadoc-jar" depends="javadoc">
+        <jar jarfile="target/enumerable-javadoc.jar">
+            <fileset dir="target/apidocs"/>
+        </jar>
+    </target>
+    
+    <target name="jars" depends="agent-jar, source-jar, javadoc-jar"/>
+    
+    <target name="dist" depends="jars">
+        <tar destfile="target/enumerable-java.tgz" compression="gzip">
+            <tarfileset dir="target" prefix="enumerable-java">
+                <include name="*.jar"/>
+            </tarfileset>
+            <tarfileset dir="." prefix="enumerable-java">
+                <include name="README.markdown"/>
+                <include name="epl-v10.html"/>
+            </tarfileset>
+        </tar>
+    </target>
+    
+    <target name="javadoc-uptodate">
+        <uptodate property="javadoc.notRequired" targetfile="target/enumerable-javadoc.jar">
+            <srcfiles dir="src/main/java" includes="**/*"/>
+        </uptodate>
+    </target>
+    
+    <target name="javadoc" unless="javadoc.notRequired" depends="javadoc-uptodate">
+        <javadoc
+         destdir="target/apidocs"
+         charset="UTF-8"
+         Encoding="UTF-8"
+         classpathref="enumerable.classpath"
+         source="1.5"
+         windowtitle="Enumerable.java API">
+            <packageset dir="src/main/java" defaultexcludes="yes"/>
+            <doctitle>
+                <![CDATA[<h1>Enumerable.java API</h1>]]>
+            </doctitle>
+            <bottom>
+                <![CDATA[<i>Copyright &#169; 2010 Håkan Råberg</i>]]>
+            </bottom>
+        </javadoc>
     </target>
 </project>

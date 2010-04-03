@@ -8,7 +8,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public class EmptyVisitor implements ClassVisitor, FieldVisitor, MethodVisitor, Opcodes {
+class EmptyVisitor implements ClassVisitor, FieldVisitor, MethodVisitor, Opcodes {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
     }
 

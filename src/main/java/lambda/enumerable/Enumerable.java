@@ -26,7 +26,10 @@ import lambda.Fn2;
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
  * transformation to capture expressions as closures.
  * 
- * {@link http://ruby-doc.org/core/classes/Enumerable.html#M003127}
+ * <p>
+ * <a href="http://ruby-doc.org/core/classes/Enumerable.html"/>Ruby's Enumerable
+ * module</a>
+ * </p>
  */
 public class Enumerable {
     /**
@@ -131,7 +134,7 @@ public class Enumerable {
     }
 
     /**
-     * @see #select()
+     * @see #select(Iterable, Fn1)
      */
     public static <E> List<E> findAll(Iterable<E> col, Fn1<E, Boolean> block) {
         return select(col, block);
@@ -231,7 +234,7 @@ public class Enumerable {
     }
 
     /**
-     * @see #detect()
+     * @see #detect(Iterable, Fn1)
      */
     public static <E> E find(Iterable<E> col, Fn1<E, Boolean> block) {
         return detect(col, block);
