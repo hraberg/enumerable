@@ -18,7 +18,7 @@ Which is expanded using the [ASM Toolkit for Bytecode Manipulation](http://asm.o
 
     Fn1 square = new Fn1() {
         public Object call(Object arg) {
-            return ((Integer) arg) * ((Integer) arg);
+            return (Integer) arg * (Integer) arg;
         }
     };
     List<Integer> result = collect(integers, square);
