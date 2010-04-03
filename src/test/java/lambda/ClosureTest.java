@@ -60,7 +60,7 @@ public class ClosureTest {
 
     @Test
     public void closeOverThis() throws Exception {
-        assertSame(this, λ(n, this).call(null));
+        assertSame(this, λ(n, this).call());
     }
 
     @Test
@@ -69,8 +69,8 @@ public class ClosureTest {
     }
 
     void methodCall(String string) {
-        assertSame(string, λ(n, string).call(null));
-        λ(n, string = "world").call(null);
+        assertSame(string, λ(n, string).call());
+        λ(n, string = "world").call();
         assertEquals("world", string);
     }
 
@@ -141,7 +141,7 @@ public class ClosureTest {
 
     @Test
     public void callInstanceMethodOnThis() throws Exception {
-        assertEquals(hello(), λ(n, hello()).call(null));
+        assertEquals(hello(), λ(n, hello()).call());
     }
 
     public String hello() {
@@ -150,7 +150,7 @@ public class ClosureTest {
 
     @Test
     public void callStaticMethod() throws Exception {
-        assertEquals(ClosureTest.world(), λ(n, ClosureTest.world()).call(null));
+        assertEquals(ClosureTest.world(), λ(n, ClosureTest.world()).call());
     }
 
     public static String world() {
