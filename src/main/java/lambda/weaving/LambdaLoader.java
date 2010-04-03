@@ -4,6 +4,7 @@ import static java.lang.System.*;
 import static java.util.Arrays.*;
 import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
+import static lambda.weaving.Version.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -21,7 +22,6 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     public static boolean tranformationFailed;
 
     static Set<String> packagesToSkip = new HashSet<String>();
-
     static {
         packagesToSkip.add("java.");
         packagesToSkip.add("javax.");
@@ -69,6 +69,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
             return b;
         } catch (Throwable t) {
             tranformationFailed = true;
+            err.println(getVersionString());
             err.println("caught throwable while transforming " + name
                     + " lambda transformation disabled from here on");
             throw uncheck(t);
@@ -91,7 +92,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     }
 
     public static void premain(String agentArgs, Instrumentation instrumentation) {
-        debug("running premain " + LambdaLoader.class.getSimpleName());
+        debug("[premain] " + getVersionString());
         addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
         instrumentation.addTransformer(new LambdaLoader());
     }
@@ -102,7 +103,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                 out.println("Usage: class [args...]");
                 return;
             }
-            debug("running main " + LambdaLoader.class.getSimpleName());
+            debug("[main] " + getVersionString());
             addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
             launchApplication(args[0], copyOfRange(args, 1, args.length));
         } catch (InvocationTargetException e) {

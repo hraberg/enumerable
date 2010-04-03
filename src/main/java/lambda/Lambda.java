@@ -98,7 +98,7 @@ public class Lambda {
     }
 
     /**
-     * @see #fn(Object, Object, Object, Object))
+     * @see #fn(Object, Object, Object, Object)
      */
     @NewLambda
     public static <A1, A2, A3, R> Fn3<A1, A2, A3, R> λ(A1 a1, A2 a2, A3 a3, R block) {

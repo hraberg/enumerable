@@ -1,144 +1,151 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="enumerable">
-    <property file="lambda.weaving.properties"/>
-    <property name="enumerable.version" value="0.1"/>
+    <property name="enumerable.version" value="0.1" />
+    <property file="lambda.weaving.properties" />
+    <tstamp />
 
     <path id="enumerable.classpath">
-        <pathelement location="target/classes"/>
-        <pathelement location="lib/asm-3.2.jar"/>
+        <pathelement location="target/classes" />
+        <pathelement location="lib/asm-3.2.jar" />
     </path>
     <path id="enumerable.test.classpath">
-        <pathelement location="target/test-classes"/>
-        <pathelement location="lib/junit-4.7.jar"/>
-        <path refid="enumerable.classpath"/>
+        <pathelement location="target/test-classes" />
+        <pathelement location="lib/junit-4.7.jar" />
+        <path refid="enumerable.classpath" />
     </path>
 
-    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-0.6.jar"/>
+    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-0.6.jar" />
 
     <target name="clean">
-        <delete dir="target"/>
+        <delete dir="target" />
     </target>
 
     <target name="build">
-        <mkdir dir="target/classes"/>
+        <mkdir dir="target/classes" />
         <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
-            <src path="src/main/java"/>
-            <classpath refid="enumerable.classpath"/>
+            <src path="src/main/java" />
+            <classpath refid="enumerable.classpath" />
         </javac>
-        <mkdir dir="target/test-classes"/>
+        <mkdir dir="target/test-classes" />
         <javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8">
-            <src path="src/test/java"/>
-            <classpath refid="enumerable.test.classpath"/>
+            <src path="src/test/java" />
+            <classpath refid="enumerable.test.classpath" />
         </javac>
+
+        <exec executable="git" outputproperty="enumerable.git.commit" failifexecutionfails="false" timeout="5000">
+            <arg line="rev-parse HEAD" />
+        </exec>
+        <property name="enumerable.git.commit" value="&lt;git commit info not available&gt;" />
+
+        <echo file="target/classes/lambda/enumerable.version.properties">
+        	enumerable.version=${enumerable.version}
+        	enumerable.build.date=${DSTAMP}
+        	enumerable.git.commit=${enumerable.git.commit}
+    	</echo>
     </target>
 
     <target name="agent-jar-uptodate">
         <uptodate property="jarjar.notRequired" targetfile="target/enumerable-agent.jar">
-            <srcfiles dir="target/classes" includes="**/*"/>
+            <srcfiles dir="target/classes" includes="**/*" />
         </uptodate>
     </target>
 
     <target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
         <jarjar jarfile="target/enumerable-agent.jar">
-            <fileset dir="target/classes"/>
-            <zipfileset src="lib/asm-3.2.jar"/>
-            <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1"/>
+            <fileset dir="target/classes" />
+            <zipfileset src="lib/asm-3.2.jar" />
+            <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
             <manifest>
-                <attribute name="Main-Class" value="lambda.weaving.LambdaLoader"/>
-                <attribute name="Premain-Class" value="lambda.weaving.LambdaLoader"/>
-                <attribute name="Can-Retransform-Classes" value="true"/>
+                <attribute name="Main-Class" value="lambda.weaving.LambdaLoader" />
+                <attribute name="Premain-Class" value="lambda.weaving.LambdaLoader" />
+                <attribute name="Can-Retransform-Classes" value="true" />
             </manifest>
         </jarjar>
     </target>
 
     <target name="tests" depends="agent-jar">
-        <mkdir dir="target/junit"/>
+        <mkdir dir="target/junit" />
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
-            <jvmarg value="-javaagent:target/enumerable-agent.jar"/>
-            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
-            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
-            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
-            <classpath refid="enumerable.test.classpath"/>
+            <jvmarg value="-javaagent:target/enumerable-agent.jar" />
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
+            <classpath refid="enumerable.test.classpath" />
             <batchtest todir="target/junit">
                 <fileset dir="src/test/java">
-                    <include name="**/*Test*.java"/>
+                    <include name="**/*Test*.java" />
                 </fileset>
             </batchtest>
-            <formatter type="xml"/>
-            <formatter type="plain"/>
+            <formatter type="xml" />
+            <formatter type="plain" />
         </junit>
-        <fail if="tests.failed" message="unit tests failed"/>
+        <fail if="tests.failed" message="unit tests failed" />
     </target>
 
-    <target name="example" depends="example-with-agent"/>
+    <target name="example" depends="example-with-agent" />
 
     <target name="example-with-agent" depends="agent-jar">
         <java fork="yes" classname="lambda.enumerable.EnumerableExample">
-            <jvmarg value="-javaagent:target/enumerable-agent.jar"/>
-            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
-            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
-            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
-            <classpath refid="enumerable.test.classpath"/>
+            <jvmarg value="-javaagent:target/enumerable-agent.jar" />
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
+            <classpath refid="enumerable.test.classpath" />
         </java>
     </target>
 
     <target name="example-with-loader" depends="agent-jar">
         <java fork="yes" classname="lambda.weaving.LambdaLoader">
-            <arg value="lambda.enumerable.EnumerableExample"/>
-            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
-            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
-            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
-            <classpath refid="enumerable.test.classpath"/>
+            <arg value="lambda.enumerable.EnumerableExample" />
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
+            <classpath refid="enumerable.test.classpath" />
         </java>
     </target>
 
     <target name="source-jar">
         <jar jarfile="target/enumerable-${enumerable.version}-sources.jar">
-            <fileset dir="src/main/java"/>
+            <fileset dir="src/main/java" />
         </jar>
     </target>
 
     <target name="javadoc-jar" depends="javadoc">
         <jar jarfile="target/enumerable-${enumerable.version}-javadoc.jar">
-            <fileset dir="target/apidocs"/>
+            <fileset dir="target/apidocs" />
         </jar>
     </target>
 
-    <target name="jars" depends="agent-jar, source-jar, javadoc-jar"/>
+    <target name="jars" depends="agent-jar, source-jar, javadoc-jar" />
 
     <target name="dist" depends="tests, jars">
-        <tar destfile="target/enumerable-java-${enumerable.version}.tgz" compression="gzip">
-            <tarfileset dir="target"
-             fullpath="enumerable-java-${enumerable.version}/enumerable-${enumerable.version}-agent.jar">
-                <include name="enumerable-agent.jar"/>
+        <property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}"/>
+        <tar destfile="target/${enumerable.dist.name}.tgz" compression="gzip">
+            <tarfileset dir="target" fullpath="${enumerable.dist.name}/enumerable-${enumerable.version}-agent.jar">
+                <include name="enumerable-agent.jar" />
             </tarfileset>
-            <tarfileset dir="target" prefix="enumerable-java-${enumerable.version}">
-                <include name="*.jar"/>
+            <tarfileset dir="target" prefix="${enumerable.dist.name}">
+                <include name="*.jar" />
+                <exclude name="enumerable-agent.jar" />
             </tarfileset>
-            <tarfileset dir="." prefix="enumerable-java-${enumerable.version}">
-                <include name="README.markdown"/>
-                <include name="epl-v10.html"/>
+            <tarfileset dir="." prefix="${enumerable.dist.name}">
+                <include name="README.markdown" />
+                <include name="epl-v10.html" />
             </tarfileset>
         </tar>
     </target>
-    
+
     <target name="javadoc-uptodate">
         <uptodate property="javadoc.notRequired" targetfile="target/enumerable-${enumerable.version}-javadoc.jar">
-            <srcfiles dir="src/main/java" includes="**/*"/>
+            <srcfiles dir="src/main/java" includes="**/*" />
         </uptodate>
     </target>
-    
+
     <target name="javadoc" unless="javadoc.notRequired" depends="javadoc-uptodate">
-        <javadoc
-         destdir="target/apidocs"
-         charset="UTF-8"
-         Encoding="UTF-8"
-         classpathref="enumerable.classpath"
-         source="1.5"
-         windowtitle="Enumerable.java API">
-            <packageset dir="src/main/java" defaultexcludes="yes"/>
+        <javadoc destdir="target/apidocs" charset="UTF-8" Encoding="UTF-8" classpathref="enumerable.classpath" source="1.5" windowtitle="Enumerable.java API ${enumerable.version}">
+            <packageset dir="src/main/java" defaultexcludes="yes" />
             <doctitle>
-                <![CDATA[<h1>Enumerable.java API</h1>]]>
+                <![CDATA[<h1>Enumerable.java API ${enumerable.version}</h1>]]>
             </doctitle>
             <bottom>
                 <![CDATA[<i>Copyright &#169; 2010 Håkan Råberg</i>]]>
