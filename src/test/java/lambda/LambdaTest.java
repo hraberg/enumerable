@@ -88,6 +88,17 @@ public class LambdaTest {
         assertEquals(1, (int) λ(n, ++n).call(0));
     }
 
+    @LambdaParameter
+    static int[] ints;
+
+    @Test
+    public void callLambdaWithArrayArgument() throws Exception {
+        Fn3<int[], Integer, Integer, Integer> storeInArray = λ(ints, idx, n, ints[idx] = n);
+        int[] array = { 2 };
+        storeInArray.call(array, 0, 4);
+        assertEquals(4, array[0]);
+    }
+
     @Test
     public void callLambdaInLambda() throws Exception {
         Fn1<Integer, Integer> timesTwo = λ(n, n * 2);

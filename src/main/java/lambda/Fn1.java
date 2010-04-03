@@ -52,4 +52,16 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
             }
         };
     }
+
+    /**
+     * Function composition, returns a {@link Fn3} that calls this function with
+     * the result of f called with a1, a2 and a3.
+     */
+    public <X, Y, Z> Fn3<X, Y, Z, R> compose(final Fn3<X, Y, Z, ? extends A1> f) {
+        return new Fn3<X, Y, Z, R>() {
+            public R call(X a1, Y a2, Z a3) {
+                return Fn1.this.call(f.call(a1, a2, a3));
+            }
+        };
+    }
 }

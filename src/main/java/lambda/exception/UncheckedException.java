@@ -7,7 +7,7 @@ import java.util.Set;
 
 @SuppressWarnings("serial")
 public class UncheckedException extends RuntimeException {
-    static Set<String> filteredPackages = new HashSet<String>();
+    public static Set<String> filteredPackages = new HashSet<String>();
 
     static {
         filteredPackages.add("sun.reflect");
@@ -17,7 +17,6 @@ public class UncheckedException extends RuntimeException {
     }
 
     Throwable wrapped;
-
 
     public static RuntimeException uncheck(Throwable t) {
         if (t.getCause() != null)
@@ -29,7 +28,7 @@ public class UncheckedException extends RuntimeException {
         return new UncheckedException(t);
     }
 
-    private UncheckedException(Throwable t) {
+    UncheckedException(Throwable t) {
         super(t.getMessage(), t.getCause());
         this.wrapped = t;
         setStackTrace(filterStackTrace(t.getStackTrace()));
@@ -43,7 +42,7 @@ public class UncheckedException extends RuntimeException {
         return trace.toArray(new StackTraceElement[0]);
     }
 
-    private static boolean isFilteredPackage(StackTraceElement element) {
+    static boolean isFilteredPackage(StackTraceElement element) {
         for (String prefix : filteredPackages)
             if (element.getClassName().startsWith(prefix))
                 return true;

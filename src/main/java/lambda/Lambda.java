@@ -77,4 +77,29 @@ public class Lambda {
     public static <A1, A2, R> Fn2<A1, A2, R> fn(A1 a1, A2 a2, R block) {
         throw new LambdaWeavingNotEnabledException();
     }
+
+    /**
+     * @see #fn(Object, Object, Object, Object))
+     */
+    @NewLambda
+    public static <A1, A2, A3, R> Fn3<A1, A2, A3, R> λ(A1 a1, A2 a2, A3 a3, R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * @see #fn(Object, Object, Object, Object)
+     */
+    @NewLambda
+    public static <A1, A2, A3, R> Fn3<A1, A2, A3, R> lambda(A1 a1, A2 a2, A3 a3, R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * Creates a new lambda with three arguments.
+     */
+    @NewLambda
+    public static <A1, A2, A3, R> Fn3<A1, A2, A3, R> fn(A1 a1, A2 a2, A3 a3, R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
 }
