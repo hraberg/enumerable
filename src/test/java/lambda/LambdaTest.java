@@ -16,14 +16,17 @@ import org.junit.Test;
 public class LambdaTest {
     @Test
     public void partialApplication() throws Exception {
-        Fn2<Integer, Integer, Integer> add = λ(n, m, n + m);
-        assertEquals(2, (int) add.call(1, 1));
+        Fn3<String, Integer, Integer, String> addWithPrefixString = λ(s, n, m, s + (n + m));
+        assertEquals("prefix: 5", addWithPrefixString.call("prefix: ", 2, 3));
 
-        Fn1<Integer, Integer> add2 = add.partial(2);
-        assertEquals(4, (int) add2.call(2));
+        Fn2<Integer, Integer, String> add = addWithPrefixString.partial("result: ");
+        assertEquals("result: 2", add.call(1, 1));
 
-        Fn0<Integer> six = add2.partial(4);
-        assertEquals(6, (int) six.call());
+        Fn1<Integer, String> add2 = add.partial(2);
+        assertEquals("result: 4", add2.call(2));
+
+        Fn0<String> six = add2.partial(4);
+        assertEquals("result: 6", six.call());
     }
 
     @Test
@@ -40,10 +43,29 @@ public class LambdaTest {
         assertEquals(64, (int) nTimesMtimesTwo.apply(new Object[] { 4, 8 }));
     }
 
+    @Test
+    public void applyWithThreeArguments() throws Exception {
+        Fn3<String, Integer, Integer, String> addWithPrefixString = λ(s, n, m, s + (n + m));
+        assertEquals("total: 4", addWithPrefixString.apply("total: ", 2, 2));
+        assertEquals("total: 12", (addWithPrefixString.apply(new Object[] { "total: ", 4, 8 })));
+    }
+
     @Test(expected = NullPointerException.class)
     public void applyWithOneArgumentWhenTwoAreUsedMayThrowException() throws Exception {
         Fn2<Integer, Integer, Integer> nTimesMtimesTwo = λ(n, m, n * m * 2);
-        assertEquals(8, (int) nTimesMtimesTwo.apply(2));
+        nTimesMtimesTwo.apply(2);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void applyWithTwoArgumentsWhenThreeAreUsedMayThrowException() throws Exception {
+        Fn3<String, Integer, Integer, String> nTimesMtimesTwoPlusS = λ(s, n, m, n * m * 2 + s);
+        nTimesMtimesTwoPlusS.apply(2, 4);
+    }
+
+    @Test
+    public void applyWithTwoArgumentsWhenThirdArgumentIsNotUsed() throws Exception {
+        Fn3<Integer, Integer, String, Integer> nTimesMtimesTwo = λ(n, m, s, n * m);
+        assertEquals(8, (int) nTimesMtimesTwo.apply(2, 4));
     }
 
     @Test
@@ -76,6 +98,8 @@ public class LambdaTest {
         assertNull(firstArgument.apply());
         Fn2<String, String, String> secondArgument = λ(s, t, t);
         assertNull(secondArgument.apply());
+        Fn3<Integer, String, String, String> thirdArgument = λ(n, s, t, t);
+        assertNull(thirdArgument.apply());
     }
 
     @Test
