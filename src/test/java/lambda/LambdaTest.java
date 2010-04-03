@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -214,5 +215,29 @@ public class LambdaTest {
 
         Fn2<Integer, Integer, String> toStringTimes = toString.compose(times);
         assertEquals("12", toStringTimes.call(3, 4));
+    }
+
+    @LambdaParameter
+    @SuppressWarnings("unchecked")
+    static List l;
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void toyScheme() throws Exception {
+        Fn1<List, Object> car = λ(l, l.get(0));
+        Fn1<List, List> cdr = λ(l, l.subList(1, l.size()));
+        Fn2<Object, List, List> cons = λ(obj, l, (l = new ArrayList(l)).addAll(0, list(obj)) ? l : l);
+        Fn1<Object, Boolean> isPair = λ(obj, obj instanceof List);
+        Fn1<Object, Boolean> isAtom = λ(b, !b).compose(isPair);
+
+        List ints = list(1, 2, 3);
+
+        assertEquals(1, car.call(ints));
+        assertEquals(list(2, 3), cdr.call(ints));
+
+        assertEquals(list(0, 1, 2, 3), cons.call(0, ints));
+
+        assertTrue(isAtom.call(car.call(ints)));
+        assertTrue(isPair.call(cdr.call(ints)));
     }
 }
