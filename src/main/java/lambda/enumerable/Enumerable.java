@@ -103,21 +103,18 @@ public class Enumerable {
      * Executes the block for every line in reader.
      */
     public static <R> Reader eachLine(Reader reader, Fn1<String, R> block) {
-        BufferedReader in = null;
         try {
-            in = new BufferedReader(reader);
-            String line = null;
+            BufferedReader in = new BufferedReader(reader);
+            String line;
             while ((line = in.readLine()) != null)
                 block.call(line);
             return reader;
         } catch (IOException e) {
             throw uncheck(e);
         } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException silent) {
-                }
+            try {
+                reader.close();
+            } catch (IOException silent) {
             }
         }
     }
@@ -181,11 +178,7 @@ public class Enumerable {
      * their own compareTo method.
      */
     public static <E extends Object & Comparable<? super E>> List<E> sort(Iterable<E> col) {
-        List<E> result = new ArrayList<E>();
-        for (E each : col)
-            result.add(each);
-        Collections.sort(result);
-        return result;
+        return sort(col, (Comparator<E>) null);
     }
 
     /**
@@ -194,11 +187,7 @@ public class Enumerable {
      */
     @SuppressWarnings("unchecked")
     public static <E> List<E> sort(Iterable<E> col, final Fn2<E, E, Integer> block) {
-        List<E> result = new ArrayList<E>();
-        for (E each : col)
-            result.add(each);
-        Collections.sort(result, block.as(Comparator.class));
-        return result;
+        return sort(col, block.as(Comparator.class));
     }
 
     /**
@@ -206,14 +195,18 @@ public class Enumerable {
      * collection through the given block.
      */
     public static <E, R extends Object & Comparable<? super R>> List<E> sortBy(Iterable<E> col, final Fn1<E, R> block) {
-        List<E> result = new ArrayList<E>();
-        for (E each : col)
-            result.add(each);
-        Collections.sort(result, new Comparator<E>() {
+        return sort(col, new Comparator<E>() {
             public int compare(E o1, E o2) {
                 return block.call(o1).compareTo(block.call(o2));
             }
         });
+    }
+
+    private static <E> List<E> sort(Iterable<E> col, Comparator<E> comparator) {
+        List<E> result = new ArrayList<E>();
+        for (E each : col)
+            result.add(each);
+        Collections.sort(result, comparator);
         return result;
     }
 
@@ -223,14 +216,14 @@ public class Enumerable {
      */
     @SuppressWarnings("unchecked")
     public static <E> List<List<E>> partition(Iterable<E> col, Fn1<E, Boolean> block) {
-        List<E> result1 = new ArrayList<E>();
-        List<E> result2 = new ArrayList<E>();
+        List<E> selected = new ArrayList<E>();
+        List<E> rejected = new ArrayList<E>();
         for (E each : col)
             if (block.call(each))
-                result1.add(each);
+                selected.add(each);
             else
-                result2.add(each);
-        return new ArrayList<List<E>>(asList(result1, result2));
+                rejected.add(each);
+        return new ArrayList<List<E>>(asList(selected, rejected));
     }
 
     /**

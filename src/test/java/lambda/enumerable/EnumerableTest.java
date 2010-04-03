@@ -224,6 +224,11 @@ public class EnumerableTest {
     }
 
     @Test
+    public void sortUsingNaturalOrder() throws Exception {
+        assertEquals(oneToFive, sort(list(5, 4, 3, 2, 1)));
+    }
+
+    @Test
     public void sortUsingBlock() throws Exception {
         assertEquals(list(5, 4, 3, 2, 1), sort(oneToFive, λ(n, m, m - n)));
     }

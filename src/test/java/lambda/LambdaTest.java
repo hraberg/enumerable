@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -226,7 +225,7 @@ public class LambdaTest {
     public void toyScheme() throws Exception {
         Fn1<List, Object> car = λ(l, l.get(0));
         Fn1<List, List> cdr = λ(l, l.subList(1, l.size()));
-        Fn2<Object, List, List> cons = λ(obj, l, (l = new ArrayList(l)).addAll(0, list(obj)) ? l : l);
+        Fn2<Object, List, List> cons = λ(obj, l, (l = list(l.toArray())).addAll(0, list(obj)) ? l : l);
         Fn1<Object, Boolean> isPair = λ(obj, obj instanceof List);
         Fn1<Object, Boolean> isAtom = λ(b, !b).compose(isPair);
 
