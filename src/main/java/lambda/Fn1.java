@@ -22,7 +22,7 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
         };
     }
 
-    public <X> Fn1<X, R> compose(final Fn1<X, A1> f) {
+    public <X> Fn1<X, R> compose(final Fn1<X, ? extends A1> f) {
         return new Fn1<X, R>() {
             public R call(X a1) {
                 return Fn1.this.call(f.call(a1));
@@ -30,7 +30,7 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
         };
     }
 
-    public <X, Y> Fn2<X, Y, R> compose(final Fn2<X, Y, A1> f) {
+    public <X, Y> Fn2<X, Y, R> compose(final Fn2<X, Y, ? extends A1> f) {
         return new Fn2<X, Y, R>() {
             public R call(X a1, Y a2) {
                 return Fn1.this.call(f.call(a1, a2));

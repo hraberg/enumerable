@@ -155,11 +155,21 @@ public class LambdaTest {
     }
 
     @Test
-    public void functionComposition() throws Exception {
+    public void fn1OfFn1FunctionComposition() throws Exception {
         Fn1<Boolean, Boolean> not = λ(b, !b);
         Fn1<Integer, Boolean> even = λ(n, n % 2 == 0);
+        assertTrue(even.call(2));
 
         Fn1<Integer, Boolean> notEven = not.compose(even);
         assertTrue(notEven.call(3));
+    }
+
+    @Test
+    public void fn1OfFn2FunctionComposition() throws Exception {
+        Fn1<Object, String> toString = λ(obj, obj.toString());
+        Fn2<Integer, Integer, Integer> times = λ(n, m, n * m);
+
+        Fn2<Integer, Integer, String> toStringTimes = toString.compose(times);
+        assertEquals("12", toStringTimes.call(3, 4));
     }
 }
