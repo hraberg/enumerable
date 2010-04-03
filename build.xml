@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="enumerable">
     <property file="lambda.weaving.properties"/>
-    
+    <property name="enumerable.version" value="0.1"/>
+
     <path id="enumerable.classpath">
         <pathelement location="target/classes"/>
         <pathelement location="lib/asm-3.2.jar"/>
@@ -11,13 +12,13 @@
         <pathelement location="lib/junit-4.7.jar"/>
         <path refid="enumerable.classpath"/>
     </path>
-    
+
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-0.6.jar"/>
-    
+
     <target name="clean">
         <delete dir="target"/>
     </target>
-    
+
     <target name="build">
         <mkdir dir="target/classes"/>
         <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
@@ -30,13 +31,13 @@
             <classpath refid="enumerable.test.classpath"/>
         </javac>
     </target>
-    
+
     <target name="agent-jar-uptodate">
         <uptodate property="jarjar.notRequired" targetfile="target/enumerable-agent.jar">
             <srcfiles dir="target/classes" includes="**/*"/>
         </uptodate>
     </target>
-    
+
     <target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
         <jarjar jarfile="target/enumerable-agent.jar">
             <fileset dir="target/classes"/>
@@ -49,7 +50,7 @@
             </manifest>
         </jarjar>
     </target>
-    
+
     <target name="tests" depends="agent-jar">
         <mkdir dir="target/junit"/>
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
@@ -68,9 +69,9 @@
         </junit>
         <fail if="tests.failed" message="unit tests failed"/>
     </target>
-    
+
     <target name="example" depends="example-with-agent"/>
-    
+
     <target name="example-with-agent" depends="agent-jar">
         <java fork="yes" classname="lambda.enumerable.EnumerableExample">
             <jvmarg value="-javaagent:target/enumerable-agent.jar"/>
@@ -80,7 +81,7 @@
             <classpath refid="enumerable.test.classpath"/>
         </java>
     </target>
-    
+
     <target name="example-with-loader" depends="agent-jar">
         <java fork="yes" classname="lambda.weaving.LambdaLoader">
             <arg value="lambda.enumerable.EnumerableExample"/>
@@ -90,27 +91,31 @@
             <classpath refid="enumerable.test.classpath"/>
         </java>
     </target>
-    
+
     <target name="source-jar">
-        <jar jarfile="target/enumerable-src.jar">
+        <jar jarfile="target/enumerable-${enumerable.version}-sources.jar">
             <fileset dir="src/main/java"/>
         </jar>
     </target>
-    
+
     <target name="javadoc-jar" depends="javadoc">
-        <jar jarfile="target/enumerable-javadoc.jar">
+        <jar jarfile="target/enumerable-${enumerable.version}-javadoc.jar">
             <fileset dir="target/apidocs"/>
         </jar>
     </target>
-    
+
     <target name="jars" depends="agent-jar, source-jar, javadoc-jar"/>
-    
+
     <target name="dist" depends="jars, tests">
-        <tar destfile="target/enumerable-java.tgz" compression="gzip">
-            <tarfileset dir="target" prefix="enumerable-java">
+        <tar destfile="target/enumerable-java-${enumerable.version}.tgz" compression="gzip">
+            <tarfileset dir="target"
+             fullpath="enumerable-java-${enumerable.version}/enumerable-${enumerable.version}-agent.jar">
+                <include name="enumerable-agent.jar"/>
+            </tarfileset>
+            <tarfileset dir="target" prefix="enumerable-java-${enumerable.version}">
                 <include name="*.jar"/>
             </tarfileset>
-            <tarfileset dir="." prefix="enumerable-java">
+            <tarfileset dir="." prefix="enumerable-java-${enumerable.version}">
                 <include name="README.markdown"/>
                 <include name="epl-v10.html"/>
             </tarfileset>
@@ -118,7 +123,7 @@
     </target>
     
     <target name="javadoc-uptodate">
-        <uptodate property="javadoc.notRequired" targetfile="target/enumerable-javadoc.jar">
+        <uptodate property="javadoc.notRequired" targetfile="target/enumerable-${enumerable.version}-javadoc.jar">
             <srcfiles dir="src/main/java" includes="**/*"/>
         </uptodate>
     </target>
