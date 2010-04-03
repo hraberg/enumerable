@@ -104,6 +104,14 @@ public class LambdaTest {
     }
 
     @Test
+    @SuppressWarnings("null")
+    public void recursion() throws Exception {
+        Fn1<Integer, Integer> fib = null;
+        fib = λ(n, n <= 1 ? n : fib.call(n - 1) + fib.call(n - 2));
+        assertEquals(55, (int) fib.call(10));
+    }
+
+    @Test
     public <R> void returnAnonymousInnerClassFromLambda() throws Exception {
         Fn1<?, ? extends Callable<String>> returnsCallable = λ(_, new Callable<String>() {
             public String call() throws Exception {

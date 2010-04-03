@@ -13,6 +13,7 @@ import java.util.Map;
 import lambda.Fn1;
 
 public class EnumerableExample {
+    @SuppressWarnings("null")
     public void example(PrintStream out) {
         /*
          * While λ looks good, it is cumbersome to insert. There are three
@@ -187,6 +188,19 @@ public class EnumerableExample {
         Fn1<Integer, Integer> add2 = λ(n, m, n + m).partial(2);
         out.println(add2.call(5));
         out.println(add2.call(-5));
+
+        /*
+         * You can use function composition to chain functions like this.
+         */
+        Fn1<Integer, Integer> negatedAdd2 = λ(n, -n).compose(add2);
+        out.println(negatedAdd2.call(4));
+
+        /*
+         * Once defined, lambdas can call themselves recursively.
+         */
+        Fn1<Integer, Integer> fib = null;
+        fib = λ(n, n <= 1 ? n : fib.call(n - 1) + fib.call(n - 2));
+        out.println(fib.call(10));
 
         List<Integer> moreInts = asList(-1, 0, 1);
 
