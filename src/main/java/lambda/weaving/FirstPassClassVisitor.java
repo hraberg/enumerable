@@ -6,6 +6,8 @@ import static org.objectweb.asm.Type.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import lambda.weaving.MethodInfo.LambdaInfo;
+
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
@@ -14,8 +16,8 @@ class FirstPassClassVisitor extends EmptyVisitor {
 
     LambdaTransformer transformer;
 
-    boolean inLambda;
     MethodInfo currentMethod;
+    private LambdaInfo currentLambda;
 
     FirstPassClassVisitor(LambdaTransformer transformer) {
         this.transformer = transformer;
@@ -29,28 +31,25 @@ class FirstPassClassVisitor extends EmptyVisitor {
 
     public void visitFieldInsn(int opcode, String owner, String name, String desc) {
         try {
-            if (!inLambda && transformer.isLambdaParameterField(owner, name)) {
-                if (transformer.isLambdaParameterField(owner, name)) {
-                    inLambda = true;
-                    currentMethod.newLambda();
-                }
-            }
-            if (transformer.isLambdaParameterField(owner, name)) {
+            if (!inLambda() && transformer.isLambdaParameterField(owner, name))
+                if (transformer.isLambdaParameterField(owner, name))
+                    currentLambda = currentMethod.newLambda();
+
+            if (transformer.isLambdaParameterField(owner, name))
                 currentMethod.lastLambda().setParameterInfo(name, getType(desc));
-            }
         } catch (Exception e) {
             throw uncheck(e);
         }
     }
 
     public void visitIincInsn(int var, int increment) {
-        if (inLambda)
-            currentMethod.accessLocalFromLambda(var);
+        if (inLambda())
+            currentLambda.accessLocal(var);
     }
 
     public void visitVarInsn(int opcode, int operand) {
-        if (inLambda)
-            currentMethod.accessLocalFromLambda(operand);
+        if (inLambda())
+            currentLambda.accessLocal(operand);
     }
 
     public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
@@ -59,15 +58,19 @@ class FirstPassClassVisitor extends EmptyVisitor {
 
     public void visitMethodInsn(int opcode, String owner, String name, String desc) {
         try {
-            if (inLambda && opcode == INVOKESTATIC) {
+            if (inLambda() && opcode == INVOKESTATIC) {
                 if (transformer.isNewLambdaMethod(owner, name, desc)) {
-                    currentMethod.lastLambda().setInfo(getReturnType(desc), getArgumentTypes(desc).length - 1);
-                    inLambda = false;
+                    currentLambda.setType(getReturnType(desc));
+                    currentLambda = null;
                 }
             }
         } catch (Exception e) {
             throw uncheck(e);
         }
+    }
+
+    boolean inLambda() {
+        return currentLambda != null;
     }
 
     boolean hasNoLambdas() {

@@ -28,45 +28,26 @@ class MethodInfo {
     }
 
     public String toString() {
-        String arguments = "(";
-        Type[] argumentTypes = getArgumentTypes(desc);
-        for (int i = 0; i < argumentTypes.length; i++) {
-            arguments += getSimpleClassName(argumentTypes[i]);
-            if (i < argumentTypes.length - 1)
-                arguments += ", ";
-        }
-        arguments += ")";
-        return getSimpleClassName(getReturnType(desc)) + " " + name + arguments;
-    }
-
-    static String getSimpleClassName(Type type) {
-        String name = type.getClassName();
-        if (!name.contains("."))
-            return name;
-        return name.substring(name.lastIndexOf('.') + 1, name.length());
+        List<String> parameters = new ArrayList<String>();
+        for (Type type : getArgumentTypes(desc))
+            parameters.add(getSimpleClassName(type));
+        return getSimpleClassName(getReturnType(desc)) + " " + name + toParameterString(parameters);
     }
 
     Map<Integer, LocalInfo> accessedLocalsByIndex = new HashMap<Integer, LocalInfo>();
-    List<MethodInfo.LambdaInfo> lambdas = new ArrayList<MethodInfo.LambdaInfo>();
+    List<LambdaInfo> lambdas = new ArrayList<LambdaInfo>();
 
-    void accessLocalFromLambda(int operand) {
-        LocalInfo local = accessedLocalsByIndex.get(operand);
-        if (local == null) {
-            local = new LocalInfo();
-            accessedLocalsByIndex.put(operand, local);
-        }
-        lastLambda().accessedLocals.add(operand);
+    LambdaInfo newLambda() {
+        LambdaInfo lambda = new LambdaInfo();
+        lambdas.add(lambda);
+        return lambda;
     }
 
-    void newLambda() {
-        lambdas.add(new LambdaInfo());
-    }
-
-    MethodInfo.LambdaInfo lastLambda() {
+    LambdaInfo lastLambda() {
         return lambdas.get(lambdas.size() - 1);
     }
 
-    Iterator<MethodInfo.LambdaInfo> lambdas() {
+    Iterator<LambdaInfo> lambdas() {
         return lambdas.iterator();
     }
 
@@ -90,33 +71,47 @@ class MethodInfo {
         return accessedLocalsByIndex.containsKey(index);
     }
 
-    Set<Integer> getAccessedArguments() {
-        Set<Integer> accessedArguments = new HashSet<Integer>();
+    Set<Integer> getAccessedParameters() {
+        Set<Integer> accessedParameters = new HashSet<Integer>();
         for (int i = 1; i <= getArgumentTypes(desc).length; i++)
             if (accessedLocalsByIndex.keySet().contains(i))
-                accessedArguments.add(i);
-        return accessedArguments;
+                accessedParameters.add(i);
+        return accessedParameters;
     }
 
-    String getAccessedArgumentsAndLocalsString(Set<Integer> accessedLocals) {
+    String getAccessedParametersAndLocalsString(Set<Integer> accessedLocals) {
         accessedLocals = new HashSet<Integer>(accessedLocals);
-        Set<Integer> accessedArguments = getAccessedArguments();
-        accessedArguments.retainAll(accessedLocals);
-        accessedLocals.removeAll(accessedArguments);
-        List<String> arguments = getAccessedLocalNames(accessedArguments);
-        List<String> locals = getAccessedLocalNames(accessedLocals);
-        return (arguments.isEmpty() ? "" : toParameterString(arguments)) + (locals.isEmpty() ? "" : locals);
+        Set<Integer> accessedParameters = getAccessedParameters();
+
+        accessedParameters.retainAll(accessedLocals);
+        accessedLocals.removeAll(accessedParameters);
+
+        List<String> parameters = getLocalNames(accessedParameters);
+        List<String> locals = getLocalNames(accessedLocals);
+
+        return (parameters.isEmpty() ? "" : toParameterString(parameters)) + (locals.isEmpty() ? "" : locals);
     }
 
     String toParameterString(Collection<String> parameters) {
         return parameters.toString().replace('[', '(').replace(']', ')');
     }
 
-    List<String> getAccessedLocalNames(Set<Integer> accessedLocals) {
+    List<String> getLocalNames(Set<Integer> locals) {
         List<String> result = new ArrayList<String>();
-        for (Iterator<Integer> i = accessedLocals.iterator(); i.hasNext();)
+        for (Iterator<Integer> i = locals.iterator(); i.hasNext();)
             result.add(getNameOfLocal(i.next()));
         return result;
+    }
+
+    Set<Integer> getAccessedLocals() {
+        return accessedLocalsByIndex.keySet();
+    }
+
+    static String getSimpleClassName(Type type) {
+        String name = type.getClassName();
+        if (!name.contains("."))
+            return name;
+        return name.substring(name.lastIndexOf('.') + 1, name.length());
     }
 
     class LocalInfo {
@@ -126,13 +121,21 @@ class MethodInfo {
     }
 
     class LambdaInfo {
-        int arity;
         Set<Integer> accessedLocals = new HashSet<Integer>();
         Set<String> parameters = new LinkedHashSet<String>();
+        Set<String> definedParameters = new HashSet<String>();
         Type type;
 
-        void setInfo(Type type, int arity) {
-            this.arity = arity;
+        void accessLocal(int operand) {
+            LocalInfo local = accessedLocalsByIndex.get(operand);
+            if (local == null) {
+                local = new LocalInfo();
+                accessedLocalsByIndex.put(operand, local);
+            }
+            accessedLocals.add(operand);
+        }
+
+        void setType(Type type) {
             this.type = type;
         }
 
@@ -143,9 +146,33 @@ class MethodInfo {
         String getParametersString() {
             return toParameterString(parameters);
         }
-    }
 
-    Set<Integer> getAccessedLocals() {
-        return accessedLocalsByIndex.keySet();
+        int getParameterIndex(String name) {
+            return new ArrayList<String>(parameters).indexOf(name) + 1;
+        }
+
+        boolean isParameterDefined(String name) {
+            return definedParameters.contains(name);
+        }
+
+        boolean hasParameter(String name) {
+            return parameters.contains(name);
+        }
+
+        boolean allParametersAreDefined() {
+            return definedParameters.equals(parameters);
+        }
+
+        void defineParameter(String name) {
+            definedParameters.add(name);
+        }
+
+        int getArity() {
+            return parameters.size();
+        }
+
+        String getInternalName() {
+            return type.getInternalName();
+        }
     }
 }
