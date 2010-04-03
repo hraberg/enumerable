@@ -61,7 +61,7 @@ If you're using Eclipse, you can add the agent as a default VM argument under In
 
 ### System Properties
 
-* `lambda.weaving.debug` - will log to System.err and write all generated classes to disk if set to true.
+* `lambda.weaving.debug` - will log to System.out and write all generated classes to disk if set to true.
 * `lambda.weaving.debug.classes.dir` - where to write the classes. Defaults to `target/generated-classes`.
 * `lambda.weaving.skipped.packages` - is a comma separeted list of package prefixes to skip.
 

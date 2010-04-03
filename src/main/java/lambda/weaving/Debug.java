@@ -17,6 +17,6 @@ class Debug {
 
     static void debug(String msg) {
         if (debug)
-            err.println(debugIndentation + msg);
+            out.println(debugIndentation + msg);
     }
 }
