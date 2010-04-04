@@ -1,14 +1,11 @@
 package lambda;
 
 import static java.lang.Math.*;
-import static java.util.Arrays.*;
 import static lambda.Lambda.*;
-import static lambda.enumerable.Enumerable.*;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.List;
 
 import org.junit.Test;
 
@@ -200,12 +197,11 @@ public class ClosureTest {
     public void canAccessMethodArgumentInClosureFirst() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         printOnStream(new PrintStream(out));
-        assertEquals("word: hello\nword: world\n", out.toString());
+        assertEquals("word: hello\n", out.toString());
     }
 
     public void printOnStream(PrintStream out) {
-        List<String> strings = asList("hello", "world");
-        each(strings, λ(s, out.printf("word: %s\n", s)));
+        λ(s, out.printf("word: %s\n", s)).call("hello");
     }
 
     @Test
