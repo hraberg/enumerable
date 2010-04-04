@@ -125,18 +125,19 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         public void visitVarInsn(int opcode, int operand) {
             if (method.isLocalAccessedFromLambda(operand)) {
                 Type type = method.getTypeOfLocal(operand);
-                if (method.isLocalReadOnly(operand)) {
+                boolean localReadOnly = method.isLocalReadOnly(operand);
+                debug("variable " + method.getNameOfLocal(operand) + " "
+                        + getSimpleClassName(type)
+                        + (isStoreInstruction(opcode) ? " stored in" : " read from")
+                        + (localReadOnly ? " read only" : " wrapped array in")
+                        + (inLambda() ? " lambda field " + currentLambda.getFieldNameForLocal(operand)
+                        : " local " + operand));
+                if (localReadOnly) {
                     if (inLambda())
                         loadLambdaField(operand, type);
                     else
                         super.visitIntInsn(opcode, operand);
                 } else {
-                    debug("variable " + method.getNameOfLocal(operand) + " "
-                            + getSimpleClassName(type)
-                            + (isStoreInstruction(opcode) ? " stored in" : " read from")
-                            + (inLambda() ? " lambda field " + currentLambda.getFieldNameForLocal(operand)
-                            : " local " + operand));
-
                     loadArrayFromLocalOrLambdaField(operand, type);
                     accessFirstArrayElement(opcode, type, isStoreInstruction(opcode));
                 }
