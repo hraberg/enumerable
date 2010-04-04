@@ -30,6 +30,33 @@ public class ClosureTest {
     }
 
     @Test
+    public void closeOverLocalDoubleVaribleWithoutModification() throws Exception {
+        double i = 0;
+        assertEquals(3.14, λ(d, i + d).call(3.14), 0);
+    }
+
+    @Test
+    public void closeOverLocalDoubleWithModification() throws Exception {
+        double i = 0;
+        λ(d, i = d).call(3.14);
+        assertEquals(3.14, i, 0);
+    }
+
+    @Test
+    public void closeOverLocalLongVaribleWithoutModification() throws Exception {
+        long i = 0;
+        assertEquals(10, (long) λ(l, i + l).call(10L));
+    }
+
+    @Test
+    public void closeOverLocalLongWithModification() throws
+            Exception {
+        long i = 0;
+        λ(l, i += l).call(10L);
+        assertEquals(10, i);
+    }
+
+    @Test
     public void closeOverLocalReferenceVarible() throws Exception {
         String hello = "hello";
         λ(s, hello += s).call(" world");

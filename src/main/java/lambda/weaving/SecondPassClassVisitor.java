@@ -139,8 +139,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     else
                         super.visitIntInsn(opcode, operand);
                 } else {
-                    loadArrayFromLocalOrLambdaField(operand, type);
-                    accessFirstArrayElement(opcode, type, isStoreInstruction(opcode));
+                    accessFirstArrayElement(operand, type, isStoreInstruction(opcode));
                 }
             } else {
                 super.visitIntInsn(opcode, operand);
@@ -238,13 +237,27 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 mv.visitVarInsn(ALOAD, operand);
         }
 
-        void accessFirstArrayElement(int opcode, Type type, boolean store) {
+        void accessFirstArrayElement(int local, Type type, boolean store) {
             if (store) {
-                mv.visitInsn(SWAP);
-                mv.visitInsn(ICONST_0);
-                mv.visitInsn(SWAP);
-                mv.visitInsn(type.getOpcode(IASTORE));
+                // x is at the top of stack, as it was to be stored
+                // directly into a local but now we need to move it
+                // into an array
+                loadArrayFromLocalOrLambdaField(local, type); // x a[]
+                if (type.equals(DOUBLE_TYPE) || type.equals(LONG_TYPE)) {
+                    mv.visitInsn(DUP_X2); // a[] x a[]
+                    mv.visitInsn(POP); // a[] x
+                    mv.visitInsn(ICONST_0); // a[] x 0
+                    mv.visitInsn(DUP_X2); // a[] 0 x 0
+                    mv.visitInsn(POP); // a[] 0 x (arrayref index value)
+                    mv.visitInsn(type.getOpcode(IASTORE));
+                } else {
+                    mv.visitInsn(SWAP); // a[] x
+                    mv.visitInsn(ICONST_0); // a[] x 0
+                    mv.visitInsn(SWAP); // a[] 0 x (arrayref index value)
+                    mv.visitInsn(type.getOpcode(IASTORE));
+                }
             } else {
+                loadArrayFromLocalOrLambdaField(local, type);
                 mv.visitInsn(ICONST_0);
                 mv.visitInsn(type.getOpcode(IALOAD));
             }
@@ -368,7 +381,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         String sourceAndLine() {
-            return source != null ? "(" + source + ":" + currentLine + ")" : "";
+            return source != null ? "(" + source + ":" + currentLine + ")" : "(Unknown Source)";
         }
 
         void nextLambdaId() {

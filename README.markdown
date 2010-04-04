@@ -59,6 +59,8 @@ The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/co
 
 If you're using Eclipse, you can add the agent as a default VM argument under Installed JREs. You can also add Lambda and Enumerable as Favorites in the Java Content Assist settings.
 
+Enumerable.java requires your classes to have local variable debugging info (-g:vars or -g in javac).
+
 ### System Properties
 
 * `lambda.weaving.debug` - will log to System.out and write all generated classes to disk if set to true.

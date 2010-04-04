@@ -22,6 +22,8 @@ public class Lambda {
     @LambdaParameter
     public static Integer idx;
     @LambdaParameter
+    public static Long l;
+    @LambdaParameter
     public static String s;
     @LambdaParameter
     public static String t;
