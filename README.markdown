@@ -24,7 +24,7 @@ Which is expanded using the [ASM Toolkit for Bytecode Manipulation](http://asm.o
     List<Integer> result = collect(integers, square);
 
 
-Closure works as expected, by trasforming local variables to arrays:
+Closure works as expected, by transforming local variables to arrays:
 
     int i = 0;
     fn(n, i += n).call(10);
