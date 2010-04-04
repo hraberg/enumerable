@@ -7,8 +7,10 @@ import java.lang.reflect.Proxy;
 /**
  * A function that takes no arguments.
  */
-public abstract class Fn0<R> {
-    public abstract R call();
+public class Fn0<R> {
+    public R call() {
+        return null;
+    }
 
     /**
      * Applies args to this function, padded with null if needed to match the

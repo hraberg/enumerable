@@ -65,7 +65,6 @@ If you're using Eclipse, you can add the agent as a default VM argument under In
 * `lambda.weaving.debug.classes.dir` - where to write the classes. Defaults to `target/generated-classes`.
 * `lambda.weaving.skipped.packages` - is a comma separeted list of package prefixes to skip.
 
-
 ### LambdaParameter
 
 You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
@@ -76,6 +75,7 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
     }
 
 Accessing a static field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses are redirected.
+
 
 ## Implementation
 
@@ -89,7 +89,6 @@ The transformation is implemented in two passes. The first pass identifies all b
 
 To understand the transformation better, a good point to start is running `ant example -Dlambda.weaving.debug=true`.
 
-
 ### How expressions are transformed into blocks
 
 Take this block:
@@ -100,7 +99,6 @@ Take this block:
     // ...
 
     each(strings, fn(s, out.printf("Country: %s\n", s)));
-
     
 The first pass starts by looking for any static fields marked with the *@LambdaParameter* annotation. Once it sees access to one, *s* in this case, it will start moving the code into a new *Fn1* (or *Fn2*) implementation. A block ends with a call to a static method marked with *@NewLambda*: *fn*. (Remember when reading the code that all arguments are (obviously) evaluated before the method call, so *s* is accessed first, and *fn* called last.)
 
@@ -108,6 +106,21 @@ The first pass also keeps track of any local varible that is accessed from withi
 
 The Enumerable methods themselves are implemented using plain old Java. You can call them using normal anonymous inner classes (as seen in the beginning of this document).
 
+## Notes on the Architecture
+
+Enumerable.java has 3 layers:
+
+### lambda.weaving - transforms expressions into anonymous inner classes
+
+This layer uses ASM, and is directed by the annotations @LambdaParameter, and @NewLambda. It's not really coupled to the layer above for which it targets the transform.
+
+### lambda - simple functional programming constructs
+
+This layer is normal Java and mainly exist out of necessity to bridge the user facing closures to an actual Java API. If you want to use Enumerable.java closures for another library, you'll wrap or implement its API using this layer.
+
+### lambda.enumerable - a port of Ruby's Enumerable
+
+This layer is also normal Java and has no knowledge of the bytecode weaving.
 
 ## Links
 

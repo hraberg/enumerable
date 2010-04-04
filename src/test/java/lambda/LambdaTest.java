@@ -10,6 +10,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import lambda.exception.LambdaWeavingNotEnabledException;
+
 import org.junit.Test;
 
 public class LambdaTest extends TestBase {
@@ -163,6 +165,20 @@ public class LambdaTest extends TestBase {
         Callable<String> callable = returnsCallable.call();
         assertEquals("hello", callable.call());
         assertNotSame(callable, returnsCallable.call());
+    }
+
+    @NewLambda
+    public static Runnable runnable(Object none, Object block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    @Test
+    public void createInterfacesUsingNewLambda() throws Exception {
+        String hello = "";
+        Runnable runnable = runnable(_, hello = "hello");
+        runnable.run();
+        assertEquals("hello", hello);
+        assertFalse(runnable instanceof Fn0<?>);
     }
 
     @LambdaParameter

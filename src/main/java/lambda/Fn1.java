@@ -3,8 +3,10 @@ package lambda;
 /**
  * A function that takes one argument.
  */
-public abstract class Fn1<A1, R> extends Fn0<R> {
-    public abstract R call(A1 a1);
+public class Fn1<A1, R> extends Fn0<R> {
+    public R call(A1 a1) {
+        return null;
+    }
 
     public R call() {
         return call(null);

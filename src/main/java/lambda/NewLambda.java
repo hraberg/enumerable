@@ -10,8 +10,23 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  * one of it's subclasses so calls to it will be transformed at load time into
  * code that instantiates the new lambda as a {@link Fn0}.
  * 
- * This annotation is not really expected to to be used by clients of the
- * library.
+ * <p>
+ * This method can also be used to create anonymous subclasses implementing
+ * other interfaces, but several restrictions apply. Example:
+ * </p>
+ * 
+ * <pre>
+ * 
+ *  &#064;NewLambda
+ *  public static Runnable runnable(Object none, Object block) {
+ *      throw new LambdaWeavingNotEnabledException();
+ *  }
+ * 
+ *  String hello = "";
+ *  Runnable runnable = runnable(_, hello = "hello");
+ *  runnable.run();
+ * 
+ * </pre>
  * 
  * Methods marked with this annotation should throw
  * {@link LambdaWeavingNotEnabledException} when the code is run without

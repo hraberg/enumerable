@@ -184,8 +184,8 @@ class MethodInfo {
             return parameters.size();
         }
 
-        String getInternalName() {
-            return type.getInternalName();
+        Type getType() {
+            return type;
         }
 
         String getFieldNameForLocal(int local) {

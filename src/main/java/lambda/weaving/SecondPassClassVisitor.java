@@ -40,6 +40,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         MethodInfo method;
         Iterator<LambdaInfo> lambdas;
         LambdaInfo currentLambda;
+        private MethodInfo currentLambdaMethod;
 
         LambdaMethodVisitor(MethodVisitor mv, MethodInfo method) {
             super(mv);
@@ -70,7 +71,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     createLambdaClass();
                     createLambdaConstructor();
 
-                    createCallMethodAndRedirectMethodVisitorToIt();
+                    createLambdaMethodAndRedirectMethodVisitorToIt();
                 }
                 if (transformer.isLambdaParameterField(owner, name)) {
                     if (!currentLambda.hasParameter(name))
@@ -99,7 +100,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             try {
                 if (inLambda() && opcode == INVOKESTATIC) {
                     if (transformer.isNewLambdaMethod(owner, name, desc)) {
-                        returnFromCall();
+                        returnFromLambdaMethod();
                         endLambdaClass();
 
                         restoreOriginalMethodWriterAndInstantiateTheLambda();
@@ -279,21 +280,34 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void createLambdaClass() {
             lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-            lambdaWriter.visit(V1_5, ACC_PUBLIC | ACC_FINAL, currentLambdaClass(), null, currentLambda.getInternalName(),
-                    null);
+
+            String[] interfaces = null;
+            String superName = getType(Object.class).getInternalName();
+
+            Type type = currentLambda.getType();
+            if (transformer.isInterface(type.getInternalName()))
+                interfaces = new String[] { type.getInternalName() };
+            else
+                superName = type.getInternalName();
+
+            lambdaWriter.visit(V1_5, ACC_PUBLIC | ACC_FINAL, currentLambdaClass(), null, superName,
+                    interfaces);
             lambdaWriter.visitOuterClass(className, method.name, method.desc);
             lambdaWriter.visitInnerClass(currentLambdaClass(), null, null, 0);
         }
 
-        void createCallMethodAndRedirectMethodVisitorToIt() {
+        void createLambdaMethodAndRedirectMethodVisitorToIt() {
             Type[] objects = getTypeArrayOfObjects(currentLambda.getArity());
             String descriptor = getMethodDescriptor(getType(Object.class), objects);
-            mv = lambdaWriter.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "call", descriptor, null, null);
+            currentLambdaMethod = transformer.getLambdaMethodBestMatch(currentLambda.getType().getInternalName(), descriptor);
+
+            mv = lambdaWriter.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, currentLambdaMethod.name, currentLambdaMethod.desc, null, null);
             mv.visitCode();
         }
 
-        void returnFromCall() {
-            mv.visitInsn(ARETURN);
+        void returnFromLambdaMethod() {
+            Type returnType = getReturnType(currentLambdaMethod.desc);
+            mv.visitInsn(returnType.getOpcode(IRETURN));
             mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
@@ -319,7 +333,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             }
 
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKESPECIAL, currentLambda.getInternalName(), "<init>", "()V");
+            Type type = currentLambda.getType();
+            if (transformer.isInterface(type.getInternalName()))
+                type = getType(Object.class);
+            mv.visitMethodInsn(INVOKESPECIAL, type.getInternalName(), "<init>", "()V");
             mv.visitInsn(RETURN);
             mv.visitMaxs(0, 0);
             mv.visitEnd();
@@ -379,7 +396,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         String currentLambdaClass() {
-            String lambdaClass = currentLambda.getInternalName();
+            String lambdaClass = currentLambda.getType().getInternalName();
             lambdaClass = lambdaClass.substring(lambdaClass.lastIndexOf("/") + 1, lambdaClass.length());
             return className + "$" + lambdaClass + "_" + currentLambdaId;
         }

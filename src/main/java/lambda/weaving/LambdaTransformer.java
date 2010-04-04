@@ -1,7 +1,10 @@
 package lambda.weaving;
 
+import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
+import static org.objectweb.asm.ClassReader.*;
 import static org.objectweb.asm.ClassWriter.*;
+import static org.objectweb.asm.Type.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +35,35 @@ class LambdaTransformer {
 
     boolean isNewLambdaMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
         return newLambdaMethods.hasAnnotation(owner, name, desc);
+    }
+
+    boolean isInterface(String owner) {
+        try {
+            class IsInterfaceFinder extends EmptyVisitor {
+                boolean isInterface;
+
+                public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+                    isInterface = (access & ACC_INTERFACE) != 0;
+                }
+            }
+            ClassReader cr = new ClassReader(getObjectType(owner).getClassName());
+            IsInterfaceFinder finder = new IsInterfaceFinder();
+            cr.accept(finder, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+            return finder.isInterface;
+        } catch (IOException e) {
+            throw uncheck(e);
+        }
+    }
+
+    MethodInfo getLambdaMethodBestMatch(String owner, String desc) {
+        try {
+            MethodFinder finder = new MethodFinder(desc);
+            ClassReader cr = new ClassReader(getObjectType(owner).getClassName());
+            cr.accept(finder, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+            return finder.getMethod();
+        } catch (IOException e) {
+            throw uncheck(e);
+        }
     }
 
     byte[] transform(String name, InputStream in) throws IOException {
