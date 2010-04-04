@@ -5,6 +5,7 @@ import static org.objectweb.asm.Type.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import lambda.weaving.MethodInfo.LambdaInfo;
 
@@ -17,7 +18,9 @@ class FirstPassClassVisitor extends EmptyVisitor {
     LambdaTransformer transformer;
 
     MethodInfo currentMethod;
-    private LambdaInfo currentLambda;
+    LambdaInfo currentLambda;
+
+    Map<Integer, Integer> localsToNumberOfWrites;
 
     FirstPassClassVisitor(LambdaTransformer transformer) {
         this.transformer = transformer;
@@ -26,6 +29,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         currentMethod = new MethodInfo(name, desc);
         methodsByNameAndDesc.put(currentMethod.getNameAndDesc(), currentMethod);
+        localsToNumberOfWrites = new HashMap<Integer, Integer>();
         return this;
     }
 
@@ -42,14 +46,35 @@ class FirstPassClassVisitor extends EmptyVisitor {
         }
     }
 
+    public void visitMaxs(int maxStack, int maxLocals) {
+        for (Entry<Integer, Integer> entry : localsToNumberOfWrites.entrySet())
+            if (entry.getValue() > 1)
+                currentMethod.makeLocalMutable(entry.getKey());
+    }
+
     public void visitIincInsn(int var, int increment) {
-        if (inLambda())
+        if (inLambda()) {
             currentLambda.accessLocal(var);
+            currentMethod.makeLocalMutable(var);
+        }
+        increseNumberOfWritesFor(var);
     }
 
     public void visitVarInsn(int opcode, int operand) {
         if (inLambda())
             currentLambda.accessLocal(operand);
+
+        if (inLambda() && isStoreInstruction(opcode))
+            currentMethod.makeLocalMutable(operand);
+        if (isStoreInstruction(opcode))
+            increseNumberOfWritesFor(operand);
+    }
+
+    void increseNumberOfWritesFor(int local) {
+        if (!localsToNumberOfWrites.containsKey(local))
+            localsToNumberOfWrites.put(local, 0);
+
+        localsToNumberOfWrites.put(local, localsToNumberOfWrites.get(local) + 1);
     }
 
     public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
@@ -67,6 +92,10 @@ class FirstPassClassVisitor extends EmptyVisitor {
         } catch (Exception e) {
             throw uncheck(e);
         }
+    }
+
+    boolean isStoreInstruction(int opcode) {
+        return opcode >= ISTORE && opcode <= ASTORE;
     }
 
     boolean inLambda() {

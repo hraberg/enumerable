@@ -285,7 +285,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void createLambdaClass() {
             lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-            lambdaWriter.visit(V1_5, ACC_PUBLIC, currentLambdaClass(), null, currentLambda.getInternalName(),
+            lambdaWriter.visit(V1_5, ACC_PUBLIC | ACC_FINAL, currentLambdaClass(), null, currentLambda.getInternalName(),
                     null);
             lambdaWriter.visitOuterClass(className, method.name, method.desc);
             lambdaWriter.visitInnerClass(currentLambdaClass(), null, null, 0);
@@ -294,7 +294,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void createCallMethodAndRedirectMethodVisitorToIt() {
             Type[] objects = getTypeArrayOfObjects(currentLambda.getArity());
             String descriptor = getMethodDescriptor(getType(Object.class), objects);
-            mv = lambdaWriter.visitMethod(ACC_PUBLIC, "call", descriptor, null, null);
+            mv = lambdaWriter.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, "call", descriptor, null, null);
             mv.visitCode();
         }
 
@@ -319,7 +319,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 lambdaWriter.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, field, type.getDescriptor(), null, null).visitEnd();
 
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitVarInsn(ALOAD, i + 1);
+                mv.visitVarInsn(type.getOpcode(ILOAD), i + 1);
+
                 mv.visitFieldInsn(PUTFIELD, currentLambdaClass(), field, type.getDescriptor());
             }
 
@@ -335,8 +336,12 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitTypeInsn(NEW, currentLambdaClass());
             mv.visitInsn(DUP);
 
-            for (int local : currentLambda.accessedLocals)
-                mv.visitVarInsn(ALOAD, local);
+            for (int local : currentLambda.accessedLocals) {
+                Type type = method.getTypeOfLocal(local);
+                if (!method.isLocalReadOnly(local))
+                    type = toArrayType(type);
+                mv.visitVarInsn(type.getOpcode(ILOAD), local);
+            }
 
             String descriptor = getMethodDescriptor(Type.VOID_TYPE, getLambdaConstructorParameters());
             mv.visitMethodInsn(INVOKESPECIAL, currentLambdaClass(), "<init>", descriptor);

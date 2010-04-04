@@ -34,7 +34,7 @@ class MethodInfo {
         return getSimpleClassName(getReturnType(desc)) + " " + name + toParameterString(parameters);
     }
 
-    Map<Integer, LocalInfo> accessedLocalsByIndex = new HashMap<Integer, LocalInfo>();
+    Map<Integer, VariableInfo> accessedLocalsByIndex = new HashMap<Integer, VariableInfo>();
     List<LambdaInfo> lambdas = new ArrayList<LambdaInfo>();
 
     LambdaInfo newLambda() {
@@ -52,10 +52,10 @@ class MethodInfo {
     }
 
     void setInfoForLocal(int index, String name, Type type) {
-        LocalInfo localInfo = accessedLocalsByIndex.get(index);
-        if (localInfo != null) {
-            localInfo.name = name;
-            localInfo.type = type;
+        VariableInfo variableInfo = accessedLocalsByIndex.get(index);
+        if (variableInfo != null) {
+            variableInfo.name = name;
+            variableInfo.type = type;
         }
     }
 
@@ -92,7 +92,7 @@ class MethodInfo {
         return (parameters.isEmpty() ? "" : toParameterString(parameters)) + (locals.isEmpty() ? "" : locals);
     }
 
-    String toParameterString(Collection<String> parameters) {
+    String toParameterString(Collection<?> parameters) {
         return parameters.toString().replace('[', '(').replace(']', ')');
     }
 
@@ -114,10 +114,23 @@ class MethodInfo {
         return name.substring(name.lastIndexOf('.') + 1, name.length());
     }
 
-    class LocalInfo {
+    boolean isThis(int operand) {
+        return operand == 0;
+    }
+
+    boolean isLocalReadOnly(int local) {
+        return isThis(local) || !accessedLocalsByIndex.get(local).mutable;
+    }
+
+    void makeLocalMutable(int local) {
+        if (accessedLocalsByIndex.containsKey(local))
+            accessedLocalsByIndex.get(local).mutable = true;
+    }
+
+    class VariableInfo {
         String name;
-        int index;
         Type type;
+        boolean mutable;
     }
 
     class LambdaInfo {
@@ -127,9 +140,9 @@ class MethodInfo {
         Type type;
 
         void accessLocal(int operand) {
-            LocalInfo local = accessedLocalsByIndex.get(operand);
+            VariableInfo local = accessedLocalsByIndex.get(operand);
             if (local == null) {
-                local = new LocalInfo();
+                local = new VariableInfo();
                 accessedLocalsByIndex.put(operand, local);
             }
             accessedLocals.add(operand);
@@ -178,13 +191,5 @@ class MethodInfo {
         String getFieldNameForLocal(int local) {
             return isThis(local) ? "this$0" : "val$" + local;
         }
-    }
-
-    boolean isThis(int operand) {
-        return operand == 0;
-    }
-
-    boolean isLocalReadOnly(int local) {
-        return isThis(local);
     }
 }
