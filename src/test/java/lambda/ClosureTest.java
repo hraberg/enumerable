@@ -59,6 +59,25 @@ public class ClosureTest {
     }
 
     @Test
+    public void closeOverLocalFinalPrimitiveVarible() throws Exception {
+        final int i = 10;
+        assertEquals(20, (int) λ(n, i + n).call(10));
+    }
+
+    @Test
+    public void closeOverLocalFinalReferenceVarible() throws Exception {
+        final String hello = "hello";
+        assertEquals("hello world", λ(s, hello + s).call(" world"));
+    }
+
+    @Test
+    public void closeOverLocalFinalArrayVarible() throws Exception {
+        final String[] hello = new String[] { "hello" };
+        λ(s, hello[0] += s).call(" world");
+        assertEquals("hello world", hello[0]);
+    }
+
+    @Test
     public void closeOverThis() throws Exception {
         assertSame(this, λ(n, this).call());
     }

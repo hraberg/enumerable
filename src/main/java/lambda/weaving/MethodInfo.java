@@ -119,7 +119,7 @@ class MethodInfo {
     }
 
     boolean isLocalReadOnly(int local) {
-        return isThis(local) || !accessedLocalsByIndex.get(local).mutable;
+        return !accessedLocalsByIndex.get(local).mutable;
     }
 
     void makeLocalMutableFromLambda(int local) {
