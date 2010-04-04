@@ -1,7 +1,6 @@
 package lambda;
 
 import static lambda.Lambda.*;
-import static lambda.enumerable.EnumerableTest.*;
 import static org.junit.Assert.*;
 
 import java.awt.event.ActionEvent;
@@ -13,7 +12,7 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
-public class LambdaTest {
+public class LambdaTest extends TestBase {
     @Test
     public void partialApplication() throws Exception {
         Fn3<String, Integer, Integer, String> addWithPrefixString = λ(s, n, m, s + (n + m));

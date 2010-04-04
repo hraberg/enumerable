@@ -13,7 +13,7 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  * This annotation is not really expected to to be used by clients of the
  * library.
  * 
- * Methods marked with this annotation are expected to throw
+ * Methods marked with this annotation should throw
  * {@link LambdaWeavingNotEnabledException} when the code is run without
  * transformation.
  */

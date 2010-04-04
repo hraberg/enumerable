@@ -73,7 +73,7 @@
             <classpath refid="enumerable.test.classpath" />
             <batchtest todir="target/junit">
                 <fileset dir="src/test/java">
-                    <include name="**/*Test*.java" />
+                    <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
             <formatter type="xml" />
