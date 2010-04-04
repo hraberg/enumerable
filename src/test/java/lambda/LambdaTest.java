@@ -10,7 +10,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import lambda.Lambda.None;
+import lambda.annotation.LambdaParameter;
+import lambda.annotation.NewLambda;
+import lambda.annotation.None;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
 import org.junit.Test;
@@ -175,7 +177,7 @@ public class LambdaTest extends TestBase {
     }
 
     @NewLambda
-    static Runnable runnable(None none, Object block) {
+    static Runnable runnable(None _, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 

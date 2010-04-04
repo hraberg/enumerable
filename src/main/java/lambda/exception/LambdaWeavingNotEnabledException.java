@@ -1,6 +1,6 @@
 package lambda.exception;
 
-import lambda.NewLambda;
+import lambda.annotation.NewLambda;
 
 /**
  * Exception to be thrown by methods marked with {@link NewLambda} if

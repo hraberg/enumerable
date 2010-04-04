@@ -2,6 +2,9 @@ package lambda;
 
 import java.util.Collection;
 
+import lambda.annotation.LambdaParameter;
+import lambda.annotation.NewLambda;
+import lambda.annotation.None;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
 /**
@@ -48,19 +51,6 @@ public class Lambda {
      */
     @LambdaParameter
     public static None _;
-
-    /**
-     * This class is used to mark an unused parameter, see
-     * {@link Lambda#fn(None, Object)} and {@link Lambda#_} for the default way
-     * to do this.
-     * 
-     * The {@link NewLambda} marked method definition must explicitly use this
-     * type.
-     */
-    public final class None {
-        private None() {
-        }
-    }
 
     /**
      * @see #fn(None, Object)
@@ -159,16 +149,29 @@ public class Lambda {
     }
 
     /**
-     * Creates a new lambda implementing I taking no arguments.
+     * Creates a new lambda implementing single method interface or class I
+     * taking no arguments.
+     * 
+     * <p>
+     * Example:
+     * </p>
+     * 
+     * <pre>
+     * Runnable r = delegate(_, out.printf(&quot;hello\n&quot;));
+     * </pre>
+     * 
+     * The real type of I is resolved during the transformation by inspecting
+     * the bytecode.
+     * 
      */
     @NewLambda
-    static <I> I delegate(None none, Object block) {
+    static <I> I delegate(None _, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
     /**
      * Creates a new lambda implementing single method interface or class I
-     * taking one argument.
+     * taking one argument. See {@link #delegate(None, Object)} for an example.
      */
     @NewLambda
     static <A1, I> I delegate(A1 a1, Object block) {
@@ -177,7 +180,7 @@ public class Lambda {
 
     /**
      * Creates a new lambda implementing single method interface or class I
-     * taking two arguments.
+     * taking two arguments. See {@link #delegate(None, Object)} for an example.
      */
     @NewLambda
     static <A1, A2, I> I delegate(A1 a1, A2 a2, Object block) {
@@ -186,7 +189,8 @@ public class Lambda {
 
     /**
      * Creates a new lambda implementing single method interface or class I
-     * taking three arguments.
+     * taking three arguments. See {@link #delegate(None, Object)} for an
+     * example.
      */
     @NewLambda
     static <A1, A2, A3, I> I delegate(A1 a1, A2 a2, A3 a3, Object block) {

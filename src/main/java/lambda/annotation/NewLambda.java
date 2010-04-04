@@ -1,8 +1,9 @@
-package lambda;
+package lambda.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
+import lambda.Fn0;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
 /**

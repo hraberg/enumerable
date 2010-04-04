@@ -11,9 +11,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import lambda.LambdaParameter;
-import lambda.NewLambda;
-import lambda.Lambda.None;
+import lambda.annotation.LambdaParameter;
+import lambda.annotation.NewLambda;
+import lambda.annotation.None;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
