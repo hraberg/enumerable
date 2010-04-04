@@ -1,6 +1,7 @@
 package lambda.weaving;
 
 import static lambda.weaving.Debug.*;
+import static org.objectweb.asm.ClassWriter.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +47,7 @@ class LambdaTransformer {
         if (firstPass.hasNoLambdas())
             return null;
 
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        ClassWriter cw = new ClassWriter(COMPUTE_MAXS);
         SecondPassClassVisitor visitor = new SecondPassClassVisitor(cw, firstPass, this);
         cr.accept(visitor, 0);
 

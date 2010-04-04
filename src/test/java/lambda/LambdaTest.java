@@ -138,12 +138,20 @@ public class LambdaTest {
         assertEquals(4, (int) λ(intToInt, intToInt.call(2)).call(timesTwo));
     }
 
+    Fn1<Integer, Integer> fib;
+
     @Test
-    @SuppressWarnings("null")
     public void recursion() throws Exception {
-        Fn1<Integer, Integer> fib = null;
         fib = λ(n, n <= 1 ? n : fib.call(n - 1) + fib.call(n - 2));
         assertEquals(55, (int) fib.call(10));
+    }
+
+    Fn1<?, ?> self;
+
+    @Test
+    public void returningThisOfLambda() throws Exception {
+        self = λ(_, self);
+        assertSame(self, self.call());
     }
 
     @Test

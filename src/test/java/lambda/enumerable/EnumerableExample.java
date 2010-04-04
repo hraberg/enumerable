@@ -13,7 +13,6 @@ import java.util.Map;
 import lambda.Fn1;
 
 public class EnumerableExample {
-    @SuppressWarnings("null")
     public void example(PrintStream out) {
         /*
          * While λ looks good, it is cumbersome to insert. There are three
@@ -198,7 +197,6 @@ public class EnumerableExample {
         /*
          * Once defined, lambdas can call themselves recursively.
          */
-        Fn1<Integer, Integer> fib = null;
         fib = λ(n, n <= 1 ? n : fib.call(n - 1) + fib.call(n - 2));
         out.println(fib.call(10));
 
@@ -240,6 +238,8 @@ public class EnumerableExample {
         λ(n, x = n).call(2);
         out.println(x);
     }
+
+    Fn1<Integer, Integer> fib;
 
     public static void main(String[] args) {
         new EnumerableExample().example(System.out);
