@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import lambda.weaving.MethodInfo.LambdaInfo;
 
@@ -63,7 +62,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     String locals = "";
                     if (!currentLambda.accessedLocals.isEmpty())
-                        locals = " closing over " + method.getLocalNames(currentLambda.accessedLocals);
+                        locals = " closing over " + method.getAccessedParametersAndLocalsString(currentLambda.accessedLocals);
 
                     debug("starting lambda" + currentLambda.getParametersString() + locals + " at " + sourceAndLine());
                     debugIndent();
@@ -125,14 +124,14 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         public void visitVarInsn(int opcode, int operand) {
             if (method.isLocalAccessedFromLambda(operand)) {
                 Type type = method.getTypeOfLocal(operand);
-                boolean localReadOnly = method.isLocalReadOnly(operand);
+                boolean readOnly = method.isLocalReadOnly(operand);
                 debug("variable " + method.getNameOfLocal(operand) + " "
                         + getSimpleClassName(type)
                         + (isStoreInstruction(opcode) ? " stored in" : " read from")
-                        + (localReadOnly ? " read only" : " wrapped array in")
+                        + (readOnly ? " read only" : " wrapped array in")
                         + (inLambda() ? " lambda field " + currentLambda.getFieldNameForLocal(operand)
                         : " local " + operand));
-                if (localReadOnly) {
+                if (readOnly) {
                     if (inLambda())
                         loadLambdaField(operand, type);
                     else
@@ -171,12 +170,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void initAccessedLocalsAndParametersAsArrays() {
-            Set<Integer> accessedLocals = method.getAccessedLocals();
-            if (accessedLocals.isEmpty())
-                debug("no locals accessed by lambdas");
-            else
-                debug("wrapping locals accessed by lambdas in arrays " + method.getAccessedParametersAndLocalsString(accessedLocals));
-            for (int local : accessedLocals)
+            for (int local : method.getAccessedLocals())
                 if (!method.isLocalReadOnly(local))
                     initArray(local, method.getTypeOfLocal(local));
         }
