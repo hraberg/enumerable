@@ -3,8 +3,10 @@ package lambda;
 /**
  * A function that takes three arguments.
  */
-public abstract class Fn3<A1, A2, A3, R> extends Fn2<A1, A2, R> {
-    public abstract R call(A1 a1, A2 a2, A3 a3);
+public class Fn3<A1, A2, A3, R> extends Fn2<A1, A2, R> {
+    public R call(A1 a1, A2 a2, A3 a3) {
+        return null;
+    }
 
     public R call(A1 a1, A2 a2) {
         return call(a1, a2, null);
