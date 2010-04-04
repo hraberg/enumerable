@@ -72,7 +72,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     createLambdaMethodAndRedirectMethodVisitorToIt();
                 }
-                if (transformer.isLambdaParameterField(owner, name) && !transformer.isNoneParameter(desc)) {
+                if (transformer.isLambdaParameterField(owner, name)) {
+                    if (transformer.isUnusedParameter(desc))
+                        return;
                     if (!currentLambda.hasParameter(name))
                         throw new IllegalArgumentException("Tried to access a undefined parameter " + name + " valid ones are "
                                 + currentLambda.getParameters() + " " + sourceAndLine());

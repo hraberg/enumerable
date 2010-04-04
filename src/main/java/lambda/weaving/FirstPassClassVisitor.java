@@ -42,7 +42,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
                 if (transformer.isLambdaParameterField(owner, name))
                     currentLambda = currentMethod.newLambda();
 
-            if (transformer.isLambdaParameterField(owner, name) && !transformer.isNoneParameter(desc))
+            if (transformer.isLambdaParameterField(owner, name) && !transformer.isUnusedParameter(desc))
                 currentMethod.lastLambda().setParameterInfo(name, getType(desc));
         } catch (Exception e) {
             throw uncheck(e);

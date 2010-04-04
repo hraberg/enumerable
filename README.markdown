@@ -120,7 +120,7 @@ This layer is normal Java and can be used on it's own. It also uses the annotate
 
 This layer mainly exists to simplify implemention of bridges from the user facing closures to an actual Java API. If you want to use Enumerable.java closures for another library, you can wrap or implement its API using this layer as a starting point.
 
-#### lambda.enumerable - a port of Ruby's Enumerable
+#### lambda.enumerable - a port of Ruby's Enumerable module
 
 This layer is also normal Java and has no knowledge of the bytecode weaving.
 

@@ -56,7 +56,7 @@ class LambdaTransformer {
         }
     }
 
-    boolean isNoneParameter(String desc) {
+    boolean isUnusedParameter(String desc) {
         return getType(desc).getClassName().equals(Unused.class.getName());
     }
 
