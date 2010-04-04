@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
-import lambda.annotation.None;
+import lambda.annotation.Unused;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
-    public void creatingLambdaWithNoArgumentsUsingNoneMarker() throws Exception {
+    public void creatingLambdaWithNoArgumentsUsingUnusedParameterMarker() throws Exception {
         Fn0<String> hello = λ(_, "hello");
         assertEquals("hello", hello.call());
     }
@@ -177,7 +177,7 @@ public class LambdaTest extends TestBase {
     }
 
     @NewLambda
-    static Runnable runnable(None _, Object block) {
+    static Runnable runnable(Unused _, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 

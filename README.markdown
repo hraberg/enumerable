@@ -112,11 +112,13 @@ Enumerable.java has 3 layers:
 
 #### lambda.weaving - transforms expressions into anonymous inner classes
 
-This layer uses ASM, and is directed by the annotations @LambdaParameter, and @NewLambda. It's not really coupled to the layer above for which it targets the transform.
+This layer uses ASM, and is directed by the annotations *@LambdaParameter*, and *@NewLambda* and the class *Unused* (for parameters). It's not coupled to the layer above, and you can build your own bridge layer by using these annotations.
 
 #### lambda - simple functional programming constructs
 
-This layer is normal Java and mainly exist out of necessity to bridge the user facing closures to an actual Java API. If you want to use Enumerable.java closures for another library, you'll wrap or implement its API using this layer.
+This layer is normal Java and can be used on it's own. It also uses the annotated class *lambda.Lambda* to direct the weaving process, if enabled.
+
+This layer mainly exists to simplify implemention of bridges from the user facing closures to an actual Java API. If you want to use Enumerable.java closures for another library, you can wrap or implement its API using this layer as a starting point.
 
 #### lambda.enumerable - a port of Ruby's Enumerable
 

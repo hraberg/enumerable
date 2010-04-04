@@ -39,7 +39,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         MethodInfo method;
         Iterator<LambdaInfo> lambdas;
         LambdaInfo currentLambda;
-        private MethodInfo currentLambdaMethod;
+        MethodInfo currentLambdaMethod;
 
         LambdaMethodVisitor(MethodVisitor mv, MethodInfo method) {
             super(mv);

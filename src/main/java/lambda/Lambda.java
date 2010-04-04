@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
-import lambda.annotation.None;
+import lambda.annotation.Unused;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
 /**
@@ -38,33 +38,31 @@ public class Lambda {
 
     /**
      * This LambdaParameter is a used to to create a lambda
-     * {@link #fn(None, Object)} that takes no parameters.
-     * 
+     * {@link #fn(Unused, Object)} that takes no parameters.
      * <p>
      * For example, this function will always return 1, ignoring the argument:
      * </p>
-     * 
      * <pre>
      * fn(_, 1);
      * </pre>
      * 
      */
     @LambdaParameter
-    public static None _;
+    public static Unused _;
 
     /**
-     * @see #fn(None, Object)
+     * @see #fn(Unused, Object)
      */
     @NewLambda
-    public static <R> Fn0<R> λ(None _, R block) {
+    public static <R> Fn0<R> λ(Unused _, R block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
     /**
-     * @see #fn(None, Object)
+     * @see #fn(Unused, Object)
      */
     @NewLambda
-    public static <R> Fn0<R> lambda(None _, R block) {
+    public static <R> Fn0<R> lambda(Unused _, R block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -72,7 +70,7 @@ public class Lambda {
      * Creates a new lambda with no arguments.
      */
     @NewLambda
-    public static <R> Fn0<R> fn(None _, R block) {
+    public static <R> Fn0<R> fn(Unused _, R block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -165,13 +163,13 @@ public class Lambda {
      * 
      */
     @NewLambda
-    static <I> I delegate(None _, Object block) {
+    static <I> I delegate(Unused _, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
     /**
      * Creates a new lambda implementing single method interface or class I
-     * taking one argument. See {@link #delegate(None, Object)} for an example.
+     * taking one argument. See {@link #delegate(Unused, Object)} for an example.
      */
     @NewLambda
     static <A1, I> I delegate(A1 a1, Object block) {
@@ -180,7 +178,7 @@ public class Lambda {
 
     /**
      * Creates a new lambda implementing single method interface or class I
-     * taking two arguments. See {@link #delegate(None, Object)} for an example.
+     * taking two arguments. See {@link #delegate(Unused, Object)} for an example.
      */
     @NewLambda
     static <A1, A2, I> I delegate(A1 a1, A2 a2, Object block) {
@@ -189,7 +187,7 @@ public class Lambda {
 
     /**
      * Creates a new lambda implementing single method interface or class I
-     * taking three arguments. See {@link #delegate(None, Object)} for an
+     * taking three arguments. See {@link #delegate(Unused, Object)} for an
      * example.
      */
     @NewLambda

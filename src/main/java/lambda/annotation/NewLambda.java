@@ -17,7 +17,6 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  * </p>
  * 
  * <pre>
- * 
  *  &#064;NewLambda
  *  public static Runnable runnable(Object none, Object block) {
  *      throw new LambdaWeavingNotEnabledException();
@@ -26,7 +25,18 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  *  String hello = "";
  *  Runnable runnable = runnable(_, hello = "hello");
  *  runnable.run();
+ * </pre>
  * 
+ * It also supports creation using generics, like this:
+ * 
+ * <pre>
+ * &#064;NewLambda
+ *  public static &lt;I&gt; I delegate(Object none, Object block) {
+ *      throw new LambdaWeavingNotEnabledException(); 
+ *  }
+ * 
+ *  String hello = ""; Runnable runnable = delegate(_, hello = "hello");
+ *  runnable.run();
  * </pre>
  * 
  * Methods marked with this annotation should throw

@@ -13,7 +13,7 @@ import java.util.Map;
 
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
-import lambda.annotation.None;
+import lambda.annotation.Unused;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -57,7 +57,7 @@ class LambdaTransformer {
     }
 
     boolean isNoneParameter(String desc) {
-        return getType(desc).getClassName().equals(None.class.getName());
+        return getType(desc).getClassName().equals(Unused.class.getName());
     }
 
     MethodInfo getLambdaMethodBestMatch(String owner, String desc) {
