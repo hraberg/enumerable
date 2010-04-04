@@ -174,5 +174,17 @@ class MethodInfo {
         String getInternalName() {
             return type.getInternalName();
         }
+
+        String getFieldNameForLocal(int local) {
+            return isThis(local) ? "this$0" : "val$" + local;
+        }
+    }
+
+    boolean isThis(int operand) {
+        return operand == 0;
+    }
+
+    boolean isLocalReadOnly(int local) {
+        return isThis(local);
     }
 }

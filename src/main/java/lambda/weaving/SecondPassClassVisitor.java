@@ -3,9 +3,12 @@ package lambda.weaving;
 import static java.util.Arrays.*;
 import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
+import static lambda.weaving.MethodInfo.*;
 import static org.objectweb.asm.Type.*;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,7 +80,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     if (currentLambda.isParameterDefined(name)) {
                         if (currentLambda.allParametersAreDefined())
-                            accessLambdaParameter(opcode == PUTSTATIC, name, desc);
+                            accessLambdaParameter(name, desc, opcode == PUTSTATIC);
                         else
                             throw new IllegalArgumentException("All parameters " + currentLambda.parameters
                                     + " have to be defined before accessing " + name + " "
@@ -122,16 +125,16 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         public void visitVarInsn(int opcode, int operand) {
             if (method.isLocalAccessedFromLambda(operand)) {
                 Type type = method.getTypeOfLocal(operand);
-                if (isThis(operand)) {
+                if (method.isLocalReadOnly(operand)) {
                     if (inLambda())
                         loadLambdaField(operand, type);
                     else
                         super.visitIntInsn(opcode, operand);
                 } else {
                     debug("variable " + method.getNameOfLocal(operand) + " "
-                            + MethodInfo.getSimpleClassName(type)
+                            + getSimpleClassName(type)
                             + (isStoreInstruction(opcode) ? " stored in" : " read from")
-                            + (inLambda() ? " lambda field " + getLambdaFieldNameForLocal(operand)
+                            + (inLambda() ? " lambda field " + currentLambda.getFieldNameForLocal(operand)
                             : " local " + operand));
 
                     loadArrayFromLocalOrLambdaField(operand, type);
@@ -140,10 +143,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             } else {
                 super.visitIntInsn(opcode, operand);
             }
-        }
-
-        boolean isStoreInstruction(int opcode) {
-            return opcode >= ISTORE && opcode <= ASTORE;
         }
 
         public void visitCode() {
@@ -162,12 +161,12 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             super.visitLocalVariable(name, desc, signature, start, end, index);
         }
 
-        boolean isMethodParameter(int operand) {
-            return operand <= getArgumentTypes(method.desc).length;
+        boolean isStoreInstruction(int opcode) {
+            return opcode >= ISTORE && opcode <= ASTORE;
         }
 
-        boolean isThis(int operand) {
-            return operand == 0;
+        boolean isMethodParameter(int operand) {
+            return operand <= getArgumentTypes(method.desc).length;
         }
 
         void initAccessedLocalsAndParametersAsArrays() {
@@ -177,7 +176,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             else
                 debug("wrapping locals accessed by lambdas in arrays " + method.getAccessedParametersAndLocalsString(accessedLocals));
             for (int local : accessedLocals)
-                if (!isThis(local))
+                if (!method.isLocalReadOnly(local))
                     initArray(local, method.getTypeOfLocal(local));
         }
 
@@ -231,9 +230,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void loadLambdaField(int operand, Type type) {
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitFieldInsn(GETFIELD, currentLambdaClass(), getLambdaFieldNameForLocal(operand),
-                    getDescriptor(Object.class));
-            mv.visitTypeInsn(CHECKCAST, type.getInternalName());
+            mv.visitFieldInsn(GETFIELD, currentLambdaClass(), currentLambda.getFieldNameForLocal(operand),
+                    type.getDescriptor());
         }
 
         void loadArrayFromLocalOrLambdaField(int operand, Type type) {
@@ -274,10 +272,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 mv.visitLdcInsn(value);
         }
 
-        void accessLambdaParameter(boolean write, String name, String desc) {
-            debug("parameter " + name + " " + MethodInfo.getSimpleClassName(getType(desc)) + (write ? " assigned" : " read"));
-            if (write) {
-                mv.visitTypeInsn(CHECKCAST, getType(desc).getInternalName());
+        void accessLambdaParameter(String name, String desc, boolean store) {
+            debug("parameter " + name + " " + getSimpleClassName(getType(desc)) + (store ? " assigned" : " read"));
+            if (store) {
                 mv.visitVarInsn(ASTORE, currentLambda.getParameterIndex(name));
             } else {
                 mv.visitVarInsn(ALOAD, currentLambda.getParameterIndex(name));
@@ -294,39 +291,40 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void createCallMethodAndRedirectMethodVisitorToIt() {
-            String descriptor = getMethodDescriptor(getType(Object.class), getTypeArrayOfObjects(currentLambda.getArity()));
+            Type[] objects = getTypeArrayOfObjects(currentLambda.getArity());
+            String descriptor = getMethodDescriptor(getType(Object.class), objects);
             mv = lambdaWriter.visitMethod(ACC_PUBLIC, "call", descriptor, null, null);
             mv.visitCode();
         }
 
+        void returnFromCall() {
+            mv.visitInsn(ARETURN);
+            mv.visitMaxs(0, 0);
+            mv.visitEnd();
+        }
+
         void createLambdaConstructor() {
-            String descriptor = getMethodDescriptor(Type.VOID_TYPE, getTypeArrayOfObjects(currentLambda.accessedLocals.size()));
+            Type[] parameters = getLambdaConstructorParameters();
+            String descriptor = getMethodDescriptor(Type.VOID_TYPE, parameters);
+
             mv = lambdaWriter.visitMethod(ACC_PUBLIC, "<init>", descriptor, null, null);
             mv.visitCode();
 
-            int i = 1;
-            for (int local : currentLambda.accessedLocals) {
-                String field = getLambdaFieldNameForLocal(local);
-                lambdaWriter.visitField(ACC_FINAL + ACC_SYNTHETIC, field, getDescriptor(Object.class), null,
-                        null).visitEnd();
+            Iterator<Integer> locals = currentLambda.accessedLocals.iterator();
+            for (int i = 0; locals.hasNext(); i++) {
+                String field = currentLambda.getFieldNameForLocal(locals.next());
+                Type type = parameters[i];
+
+                lambdaWriter.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, field, type.getDescriptor(), null, null).visitEnd();
+
                 mv.visitVarInsn(ALOAD, 0);
-                mv.visitVarInsn(ALOAD, i++);
-                mv.visitFieldInsn(PUTFIELD, currentLambdaClass(), field, getDescriptor(Object.class));
+                mv.visitVarInsn(ALOAD, i + 1);
+                mv.visitFieldInsn(PUTFIELD, currentLambdaClass(), field, type.getDescriptor());
             }
 
             mv.visitVarInsn(ALOAD, 0);
             mv.visitMethodInsn(INVOKESPECIAL, currentLambda.getInternalName(), "<init>", "()V");
             mv.visitInsn(RETURN);
-            mv.visitMaxs(0, 0);
-            mv.visitEnd();
-        }
-
-        String getLambdaFieldNameForLocal(int local) {
-            return isThis(local) ? "this$0" : "val$" + local;
-        }
-
-        void returnFromCall() {
-            mv.visitInsn(ARETURN);
             mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
@@ -339,7 +337,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             for (int local : currentLambda.accessedLocals)
                 mv.visitVarInsn(ALOAD, local);
 
-            String descriptor = getMethodDescriptor(Type.VOID_TYPE, getTypeArrayOfObjects(currentLambda.accessedLocals.size()));
+            String descriptor = getMethodDescriptor(Type.VOID_TYPE, getLambdaConstructorParameters());
             mv.visitMethodInsn(INVOKESPECIAL, currentLambdaClass(), "<init>", descriptor);
         }
 
@@ -359,6 +357,15 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void nextLambdaId() {
             currentLambdaId++;
+        }
+
+        Type[] getLambdaConstructorParameters() {
+            List<Type> result = new ArrayList<Type>();
+            for (int local : currentLambda.accessedLocals) {
+                Type type = method.getTypeOfLocal(local);
+                result.add(method.isLocalReadOnly(local) ? type : toArrayType(type));
+            }
+            return result.toArray(new Type[0]);
         }
 
         Type toArrayType(Type type) {

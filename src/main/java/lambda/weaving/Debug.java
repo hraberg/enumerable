@@ -4,7 +4,6 @@ import static java.lang.System.*;
 
 class Debug {
     static boolean debug = Boolean.valueOf(getProperty("lambda.weaving.debug"));
-
     static String debugIndentation = "";
 
     static void debugIndent() {
