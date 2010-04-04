@@ -122,7 +122,7 @@ class MethodInfo {
         return isThis(local) || !accessedLocalsByIndex.get(local).mutable;
     }
 
-    void makeLocalMutable(int local) {
+    void makeLocalMutableFromLambda(int local) {
         if (accessedLocalsByIndex.containsKey(local))
             accessedLocalsByIndex.get(local).mutable = true;
     }

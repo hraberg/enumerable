@@ -49,13 +49,13 @@ class FirstPassClassVisitor extends EmptyVisitor {
     public void visitMaxs(int maxStack, int maxLocals) {
         for (Entry<Integer, Integer> entry : localsToNumberOfWrites.entrySet())
             if (entry.getValue() > 1)
-                currentMethod.makeLocalMutable(entry.getKey());
+                currentMethod.makeLocalMutableFromLambda(entry.getKey());
     }
 
     public void visitIincInsn(int var, int increment) {
         if (inLambda()) {
             currentLambda.accessLocal(var);
-            currentMethod.makeLocalMutable(var);
+            currentMethod.makeLocalMutableFromLambda(var);
         }
         increseNumberOfWritesFor(var);
     }
@@ -65,7 +65,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
             currentLambda.accessLocal(operand);
 
         if (inLambda() && isStoreInstruction(opcode))
-            currentMethod.makeLocalMutable(operand);
+            currentMethod.makeLocalMutableFromLambda(operand);
         if (isStoreInstruction(opcode))
             increseNumberOfWritesFor(operand);
     }
@@ -73,7 +73,6 @@ class FirstPassClassVisitor extends EmptyVisitor {
     void increseNumberOfWritesFor(int local) {
         if (!localsToNumberOfWrites.containsKey(local))
             localsToNumberOfWrites.put(local, 0);
-
         localsToNumberOfWrites.put(local, localsToNumberOfWrites.get(local) + 1);
     }
 
