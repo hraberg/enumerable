@@ -110,15 +110,15 @@ The Enumerable methods themselves are implemented using plain old Java. You can 
 
 Enumerable.java has 3 layers:
 
-### lambda.weaving - transforms expressions into anonymous inner classes
+#### lambda.weaving - transforms expressions into anonymous inner classes
 
 This layer uses ASM, and is directed by the annotations @LambdaParameter, and @NewLambda. It's not really coupled to the layer above for which it targets the transform.
 
-### lambda - simple functional programming constructs
+#### lambda - simple functional programming constructs
 
 This layer is normal Java and mainly exist out of necessity to bridge the user facing closures to an actual Java API. If you want to use Enumerable.java closures for another library, you'll wrap or implement its API using this layer.
 
-### lambda.enumerable - a port of Ruby's Enumerable
+#### lambda.enumerable - a port of Ruby's Enumerable
 
 This layer is also normal Java and has no knowledge of the bytecode weaving.
 
