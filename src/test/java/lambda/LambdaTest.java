@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import lambda.Lambda.None;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
 import org.junit.Test;
@@ -28,6 +29,12 @@ public class LambdaTest extends TestBase {
 
         Fn0<String> six = add2.partial(4);
         assertEquals("result: 6", six.call());
+    }
+
+    @Test
+    public void creatingLambdaWithNoArgumentsUsingNoneMarker() throws Exception {
+        Fn0<String> hello = λ(_, "hello");
+        assertEquals("hello", hello.call());
     }
 
     @Test
@@ -147,7 +154,7 @@ public class LambdaTest extends TestBase {
         assertEquals(55, (int) fib.call(10));
     }
 
-    Fn1<?, ?> self;
+    Fn0<?> self;
 
     @Test
     public void returningThisOfLambda() throws Exception {
@@ -157,7 +164,7 @@ public class LambdaTest extends TestBase {
 
     @Test
     public <R> void returnAnonymousInnerClassFromLambda() throws Exception {
-        Fn1<?, ? extends Callable<String>> returnsCallable = λ(_, new Callable<String>() {
+        Fn0<? extends Callable<String>> returnsCallable = λ(_, new Callable<String>() {
             public String call() throws Exception {
                 return "hello";
             }
@@ -168,17 +175,71 @@ public class LambdaTest extends TestBase {
     }
 
     @NewLambda
-    public static Runnable runnable(Object none, Object block) {
+    static Runnable runnable(None none, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
     @Test
-    public void createInterfacesUsingNewLambda() throws Exception {
+    public void createSingleMethodInterfaceUsingNewLambda() throws Exception {
         String hello = "";
         Runnable runnable = runnable(_, hello = "hello");
         runnable.run();
         assertEquals("hello", hello);
         assertFalse(runnable instanceof Fn0<?>);
+    }
+
+    @NewLambda
+    static ActionListener action(ActionEvent e, Object block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    @Test
+    public void createSingleMethodInterfaceTakingOneArgumentUsingNewLambda() throws Exception {
+        ActionEvent actual;
+        ActionEvent event = new ActionEvent(this, 1, "command");
+        action(e, actual = e).actionPerformed(event);
+        assertSame(event, actual);
+    }
+
+    @Test
+    public void createSingleMethodInterfaceUsingNewLambdaGenericDelegate() throws Exception {
+        String hello = "";
+        Runnable runnable = delegate(_, hello = "hello");
+        runnable.run();
+        assertEquals("hello", hello);
+        assertFalse(runnable instanceof Fn0<?>);
+    }
+
+    @Test
+    public void createSingleMethodInterfaceTakingOneArgumentUsingNewLambdaGenericDelagate() throws Exception {
+        ActionEvent actual;
+        ActionListener a = delegate(e, actual = e);
+        ActionEvent event = new ActionEvent(this, 1, "command");
+        a.actionPerformed(event);
+        assertSame(event, actual);
+    }
+    
+    static abstract class SingleAbstractMethodNoArgumentsClass {
+        public abstract String getMessage();
+    }
+
+    @Test
+    public void createSingleMethodWithNoArgumentsClassUsingNewLambdaGenericDelagate() throws Exception {
+        SingleAbstractMethodNoArgumentsClass m = delegate(_, "hello");
+        assertEquals("hello", m.getMessage());
+    }
+
+    static abstract class SingleAbstractMethodOneArgumentClass {
+        public void ignoredAsNotAbstract() {
+        }
+
+        public abstract String getHelloMessage(String name);
+    }
+
+    @Test
+    public void createSingleMethodWithOneArugmentClassUsingNewLambdaGenericDelagate() throws Exception {
+        SingleAbstractMethodOneArgumentClass m = delegate(s, "hello: " + s);
+        assertEquals("hello: world", m.getHelloMessage("world"));
     }
 
     @LambdaParameter

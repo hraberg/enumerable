@@ -71,7 +71,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
             tranformationFailed = true;
             err.println(getVersionString());
             err.println("caught throwable while transforming " + name
-                    + " lambda transformation disabled from here on");
+                    + ", transformation is disabled from here on");
             throw uncheck(t);
         }
     }

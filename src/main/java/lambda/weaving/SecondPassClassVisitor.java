@@ -1,6 +1,5 @@
 package lambda.weaving;
 
-import static java.util.Arrays.*;
 import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
 import static lambda.weaving.MethodInfo.*;
@@ -73,16 +72,16 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     createLambdaMethodAndRedirectMethodVisitorToIt();
                 }
-                if (transformer.isLambdaParameterField(owner, name)) {
+                if (transformer.isLambdaParameterField(owner, name) && !transformer.isNoneParameter(desc)) {
                     if (!currentLambda.hasParameter(name))
                         throw new IllegalArgumentException("Tried to access a undefined parameter " + name + " valid ones are "
-                                + currentLambda.parameters + " " + sourceAndLine());
+                                + currentLambda.getParameters() + " " + sourceAndLine());
 
                     if (currentLambda.isParameterDefined(name)) {
                         if (currentLambda.allParametersAreDefined())
                             accessLambdaParameter(name, desc, opcode == PUTSTATIC);
                         else
-                            throw new IllegalArgumentException("All parameters " + currentLambda.parameters
+                            throw new IllegalArgumentException("All parameters " + currentLambda.getParameters()
                                     + " have to be defined before accessing " + name + " "
                                     + sourceAndLine());
                     } else {
@@ -297,8 +296,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void createLambdaMethodAndRedirectMethodVisitorToIt() {
-            Type[] objects = getTypeArrayOfObjects(currentLambda.getArity());
-            String descriptor = getMethodDescriptor(getType(Object.class), objects);
+            String descriptor = getMethodDescriptor(getType(Object.class), currentLambda.getParameterTypes());
             currentLambdaMethod = transformer.getLambdaMethodBestMatch(currentLambda.getType().getInternalName(), descriptor);
 
             mv = lambdaWriter.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, currentLambdaMethod.name, currentLambdaMethod.desc, null, null);
@@ -306,8 +304,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void returnFromLambdaMethod() {
-            Type returnType = getReturnType(currentLambdaMethod.desc);
-            mv.visitInsn(returnType.getOpcode(IRETURN));
+            mv.visitInsn(getReturnType(currentLambdaMethod.desc).getOpcode(IRETURN));
             mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
@@ -387,12 +384,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         Type toArrayType(Type type) {
             return getType("[" + type.getDescriptor());
-        }
-
-        Type[] getTypeArrayOfObjects(int length) {
-            Type[] arguments = new Type[length];
-            fill(arguments, getType(Object.class));
-            return arguments;
         }
 
         String currentLambdaClass() {

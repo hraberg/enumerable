@@ -13,6 +13,7 @@ import java.util.Map;
 
 import lambda.LambdaParameter;
 import lambda.NewLambda;
+import lambda.Lambda.None;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -53,6 +54,10 @@ class LambdaTransformer {
         } catch (IOException e) {
             throw uncheck(e);
         }
+    }
+
+    boolean isNoneParameter(String desc) {
+        return getType(desc).getClassName().equals(None.class.getName());
     }
 
     MethodInfo getLambdaMethodBestMatch(String owner, String desc) {

@@ -11,6 +11,7 @@ import lambda.weaving.MethodInfo.LambdaInfo;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
 
 class FirstPassClassVisitor extends EmptyVisitor {
     Map<String, MethodInfo> methodsByNameAndDesc = new HashMap<String, MethodInfo>();
@@ -21,6 +22,8 @@ class FirstPassClassVisitor extends EmptyVisitor {
     LambdaInfo currentLambda;
 
     Map<Integer, Integer> localsToNumberOfWrites;
+
+    boolean resolvingTypeUsingCheckCast;
 
     FirstPassClassVisitor(LambdaTransformer transformer) {
         this.transformer = transformer;
@@ -39,7 +42,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
                 if (transformer.isLambdaParameterField(owner, name))
                     currentLambda = currentMethod.newLambda();
 
-            if (transformer.isLambdaParameterField(owner, name))
+            if (transformer.isLambdaParameterField(owner, name) && !transformer.isNoneParameter(desc))
                 currentMethod.lastLambda().setParameterInfo(name, getType(desc));
         } catch (Exception e) {
             throw uncheck(e);
@@ -84,12 +87,25 @@ class FirstPassClassVisitor extends EmptyVisitor {
         try {
             if (inLambda() && opcode == INVOKESTATIC) {
                 if (transformer.isNewLambdaMethod(owner, name, desc)) {
-                    currentLambda.setType(getReturnType(desc));
-                    currentLambda = null;
+                    Type returnType = getReturnType(desc);
+                    if (returnType.equals(getType(Object.class))) {
+                        resolvingTypeUsingCheckCast = true;
+                    } else {
+                        currentLambda.setType(returnType);
+                        currentLambda = null;
+                    }
                 }
             }
         } catch (Exception e) {
             throw uncheck(e);
+        }
+    }
+
+    public void visitTypeInsn(int opcode, String type) {
+        if (CHECKCAST == opcode && resolvingTypeUsingCheckCast) {
+            currentLambda.setType(getObjectType(type));
+            currentLambda = null;
+            resolvingTypeUsingCheckCast = false;
         }
     }
 

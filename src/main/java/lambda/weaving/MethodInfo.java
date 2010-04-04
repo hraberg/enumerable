@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,7 +135,7 @@ class MethodInfo {
 
     class LambdaInfo {
         Set<Integer> accessedLocals = new HashSet<Integer>();
-        Set<String> parameters = new LinkedHashSet<String>();
+        Map<String, VariableInfo> parametersByName = new LinkedHashMap<String, VariableInfo>();
         Set<String> definedParameters = new HashSet<String>();
         Type type;
 
@@ -153,15 +153,21 @@ class MethodInfo {
         }
 
         void setParameterInfo(String name, Type type) {
-            parameters.add(name);
+            if (parametersByName.containsKey(name))
+                return;
+            VariableInfo value = new VariableInfo();
+            value.name = name;
+            value.type = type;
+            value.mutable = true;
+            parametersByName.put(name, value);
         }
 
         String getParametersString() {
-            return toParameterString(parameters);
+            return toParameterString(getParameters());
         }
 
         int getParameterIndex(String name) {
-            return new ArrayList<String>(parameters).indexOf(name) + 1;
+            return new ArrayList<String>(getParameters()).indexOf(name) + 1;
         }
 
         boolean isParameterDefined(String name) {
@@ -169,11 +175,11 @@ class MethodInfo {
         }
 
         boolean hasParameter(String name) {
-            return parameters.contains(name);
+            return getParameters().contains(name);
         }
 
         boolean allParametersAreDefined() {
-            return definedParameters.equals(parameters);
+            return definedParameters.equals(getParameters());
         }
 
         void defineParameter(String name) {
@@ -181,15 +187,26 @@ class MethodInfo {
         }
 
         int getArity() {
-            return parameters.size();
+            return getParameters().size();
         }
 
         Type getType() {
             return type;
         }
 
+        Type[] getParameterTypes() {
+            List<Type> result = new ArrayList<Type>();
+            for (VariableInfo parameter : parametersByName.values())
+                result.add(parameter.type);
+            return result.toArray(new Type[0]);
+        }
+
         String getFieldNameForLocal(int local) {
             return isThis(local) ? "this$0" : "val$" + local;
+        }
+
+        Set<String> getParameters() {
+            return parametersByName.keySet();
         }
     }
 }

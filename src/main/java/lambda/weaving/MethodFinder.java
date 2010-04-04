@@ -1,12 +1,14 @@
 package lambda.weaving;
 
+import static org.objectweb.asm.Type.*;
+
+import java.util.Arrays;
+
 import org.objectweb.asm.MethodVisitor;
 
 class MethodFinder extends EmptyVisitor {
     String name;
     String desc;
-    String onlyMethod;
-    String onlyDesc;
 
     MethodFinder(String desc) {
         this.desc = desc;
@@ -14,18 +16,24 @@ class MethodFinder extends EmptyVisitor {
 
     public MethodVisitor visitMethod(int access, String name, String
             desc, String signature, String[] exceptions) {
-        if (this.desc.equals(desc)) {
-            this.name = name;
-            this.desc = desc;
+        if (isAbstract(access)) {
+            if (Arrays.equals(getArgumentTypes(this.desc), getArgumentTypes(desc))) {
+                this.name = name;
+                this.desc = desc;
+            }
+            if (this.name == null && getArgumentTypes(this.desc).length == getArgumentTypes(desc).length) {
+                this.name = name;
+                this.desc = desc;
+            }
         }
-        onlyMethod = name;
-        onlyDesc = desc;
         return null;
     }
 
+    boolean isAbstract(int access) {
+        return (access & ACC_ABSTRACT) != 0;
+    }
+
     MethodInfo getMethod() {
-        if (name == null)
-            return new MethodInfo(onlyMethod, onlyDesc);
         return new MethodInfo(name, desc);
     }
 }

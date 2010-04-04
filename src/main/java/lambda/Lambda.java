@@ -34,8 +34,8 @@ public class Lambda {
     public static Object obj;
 
     /**
-     * This LambdaParameter is a convention used to to create a lambda
-     * {@link #fn(Object, Object)} that takes no parameters.
+     * This LambdaParameter is a used to to create a lambda
+     * {@link #fn(None, Object)} that takes no parameters.
      * 
      * <p>
      * For example, this function will always return 1, ignoring the argument:
@@ -47,7 +47,44 @@ public class Lambda {
      * 
      */
     @LambdaParameter
-    public static Object _;
+    public static None _;
+
+    /**
+     * This class is used to mark an unused parameter, see
+     * {@link Lambda#fn(None, Object)} and {@link Lambda#_} for the default way
+     * to do this.
+     * 
+     * The {@link NewLambda} marked method definition must explicitly use this
+     * type.
+     */
+    public final class None {
+        private None() {
+        }
+    }
+
+    /**
+     * @see #fn(None, Object)
+     */
+    @NewLambda
+    public static <R> Fn0<R> λ(None _, R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * @see #fn(None, Object)
+     */
+    @NewLambda
+    public static <R> Fn0<R> lambda(None _, R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * Creates a new lambda with no arguments.
+     */
+    @NewLambda
+    public static <R> Fn0<R> fn(None _, R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
 
     /**
      * @see #fn(Object, Object)
@@ -121,4 +158,38 @@ public class Lambda {
         throw new LambdaWeavingNotEnabledException();
     }
 
+    /**
+     * Creates a new lambda implementing I taking no arguments.
+     */
+    @NewLambda
+    static <I> I delegate(None none, Object block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * Creates a new lambda implementing single method interface or class I
+     * taking one argument.
+     */
+    @NewLambda
+    static <A1, I> I delegate(A1 a1, Object block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * Creates a new lambda implementing single method interface or class I
+     * taking two arguments.
+     */
+    @NewLambda
+    static <A1, A2, I> I delegate(A1 a1, A2 a2, Object block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * Creates a new lambda implementing single method interface or class I
+     * taking three arguments.
+     */
+    @NewLambda
+    static <A1, A2, A3, I> I delegate(A1 a1, A2 a2, A3 a3, Object block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
 }
