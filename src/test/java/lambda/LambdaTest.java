@@ -305,6 +305,18 @@ public class LambdaTest extends TestBase {
         assertEquals("hello", string);
     }
 
+
+    @Test
+    public void lambdaInConstructor() throws Exception {
+        class ConstructorClass {
+            public String fromConstructor;
+            {
+                λ(_, fromConstructor = "hello").call();
+            }
+        }
+        assertEquals("hello", new ConstructorClass().fromConstructor);
+    }
+
     @Test
     public void reflectionOnLambda() throws Exception {
         int i = 0;
@@ -319,6 +331,10 @@ public class LambdaTest extends TestBase {
 
         assertEquals(getClass(), addToIClass.getEnclosingClass());
         assertTrue(list(getClass().getDeclaredClasses()).contains(addToIClass));
+        assertEquals(getClass().getMethod("reflectionOnLambda"), addToIClass.getEnclosingMethod());
+
+        assertEquals(1, addToIClass.getDeclaredMethods().length);
+        assertEquals(1, addToIClass.getDeclaredFields().length);
 
         Field field = addToIClass.getDeclaredField("i$1");
         assertEquals(int[].class, field.getType());
