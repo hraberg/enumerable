@@ -5,6 +5,7 @@ import static lambda.Lambda.*;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.NotSerializableException;
 import java.io.PrintStream;
 import java.io.Serializable;
 
@@ -326,5 +327,13 @@ public class ClosureTest extends TestBase implements Serializable {
 
         assertEquals(15, (int) deserializedInc.call(5));
         assertEquals(10, x);
+    }
+
+    @Test(expected = NotSerializableException.class)
+    public void lambdaMustBeExplicitlySerializable() throws Exception {
+        Runnable runnable = delegate(_, x = 1);
+        runnable.run();
+        assertEquals(1, x);
+        serialze(runnable);
     }
 }

@@ -39,7 +39,7 @@ public class TestBase {
         }
     }
 
-    public byte[] serialze(Serializable original) throws Exception {
+    public byte[] serialze(Object original) throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bos);
         try {
