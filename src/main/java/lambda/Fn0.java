@@ -1,5 +1,6 @@
 package lambda;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -7,7 +8,8 @@ import java.lang.reflect.Proxy;
 /**
  * A function that takes no arguments.
  */
-public abstract class Fn0<R> {
+@SuppressWarnings("serial")
+public abstract class Fn0<R> implements Serializable {
     public abstract R call();
 
     /**

@@ -170,7 +170,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         public void visitCode() {
             super.visitCode();
-            initAccessedLocalsAndParametersAsArrays();
+            initAccessedLocalsAndMethodParametersAsArrays();
         }
 
         public void visitLineNumber(int line, Label start) {
@@ -188,7 +188,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             return local <= getArgumentTypes(method.desc).length;
         }
 
-        void initAccessedLocalsAndParametersAsArrays() {
+        void initAccessedLocalsAndMethodParametersAsArrays() {
             for (int local : method.getAccessedLocals())
                 if (!method.isLocalReadOnly(local))
                     initArray(local, method.getTypeOfLocal(local));
@@ -311,7 +311,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void accessLambdaParameter(String name, boolean store) {
             Type type = currentLambda.getParameterType(name);
             int index = currentLambda.getParameterIndex(name);
-            debugParameterAccess(name, store, type);
+            debugLambdaParameterAccess(name, store, type);
 
             if (store) {
                 mv.visitVarInsn(ASTORE, index);
@@ -321,7 +321,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             }
         }
 
-        void debugParameterAccess(String name, boolean store, Type type) {
+        void debugLambdaParameterAccess(String name, boolean store, Type type) {
             debug("parameter " + name + " " + getSimpleClassName(type) + (store ? " assigned" : " read"));
         }
 
@@ -377,7 +377,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitMethodInsn(INVOKESTATIC, boxed.getInternalName(), name, descriptor);
         }
 
-        boolean isReferenceType(final Type type) {
+        boolean isReferenceType(Type type) {
             return type.getSort() == OBJECT || type.getSort() == ARRAY;
         }
 
@@ -435,7 +435,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv = lambdaWriter.visitMethod(ACC_PUBLIC, "<init>", descriptor, null, null);
             mv.visitCode();
 
-            createAndInitializeFieldsForHoldingAccessedLocals(parameters);
+            createAndInitializeFieldsWithAccessedLocals(parameters);
 
             invokeSuperConstructor();
 
@@ -444,7 +444,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitEnd();
         }
 
-        void createAndInitializeFieldsForHoldingAccessedLocals(Type[] parameters) {
+        void createAndInitializeFieldsWithAccessedLocals(Type[] parameters) {
             Iterator<Integer> locals = currentLambda.accessedLocals.iterator();
             for (int i = 0; locals.hasNext(); i++) {
                 String field = currentLambda.getFieldNameForLocal(locals.next());
@@ -454,7 +454,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitVarInsn(type.getOpcode(ILOAD), i + 1);
-
                 mv.visitFieldInsn(PUTFIELD, currentLambdaClass(), field, type.getDescriptor());
             }
         }
@@ -477,7 +476,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitInsn(DUP);
 
             loadAccessedLocals();
-
             String descriptor = getMethodDescriptor(VOID_TYPE, getLambdaConstructorParameters());
             mv.visitMethodInsn(INVOKESPECIAL, currentLambdaClass(), "<init>", descriptor);
         }

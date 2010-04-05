@@ -9,7 +9,7 @@ import java.io.PrintStream;
 
 import org.junit.Test;
 
-public class ClosureTest {
+public class ClosureTest extends TestBase {
     @Test(expected = ArithmeticException.class)
     public void uncheckedExceptionInBlockPropagetsOut() throws Exception {
         λ(n, n / 0).call(0);
@@ -154,7 +154,7 @@ public class ClosureTest {
         assertEquals(String.class, string.getClass());
     }
 
-    private void otherMethod(Fn1<Integer, Integer> add, int x) {
+    void otherMethod(Fn1<Integer, Integer> add, int x) {
         add.call(x);
     }
 
@@ -287,5 +287,26 @@ public class ClosureTest {
     @Test
     public void accessStaticFieldOnDifferentClass() throws Exception {
         assertEquals(PI, λ(d, PI).call(0.0), 0.0);
+    }
+
+    @Test
+    public void serializingOfClosure() throws Exception {
+        int x = 5;
+
+        Fn1<Integer, Integer> inc = λ(n, x = n + x);
+        assertEquals(10, (int) inc.call(5));
+        assertEquals(10, x);
+
+        byte[] bytes = serialze(inc);
+        Fn1<Integer, Integer> deserializedInc = deserialize(bytes);
+        assertNotSame(inc, deserializedInc);
+
+        assertEquals(15, (int) deserializedInc.call(5));
+        assertEquals(10, x);
+
+        assertEquals(12, (int) inc.call(2));
+        assertEquals(12, x);
+
+        assertEquals(20, (int) deserializedInc.call(5));
     }
 }

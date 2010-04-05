@@ -2,6 +2,11 @@ package lambda;
 
 import static java.util.Arrays.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,5 +27,26 @@ public class TestBase {
 
     public <E> List<E> list(Class<E> type) {
         return new ArrayList<E>();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Object & Serializable> T deserialize(byte[] bytes) throws Exception {
+        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes));
+        try {
+            return (T) in.readObject();
+        } finally {
+            in.close();
+        }
+    }
+
+    public byte[] serialze(Serializable original) throws Exception {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bos);
+        try {
+            out.writeObject(original);
+            return bos.toByteArray();
+        } finally {
+            out.close();
+        }
     }
 }
