@@ -12,12 +12,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import lambda.Fn1;
 import lambda.Fn2;
@@ -32,6 +34,9 @@ import lambda.Fn2;
  * </p>
  */
 public class Enumerable {
+    // Missing: zip
+    // Missing tests: eachCons, eachSlice, toList, member, min, max, grep
+
     /**
      * Calls block for each item in collection.
      */
@@ -77,6 +82,101 @@ public class Enumerable {
         for (E each : col)
             result = block.call(each, i++);
         return result;
+    }
+
+    /**
+     * Iterates the given block for each list of consecutive n elements.
+     */
+    public static <E, R> R eachCons(Iterable<E> col, int n, Fn1<List<E>, R> block) {
+        List<E> list = toList(col);
+        R result = null;
+        for (int i = 0; i < list.size(); i++)
+            result = block.call(list.subList(i, i + n - 1));
+        return result;
+    }
+
+    /**
+     * Iterates the given block for each slice of n elements.
+     */
+    public static <E, R> R eachSlice(Iterable<E> col, int n, Fn1<List<E>, R> block) {
+        List<E> list = toList(col);
+        R result = null;
+        for (int i = 0; i < list.size(); i += n)
+            result = block.call(list.subList(i, i + n - 1));
+        return result;
+    }
+
+    /**
+     * @see #toList(Iterable)
+     */
+    public static <E> List<E> entries(Iterable<E> col) {
+        return toList(col);
+    }
+
+    /**
+     * Returns a list containing the items in collection.
+     */
+    public static <E> List<E> toList(Iterable<E> col) {
+        if (col instanceof Collection<?>)
+            return new ArrayList<E>((Collection<E>) col);
+
+        List<E> result = new ArrayList<E>();
+        for (E each : col)
+            result.add(each);
+        return result;
+    }
+
+    /**
+     * @see #grep(Iterable, Pattern)
+     */
+    public static <E> List<E> grep(Iterable<E> col, String pattern) {
+        return grep(col, Pattern.compile(pattern));
+    }
+
+    /**
+     * Returns a list of every element in collection for which pattern matches.
+     */
+    public static <E> List<E> grep(Iterable<E> col, Pattern pattern) {
+        List<E> result = new ArrayList<E>();
+        for (E each : col)
+            if (pattern.matcher(each.toString()).matches())
+                result.add(each);
+        return result;
+    }
+
+    /**
+     * @see #grep(Iterable, Pattern, Fn1)
+     */
+    public static <E, R> List<R> grep(Iterable<E> col, String pattern, Fn1<E, R> block) {
+        return grep(col, Pattern.compile(pattern), block);
+    }
+
+    /**
+     * Returns a list of every element in collection for which pattern matches.
+     * Each matching element is passed to tje block, and its result is stored in
+     * the output list.
+     */
+    public static <E, R> List<R> grep(Iterable<E> col, Pattern pattern, Fn1<E, R> block) {
+        List<R> result = new ArrayList<R>();
+        for (E each : col)
+            if (pattern.matcher(each.toString()).matches())
+                result.add(block.call(each));
+        return result;
+    }
+
+    /**
+     * @see #member(Iterable, Object)
+     */
+    public static <E> boolean includes(Iterable<E> col, Object obj) {
+        return toList(col).contains(obj);
+    }
+
+    /**
+     * Returns true if any member of collection equals obj. Equality is tested
+     * using {@link Object#equals(Object)}.
+     */
+    public static <E> boolean member(Iterable<E> col, Object obj) {
+        return includes(col, obj);
     }
 
     /**
@@ -174,6 +274,50 @@ public class Enumerable {
     }
 
     /**
+     * Returns the object in collection with the maximum value. This form
+     * assumes all objects implement {@link Comparable}
+     */
+    public static <E extends Object & Comparable<? super E>> E max(Iterable<E> col) {
+        List<E> sorted = sort(col);
+        if (sorted.isEmpty())
+            return null;
+        return sorted.get(sorted.size() - 1);
+    }
+
+    /**
+     * Returns the object in collection with the maximum value. This form uses
+     * the block to return a <=> b.
+     */
+    public static <E extends Object & Comparable<? super E>> E min(Iterable<E> col, Fn2<E, E, Integer> block) {
+        List<E> sorted = sort(col, block);
+        if (sorted.isEmpty())
+            return null;
+        return sorted.get(sorted.size() - 1);
+    }
+
+    /**
+     * Returns the object in collection with the minimum value. This form
+     * assumes all objects implement {@link Comparable}
+     */
+    public static <E extends Object & Comparable<? super E>> E min(Iterable<E> col) {
+        List<E> sorted = sort(col);
+        if (sorted.isEmpty())
+            return null;
+        return sorted.get(0);
+    }
+
+    /**
+     * Returns the object in collection with the maximum value. This form uses
+     * the block to return a <=> b.
+     */
+    public static <E extends Object & Comparable<? super E>> E max(Iterable<E> col, Fn2<E, E, Integer> block) {
+        List<E> sorted = sort(col, block);
+        if (sorted.isEmpty())
+            return null;
+        return sorted.get(0);
+    }
+
+    /**
      * Returns a list containing the items in collection sorted, according to
      * their own compareTo method.
      */
@@ -186,7 +330,7 @@ public class Enumerable {
      * results of the supplied block.
      */
     @SuppressWarnings("unchecked")
-    public static <E> List<E> sort(Iterable<E> col, final Fn2<E, E, Integer> block) {
+    public static <E> List<E> sort(Iterable<E> col, Fn2<E, E, Integer> block) {
         return sort(col, block.as(Comparator.class));
     }
 
@@ -205,23 +349,6 @@ public class Enumerable {
     private static <E> List<E> sort(Iterable<E> col, Comparator<E> comparator) {
         List<E> result = toList(col);
         Collections.sort(result, comparator);
-        return result;
-    }
-
-    /**
-     * @see #toList(Iterable)
-     */
-    public static <E> List<E> entries(Iterable<E> col) {
-        return toList(col);
-    }
-
-    /**
-     * Returns a list containing the items in collection.
-     */
-    public static <E> List<E> toList(Iterable<E> col) {
-        List<E> result = new ArrayList<E>();
-        for (E each : col)
-            result.add(each);
         return result;
     }
 

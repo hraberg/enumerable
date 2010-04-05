@@ -10,6 +10,7 @@ import java.lang.reflect.Proxy;
  */
 @SuppressWarnings("serial")
 public abstract class Fn0<R> implements Serializable {
+
     public abstract R call();
 
     /**
