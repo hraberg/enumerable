@@ -65,7 +65,7 @@ class LambdaTransformer implements Opcodes {
         return opcode >= ISTORE && opcode <= ASTORE;
     }
 
-    MethodInfo getLambdaMethodBestMatch(String owner, String desc) {
+    MethodInfo findMethodByParameterTypes(String owner, String desc) {
         try {
             MethodFinder finder = new MethodFinder(desc);
             ClassReader cr = new ClassReader(getObjectType(owner).getClassName());

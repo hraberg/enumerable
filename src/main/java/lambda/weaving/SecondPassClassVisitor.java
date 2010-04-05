@@ -81,7 +81,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     if (currentLambda.isParameterDefined(name)) {
                         if (currentLambda.allParametersAreDefined())
-                            accessLambdaParameter(name, desc, opcode == PUTSTATIC);
+                            accessLambdaParameter(name, opcode == PUTSTATIC);
                         else
                             throw new IllegalArgumentException("All parameters " + currentLambda.getParameters()
                                     + " have to be defined before accessing " + name + " "
@@ -139,11 +139,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     else
                         super.visitIntInsn(opcode, operand);
                 } else {
-                    if (transformer.isStoreInstruction(opcode)) {
+                    if (transformer.isStoreInstruction(opcode))
                         storeTopOfStackInArray(operand, type);
-                    } else {
+                    else
                         loadFirstElementOfArray(operand, type);
-                    }
                 }
             } else {
                 super.visitIntInsn(opcode, operand);
@@ -283,13 +282,15 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 mv.visitLdcInsn(value);
         }
 
-        void accessLambdaParameter(String name, String desc, boolean store) {
-            debug("parameter " + name + " " + getSimpleClassName(getType(desc)) + (store ? " assigned" : " read"));
+        void accessLambdaParameter(String name, boolean store) {
+            Type type = currentLambda.getParameterType(name);
+            int index = currentLambda.getParameterIndex(name);
+            debug("parameter " + name + " " + getSimpleClassName(type) + (store ? " assigned" : " read"));
             if (store) {
-                mv.visitVarInsn(ASTORE, currentLambda.getParameterIndex(name));
+                mv.visitVarInsn(ASTORE, index);
             } else {
-                mv.visitVarInsn(ALOAD, currentLambda.getParameterIndex(name));
-                mv.visitTypeInsn(CHECKCAST, getType(desc).getInternalName());
+                mv.visitVarInsn(ALOAD, index);
+                mv.visitTypeInsn(CHECKCAST, type.getInternalName());
             }
         }
 
@@ -313,17 +314,16 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void createLambdaMethodAndRedirectMethodVisitorToIt() {
             String descriptor = getMethodDescriptor(getType(Object.class), currentLambda.getParameterTypes());
-            currentLambdaMethod = transformer.getLambdaMethodBestMatch(currentLambda.getType().getInternalName(), descriptor);
+            currentLambdaMethod = transformer.findMethodByParameterTypes(currentLambda.getType().getInternalName(), descriptor);
 
             mv = lambdaWriter.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, currentLambdaMethod.name, currentLambdaMethod.desc, null, null);
             mv.visitCode();
 
             Type[] argumentTypes = getArgumentTypes(currentLambdaMethod.desc);
-            for (int i = 1; i <= argumentTypes.length; i++) {
-                Type type = argumentTypes[i - 1];
-                if (!isReferenceType(type)) {
-                    boxLocal(i, type);
-                }
+            for (int i = 0; i < argumentTypes.length; i++) {
+                Type type = argumentTypes[i];
+                if (!isReferenceType(type))
+                    boxLocal(i + 1, type);
             }
         }
 

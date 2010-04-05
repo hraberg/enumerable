@@ -208,5 +208,9 @@ class MethodInfo {
         Set<String> getParameters() {
             return parametersByName.keySet();
         }
+
+        Type getParameterType(String name) {
+            return parametersByName.get(name).type;
+        }
     }
 }
