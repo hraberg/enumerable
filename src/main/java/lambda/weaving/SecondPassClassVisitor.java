@@ -139,7 +139,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     else
                         super.visitIntInsn(opcode, operand);
                 } else {
-                    accessFirstArrayElement(operand, type, isStoreInstruction(opcode));
+                    if (isStoreInstruction(opcode)) {
+                        storeTopOfStackInArray(operand, type);
+                    } else {
+                        loadFirstElementOfArray(operand, type);
+                    }
                 }
             } else {
                 super.visitIntInsn(opcode, operand);
@@ -237,39 +241,40 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 mv.visitVarInsn(ALOAD, operand);
         }
 
-        void accessFirstArrayElement(int local, Type type, boolean store) {
-            if (store) {
-                // x is at the top of stack, as it was to be stored
-                // directly into a local but now we need to move it
-                // into an array
-                loadArrayFromLocalOrLambdaField(local, type); // x a[]
-                if (type.equals(DOUBLE_TYPE) || type.equals(LONG_TYPE)) {
-                    mv.visitInsn(DUP_X2); // a[] x a[]
-                    mv.visitInsn(POP); // a[] x
-                    mv.visitInsn(ICONST_0); // a[] x 0
-                    mv.visitInsn(DUP_X2); // a[] 0 x 0
-                    mv.visitInsn(POP); // a[] 0 x (arrayref index value)
-                    mv.visitInsn(type.getOpcode(IASTORE));
-                } else {
-                    mv.visitInsn(SWAP); // a[] x
-                    mv.visitInsn(ICONST_0); // a[] x 0
-                    mv.visitInsn(SWAP); // a[] 0 x (arrayref index value)
-                    mv.visitInsn(type.getOpcode(IASTORE));
-                }
-            } else {
-                loadArrayFromLocalOrLambdaField(local, type);
-                mv.visitInsn(ICONST_0);
-                mv.visitInsn(type.getOpcode(IALOAD));
-            }
+        void loadFirstElementOfArray(int local, Type type) {
+            loadArrayFromLocalOrLambdaField(local, type);
+            mv.visitInsn(ICONST_0);
+            mv.visitInsn(type.getOpcode(IALOAD));
+        }
+
+        void storeTopOfStackInArray(int local, Type type) {
+            boolean category2 = type.equals(DOUBLE_TYPE) || type.equals(LONG_TYPE);
+            // x is at the top of the stack, as it was to be stored
+            // directly into a local
+            loadArrayFromLocalOrLambdaField(local, type);
+            // x a[]
+            mv.visitInsn(ICONST_0);
+            // x a[] 0
+            mv.visitInsn(category2 ? DUP2_X2 : DUP2_X1);
+            // a[] 0 x a[] 0
+            mv.visitInsn(POP2);
+            // a[] 0 x
+            mv.visitInsn(type.getOpcode(IASTORE));
         }
 
         void incrementInArray(int var, int increment) {
             loadArrayFromLocalOrLambdaField(var, method.getTypeOfLocal(var));
+            // a[]
             mv.visitInsn(ICONST_0);
+            // a[] 0
             mv.visitInsn(DUP2);
+            // a[] 0 a[] 0
             mv.visitInsn(IALOAD);
+            // a[] 0 a
             loadInt(increment);
+            // a[] 0 a i
             mv.visitInsn(IADD);
+            // a[] 0 a+i
             mv.visitInsn(IASTORE);
         }
 
