@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -124,6 +126,21 @@ public class Enumerable {
         for (E each : col)
             result.add(each);
         return result;
+    }
+
+    /**
+     * Creates a new Set containing the elements of the given collection.
+     */
+    public static <E> Set<E> toSet(Iterable<E> col) {
+        return new HashSet<E>(toList(col));
+    }
+
+    /**
+     * Creates a new Set containing the elements of the given collection, the
+     * elements are preprocessed by the given block.
+     */
+    public static <E, R> Set<R> toSet(Iterable<E> col, Fn1<E, R> block) {
+        return new HashSet<R>(collect(col, block));
     }
 
     /**
@@ -297,7 +314,7 @@ public class Enumerable {
 
     /**
      * Returns the object in collection with the minimum value. This form
-     * assumes all objects implement {@link Comparable}
+     * assumes all objects implement {@link Comparable}.
      */
     public static <E extends Object & Comparable<? super E>> E min(Iterable<E> col) {
         List<E> sorted = sort(col);
