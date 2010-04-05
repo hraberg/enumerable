@@ -1,5 +1,6 @@
 package lambda;
 
+import static java.lang.Thread.*;
 import static lambda.Lambda.*;
 import static org.junit.Assert.*;
 
@@ -8,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
 import lambda.annotation.LambdaParameter;
@@ -260,6 +263,19 @@ public class LambdaTest extends TestBase {
     public void createSingleMethodWithOneArugmentClassUsingGenericDelagate() throws Exception {
         SingleAbstractMethodOneArgumentClass m = delegate(s, "hello: " + s);
         assertEquals("hello: world", m.getHelloMessage("world"));
+    }
+
+    @Test
+    public void createSingleAbstractMethodWithLibrarySuperClass() throws Exception {
+        Timer timer = new Timer();
+        int x = 0;
+
+        TimerTask t = delegate(_, x = 1);
+        timer.schedule(t, 50);
+        assertEquals(0, x);
+
+        sleep(100);
+        assertEquals(1, x);
     }
 
     @LambdaParameter
