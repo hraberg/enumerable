@@ -317,6 +317,14 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
             mv = lambdaWriter.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, currentLambdaMethod.name, currentLambdaMethod.desc, null, null);
             mv.visitCode();
+
+            Type[] argumentTypes = getArgumentTypes(currentLambdaMethod.desc);
+            for (int i = 1; i <= argumentTypes.length; i++) {
+                Type type = argumentTypes[i - 1];
+                if (!isReferenceType(type)) {
+                    boxLocal(i, type);
+                }
+            }
         }
 
         void returnFromLambdaMethod() {
@@ -325,6 +333,47 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitInsn(returnType.getOpcode(IRETURN));
             mv.visitMaxs(0, 0);
             mv.visitEnd();
+        }
+
+        void valueOf(final Type type) {
+            if (isReferenceType(type))
+                return;
+            Type boxed = getBoxedType(type);
+            String descriptor = getMethodDescriptor(boxed, new Type[] { type });
+            String name = "valueOf";
+            mv.visitMethodInsn(INVOKESTATIC, boxed.getInternalName(), name, descriptor);
+        }
+
+        boolean isReferenceType(final Type type) {
+            return type.getSort() == Type.OBJECT || type.getSort() == Type.ARRAY;
+        }
+
+        void boxLocal(int i, Type type) {
+            mv.visitVarInsn(type.getOpcode(ILOAD), i);
+            valueOf(type);
+            mv.visitVarInsn(ASTORE, i);
+        }
+
+        Type getBoxedType(Type type) {
+            switch (type.getSort()) {
+            case Type.BYTE:
+                return getType(Byte.class);
+            case Type.BOOLEAN:
+                return getType(Boolean.class);
+            case Type.SHORT:
+                return getType(Short.class);
+            case Type.CHAR:
+                return getType(Character.class);
+            case Type.INT:
+                return getType(Integer.class);
+            case Type.FLOAT:
+                return getType(Float.class);
+            case Type.LONG:
+                return getType(Long.class);
+            case Type.DOUBLE:
+                return getType(Double.class);
+            }
+            return type;
         }
 
         void unbox(Type returnType) {

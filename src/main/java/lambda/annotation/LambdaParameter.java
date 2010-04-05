@@ -5,13 +5,14 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to mark static fields which can then be used in a
- * lambda to define parameters and access it's arguments.
+ * lambda to define parameters and access it's arguments. The field cannot be
+ * primitive.
  * <p>
  * Example:
  * 
  * <pre>
  * &#064;LambdaParameter
- * public static int n;
+ * public static Integer n;
  * 
  * fn(n, n * n);
  * </pre>
