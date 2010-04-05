@@ -303,7 +303,7 @@ public class Enumerable {
 
     /**
      * Returns the object in collection with the maximum value. This form uses
-     * the block to return a <=> b.
+     * the block to {@link Comparator#compare}.
      */
     public static <E extends Object & Comparable<? super E>> E min(Iterable<E> col, Fn2<E, E, Integer> block) {
         List<E> sorted = sort(col, block);
@@ -325,7 +325,7 @@ public class Enumerable {
 
     /**
      * Returns the object in collection with the maximum value. This form uses
-     * the block to return a <=> b.
+     * the block to {@link Comparator#compare}.
      */
     public static <E extends Object & Comparable<? super E>> E max(Iterable<E> col, Fn2<E, E, Integer> block) {
         List<E> sorted = sort(col, block);
