@@ -316,7 +316,7 @@ public class ClosureTest extends TestBase implements Serializable {
 
     @Test
     public void serializingWhenClosingOverThis() throws Exception {
-        Fn1<Integer, Integer> inc = λ(n, x = n + x);
+        Fn1<Integer, Integer> inc = λ(n, this.x = n + x);
         assertEquals(10, (int) inc.call(5));
         assertEquals(10, x);
 
