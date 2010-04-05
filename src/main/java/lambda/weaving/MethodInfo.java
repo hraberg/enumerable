@@ -202,7 +202,7 @@ class MethodInfo {
         }
 
         String getFieldNameForLocal(int local) {
-            return isThis(local) ? "this$0" : "val$" + local;
+            return getNameOfLocal(local) + "$" + local;
         }
 
         Set<String> getParameters() {

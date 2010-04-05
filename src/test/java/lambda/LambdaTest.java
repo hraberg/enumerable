@@ -6,6 +6,9 @@ import static org.junit.Assert.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -315,6 +318,27 @@ public class LambdaTest extends TestBase {
         thread.start();
         thread.join();
         assertEquals("hello", string);
+    }
+
+    @Test
+    public void reflectionOnLambda() throws Exception {
+        int i = 0;
+        Fn1<Integer, Integer> addToI = λ(n, i += n);
+        Method fn1Call = Fn1.class.getMethod("call", Object.class);
+        assertEquals(1, fn1Call.invoke(addToI, 1));
+        assertEquals(1, i);
+
+        Field field = addToI.getClass().getDeclaredField("i$1");
+        assertEquals(int[].class, field.getType());
+        assertTrue(field.isSynthetic());
+        assertTrue(Modifier.isFinal(field.getModifiers()));
+
+        field.setAccessible(true);
+        int[] capturedI = (int[]) field.get(addToI);
+        assertEquals(1, i);
+        capturedI[0] = 2;
+        assertEquals(2, i);
+        assertEquals(3, (int) addToI.call(1));
     }
 
     @Test
