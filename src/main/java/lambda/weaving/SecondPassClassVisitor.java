@@ -345,25 +345,25 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         boolean isReferenceType(final Type type) {
-            return type.getSort() == Type.OBJECT || type.getSort() == Type.ARRAY;
+            return type.getSort() == OBJECT || type.getSort() == ARRAY;
         }
 
-        void boxLocal(int i, Type type) {
-            mv.visitVarInsn(type.getOpcode(ILOAD), i);
+        void boxLocal(int local, Type type) {
+            mv.visitVarInsn(type.getOpcode(ILOAD), local);
             valueOf(type);
-            mv.visitVarInsn(ASTORE, i);
+            mv.visitVarInsn(ASTORE, local);
         }
 
         Type getBoxedType(Type type) {
             switch (type.getSort()) {
-            case Type.BYTE:
-                return getType(Byte.class);
             case Type.BOOLEAN:
                 return getType(Boolean.class);
-            case Type.SHORT:
-                return getType(Short.class);
             case Type.CHAR:
                 return getType(Character.class);
+            case Type.BYTE:
+                return getType(Byte.class);
+            case Type.SHORT:
+                return getType(Short.class);
             case Type.INT:
                 return getType(Integer.class);
             case Type.FLOAT:
@@ -397,7 +397,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void createLambdaConstructor() {
             Type[] parameters = getLambdaConstructorParameters();
-            String descriptor = getMethodDescriptor(Type.VOID_TYPE, parameters);
+            String descriptor = getMethodDescriptor(VOID_TYPE, parameters);
 
             mv = lambdaWriter.visitMethod(ACC_PUBLIC, "<init>", descriptor, null, null);
             mv.visitCode();
@@ -437,7 +437,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 mv.visitVarInsn(type.getOpcode(ILOAD), local);
             }
 
-            String descriptor = getMethodDescriptor(Type.VOID_TYPE, getLambdaConstructorParameters());
+            String descriptor = getMethodDescriptor(VOID_TYPE, getLambdaConstructorParameters());
             mv.visitMethodInsn(INVOKESPECIAL, currentLambdaClass(), "<init>", descriptor);
         }
 
