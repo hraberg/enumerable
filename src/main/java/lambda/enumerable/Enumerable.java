@@ -203,10 +203,25 @@ public class Enumerable {
     }
 
     private static <E> List<E> sort(Iterable<E> col, Comparator<E> comparator) {
+        List<E> result = toList(col);
+        Collections.sort(result, comparator);
+        return result;
+    }
+
+    /**
+     * @see #toList(Iterable)
+     */
+    public static <E> List<E> entries(Iterable<E> col) {
+        return toList(col);
+    }
+
+    /**
+     * Returns a list containing the items in collection.
+     */
+    public static <E> List<E> toList(Iterable<E> col) {
         List<E> result = new ArrayList<E>();
         for (E each : col)
             result.add(each);
-        Collections.sort(result, comparator);
         return result;
     }
 
