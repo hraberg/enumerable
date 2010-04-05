@@ -67,9 +67,9 @@ class FirstPassClassVisitor extends EmptyVisitor {
         if (inLambda())
             currentLambda.accessLocal(operand);
 
-        if (inLambda() && isStoreInstruction(opcode))
+        if (inLambda() && transformer.isStoreInstruction(opcode))
             currentMethod.makeLocalMutableFromLambda(operand);
-        if (isStoreInstruction(opcode))
+        if (transformer.isStoreInstruction(opcode))
             increseNumberOfWritesFor(operand);
     }
 
@@ -107,10 +107,6 @@ class FirstPassClassVisitor extends EmptyVisitor {
             currentLambda = null;
             resolvingTypeUsingCheckCast = false;
         }
-    }
-
-    boolean isStoreInstruction(int opcode) {
-        return opcode >= ISTORE && opcode <= ASTORE;
     }
 
     boolean inLambda() {

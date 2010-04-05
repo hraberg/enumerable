@@ -129,7 +129,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 boolean readOnly = method.isLocalReadOnly(operand);
                 debug("variable " + method.getNameOfLocal(operand) + " "
                         + getSimpleClassName(type)
-                        + (isStoreInstruction(opcode) ? (readOnly ? " initalized in" : " stored in") : " read from")
+                        + (transformer.isStoreInstruction(opcode) ? (readOnly ? " initalized in" : " stored in") : " read from")
                         + (readOnly ? " final" : " wrapped array in")
                         + (inLambda() ? " lambda field " + currentLambda.getFieldNameForLocal(operand)
                         : (method.getAccessedParameters().contains(operand) ? " method parameter " : " local ") + operand));
@@ -139,7 +139,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     else
                         super.visitIntInsn(opcode, operand);
                 } else {
-                    if (isStoreInstruction(opcode)) {
+                    if (transformer.isStoreInstruction(opcode)) {
                         storeTopOfStackInArray(operand, type);
                     } else {
                         loadFirstElementOfArray(operand, type);
@@ -164,10 +164,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             if (method.isLocalAccessedFromLambda(index))
                 desc = getDescriptor(Object.class);
             super.visitLocalVariable(name, desc, signature, start, end, index);
-        }
-
-        boolean isStoreInstruction(int opcode) {
-            return opcode >= ISTORE && opcode <= ASTORE;
         }
 
         boolean isMethodParameter(int operand) {
@@ -262,8 +258,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitInsn(type.getOpcode(IASTORE));
         }
 
-        void incrementInArray(int var, int increment) {
-            loadArrayFromLocalOrLambdaField(var, method.getTypeOfLocal(var));
+        void incrementInArray(int local, int increment) {
+            loadArrayFromLocalOrLambdaField(local, method.getTypeOfLocal(local));
             // a[]
             mv.visitInsn(ICONST_0);
             // a[] 0
@@ -324,9 +320,30 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void returnFromLambdaMethod() {
-            mv.visitInsn(getReturnType(currentLambdaMethod.desc).getOpcode(IRETURN));
+            Type returnType = getReturnType(currentLambdaMethod.desc);
+            unbox(returnType);
+            mv.visitInsn(returnType.getOpcode(IRETURN));
             mv.visitMaxs(0, 0);
             mv.visitEnd();
+        }
+
+        void unbox(Type returnType) {
+            Type type = getType(Number.class);
+            switch (returnType.getSort()) {
+            case VOID:
+            case ARRAY:
+            case OBJECT:
+                return;
+            case CHAR:
+                type = getType(Character.class);
+                break;
+            case BOOLEAN:
+                type = getType(Boolean.class);
+                break;
+            }
+            String descriptor = getMethodDescriptor(returnType, new Type[0]);
+            String name = returnType.getClassName() + "Value";
+            mv.visitMethodInsn(INVOKEVIRTUAL, type.getInternalName(), name, descriptor);
         }
 
         void createLambdaConstructor() {

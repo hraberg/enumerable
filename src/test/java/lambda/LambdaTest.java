@@ -204,7 +204,7 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
-    public void createSingleMethodInterfaceUsingNewLambdaGenericDelegate() throws Exception {
+    public void createSingleMethodInterfaceUsingGenereicDelegate() throws Exception {
         String hello = "";
         Runnable runnable = delegate(_, hello = "hello");
         runnable.run();
@@ -213,7 +213,7 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
-    public void createSingleMethodInterfaceTakingOneArgumentUsingNewLambdaGenericDelagate() throws Exception {
+    public void createSingleMethodInterfaceTakingOneArgumentUsingGenericDelegate() throws Exception {
         ActionEvent actual;
         ActionListener a = delegate(e, actual = e);
         ActionEvent event = new ActionEvent(this, 1, "command");
@@ -221,12 +221,20 @@ public class LambdaTest extends TestBase {
         assertSame(event, actual);
     }
     
+    @Test
+    public void createSingleMethodInterfaceTakingTwoArgumentsAndReturningPrimitiveUsingGenericDelegate() throws Exception {
+        Comparator<Integer> c = delegate(n, m, m - n);
+        List<Integer> list = list(1, 2, 3);
+        Collections.sort(list, c);
+        assertEquals(list(3, 2, 1), list);
+    }
+
     static abstract class SingleAbstractMethodNoArgumentsClass {
         public abstract String getMessage();
     }
 
     @Test
-    public void createSingleMethodWithNoArgumentsClassUsingNewLambdaGenericDelagate() throws Exception {
+    public void createSingleMethodWithNoArgumentsClassUsingGenericDelagate() throws Exception {
         SingleAbstractMethodNoArgumentsClass m = delegate(_, "hello");
         assertEquals("hello", m.getMessage());
     }
@@ -239,7 +247,7 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
-    public void createSingleMethodWithOneArugmentClassUsingNewLambdaGenericDelagate() throws Exception {
+    public void createSingleMethodWithOneArugmentClassUsingGenericDelagate() throws Exception {
         SingleAbstractMethodOneArgumentClass m = delegate(s, "hello: " + s);
         assertEquals("hello: world", m.getHelloMessage("world"));
     }

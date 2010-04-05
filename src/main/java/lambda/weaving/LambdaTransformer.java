@@ -17,8 +17,9 @@ import lambda.annotation.Unused;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 
-class LambdaTransformer {
+class LambdaTransformer implements Opcodes {
     Map<String, byte[]> lambdasByClassName = new HashMap<String, byte[]>();
 
     ClassInjector injector = new ClassInjector();
@@ -58,6 +59,10 @@ class LambdaTransformer {
 
     boolean isUnusedParameter(String desc) {
         return getType(desc).getClassName().equals(Unused.class.getName());
+    }
+
+    boolean isStoreInstruction(int opcode) {
+        return opcode >= ISTORE && opcode <= ASTORE;
     }
 
     MethodInfo getLambdaMethodBestMatch(String owner, String desc) {
