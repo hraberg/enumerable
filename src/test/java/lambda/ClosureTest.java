@@ -186,6 +186,14 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
+    public void closeOverForLoopVariable() throws Exception {
+        int sum = 0;
+        for (int i = 1; i <= 10; i++)
+            sum = λ(n, n + i).call(sum);
+        assertEquals(55, sum);
+    }
+
+    @Test
     public void callInstanceMethodOnThis() throws Exception {
         assertEquals(hello(), λ(n, hello()).call());
     }

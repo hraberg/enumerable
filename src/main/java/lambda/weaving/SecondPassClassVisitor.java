@@ -327,11 +327,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void createLambdaClass() {
             lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-
-            lambdaWriter.visit(V1_5, ACC_PUBLIC | ACC_FINAL, currentLambdaClass(), null, getLambdaSuperType().getInternalName(),
+            lambdaWriter.visit(V1_5, ACC_FINAL | ACC_SYNTHETIC, currentLambdaClass(), null, getLambdaSuperType()
+                    .getInternalName(),
                     getLambdaInterfaces());
-            lambdaWriter.visitOuterClass(className, method.name, method.desc);
-            lambdaWriter.visitInnerClass(currentLambdaClass(), null, null, 0);
         }
 
         String[] getLambdaInterfaces() {
@@ -490,8 +488,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void endLambdaClass() {
+            lambdaWriter.visitOuterClass(className, method.name, method.desc);
             lambdaWriter.visitEnd();
-            cv.visitInnerClass(currentLambdaClass(), null, null, 0);
+
+            cv.visitInnerClass(currentLambdaClass(), className, null, 0);
 
             byte[] bs = lambdaWriter.toByteArray();
             transformer.newLambdaClass(getObjectType(currentLambdaClass()).getClassName(), bs);

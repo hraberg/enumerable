@@ -3,6 +3,7 @@ package lambda;
 /**
  * A function that takes one argument.
  */
+@SuppressWarnings("serial")
 public abstract class Fn1<A1, R> extends Fn0<R> {
     public abstract R call(A1 a1);
 

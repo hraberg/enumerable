@@ -25,21 +25,6 @@ import org.junit.Test;
 
 public class LambdaTest extends TestBase {
     @Test
-    public void partialApplication() throws Exception {
-        Fn3<String, Integer, Integer, String> addWithPrefixString = λ(s, n, m, s + (n + m));
-        assertEquals("prefix: 5", addWithPrefixString.call("prefix: ", 2, 3));
-
-        Fn2<Integer, Integer, String> add = addWithPrefixString.partial("result: ");
-        assertEquals("result: 2", add.call(1, 1));
-
-        Fn1<Integer, String> add2 = add.partial(2);
-        assertEquals("result: 4", add2.call(2));
-
-        Fn0<String> six = add2.partial(4);
-        assertEquals("result: 6", six.call());
-    }
-
-    @Test
     public void creatingLambdaWithNoArgumentsUsingUnusedParameterMarker() throws Exception {
         Fn0<String> hello = λ(_, "hello");
         assertEquals("hello", hello.call());
@@ -328,7 +313,14 @@ public class LambdaTest extends TestBase {
         assertEquals(1, fn1Call.invoke(addToI, 1));
         assertEquals(1, i);
 
-        Field field = addToI.getClass().getDeclaredField("i$1");
+        Class<?> addToIClass = addToI.getClass();
+        assertTrue(addToIClass.isSynthetic());
+        assertTrue(Modifier.isFinal(addToIClass.getModifiers()));
+
+        assertEquals(getClass(), addToIClass.getEnclosingClass());
+        assertTrue(list(getClass().getDeclaredClasses()).contains(addToIClass));
+
+        Field field = addToIClass.getDeclaredField("i$1");
         assertEquals(int[].class, field.getType());
         assertTrue(field.isSynthetic());
         assertTrue(Modifier.isFinal(field.getModifiers()));
@@ -339,6 +331,21 @@ public class LambdaTest extends TestBase {
         capturedI[0] = 2;
         assertEquals(2, i);
         assertEquals(3, (int) addToI.call(1));
+    }
+
+    @Test
+    public void partialApplication() throws Exception {
+        Fn3<String, Integer, Integer, String> addWithPrefixString = λ(s, n, m, s + (n + m));
+        assertEquals("prefix: 5", addWithPrefixString.call("prefix: ", 2, 3));
+
+        Fn2<Integer, Integer, String> add = addWithPrefixString.partial("result: ");
+        assertEquals("result: 2", add.call(1, 1));
+
+        Fn1<Integer, String> add2 = add.partial(2);
+        assertEquals("result: 4", add2.call(2));
+
+        Fn0<String> six = add2.partial(4);
+        assertEquals("result: 6", six.call());
     }
 
     @Test
