@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -61,13 +62,13 @@ public class EnumerableTest extends TestBase {
     }
 
     @Test
-    public void eachReturnsLastValue() throws Exception {
-        assertEquals(10, (int) each(oneToTen, λ(n, n)));
+    public void eachReturnsIterable() throws Exception {
+        assertEquals(oneToTen, each(oneToTen, λ(n, n)));
     }
 
     @Test
-    public void eachReturnsNullForEmptyCollection() throws Exception {
-        assertNull(each(list(), λ(obj, "hello")));
+    public void eachReturnsEmptyIterableForEmptyCollection() throws Exception {
+        assertFalse(each(list(), λ(obj, "hello")).iterator().hasNext());
     }
 
     @Test
@@ -340,7 +341,7 @@ public class EnumerableTest extends TestBase {
     @Test
     public void maxReturnsLastValueUsingBlockAsComparator() throws Exception {
         List<String> strings = list("albatross", "dog", "horse");
-        assertEquals("albatross", max(strings, λ(s, t, t.length() - s.length())));
+        assertEquals("albatross", max(strings, λ(s, t, s.length() - t.length())));
     }
 
     @Test
@@ -357,7 +358,7 @@ public class EnumerableTest extends TestBase {
     @Test
     public void minReturnsFistValueUsingBlockAsComparator() throws Exception {
         List<String> strings = list("albatross", "dog", "horse");
-        assertEquals("dog", min(strings, λ(s, t, t.length() - s.length())));
+        assertEquals("dog", min(strings, λ(s, t, s.length() - t.length())));
     }
 
     @Test
@@ -385,6 +386,13 @@ public class EnumerableTest extends TestBase {
     public void toSetCreatesSetFromIterable() throws Exception {
         Iterable<String> iterable = new ArrayIterable(new String[] { "hello", "world" });
         assertEquals(new HashSet<String>(list("hello", "world")), toSet(iterable));
+    }
+
+    @Test
+    public void toSetCreatesSetFromIterableUsingBlock() throws Exception {
+        Iterable<String> iterable = new ArrayIterable(new String[] { "hello", "world" });
+        Set<Integer> set = toSet(iterable, λ(s, s.length()));
+        assertEquals(new HashSet<Integer>(list(5)), set);
     }
 
     @Test

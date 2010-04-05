@@ -1,7 +1,6 @@
 package lambda.enumerable;
 
 import static java.lang.Boolean.*;
-import static java.util.Arrays.*;
 import static lambda.exception.UncheckedException.*;
 
 import java.io.BufferedReader;
@@ -95,22 +94,20 @@ public class Enumerable {
     /**
      * Calls block for each item in collection.
      */
-    public static <E, R> R each(Iterable<E> col, Fn1<E, R> block) {
-        R result = null;
+    public static <E, R> Iterable<E> each(Iterable<E> col, Fn1<E, R> block) {
         for (E each : col)
-            result = block.call(each);
-        return result;
+            block.call(each);
+        return col;
     }
 
     /**
      * Calls block once for each key in map, passing the key and value to the
      * block as parameters.
      */
-    public static <K, V, R> R each(Map<K, V> map, Fn2<K, V, R> block) {
-        R result = null;
+    public static <K, V, R> Map<K, V> each(Map<K, V> map, Fn2<K, V, R> block) {
         for (Entry<K, V> each : map.entrySet())
-            result = block.call(each.getKey(), each.getValue());
-        return result;
+            block.call(each.getKey(), each.getValue());
+        return map;
     }
 
     /**
@@ -127,8 +124,9 @@ public class Enumerable {
     /**
      * Calls block once for each key in map, passing the key as parameter.
      */
-    public static <K, V, R> R eachKey(Map<K, V> map, Fn1<K, R> block) {
-        return each(map.keySet(), block);
+    public static <K, V, R> Map<K, V> eachKey(Map<K, V> map, Fn1<K, R> block) {
+        each(map.keySet(), block);
+        return map;
     }
 
     /**
@@ -187,20 +185,20 @@ public class Enumerable {
     /**
      * Calls block once for each value in map, passing the key as parameter.
      */
-    public static <K, V, R> R eachValue(Map<K, V> map, Fn1<V, R> block) {
-        return each(map.values(), block);
+    public static <K, V, R> Map<K, V> eachValue(Map<K, V> map, Fn1<V, R> block) {
+        each(map.values(), block);
+        return map;
     }
 
     /**
      * Calls block with two arguments, the item and its index, for each item in
      * collection.
      */
-    public static <E, R> R eachWithIndex(Iterable<E> col, Fn2<E, Integer, R> block) {
+    public static <E, R> Iterable<E> eachWithIndex(Iterable<E> col, Fn2<E, Integer, R> block) {
         int i = 0;
-        R result = null;
         for (E each : col)
-            result = block.call(each, i++);
-        return result;
+            block.call(each, i++);
+        return col;
     }
 
     /**
@@ -334,11 +332,11 @@ public class Enumerable {
      * Returns the object in collection with the maximum value. This form uses
      * the block to {@link Comparator#compare}.
      */
-    public static <E extends Object & Comparable<? super E>> E max(Iterable<E> col, Fn2<E, E, Integer> block) {
+    public static <E> E max(Iterable<E> col, Fn2<E, E, Integer> block) {
         List<E> sorted = sort(col, block);
         if (sorted.isEmpty())
             return null;
-        return sorted.get(0);
+        return sorted.get(sorted.size() - 1);
     }
 
     /**
@@ -361,21 +359,20 @@ public class Enumerable {
     }
 
     /**
-     * Returns the object in collection with the maximum value. This form uses
+     * Returns the object in collection with the minimum value. This form uses
      * the block to {@link Comparator#compare}.
      */
-    public static <E extends Object & Comparable<? super E>> E min(Iterable<E> col, Fn2<E, E, Integer> block) {
+    public static <E> E min(Iterable<E> col, Fn2<E, E, Integer> block) {
         List<E> sorted = sort(col, block);
         if (sorted.isEmpty())
             return null;
-        return sorted.get(sorted.size() - 1);
+        return sorted.get(0);
     }
 
     /**
      * Returns two lists, the first containing the elements of collection for
      * which the block evaluates to true, the second containing the rest.
      */
-    @SuppressWarnings("unchecked")
     public static <E> List<List<E>> partition(Iterable<E> col, Fn1<E, Boolean> block) {
         List<E> selected = new ArrayList<E>();
         List<E> rejected = new ArrayList<E>();
@@ -384,7 +381,10 @@ public class Enumerable {
                 selected.add(each);
             else
                 rejected.add(each);
-        return new ArrayList<List<E>>(asList(selected, rejected));
+        List<List<E>> result = new ArrayList<List<E>>();
+        result.add(selected);
+        result.add(rejected);
+        return result;
     }
 
     /**
@@ -483,7 +483,7 @@ public class Enumerable {
      * elements are preprocessed by the given block.
      */
     public static <E, R> Set<R> toSet(Iterable<E> col, Fn1<E, R> block) {
-        return new HashSet<R>(collect(col, block));
+        return toSet(collect(col, block));
     }
 
     /**
