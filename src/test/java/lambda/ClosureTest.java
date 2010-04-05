@@ -6,10 +6,12 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.Serializable;
 
 import org.junit.Test;
 
-public class ClosureTest extends TestBase {
+@SuppressWarnings("serial")
+public class ClosureTest extends TestBase implements Serializable {
     @Test(expected = ArithmeticException.class)
     public void uncheckedExceptionInBlockPropagetsOut() throws Exception {
         λ(n, n / 0).call(0);
@@ -308,5 +310,21 @@ public class ClosureTest extends TestBase {
         assertEquals(12, x);
 
         assertEquals(20, (int) deserializedInc.call(5));
+    }
+
+    int x = 5;
+
+    @Test
+    public void serializingWhenClosingOverThis() throws Exception {
+        Fn1<Integer, Integer> inc = λ(n, x = n + x);
+        assertEquals(10, (int) inc.call(5));
+        assertEquals(10, x);
+
+        byte[] bytes = serialze(inc);
+        Fn1<Integer, Integer> deserializedInc = deserialize(bytes);
+        assertNotSame(inc, deserializedInc);
+
+        assertEquals(15, (int) deserializedInc.call(5));
+        assertEquals(10, x);
     }
 }
