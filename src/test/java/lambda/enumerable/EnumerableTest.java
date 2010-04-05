@@ -5,6 +5,7 @@ import static lambda.Lambda.*;
 import static lambda.enumerable.Enumerable.*;
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -128,6 +129,11 @@ public class EnumerableTest extends TestBase {
     }
 
     @Test
+    public void anyOnEmptyList() throws Exception {
+        assertFalse(any(list(int.class), λ(n, n > 0)));
+    }
+
+    @Test
     public void anyMarchingPredicate() throws Exception {
         assertTrue(any(oneToTen, λ(n, n > 5)));
     }
@@ -175,6 +181,11 @@ public class EnumerableTest extends TestBase {
     @Test
     public void anyNullAndTrue() throws Exception {
         assertTrue(any(asList(new Object[] { null, true }), λ(obj, obj)));
+    }
+
+    @Test
+    public void allOnEmptyList() throws Exception {
+        assertTrue(all(list(int.class), λ(n, n > 0)));
     }
 
     @Test
@@ -265,7 +276,7 @@ public class EnumerableTest extends TestBase {
         assertEquals(list(2, 3, 4), result.get(1));
         assertEquals(list(3, 4, 5), result.get(2));
     }
-    
+
     @Test
     public void eachConsDoesNothingIfNIsGreaterThanListSize() throws Exception {
         List<List<Integer>> result = list();
@@ -365,25 +376,97 @@ public class EnumerableTest extends TestBase {
     }
 
     @Test
-    public void entriesCreatesListFromIterable() throws Exception {
-        Iterable<String> iterable = new Iterable<String>() {
-            String[] strings = { "hello", "world" };
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    int i = 0;
-                    public boolean hasNext() {
-                        return i < strings.length;
-                    }
+    public void toListCreatesListFromIterable() throws Exception {
+        Iterable<String> iterable = new ArrayIterable(new String[] { "hello", "world" });
+        assertEquals(list("hello", "world"), toList(iterable));
+    }
 
-                    public String next() {
-                        return strings[i++];
-                    }
+    @Test
+    public void toSetCreatesSetFromIterable() throws Exception {
+        Iterable<String> iterable = new ArrayIterable(new String[] { "hello", "world" });
+        assertEquals(new HashSet<String>(list("hello", "world")), toSet(iterable));
+    }
 
-                    public void remove() {
-                    }
-                };
-            }
-        };
-        assertEquals(list("hello", "world"), entries(iterable));
+    @Test
+    public void zipSingleCollection() throws Exception {
+        assertEquals(list(list(1), list(2), list(3)), zip(list(1, 2, 3)));
+    }
+
+    @Test
+    public void zipMoreThanOneCollections() throws Exception {
+        List<Integer> a = list(4, 5, 6);
+        List<Integer> b = list(7, 8, 9);
+
+        List<List<?>> result = zip(list(1, 2, 3), a, b);
+
+        assertEquals(list(1, 4, 7), result.get(0));
+        assertEquals(list(2, 5, 8), result.get(1));
+        assertEquals(list(3, 6, 9), result.get(2));
+    }
+
+    @Test
+    public void zipCollectionsOfDifferentLengthsPadsWithNull() throws Exception {
+        List<Integer> a = list(4, 5);
+        List<Integer> b = list(7);
+
+        List<List<?>> result = zip(list(1, 2, 3), a, b);
+
+        assertEquals(list(1, 4, 7), result.get(0));
+        assertEquals(list(2, 5, null), result.get(1));
+        assertEquals(list(3, null, null), result.get(2));
+    }
+
+    @Test
+    public void zipReturnsLengthOfFirstCollectionNumberOfCollections() throws Exception {
+        List<Integer> a = list(4);
+        List<Integer> b = list(7, 8, 9);
+
+        List<List<?>> result = zip(list(1, 2), a, b);
+        assertEquals(2, result.size());
+
+        assertEquals(list(1, 4, 7), result.get(0));
+        assertEquals(list(2, null, 8), result.get(1));
+    }
+
+    @Test
+    public void zipCollectionsOfDifferentTypes() throws Exception {
+        List<String> a = list("4", "5", "6");
+        List<Boolean> b = list(true, false, true);
+
+        List<List<?>> result = zip(list(1, 2, 3), a, b);
+
+        assertEquals(list(1, "4", true), result.get(0));
+        assertEquals(list(2, "5", false), result.get(1));
+        assertEquals(list(3, "6", true), result.get(2));
+    }
+
+    @Test
+    public void zipEmptyCollectionReturnsEmptyCollection() throws Exception {
+        assertTrue(zip(list()).isEmpty());
+    }
+
+    class ArrayIterable<T> implements Iterable<T> {
+        Object[] elements;
+
+        ArrayIterable(Object[] elements) {
+            this.elements = elements;
+        }
+
+        public Iterator<T> iterator() {
+            return new Iterator<T>() {
+                int i = 0;
+
+                public boolean hasNext() {
+                    return i < elements.length;
+                }
+
+                public T next() {
+                    return (T) elements[i++];
+                }
+
+                public void remove() {
+                }
+            };
+        }
     }
 }

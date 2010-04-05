@@ -236,6 +236,13 @@ public class Enumerable {
     }
 
     /**
+     * @see #collect(Iterable, Fn1)
+     */
+    public static <E, R> List<R> map(Iterable<E> col, Fn1<E, R> block) {
+        return collect(col, block);
+    }
+
+    /**
      * Returns a new list with the results of running block once for every
      * element in collection.
      */
@@ -468,6 +475,41 @@ public class Enumerable {
         while (i.hasNext())
             initial = block.call(initial, i.next());
         return initial;
+    }
+
+    /**
+     * Converts any arguments to iterators, then merges elements of collection
+     * with corresponding elements from each argument. This generates a sequence
+     * of collection#size n-element list, where n is one more that the count of
+     * arguments. If the size of any argument is less than collection#size, null
+     * values are supplied.
+     * 
+     * <p>
+     * Due to varargs this version doesn't support taking a block like in Ruby.
+     * Feed the result into {@link #collect(Iterable, Fn1) to achieve the same
+     * effect.
+     * </p>
+     */
+    public static <E> List<List<?>> zip(Iterable<E> col, Iterable<?>... args) {
+        List<List<?>> allResults = new ArrayList<List<?>>();
+
+        List<Iterator<?>> iterators = new ArrayList<Iterator<?>>();
+        iterators.add(col.iterator());
+        for (Iterable<?> iterable : args)
+            iterators.add(iterable.iterator());
+
+        while (iterators.get(0).hasNext()) {
+            List<Object> result = new ArrayList<Object>();
+            for (Iterator<?> iterator : iterators) {
+                if (iterator.hasNext())
+                    result.add(iterator.next());
+                else
+                    result.add(null);
+            }
+            allResults.add(result);
+        }
+
+        return allResults;
     }
 
     /**
