@@ -34,7 +34,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         MethodVisitor originalMethodWriter;
         ClassWriter lambdaWriter;
 
-        int currentLine;
+        int currentLine = -1;
 
         MethodInfo method;
         Iterator<LambdaInfo> lambdas;
@@ -523,7 +523,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         String currentLambdaClass() {
             String lambdaClass = currentLambda.getType().getInternalName();
             lambdaClass = lambdaClass.substring(lambdaClass.lastIndexOf("/") + 1, lambdaClass.length());
-            return className + "$" + lambdaClass + "_" + currentLambdaId;
+            return className + "$" + (currentLine > 0 ? String.format("%04d_", currentLine) : "") + lambdaClass + "_" + currentLambdaId;
         }
 
         boolean inLambda() {
