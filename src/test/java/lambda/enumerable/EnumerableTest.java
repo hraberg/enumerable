@@ -5,13 +5,17 @@ import static lambda.Lambda.*;
 import static lambda.enumerable.Enumerable.*;
 import static org.junit.Assert.*;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import lambda.TestBase;
+import lambda.annotation.LambdaParameter;
 
 import org.junit.Test;
 
+@SuppressWarnings("unchecked")
 public class EnumerableTest extends TestBase {
     @Test
     public void callsBlockOnceForEachElement() throws Exception {
@@ -247,5 +251,139 @@ public class EnumerableTest extends TestBase {
     @Test
     public void injectWithoutInitialValue() throws Exception {
         assertEquals(3628800, (int) inject(oneToTen, λ(n, m, n * m)));
+    }
+
+    @LambdaParameter
+    static List<Integer> list;
+
+    @Test
+    public void eachConsCallsBlockForEachListOfNConsecutiveElements() throws Exception {
+        List<List<Integer>> result = list();
+        eachCons(oneToFive, 3, λ(list, result.add(list)));
+        assertEquals(3, result.size());
+        assertEquals(list(1, 2, 3), result.get(0));
+        assertEquals(list(2, 3, 4), result.get(1));
+        assertEquals(list(3, 4, 5), result.get(2));
+    }
+    
+    @Test
+    public void eachConsDoesNothingIfNIsGreaterThanListSize() throws Exception {
+        List<List<Integer>> result = list();
+        eachCons(oneToFive, 6, λ(list, result.add(list)));
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void eachSliceCallsBlockForEachSliceOfNElements() throws Exception {
+        List<List<Integer>> result = list();
+        eachSlice(oneToTen, 3, λ(list, result.add(list)));
+        assertEquals(4, result.size());
+        assertEquals(list(1, 2, 3), result.get(0));
+        assertEquals(list(4, 5, 6), result.get(1));
+        assertEquals(list(7, 8, 9), result.get(2));
+        assertEquals(list(10), result.get(3));
+    }
+
+    @Test
+    public void eachSliceDoesReturnRestOfListIfNIsGreaterThanAvailableElements() throws Exception {
+        List<List<Integer>> result = list();
+        eachSlice(oneToFive, 6, λ(list, result.add(list)));
+        assertEquals(1, result.size());
+        assertEquals(oneToFive, result.get(0));
+    }
+
+    @Test
+    public void grepFiltersBasedOnStringRegexp() throws Exception {
+        List<String> strings = list("java", "javadoc", "jar");
+        List<String> result = grep(strings, ".*doc.*");
+        assertEquals(list("javadoc"), result);
+    }
+
+    @Test
+    public void grepFiltersBasedOnPattern() throws Exception {
+        List<String> strings = list("java", "javadoc", "jar");
+        List<String> result = grep(strings, Pattern.compile("^jav.*"));
+        assertEquals(list("java", "javadoc"), result);
+    }
+
+    @Test
+    public void grepFiltersBasedOnStringRegexpAndMapsUsingBlock() throws Exception {
+        List<String> strings = list("java", "javadoc", "jar");
+        List<Integer> result = grep(strings, ".*doc.*", λ(s, s.length()));
+        assertEquals(list("javadoc".length()), result);
+    }
+
+    @Test
+    public void grepFiltersBasedOnPatternAndMapsUsingBlock() throws Exception {
+        List<String> strings = list("java", "javadoc", "jar");
+        List<Integer> result = grep(strings, Pattern.compile("^jav.*"), λ(s, s.length()));
+        assertEquals(list("java".length(), "javadoc".length()), result);
+    }
+
+    @Test
+    public void maxReturnsLastValueUsingNaturalOrder() throws Exception {
+        List<String> strings = list("albatross", "dog", "horse");
+        assertEquals("horse", max(strings));
+    }
+
+    @Test
+    public void maxReturnsLastValueUsingBlockAsComparator() throws Exception {
+        List<String> strings = list("albatross", "dog", "horse");
+        assertEquals("albatross", max(strings, λ(s, t, t.length() - s.length())));
+    }
+
+    @Test
+    public void maxReturnsLastNullForEmptyList() throws Exception {
+        assertNull(max(list(String.class)));
+    }
+
+    @Test
+    public void minReturnsFirstValueUsingNaturalOrder() throws Exception {
+        List<String> strings = list("albatross", "dog", "horse");
+        assertEquals("albatross", min(strings));
+    }
+
+    @Test
+    public void minReturnsFistValueUsingBlockAsComparator() throws Exception {
+        List<String> strings = list("albatross", "dog", "horse");
+        assertEquals("dog", min(strings, λ(s, t, t.length() - s.length())));
+    }
+
+    @Test
+    public void minReturnsLastNullForEmptyList() throws Exception {
+        assertNull(min(list(String.class)));
+    }
+
+    @Test
+    public void memberReturnsTrueForExistingElement() throws Exception {
+        assertTrue(member(list("hello"), "hello"));
+    }
+
+    @Test
+    public void memberReturnsFalseForNonExistingElement() throws Exception {
+        assertFalse(member(list("hello"), "world"));
+    }
+
+    @Test
+    public void entriesCreatesListFromIterable() throws Exception {
+        Iterable<String> iterable = new Iterable<String>() {
+            String[] strings = { "hello", "world" };
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    int i = 0;
+                    public boolean hasNext() {
+                        return i < strings.length;
+                    }
+
+                    public String next() {
+                        return strings[i++];
+                    }
+
+                    public void remove() {
+                    }
+                };
+            }
+        };
+        assertEquals(list("hello", "world"), entries(iterable));
     }
 }

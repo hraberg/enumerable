@@ -36,9 +36,6 @@ import lambda.Fn2;
  * </p>
  */
 public class Enumerable {
-    // Missing: zip
-    // Missing tests: eachCons, eachSlice, toList, member, min, max, grep
-
     /**
      * Calls block for each item in collection.
      */
@@ -89,23 +86,25 @@ public class Enumerable {
     /**
      * Iterates the given block for each list of consecutive n elements.
      */
-    public static <E, R> R eachCons(Iterable<E> col, int n, Fn1<List<E>, R> block) {
+    public static <E, R> Object eachCons(Iterable<E> col, int n, Fn1<List<E>, R> block) {
         List<E> list = toList(col);
-        R result = null;
-        for (int i = 0; i < list.size(); i++)
-            result = block.call(list.subList(i, i + n - 1));
-        return result;
+        for (int i = 0; i + n <= list.size(); i++)
+            if (n + i <= list.size())
+                block.call(list.subList(i, i + n));
+        return null;
     }
 
     /**
      * Iterates the given block for each slice of n elements.
      */
-    public static <E, R> R eachSlice(Iterable<E> col, int n, Fn1<List<E>, R> block) {
+    public static <E, R> Object eachSlice(Iterable<E> col, int n, Fn1<List<E>, R> block) {
         List<E> list = toList(col);
-        R result = null;
-        for (int i = 0; i < list.size(); i += n)
-            result = block.call(list.subList(i, i + n - 1));
-        return result;
+        for (int i = 0; i <= list.size(); i += n)
+            if (i + n > list.size())
+                block.call(list.subList(i, list.size()));
+            else
+                block.call(list.subList(i, i + n));
+        return null;
     }
 
     /**
