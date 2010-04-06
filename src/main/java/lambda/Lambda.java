@@ -246,6 +246,10 @@ public class Lambda {
     @LambdaParameter
     public static double d;
     @LambdaParameter
+    public static double x;
+    @LambdaParameter
+    public static double y;
+    @LambdaParameter
     public static char c;
     @LambdaParameter
     public static boolean b;

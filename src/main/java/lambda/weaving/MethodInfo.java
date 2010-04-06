@@ -222,5 +222,20 @@ class MethodInfo {
         public MethodInfo getLambdaMethod() {
             return method;
         }
+
+        public int getParameterRealLocalIndex(String name) {
+            Type[] parameterTypes = getParameterTypes();
+            int index = 1;
+            for (int i = 0; i < parameterTypes.length; i++)
+                if (getParameterIndex(name) == i + 1)
+                    break;
+                else
+                    index += parameterTypes[i].getSize();
+            return index;
+        }
+
+        String getParameterByIndex(int index) {
+            return new ArrayList<String>(getParameters()).get(index - 1);
+        }
     }
 }

@@ -16,13 +16,13 @@ import lambda.primitives.*;
  * module</a>
  * </p>
  */
-public class EnumerableInts {
+public class EnumerableDoubles {
     /**
      * Passes each element of the array to the given block. The method returns
      * true if the block never returns false.
      */
-    public static <E> boolean all(int[] array, Fn1ItoB block) {
-        for (int each : array)
+    public static <E> boolean all(double[] array, Fn1DtoB block) {
+        for (double each : array)
             if (!block.call(each))
                 return false;
         return true;
@@ -32,8 +32,8 @@ public class EnumerableInts {
      * Passes each element of the array to the given block. The method returns
      * true if the block ever returns a value other than false.
      */
-    public static <E> boolean any(int[] array, Fn1ItoB block) {
-        for (int each : array)
+    public static <E> boolean any(double[] array, Fn1DtoB block) {
+        for (double each : array)
             if (block.call(each))
                 return true;
         return false;
@@ -43,10 +43,10 @@ public class EnumerableInts {
      * Returns a new list with the results of running block once for every
      * element in array.
      */
-    public static <R> Object[] collect(int[] array, Fn1ItoX<R> block) {
+    public static <R> Object[] collect(double[] array, Fn1DtoX<R> block) {
         Object[] result = new Object[array.length];
         int i = 0;
-        for (int each : array)
+        for (double each : array)
             result[i++] = block.call(each);
         return result;
     }
@@ -56,10 +56,10 @@ public class EnumerableInts {
      * element in array.
      */
     @SuppressWarnings("unchecked")
-    public static <R> R[] collect(int[] array, Fn1ItoX<R> block, Class<R> type) {
+    public static <R> R[] collect(double[] array, Fn1DtoX<R> block, Class<R> type) {
         R[] result = (R[]) Array.newInstance(type, array.length);
         int i = 0;
-        for (int each : array)
+        for (double each : array)
             result[i++] = block.call(each);
         return result;
     }
@@ -69,7 +69,7 @@ public class EnumerableInts {
     // is
     // * not false. If no object matches, it returns null.
     // */
-    // public static <E> E detect(int[] array, Fn1<E, Boolean> block) {
+    // public static <E> E detect(double[] array, Fn1<E, Boolean> block) {
     // return Enumerable.detect(asList(array), block);
     // }
     //
@@ -78,7 +78,7 @@ public class EnumerableInts {
     // is
     // * not false. If no object matches, it returns ifNone.
     // */
-    // public static <E> E detect(int[] array, Fn1<E, Boolean> block, E ifNone)
+    // public static <E> E detect(double[] array, Fn1<E, Boolean> block, E ifNone)
     // {
     // return Enumerable.detect(asList(array), block);
     // }
@@ -86,8 +86,8 @@ public class EnumerableInts {
     /**
      * Calls block for each item in array.
      */
-    public static <R> int[] each(int[] array, Fn1ItoX<R> block) {
-        for (int each : array)
+    public static <R> double[] each(double[] array, Fn1DtoX<R> block) {
+        for (double each : array)
             block.call(each);
         return array;
     }
@@ -96,9 +96,9 @@ public class EnumerableInts {
      * Calls block with two arguments, the item and its index, for each item in
      * array.
      */
-    public static <R> int[] eachWithIndex(int[] array, Fn2IItoX<R> block) {
-        int idx = 0;
-        for (int each : array)
+    public static <R> double[] eachWithIndex(double[] array, Fn2DDtoX<R> block) {
+        double idx = 0;
+        for (double each : array)
             block.call(each, idx++);
         return array;
     }
@@ -106,35 +106,35 @@ public class EnumerableInts {
     /**
      * @see #toList(Iterable)
      */
-    public static <E> List<Integer> entries(int[] array) {
+    public static <E> List<Double> entries(double[] array) {
         return toList(array);
     }
 
     // /**
     // * @see #detect(Iterable, Fn1)
     // */
-    // public static <E> E find(int[] array, Fn1<E, Boolean> block) {
+    // public static <E> E find(double[] array, Fn1<E, Boolean> block) {
     // return Enumerable.detect(asList(array), block);
     // }
     //
     // /**
     // * @see #detect(Iterable, Fn1, Object)
     // */
-    // public static <E> E find(int[] array, Fn1<E, Boolean> block, E ifNone) {
+    // public static <E> E find(double[] array, Fn1<E, Boolean> block, E ifNone) {
     // return Enumerable.detect(asList(array), block);
     // }
     //
     /**
      * @see #select(Iterable, Fn1)
      */
-    public static int[] findAll(int[] array, Fn1ItoB block) {
+    public static double[] findAll(double[] array, Fn1DtoB block) {
         return select(array, block);
     }
 
     /**
      * @see #member(Iterable, Object)
      */
-    public static boolean includes(int[] array, int i) {
+    public static boolean includes(double[] array, double i) {
         return member(array, i);
     }
 
@@ -144,8 +144,8 @@ public class EnumerableInts {
      * value returned by the block. This form uses the first element of the
      * array as a the initial value (and skips that element while iterating).
      */
-    public static int inject(int[] array, Fn2IItoI block) {
-        int initial = array[0];
+    public static double inject(double[] array, Fn2DDtoD block) {
+        double initial = array[0];
         for (int i = 1; i < array.length; i++)
             initial = block.call(initial, array[i]);
         return initial;
@@ -157,8 +157,8 @@ public class EnumerableInts {
      * value returned by the block. This form lets you supply an initial value
      * for memo.
      */
-    public static int inject(int[] array, int initial, Fn2IItoI block) {
-        for (int each : array)
+    public static double inject(double[] array, double initial, Fn2DDtoD block) {
+        for (double each : array)
             initial = block.call(initial, each);
         return initial;
     }
@@ -166,7 +166,7 @@ public class EnumerableInts {
     /**
      * @see #collect(Iterable, Fn1)
      */
-    public static <R> Object[] map(int[] array, Fn1ItoX<R> block) {
+    public static <R> Object[] map(double[] array, Fn1DtoX<R> block) {
         return collect(array, block);
     }
 
@@ -174,10 +174,10 @@ public class EnumerableInts {
      * Returns the object in array with the maximum value. This form assumes all
      * objects implement {@link Comparable}
      */
-    public static int max(int[] array) {
+    public static double max(double[] array) {
         if (array.length == 0)
             return 0;
-        int[] result = sort(array);
+        double[] result = sort(array);
         return result[result.length - 1];
     }
 
@@ -185,7 +185,7 @@ public class EnumerableInts {
     // * Returns the object in array with the maximum value. This form uses the
     // * block to {@link Comparator#compare}.
     // */
-    // public static <E> E max(int[] array, Fn2<E, E, Integer> block) {
+    // public static <E> E max(double[] array, Fn2<E, E, doubleeger> block) {
     // return Enumerable.max(asList(array), block);
     // }
     //
@@ -194,7 +194,7 @@ public class EnumerableInts {
      * Returns true if any member of array equals obj. Equality is tested using
      * {@link Object#equals(Object)}.
      */
-    public static boolean member(int[] array, int i) {
+    public static boolean member(double[] array, double i) {
         return Arrays.binarySearch(sort(array), i) >= 0;
     }
 
@@ -202,7 +202,7 @@ public class EnumerableInts {
      * Returns the object in array with the minimum value. This form assumes all
      * objects implement {@link Comparable}.
      */
-    public static int min(int[] array) {
+    public static double min(double[] array) {
         if (array.length == 0)
             return 0;
         return sort(array)[0];
@@ -213,7 +213,7 @@ public class EnumerableInts {
     // * Returns the object in array with the minimum value. This form uses the
     // * block to {@link Comparator#compare}.
     // */
-    // public static <E> E min(int[] array, Fn2<E, E, Integer> block) {
+    // public static <E> E min(double[] array, Fn2<E, E, doubleeger> block) {
     // return Enumerable.min(asList(array), block);
     // }
     //
@@ -221,8 +221,8 @@ public class EnumerableInts {
      * Returns two lists, the first containing the elements of array for which
      * the block evaluates to true, the second containing the rest.
      */
-    public static int[][] partition(int[] array, Fn1ItoB block) {
-        int[][] result = new int[2][];
+    public static double[][] partition(double[] array, Fn1DtoB block) {
+        double[][] result = new double[2][];
 
         result[0] = select(array, block);
         result[1] = reject(array, block);
@@ -234,7 +234,7 @@ public class EnumerableInts {
      * Returns an array containing all elements of array for which block is
      * false.
      */
-    public static int[] reject(int[] array, Fn1ItoB block) {
+    public static double[] reject(double[] array, Fn1DtoB block) {
         return selectOrReject(array, block, false);
     }
 
@@ -242,14 +242,14 @@ public class EnumerableInts {
      * Returns an array containing all elements of array for which block is not
      * false.
      */
-    public static int[] select(int[] array, Fn1ItoB block) {
+    public static double[] select(double[] array, Fn1DtoB block) {
         return selectOrReject(array, block, true);
     }
 
-    private static int[] selectOrReject(int[] array, Fn1ItoB block, boolean select) {
-        int[] acc = new int[array.length];
+    private static double[] selectOrReject(double[] array, Fn1DtoB block, boolean select) {
+        double[] acc = new double[array.length];
         int i = 0;
-        for (int each : array)
+        for (double each : array)
             if (block.call(each) == select)
                 acc[i++] = each;
         return copy(acc, i);
@@ -259,8 +259,8 @@ public class EnumerableInts {
      * Returns an array containing the items in array sorted, according to their
      * own compareTo method.
      */
-    public static int[] sort(int[] array) {
-        int[] result = copy(array, array.length);
+    public static double[] sort(double[] array) {
+        double[] result = copy(array, array.length);
         Arrays.sort(result);
         return result;
     }
@@ -269,7 +269,7 @@ public class EnumerableInts {
 //     * Returns an array containing the items in array sorted by using the
 //     * results of the supplied block.
 //     */
-//     public static int[] sort(int[] array, Fn2IItoI block) {
+//     public static double[] sort(double[] array, Fn2IItoI block) {
 //     }
     //
     // /**
@@ -277,8 +277,8 @@ public class EnumerableInts {
     // array
     // * through the given block.
     // */
-    // public static <E, R extends Object & Comparable<? super R>> int[]
-    // sortBy(int[] array, final Fn1<E, R> block) {
+    // public static <E, R extends Object & Comparable<? super R>> double[]
+    // sortBy(double[] array, final Fn1<E, R> block) {
     // return Enumerable.sortBy(asList(array),
     // block).toArray(newEmptyArray(array));
     // }
@@ -286,9 +286,9 @@ public class EnumerableInts {
     /**
      * Returns a list containing the items in array.
      */
-    public static List<Integer> toList(int[] array) {
-        List<Integer> result = new ArrayList<Integer>();
-        for (int each : array)
+    public static List<Double> toList(double[] array) {
+        List<Double> result = new ArrayList<Double>();
+        for (double each : array)
             result.add(each);
         return result;
     }
@@ -296,7 +296,7 @@ public class EnumerableInts {
     /**
      * Creates a new Set containing the elements of the given array.
      */
-    public static Set<Integer> toSet(int[] array) {
+    public static Set<Double> toSet(double[] array) {
         return Enumerable.toSet(toList(array));
     }
 
@@ -304,7 +304,7 @@ public class EnumerableInts {
      * Creates a new Set containing the elements of the given array, the
      * elements are preprocessed by the given block.
      */
-    public static <R> Set<R> toSet(int[] array, Fn1ItoX<R> block) {
+    public static <R> Set<R> toSet(double[] array, Fn1DtoX<R> block) {
         return Enumerable.toSet(toList(array), block);
     }
 
@@ -322,7 +322,7 @@ public class EnumerableInts {
     // * effect.
     // * </p>
     // */
-    // public static <E> Object[][] zip(int[] array, int[]... args) {
+    // public static <E> Object[][] zip(double[] array, double[]... args) {
     // Iterable<?>[] lists = new Iterable<?>[args.length];
     // for (int i = 0; i < args.length; i++)
     // lists[i] = asList(args[i]);
@@ -335,8 +335,8 @@ public class EnumerableInts {
     // return result;
     // }
 
-    private static int[] copy(int[] acc, int length) {
-        int[] result = new int[length];
+    private static double[] copy(double[] acc, int length) {
+        double[] result = new double[length];
         System.arraycopy(acc, 0, result, 0, length);
         return result;
     }

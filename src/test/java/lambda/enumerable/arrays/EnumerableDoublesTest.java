@@ -2,7 +2,7 @@ package lambda.enumerable.arrays;
 
 import static lambda.Lambda.*;
 import static lambda.Lambda.Primitives.*;
-import static lambda.enumerable.array.EnumerableInts.*;
+import static lambda.enumerable.array.EnumerableDoubles.*;
 import static org.junit.Assert.*;
 
 import java.util.HashSet;
@@ -15,26 +15,26 @@ import lambda.annotation.LambdaParameter;
 
 import org.junit.Test;
 
-public class EnumerableIntsTest extends TestBase {
-    int[] intsOneToFive = new int[] { 1, 2, 3, 4, 5 };
+public class EnumerableDoublesTest extends TestBase {
+    double[] doublesOneToFive = new double[] { 1, 2, 3, 4, 5 };
 
     @Test
     public void callsBlockOnceForEachElement() throws Exception {
-        List<Integer> actual = list();
-        each(intsOneToFive, λ(n, actual.add(n)));
-        assertEquals(toList(intsOneToFive), actual);
+        List<Double> actual = list();
+        each(doublesOneToFive, λ(d, actual.add(d)));
+        assertEquals(toList(doublesOneToFive), actual);
     }
 
     @Test
     public void callsBlockOnceForEachElementWithDoubleReturn() throws Exception {
         double result = 1;
-        each(intsOneToFive, λ(n, result *= 3.14 * n));
+        each(doublesOneToFive, λ(d, result *= 3.14 * d));
         assertEquals(36629.373141888005, result, 0);
     }
 
     @Test
     public void eachReturnsArray() throws Exception {
-        assertArrayEquals(intsOneToFive, each(intsOneToFive, λ(n, n)));
+        assertArrayEquals(doublesOneToFive, each(doublesOneToFive, λ(d, d)), 0.0);
     }
     
     @LambdaParameter
@@ -42,155 +42,155 @@ public class EnumerableIntsTest extends TestBase {
     
     @Test
     public void collectElementsToDifferentType() throws Exception {
-        String[] expected = new String[] { "#1", "#2", "#3", "#4", "#5" };
-        Object[] actual = collect(intsOneToFive, λ(n, "#" + n));
+        String[] expected = new String[] { "#1.0", "#2.0", "#3.0", "#4.0", "#5.0" };
+        Object[] actual = collect(doublesOneToFive, λ(d, "#" + d));
         assertArrayEquals(expected, actual);
         assertFalse(expected.getClass().equals(actual.getClass()));
 
-        String[] actualStrings = collect(intsOneToFive, λ(n, "#" + n), String.class);
+        String[] actualStrings = collect(doublesOneToFive, λ(d, "#" + d), String.class);
         assertArrayEquals(expected, actualStrings);
     }
 
     @Test
     public void collectElementsToDifferentTypeWithEmptyArray() throws Exception {
         String[] expected = new String[] {};
-        Object[] actuals = collect(new int[0], λ(n, "#" + n));
+        Object[] actuals = collect(new double[0], λ(d, "#" + d));
         assertArrayEquals(expected, actuals);
     }
 
     @Test
-    public void eachWithIndexUsingAllPrimitives() throws Exception {
+    public void eachWithIndexUsingMixedPrimitives() throws Exception {
         int totalIndex = 0;
-        eachWithIndex(intsOneToFive, Primitives.λ(n, idx, totalIndex += idx));
+        eachWithIndex(doublesOneToFive, Primitives.λ(d, idx, totalIndex += idx));
         assertEquals(10, totalIndex);
     }
 
     @Test
     public void eachWithIndexIsZeroBased() throws Exception {
         List<Integer> actual = list();
-        eachWithIndex(intsOneToFive, Primitives.λ(n, idx, actual.add(idx + 1)));
-        assertEquals(toList(intsOneToFive), actual);
+        eachWithIndex(doublesOneToFive, Primitives.λ(d, x, actual.add((int) x + 1)));
+        assertEquals(list(1, 2, 3, 4, 5), actual);
     }
 
     @Test
     public void eachWithIndexToString() throws Exception {
         String indexes = "";
-        eachWithIndex(intsOneToFive, λ(n, idx, indexes += idx));
-        assertEquals("01234", indexes);
+        eachWithIndex(doublesOneToFive, λ(d, x, indexes += x));
+        assertEquals("0.01.02.03.04.0", indexes);
     }
 
     @Test
     public void selectMatchingElements() throws Exception {
-        int[] selected = select(intsOneToFive, λ(n, n % 2 == 0));
-        assertArrayEquals(new int[] { 2, 4 }, selected);
+        double[] selected = select(doublesOneToFive, λ(d, d % 2 == 0));
+        assertArrayEquals(new double[] { 2, 4 }, selected, 0.0);
     }
     
     @Test
     public void rejectMatchingElements() throws Exception {
-        int[] odd = {1, 3, 5};
-        assertArrayEquals(odd, reject(intsOneToFive, λ(n, n % 2 == 0)));
+        double[] odd = {1, 3, 5};
+        assertArrayEquals(odd, reject(doublesOneToFive, λ(d, d % 2 == 0)), 0.0);
     }
 
     @Test
     public void sortUsingNaturalOrder() throws Exception {
-        assertArrayEquals(intsOneToFive, sort(new int[] { 5, 4, 3, 2, 1 }));
+        assertArrayEquals(doublesOneToFive, sort(new double[] { 5, 4, 3, 2, 1 }), 0.0);
     }
     
     @Test
     public void injectUsingInitialValue() throws Exception {
-        assertEquals(15, inject(intsOneToFive, 0, λ(n, m, n + m)));
+        assertEquals(15, inject(doublesOneToFive, 0, λ(x, y, x + y)), 0.0);
     }
 
     @Test
     public void injectWithoutInitialValue() throws Exception {
-        assertEquals(120, inject(intsOneToFive, λ(n, m, n * m)));
+        assertEquals(120, inject(doublesOneToFive, λ(x, y, x * y)), 0.0);
     }
 
     @Test
     public void anyOnEmptyArray() throws Exception {
-        assertFalse(any(new int[0], λ(n, n > 0)));
+        assertFalse(any(new double[0], λ(d, d > 0)));
     }
 
     @Test
     public void anyMarchingPredicate() throws Exception {
-        assertTrue(any(intsOneToFive, λ(n, n > 3)));
+        assertTrue(any(doublesOneToFive, λ(d, d > 3)));
     }
 
     @Test
     public void anyNotMatchingPredicate() throws Exception {
-        assertFalse(any(intsOneToFive, λ(n, n > 5)));
+        assertFalse(any(doublesOneToFive, λ(d, d > 5)));
     }
     
     @Test
     public void allMatchingPredicate() throws Exception {
-        assertTrue(all(intsOneToFive, λ(n, n > 0)));
+        assertTrue(all(doublesOneToFive, λ(d, d > 0)));
     }
 
     @Test
     public void allNotMatchingPredicate() throws Exception {
-        assertFalse(all(intsOneToFive, λ(n, n > 1)));
+        assertFalse(all(doublesOneToFive, λ(d, d > 1)));
     }
 
     @Test
     public void allOnEmptyList() throws Exception {
-        assertTrue(all(new int[0], λ(n, n > 0)));
+        assertTrue(all(new double[0], λ(d, d > 0)));
     }
 
     @Test
     public void maxReturnsZeroForEmptyArray() throws Exception {
-        assertEquals(0, max(new int[0]));
+        assertEquals(0, max(new double[0]), 0.0);
     }
 
     @Test
     public void maxReturnsLastValueUsingNaturalOrder() throws Exception {
-        assertEquals(5, max(intsOneToFive));
+        assertEquals(5, max(doublesOneToFive), 0.0);
     }
 
     @Test
     public void minReturnsFirstValueUsingNaturalOrder() throws Exception {
-        assertEquals(1, min(intsOneToFive));
+        assertEquals(1, min(doublesOneToFive), 0.0);
     }
 
     @Test
     public void minReturnsZeroForEmptyList() throws Exception {
-        assertEquals(0, min(new int[0]));
+        assertEquals(0, min(new double[0]), 0.0);
     }
 
     @Test
     public void memberReturnsTrueForExistingElement() throws Exception {
-        assertTrue(member(intsOneToFive, 3));
+        assertTrue(member(doublesOneToFive, 3));
     }
 
     @Test
     public void memberReturnsFalseForNonExistingElement() throws Exception {
-        assertFalse(member(intsOneToFive, 0));
+        assertFalse(member(doublesOneToFive, 0));
     }
 
     @Test
     public void toListCreatesIntegerListFromIntArray() throws Exception {
-        assertEquals(list(1, 2, 3, 4, 5), toList(intsOneToFive));
+        assertEquals(list(1.0, 2.0, 3.0, 4.0, 5.0), toList(doublesOneToFive));
     }
 
     @Test
     public void toSetCreatesIntegerSetFromIntArray() throws Exception {
-        Set<Integer> expected = new HashSet<Integer>(list(1, 2, 3, 4));
-        assertEquals(expected, toSet(new int[] {1, 2, 2, 3, 4, 4}));
+        Set<Double> expected = new HashSet<Double>(list(1.0, 2.0, 3.0, 4.0));
+        assertEquals(expected, toSet(new double[] {1, 2, 2, 3, 4, 4}));
     }
 
     @Test
     public void toSetCreatesIntegerSetFromIntArrayUsingBlock() throws Exception {
-        Set<String> expected = new HashSet<String>(list("1", "2", "3", "4"));
-        assertEquals(expected, toSet(new int[] {1, 2, 2, 3, 4, 4}, λ(n, n + "")));
+        Set<String> expected = new HashSet<String>(list("1.0", "2.0", "3.0", "4.0"));
+        assertEquals(expected, toSet(new double[] {1, 2, 2, 3, 4, 4}, λ(d, d + "")));
     }
 
     @Test
     public void partitionArrayIntoTwoBasedOnPreducate() throws Exception {
-        int[] even = { 2, 4 };
-        int[] odd = { 1, 3, 5 };
+        double[] even = { 2, 4 };
+        double[] odd = { 1, 3, 5 };
 
-        int[][] partition = partition(intsOneToFive, λ(n, n % 2 == 0));
+        double[][] partition = partition(doublesOneToFive, λ(d, d % 2 == 0));
 
-        assertArrayEquals(even, partition[0]);
-        assertArrayEquals(odd, partition[1]);
+        assertArrayEquals(even, partition[0], 0.0);
+        assertArrayEquals(odd, partition[1], 0.0);
     }
 }
