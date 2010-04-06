@@ -1,12 +1,9 @@
 package lambda.enumerable.arrays;
 
-import static java.util.Arrays.asList;
+import static java.util.Arrays.*;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import lambda.Fn1;

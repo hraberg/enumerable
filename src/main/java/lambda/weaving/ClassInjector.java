@@ -1,13 +1,9 @@
 package lambda.weaving;
 
-import static lambda.exception.UncheckedException.uncheck;
-import static lambda.weaving.Debug.debug;
+import static lambda.exception.UncheckedException.*;
+import static lambda.weaving.Debug.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Method;
 
 import org.objectweb.asm.ClassReader;

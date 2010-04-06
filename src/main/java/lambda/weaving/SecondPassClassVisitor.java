@@ -5,21 +5,11 @@ import static lambda.weaving.Debug.*;
 import static lambda.weaving.MethodInfo.*;
 import static org.objectweb.asm.Type.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import lambda.weaving.MethodInfo.LambdaInfo;
 
-import org.objectweb.asm.ClassAdapter;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodAdapter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 
 class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     String source;
@@ -384,7 +374,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void returnFromLambdaMethod() {
             Type returnType = getReturnType(currentLambdaMethod.desc);
-            unbox(returnType);
+//            unbox(returnType);
             mv.visitInsn(returnType.getOpcode(IRETURN));
             mv.visitMaxs(0, 0);
             mv.visitEnd();

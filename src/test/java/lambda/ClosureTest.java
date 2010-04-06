@@ -1,23 +1,10 @@
 package lambda;
 
-import static java.lang.Math.PI;
-import static lambda.Lambda._;
-import static lambda.Lambda.c;
-import static lambda.Lambda.d;
-import static lambda.Lambda.delegate;
-import static lambda.Lambda.l;
-import static lambda.Lambda.n;
-import static lambda.Lambda.s;
-import static lambda.Lambda.λ;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static java.lang.Math.*;
+import static lambda.Lambda.*;
+import static org.junit.Assert.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.NotSerializableException;
-import java.io.PrintStream;
-import java.io.Serializable;
+import java.io.*;
 
 import org.junit.Test;
 

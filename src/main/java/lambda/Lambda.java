@@ -89,10 +89,42 @@ public class Lambda {
      * @see #fn(Object, Object)
      */
     @NewLambda
+    public static Fn1IToI λ(int a1, int block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * @see #fn(Object, Object)
+     */
+    @NewLambda
+    public static Fn1BToB λ(boolean a1, boolean block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * @see #fn(Object, Object)
+     */
+    @NewLambda
     public static <A1, R> Fn1<A1, R> lambda(A1 a1, R block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
+    /**
+     * @see #fn(Object, Object)
+     */
+    @NewLambda
+    public static Fn1IToI lambda(int a1, int block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * @see #fn(Object, Object)
+     */
+    @NewLambda
+    public static Fn1BToB lambda(boolean a1, boolean block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+ 
     /**
      * Creates a new lambda with one argument.
      */
@@ -101,6 +133,22 @@ public class Lambda {
         throw new LambdaWeavingNotEnabledException();
     }
 
+    /**
+     * @see #fn(Object, Object)
+     */
+    @NewLambda
+    public static Fn1IToI fn(int a1, int block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * @see #fn(Object, Object)
+     */
+    @NewLambda
+    public static Fn1BToB fn(boolean a1, boolean block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+ 
     /**
      * @see #fn(Object, Object, Object)
      */

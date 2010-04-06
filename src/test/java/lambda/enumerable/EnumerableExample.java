@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import lambda.Fn1;
+import lambda.Fn1IToI;
 
 public class EnumerableExample {
     public void example(PrintStream out) {
@@ -239,7 +240,7 @@ public class EnumerableExample {
         out.println(x);
     }
 
-    Fn1<Integer, Integer> fib;
+    Fn1IToI fib;
 
     public static void main(String[] args) {
         new EnumerableExample().example(System.out);
