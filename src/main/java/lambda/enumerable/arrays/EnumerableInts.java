@@ -1,0 +1,344 @@
+package lambda.enumerable.arrays;
+
+import java.util.*;
+
+import lambda.Fn1;
+import lambda.enumerable.Enumerable;
+import lambda.primitives.Fn1ItoB;
+import lambda.primitives.Fn1ItoO;
+
+/**
+ * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
+ * transformation to capture expressions as closures.
+ * 
+ * <p>
+ * <a href="http://ruby-doc.org/core/classes/Enumerable.html"/>Ruby's Enumerable
+ * module</a>
+ * </p>
+ */
+public class EnumerableInts {
+    /**
+     * Passes each element of the array to the given block. The method returns
+     * true if the block never returns false.
+     */
+    public static <E> boolean all(int[] array, Fn1ItoB block) {
+        for (int each : array)
+            if (!block.call(each))
+                return false;
+        return true;
+    }
+
+    /**
+     * Passes each element of the array to the given block. The method returns
+     * true if the block ever returns a value other than false.
+     */
+    public static <E> boolean any(int[] array, Fn1ItoB block) {
+        for (int each : array)
+            if (block.call(each))
+                return true;
+        return false;
+    }
+
+    /**
+     * Returns a new list with the results of running block once for every
+     * element in array.
+     */
+    public static <R> Object[] collect(int[] array, Fn1ItoO<R> block) {
+        Object[] result = new Object[array.length];
+        int i = 0;
+        for (int each : array)
+            result[i++] = block.call(each);
+        return result;
+    }
+
+    // /**
+    // * Passes each entry in array to block. Returns the first for which block
+    // is
+    // * not false. If no object matches, it returns null.
+    // */
+    // public static <E> E detect(int[] array, Fn1<E, Boolean> block) {
+    // return Enumerable.detect(asList(array), block);
+    // }
+    //
+    // /**
+    // * Passes each entry in array to block. Returns the first for which block
+    // is
+    // * not false. If no object matches, it returns ifNone.
+    // */
+    // public static <E> E detect(int[] array, Fn1<E, Boolean> block, E ifNone)
+    // {
+    // return Enumerable.detect(asList(array), block);
+    // }
+
+    /**
+     * Calls block for each item in array.
+     */
+    public static <R> int[] each(int[] array, Fn1ItoO<R> block) {
+        for (int each : array)
+            block.call(each);
+        return array;
+    }
+
+    // /**
+    // * Iterates the given block for each list of consecutive n elements.
+    // */
+    // public static <E, R> Object eachCons(int[] array, int n, Fn1<List<E>, R>
+    // block) {
+    // return Enumerable.eachCons(asList(array), n, block);
+    // }
+    //
+    // /**
+    // * Iterates the given block for each slice of n elements.
+    // */
+    // public static <E, R> Object eachSlice(int[] array, int n, Fn1<List<E>, R>
+    // block) {
+    // return Enumerable.eachSlice(asList(array), n, block);
+    // }
+
+    // /**
+    // * Calls block with two arguments, the item and its index, for each item
+    // in
+    // * array.
+    // */
+    // public static <E, R> int[] eachWithIndex(int[] array, Fn2<E, Integer, R>
+    // block) {
+    // return Enumerable.toList(Enumerable.eachWithIndex(asList(array),
+    // block)).toArray(newEmptyArray(array));
+    // }
+
+    /**
+     * @see #toList(Iterable)
+     */
+    public static <E> List<Integer> entries(int[] array) {
+        return toList(array);
+    }
+
+    // /**
+    // * @see #detect(Iterable, Fn1)
+    // */
+    // public static <E> E find(int[] array, Fn1<E, Boolean> block) {
+    // return Enumerable.detect(asList(array), block);
+    // }
+    //
+    // /**
+    // * @see #detect(Iterable, Fn1, Object)
+    // */
+    // public static <E> E find(int[] array, Fn1<E, Boolean> block, E ifNone) {
+    // return Enumerable.detect(asList(array), block);
+    // }
+    //
+    /**
+     * @see #select(Iterable, Fn1)
+     */
+    public static int[] findAll(int[] array, Fn1ItoB block) {
+        return select(array, block);
+    }
+
+    /**
+     * @see #member(Iterable, Object)
+     */
+    public static boolean includes(int[] array, int i) {
+        return member(array, i);
+    }
+
+    // /**
+    // * Combines the elements of array by applying the block to an accumulator
+    // * value (memo) and each element in turn. At each step, memo is set to the
+    // * value returned by the block. This form uses the first element of the
+    // * array as a the initial value (and skips that element while iterating).
+    // */
+    // public static <E> E inject(int[] array, Fn2<E, E, E> block) {
+    // return Enumerable.inject(asList(array), block);
+    // }
+    //
+    // /**
+    // * Combines the elements of array by applying the block to an accumulator
+    // * value (memo) and each element in turn. At each step, memo is set to the
+    // * value returned by the block. This form lets you supply an initial value
+    // * for memo.
+    // */
+    // public static <E, R> R inject(int[] array, R initial, Fn2<R, E, R> block)
+    // {
+    // return Enumerable.inject(asList(array), initial, block);
+    // }
+
+    /**
+     * @see #collect(Iterable, Fn1)
+     */
+    public static <R> Object[] map(int[] array, Fn1ItoO<R> block) {
+        return collect(array, block);
+    }
+
+    /**
+     * Returns the object in array with the maximum value. This form assumes all
+     * objects implement {@link Comparable}
+     */
+    public static int max(int[] array) {
+        if (array.length == 0)
+            return 0;
+        int[] result = sort(array);
+        return result[result.length - 1];
+    }
+
+    // /**
+    // * Returns the object in array with the maximum value. This form uses the
+    // * block to {@link Comparator#compare}.
+    // */
+    // public static <E> E max(int[] array, Fn2<E, E, Integer> block) {
+    // return Enumerable.max(asList(array), block);
+    // }
+    //
+
+    /**
+     * Returns true if any member of array equals obj. Equality is tested using
+     * {@link Object#equals(Object)}.
+     */
+    public static boolean member(int[] array, int i) {
+        return Arrays.binarySearch(array, i) >= 0;
+    }
+
+    /**
+     * Returns the object in array with the minimum value. This form assumes all
+     * objects implement {@link Comparable}.
+     */
+    public static int min(int[] array) {
+        if (array.length == 0)
+            return 0;
+        return sort(array)[0];
+    }
+
+    //
+    // /**
+    // * Returns the object in array with the minimum value. This form uses the
+    // * block to {@link Comparator#compare}.
+    // */
+    // public static <E> E min(int[] array, Fn2<E, E, Integer> block) {
+    // return Enumerable.min(asList(array), block);
+    // }
+    //
+    /**
+     * Returns two lists, the first containing the elements of array for which
+     * the block evaluates to true, the second containing the rest.
+     */
+    public static int[][] partition(int[] array, Fn1ItoB block) {
+        int[][] result = new int[2][];
+
+        result[0] = select(array, block);
+        result[1] = reject(array, block);
+
+        return result;
+    }
+
+    /**
+     * Returns an array containing all elements of array for which block is
+     * false.
+     */
+    public static int[] reject(int[] array, Fn1ItoB block) {
+        return selectOrReject(array, block, false);
+    }
+
+    /**
+     * Returns an array containing all elements of array for which block is not
+     * false.
+     */
+    public static int[] select(int[] array, Fn1ItoB block) {
+        return selectOrReject(array, block, true);
+    }
+
+    private static int[] selectOrReject(int[] array, Fn1ItoB block, boolean select) {
+        int[] acc = new int[array.length];
+        int i = 0;
+        for (int each : array)
+            if (block.call(each) == select)
+                acc[i++] = each;
+        return copy(acc, i);
+    }
+
+    /**
+     * Returns an array containing the items in array sorted, according to their
+     * own compareTo method.
+     */
+    public static int[] sort(int[] array) {
+        int[] result = copy(array, array.length);
+        Arrays.sort(result);
+        return result;
+    }
+
+    // /**
+    // * Returns an array containing the items in array sorted by using the
+    // * results of the supplied block.
+    // */
+    // public static <E> int[] sort(int[] array, Fn2<E, E, Integer> block) {
+    // return Enumerable.sort(asList(array),
+    // block).toArray(newEmptyArray(array));
+    // }
+    //
+    // /**
+    // * Sorts array using a set of keys generated by mapping the values in
+    // array
+    // * through the given block.
+    // */
+    // public static <E, R extends Object & Comparable<? super R>> int[]
+    // sortBy(int[] array, final Fn1<E, R> block) {
+    // return Enumerable.sortBy(asList(array),
+    // block).toArray(newEmptyArray(array));
+    // }
+    //
+    /**
+     * Returns a list containing the items in array.
+     */
+    public static List<Integer> toList(int[] array) {
+        ArrayList<Integer> result = new ArrayList<Integer>();
+        for (int each : array)
+            result.add(each);
+        return result;
+    }
+
+    /**
+     * Creates a new Set containing the elements of the given array.
+     */
+    public static Set<Integer> toSet(int[] array) {
+        return Enumerable.toSet(toList(array));
+    }
+
+    /**
+     * Creates a new Set containing the elements of the given array, the
+     * elements are preprocessed by the given block.
+     */
+    public static <R> Set<R> toSet(int[] array, Fn1ItoO<R> block) {
+        return Enumerable.toSet(toList(array), block);
+    }
+
+    // /**
+    // * Converts any arguments to iterators, then merges elements of array with
+    // * corresponding elements from each argument. This generates a sequence of
+    // * array#size n-element list, where n is one more that the count of
+    // * arguments. If the size of any argument is less than array#length, null
+    // * values are supplied.
+    // *
+    // * <p>
+    // * Due to varargs this version doesn't support taking a block like in
+    // Ruby.
+    // * Feed the result into {@link #collect(Iterable, Fn1) to achieve the same
+    // * effect.
+    // * </p>
+    // */
+    // public static <E> Object[][] zip(int[] array, int[]... args) {
+    // Iterable<?>[] lists = new Iterable<?>[args.length];
+    // for (int i = 0; i < args.length; i++)
+    // lists[i] = asList(args[i]);
+    //
+    // List<List<?>> zip = Enumerable.zip(asList(array), lists);
+    //
+    // Object[][] result = new Object[zip.size()][];
+    // for (int i = 0; i < zip.size(); i++)
+    // result[i] = zip.get(i).toArray();
+    // return result;
+    // }
+
+    private static int[] copy(int[] acc, int length) {
+        int[] result = new int[length];
+        System.arraycopy(acc, 0, result, 0, length);
+        return result;
+    }
+}

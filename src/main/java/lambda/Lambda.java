@@ -6,9 +6,7 @@ import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
 import lambda.annotation.Unused;
 import lambda.exception.LambdaWeavingNotEnabledException;
-import lambda.primitives.Fn1BtoB;
-import lambda.primitives.Fn1DtoD;
-import lambda.primitives.Fn1ItoI;
+import lambda.primitives.*;
 
 /**
  * This class acts as a placeholder during compile time and is used to direct
@@ -212,6 +210,21 @@ public class Lambda {
             throw new LambdaWeavingNotEnabledException();
         }
 
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1ItoB λ(int a1, boolean block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static <R> Fn1ItoO<R> λ(int a1, R block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
 
         /**
          * @see #fn(Object, Object)
@@ -257,6 +270,22 @@ public class Lambda {
          * @see #fn(Object, Object)
          */
         @NewLambda
+        public static Fn1ItoB lambda(int a1, boolean block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static <R> Fn1ItoO<R> lambda(int a1, R block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
         public static Fn1ItoI fn(int a1, int block) {
             throw new LambdaWeavingNotEnabledException();
         }
@@ -278,5 +307,20 @@ public class Lambda {
             throw new LambdaWeavingNotEnabledException();
         }
 
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1ItoB fn(int a1, boolean block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+        
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static <R> Fn1ItoO<R> fn(int a1, R block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
     }
 }
