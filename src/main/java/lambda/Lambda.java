@@ -63,14 +63,6 @@ public class Lambda {
     }
 
     /**
-     * @see #fn(Unused, Object)
-     */
-    @NewLambda
-    public static <R> Fn0<R> lambda(Unused _, R block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
      * Creates a new lambda with no arguments.
      */
     @NewLambda
@@ -83,14 +75,6 @@ public class Lambda {
      */
     @NewLambda
     public static <A1, R> Fn1<A1, R> λ(A1 a1, R block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
-     * @see #fn(Object, Object)
-     */
-    @NewLambda
-    public static <A1, R> Fn1<A1, R> lambda(A1 a1, R block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -111,14 +95,6 @@ public class Lambda {
     }
 
     /**
-     * @see #fn(Object, Object, Object)
-     */
-    @NewLambda
-    public static <A1, A2, R> Fn2<A1, A2, R> lambda(A1 a1, A2 a2, R block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
      * Creates a new lambda with two arguments.
      */
     @NewLambda
@@ -131,14 +107,6 @@ public class Lambda {
      */
     @NewLambda
     public static <A1, A2, A3, R> Fn3<A1, A2, A3, R> λ(A1 a1, A2 a2, A3 a3, R block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
-     * @see #fn(Object, Object, Object, Object)
-     */
-    @NewLambda
-    public static <A1, A2, A3, R> Fn3<A1, A2, A3, R> lambda(A1 a1, A2 a2, A3 a3, R block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -239,46 +207,6 @@ public class Lambda {
          */
         @NewLambda
         public static Fn1DtoD λ(double a1, double block) {
-            throw new LambdaWeavingNotEnabledException();
-        }
-
-        /**
-         * @see #fn(Object, Object)
-         */
-        @NewLambda
-        public static Fn1ItoI lambda(int a1, int block) {
-            throw new LambdaWeavingNotEnabledException();
-        }
-
-        /**
-         * @see #fn(Object, Object)
-         */
-        @NewLambda
-        public static Fn1BtoB lambda(boolean a1, boolean block) {
-            throw new LambdaWeavingNotEnabledException();
-        }
-
-        /**
-         * @see #fn(Object, Object)
-         */
-        @NewLambda
-        public static Fn1DtoD lambda(double a1, double block) {
-            throw new LambdaWeavingNotEnabledException();
-        }
-
-        /**
-         * @see #fn(Object, Object)
-         */
-        @NewLambda
-        public static Fn1ItoB lambda(int a1, boolean block) {
-            throw new LambdaWeavingNotEnabledException();
-        }
-
-        /**
-         * @see #fn(Object, Object)
-         */
-        @NewLambda
-        public static <R> Fn1ItoO<R> lambda(int a1, R block) {
             throw new LambdaWeavingNotEnabledException();
         }
 

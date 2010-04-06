@@ -31,6 +31,9 @@ public class EnumerableArraysTest extends TestBase {
         String[] strings = copyOf(actual, actual.length, String[].class);
         assertArrayEquals(expected, strings);
         assertEquals(expected.getClass(), strings.getClass());
+
+        String[] actualStrings = collect(oneToFive, λ(n, "#" + n), String.class);
+        assertArrayEquals(expected, actualStrings);
     }
 
     @Test

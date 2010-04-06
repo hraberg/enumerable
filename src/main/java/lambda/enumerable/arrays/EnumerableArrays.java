@@ -25,7 +25,7 @@ public class EnumerableArrays {
      * true if the block never returns false or null.
      */
     public static <E> boolean all(E[] array, Fn1<E, ?> block) {
-        return lambda.enumerable.Enumerable.all(asList(array), block);
+        return Enumerable.all(asList(array), block);
     }
 
     /**
@@ -42,6 +42,15 @@ public class EnumerableArrays {
      */
     public static <E, R> Object[] collect(E[] array, Fn1<E, R> block) {
         return Enumerable.collect(asList(array), block).toArray();
+    }
+
+    /**
+     * Returns a new list with the results of running block once for every
+     * element in array. Takes an extra type parameter to handle empty arrays.
+     */
+    @SuppressWarnings("unchecked")
+    public static <E, R> R[] collect(E[] array, Fn1<E, R> block, Class<R> type) {
+        return Enumerable.collect(asList(array), block).toArray((R[]) Array.newInstance(type, 0));
     }
 
     /**
@@ -179,6 +188,13 @@ public class EnumerableArrays {
      */
     public static <E, R> Object[] map(E[] array, Fn1<E, R> block) {
         return Enumerable.map(asList(array), block).toArray();
+    }
+
+    /**
+     * @see #collect(Iterable, Fn1)
+     */
+    public static <E, R> R[] map(E[] array, Fn1<E, R> block, Class<R> type) {
+        return collect(array, block, type);
     }
 
     /**

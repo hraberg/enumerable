@@ -5,10 +5,6 @@ import static lambda.Lambda.*;
 import static lambda.Lambda.Primitives.*;
 import static lambda.enumerable.arrays.EnumerableInts.*;
 import static org.junit.Assert.*;
-
-import java.util.List;
-
-import lambda.Fn1;
 import lambda.TestBase;
 
 import org.junit.Test;
