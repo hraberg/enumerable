@@ -1,11 +1,11 @@
-package lambda.enumerable.arrays;
+package lambda.enumerable.array;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import lambda.Fn1;
 import lambda.enumerable.Enumerable;
-import lambda.primitives.Fn1ItoB;
-import lambda.primitives.Fn1ItoO;
+import lambda.primitives.*;
 
 /**
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
@@ -43,8 +43,21 @@ public class EnumerableInts {
      * Returns a new list with the results of running block once for every
      * element in array.
      */
-    public static <R> Object[] collect(int[] array, Fn1ItoO<R> block) {
+    public static <R> Object[] collect(int[] array, Fn1ItoX<R> block) {
         Object[] result = new Object[array.length];
+        int i = 0;
+        for (int each : array)
+            result[i++] = block.call(each);
+        return result;
+    }
+
+    /**
+     * Returns a new list with the results of running block once for every
+     * element in array.
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R[] collect(int[] array, Fn1ItoX<R> block, Class<R> type) {
+        R[] result = (R[]) Array.newInstance(type, array.length);
         int i = 0;
         for (int each : array)
             result[i++] = block.call(each);
@@ -73,38 +86,22 @@ public class EnumerableInts {
     /**
      * Calls block for each item in array.
      */
-    public static <R> int[] each(int[] array, Fn1ItoO<R> block) {
+    public static <R> int[] each(int[] array, Fn1ItoX<R> block) {
         for (int each : array)
             block.call(each);
         return array;
     }
 
-    // /**
-    // * Iterates the given block for each list of consecutive n elements.
-    // */
-    // public static <E, R> Object eachCons(int[] array, int n, Fn1<List<E>, R>
-    // block) {
-    // return Enumerable.eachCons(asList(array), n, block);
-    // }
-    //
-    // /**
-    // * Iterates the given block for each slice of n elements.
-    // */
-    // public static <E, R> Object eachSlice(int[] array, int n, Fn1<List<E>, R>
-    // block) {
-    // return Enumerable.eachSlice(asList(array), n, block);
-    // }
-
-    // /**
-    // * Calls block with two arguments, the item and its index, for each item
-    // in
-    // * array.
-    // */
-    // public static <E, R> int[] eachWithIndex(int[] array, Fn2<E, Integer, R>
-    // block) {
-    // return Enumerable.toList(Enumerable.eachWithIndex(asList(array),
-    // block)).toArray(newEmptyArray(array));
-    // }
+    /**
+     * Calls block with two arguments, the item and its index, for each item in
+     * array.
+     */
+    public static <R> int[] eachWithIndex(int[] array, Fn2IItoX<R> block) {
+        int idx = 0;
+        for (int each : array)
+            block.call(each, idx++);
+        return array;
+    }
 
     /**
      * @see #toList(Iterable)
@@ -141,31 +138,35 @@ public class EnumerableInts {
         return member(array, i);
     }
 
-    // /**
-    // * Combines the elements of array by applying the block to an accumulator
-    // * value (memo) and each element in turn. At each step, memo is set to the
-    // * value returned by the block. This form uses the first element of the
-    // * array as a the initial value (and skips that element while iterating).
-    // */
-    // public static <E> E inject(int[] array, Fn2<E, E, E> block) {
-    // return Enumerable.inject(asList(array), block);
-    // }
-    //
-    // /**
-    // * Combines the elements of array by applying the block to an accumulator
-    // * value (memo) and each element in turn. At each step, memo is set to the
-    // * value returned by the block. This form lets you supply an initial value
-    // * for memo.
-    // */
-    // public static <E, R> R inject(int[] array, R initial, Fn2<R, E, R> block)
-    // {
-    // return Enumerable.inject(asList(array), initial, block);
-    // }
+    /**
+     * Combines the elements of array by applying the block to an accumulator
+     * value (memo) and each element in turn. At each step, memo is set to the
+     * value returned by the block. This form uses the first element of the
+     * array as a the initial value (and skips that element while iterating).
+     */
+    public static int inject(int[] array, Fn2IItoI block) {
+        int initial = array[0];
+        for (int i = 1; i < array.length; i++)
+            initial = block.call(initial, array[i]);
+        return initial;
+    }
+
+    /**
+     * Combines the elements of array by applying the block to an accumulator
+     * value (memo) and each element in turn. At each step, memo is set to the
+     * value returned by the block. This form lets you supply an initial value
+     * for memo.
+     */
+    public static int inject(int[] array, int initial, Fn2IItoI block) {
+        for (int each : array)
+            initial = block.call(initial, each);
+        return initial;
+    }
 
     /**
      * @see #collect(Iterable, Fn1)
      */
-    public static <R> Object[] map(int[] array, Fn1ItoO<R> block) {
+    public static <R> Object[] map(int[] array, Fn1ItoX<R> block) {
         return collect(array, block);
     }
 
@@ -194,7 +195,7 @@ public class EnumerableInts {
      * {@link Object#equals(Object)}.
      */
     public static boolean member(int[] array, int i) {
-        return Arrays.binarySearch(array, i) >= 0;
+        return Arrays.binarySearch(sort(array), i) >= 0;
     }
 
     /**
@@ -264,14 +265,12 @@ public class EnumerableInts {
         return result;
     }
 
-    // /**
-    // * Returns an array containing the items in array sorted by using the
-    // * results of the supplied block.
-    // */
-    // public static <E> int[] sort(int[] array, Fn2<E, E, Integer> block) {
-    // return Enumerable.sort(asList(array),
-    // block).toArray(newEmptyArray(array));
-    // }
+//     /**
+//     * Returns an array containing the items in array sorted by using the
+//     * results of the supplied block.
+//     */
+//     public static int[] sort(int[] array, Fn2IItoI block) {
+//     }
     //
     // /**
     // * Sorts array using a set of keys generated by mapping the values in
@@ -305,7 +304,7 @@ public class EnumerableInts {
      * Creates a new Set containing the elements of the given array, the
      * elements are preprocessed by the given block.
      */
-    public static <R> Set<R> toSet(int[] array, Fn1ItoO<R> block) {
+    public static <R> Set<R> toSet(int[] array, Fn1ItoX<R> block) {
         return Enumerable.toSet(toList(array), block);
     }
 

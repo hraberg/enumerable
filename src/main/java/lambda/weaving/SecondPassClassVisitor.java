@@ -73,9 +73,23 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     } else {
                         currentLambda.defineParameter(name);
 
+                        Type[] methodparameterTypes = getArgumentTypes(currentLambda.getLambdaMethod().desc);
+                        Type methodParameterType = methodparameterTypes[currentLambda.getParameterIndex(name) - 1];
                         Type parameterType = currentLambda.getParameterType(name);
-                        if (!isReferenceType(parameterType))
+
+                        if (!isReferenceType(parameterType) && isReferenceType(methodParameterType))
                             typeToIgnoreValueOfCallOn = getBoxedType(parameterType);
+
+                        
+                        // else if (!isReferenceType(parameterType) && !isReferenceType(methodParameterType))
+                        //  typeToIgnoreValueOfCallOn = getBoxedType(parameterType);
+                        //                        
+                        // if (isReferenceType(methodParameterType) &&
+                        // !isReferenceType(lambdaParameterType)) {
+                        // System.out.println(method + " " +
+                        // currentLambdaMethod);
+                        // unboxLocal(i + 1, lambdaParameterType);
+                        // }
 
                     }
                 } else {
@@ -346,9 +360,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void createLambdaMethodAndRedirectMethodVisitorToIt() {
-            String descriptor = getMethodDescriptor(getType(Object.class), currentLambda.getParameterTypes());
-            currentLambdaMethod = transformer.findMethodByParameterTypes(currentLambda.getType().getInternalName(),
-                    descriptor);
+            currentLambdaMethod = currentLambda.getLambdaMethod();
 
             mv = lambdaWriter.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, currentLambdaMethod.name,
                     currentLambdaMethod.desc, null, null);
@@ -365,11 +377,12 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 Type methodParameterType = methodParameterTypes[i];
                 Type lambdaParameterType = lambdaParameterTypes[i];
 
-                if (!isReferenceType(methodParameterType) && isReferenceType(lambdaParameterType))
-                    boxLocal(i + 1, methodParameterType);
-
-                else if (isReferenceType(methodParameterType) && !isReferenceType(lambdaParameterType))
+//                if (!isReferenceType(methodParameterType) && isReferenceType(lambdaParameterType))
+//                    boxLocal(i + 1, methodParameterType);
+//                 else
+                if (isReferenceType(methodParameterType) && !isReferenceType(lambdaParameterType))
                     unboxLocal(i + 1, lambdaParameterType);
+
             }
         }
 
@@ -434,9 +447,9 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             return type;
         }
 
-        void unbox(Type returnType) {
+        void unbox(Type primitiveType) {
             Type type = getType(Number.class);
-            switch (returnType.getSort()) {
+            switch (primitiveType.getSort()) {
             case VOID:
             case ARRAY:
             case OBJECT:
@@ -448,8 +461,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 type = getType(Boolean.class);
                 break;
             }
-            String descriptor = getMethodDescriptor(returnType, new Type[0]);
-            String name = returnType.getClassName() + "Value";
+            String descriptor = getMethodDescriptor(primitiveType, new Type[0]);
+            String name = primitiveType.getClassName() + "Value";
 
             mv.visitTypeInsn(CHECKCAST, type.getInternalName());
             mv.visitMethodInsn(INVOKEVIRTUAL, type.getInternalName(), name, descriptor);

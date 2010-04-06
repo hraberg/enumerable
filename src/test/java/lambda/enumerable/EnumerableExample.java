@@ -18,9 +18,9 @@ import lambda.primitives.Fn1ItoI;
 public class EnumerableExample {
     public void example(PrintStream out) {
         /*
-         * While λ looks good, it is cumbersome to insert. There are three
+         * While λ looks good, it is cumbersome to insert. There are two
          * (ignoring arity versions) static methods in Lambda that all are
-         * marked with @NewLambda and all do the same thing: λ, fn and lambda.
+         * marked with @NewLambda and all do the same thing: λ and fn
          */
         assert Character.isJavaIdentifierStart('λ');
 

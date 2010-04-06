@@ -131,6 +131,7 @@ class MethodInfo {
         Set<String> definedParameters = new HashSet<String>();
         Type type;
         Type expressionType;
+        MethodInfo method;
 
         void accessLocal(int operand) {
             VariableInfo local = accessedLocalsByIndex.get(operand);
@@ -212,6 +213,14 @@ class MethodInfo {
 
         public void setExpressionType(Type expresionType) {
             this.expressionType = expresionType;
+        }
+
+        void setLambdaMethod(MethodInfo method) {
+            this.method = method;
+        }
+
+        public MethodInfo getLambdaMethod() {
+            return method;
         }
     }
 }

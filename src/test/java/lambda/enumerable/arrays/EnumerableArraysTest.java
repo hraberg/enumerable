@@ -1,8 +1,7 @@
 package lambda.enumerable.arrays;
 
-import static java.util.Arrays.*;
 import static lambda.Lambda.*;
-import static lambda.enumerable.arrays.EnumerableArrays.*;
+import static lambda.enumerable.array.EnumerableArrays.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -27,10 +26,6 @@ public class EnumerableArraysTest extends TestBase {
         Object[] actual = collect(oneToFive, λ(n, "#" + n));
         assertArrayEquals(expected, actual);
         assertFalse(expected.getClass().equals(actual.getClass()));
-
-        String[] strings = copyOf(actual, actual.length, String[].class);
-        assertArrayEquals(expected, strings);
-        assertEquals(expected.getClass(), strings.getClass());
 
         String[] actualStrings = collect(oneToFive, λ(n, "#" + n), String.class);
         assertArrayEquals(expected, actualStrings);

@@ -95,6 +95,8 @@ class FirstPassClassVisitor extends EmptyVisitor {
                         resolvingTypeUsingCheckCast = true;
                     } else {
                         currentLambda.setType(returnType);
+                        setLambdaMethod();
+
                         currentLambda = null;
                     }
                 }
@@ -104,9 +106,18 @@ class FirstPassClassVisitor extends EmptyVisitor {
         }
     }
 
+    void setLambdaMethod() {
+        String descriptor = getMethodDescriptor(getType(Object.class), currentLambda.getParameterTypes());
+        MethodInfo currentLambdaMethod = transformer.findMethodByParameterTypes(currentLambda.getType().getInternalName(),
+                descriptor);
+        currentLambda.setLambdaMethod(currentLambdaMethod);
+    }
+
     public void visitTypeInsn(int opcode, String type) {
         if (CHECKCAST == opcode && resolvingTypeUsingCheckCast) {
             currentLambda.setType(getObjectType(type));
+            setLambdaMethod();
+
             currentLambda = null;
             resolvingTypeUsingCheckCast = false;
         }
