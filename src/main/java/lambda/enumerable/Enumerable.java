@@ -39,8 +39,8 @@ public class Enumerable {
      * Passes each element of the collection to the given block. The method
      * returns true if the block never returns false or null.
      */
-    public static <E> boolean all(Iterable<E> col, Fn1<E, ?> block) {
-        for (E each : col) {
+    public static <E> boolean all(Iterable<E> collection, Fn1<E, ?> block) {
+        for (E each : collection) {
             Object result = block.call(each);
             if (result == FALSE || result == null)
                 return false;
@@ -52,8 +52,8 @@ public class Enumerable {
      * Passes each element of the collection to the given block. The method
      * returns true if the block ever returns a value other than false or null.
      */
-    public static <E> boolean any(Iterable<E> col, Fn1<E, ?> block) {
-        for (E each : col) {
+    public static <E> boolean any(Iterable<E> collection, Fn1<E, ?> block) {
+        for (E each : collection) {
             Object result = block.call(each);
             if (result != FALSE && result != null)
                 return true;
@@ -65,9 +65,9 @@ public class Enumerable {
      * Returns a new list with the results of running block once for every
      * element in collection.
      */
-    public static <E, R> List<R> collect(Iterable<E> col, Fn1<E, R> block) {
+    public static <E, R> List<R> collect(Iterable<E> collection, Fn1<E, R> block) {
         List<R> result = new ArrayList<R>();
-        for (E each : col)
+        for (E each : collection)
             result.add(block.call(each));
         return result;
     }
@@ -76,16 +76,16 @@ public class Enumerable {
      * Passes each entry in collection to block. Returns the first for which
      * block is not false. If no object matches, it returns null.
      */
-    public static <E> E detect(Iterable<E> col, Fn1<E, Boolean> block) {
-        return detect(col, block, null);
+    public static <E> E detect(Iterable<E> collection, Fn1<E, Boolean> block) {
+        return detect(collection, block, null);
     }
 
     /**
      * Passes each entry in collection to block. Returns the first for which
      * block is not false. If no object matches, it returns ifNone.
      */
-    public static <E> E detect(Iterable<E> col, Fn1<E, Boolean> block, E ifNone) {
-        for (E each : col)
+    public static <E> E detect(Iterable<E> collection, Fn1<E, Boolean> block, E ifNone) {
+        for (E each : collection)
             if (block.call(each))
                 return each;
         return ifNone;
@@ -94,10 +94,10 @@ public class Enumerable {
     /**
      * Calls block for each item in collection.
      */
-    public static <E, R> Iterable<E> each(Iterable<E> col, Fn1<E, R> block) {
-        for (E each : col)
+    public static <E, R> Iterable<E> each(Iterable<E> collection, Fn1<E, R> block) {
+        for (E each : collection)
             block.call(each);
-        return col;
+        return collection;
     }
 
     /**
@@ -113,8 +113,8 @@ public class Enumerable {
     /**
      * Iterates the given block for each list of consecutive n elements.
      */
-    public static <E, R> Object eachCons(Iterable<E> col, int n, Fn1<List<E>, R> block) {
-        List<E> list = toList(col);
+    public static <E, R> Object eachCons(Iterable<E> collection, int n, Fn1<List<E>, R> block) {
+        List<E> list = toList(collection);
         for (int i = 0; i + n <= list.size(); i++)
             if (n + i <= list.size())
                 block.call(list.subList(i, i + n));
@@ -172,8 +172,8 @@ public class Enumerable {
     /**
      * Iterates the given block for each slice of n elements.
      */
-    public static <E, R> Object eachSlice(Iterable<E> col, int n, Fn1<List<E>, R> block) {
-        List<E> list = toList(col);
+    public static <E, R> Object eachSlice(Iterable<E> collection, int n, Fn1<List<E>, R> block) {
+        List<E> list = toList(collection);
         for (int i = 0; i <= list.size(); i += n)
             if (i + n > list.size())
                 block.call(list.subList(i, list.size()));
@@ -194,11 +194,11 @@ public class Enumerable {
      * Calls block with two arguments, the item and its index, for each item in
      * collection.
      */
-    public static <E, R> Iterable<E> eachWithIndex(Iterable<E> col, Fn2<E, Integer, R> block) {
+    public static <E, R> Iterable<E> eachWithIndex(Iterable<E> collection, Fn2<E, Integer, R> block) {
         int i = 0;
-        for (E each : col)
+        for (E each : collection)
             block.call(each, i++);
-        return col;
+        return collection;
     }
 
     /**
@@ -211,29 +211,29 @@ public class Enumerable {
     /**
      * @see #detect(Iterable, Fn1)
      */
-    public static <E> E find(Iterable<E> col, Fn1<E, Boolean> block) {
-        return detect(col, block);
+    public static <E> E find(Iterable<E> collection, Fn1<E, Boolean> block) {
+        return detect(collection, block);
     }
     /**
      * @see #detect(Iterable, Fn1, Object)
      */
-    public static <E> E find(Iterable<E> col, Fn1<E, Boolean> block, E ifNone) {
-        return detect(col, block, ifNone);
+    public static <E> E find(Iterable<E> collection, Fn1<E, Boolean> block, E ifNone) {
+        return detect(collection, block, ifNone);
     }
 
     /**
      * @see #select(Iterable, Fn1)
      */
-    public static <E> List<E> findAll(Iterable<E> col, Fn1<E, Boolean> block) {
-        return select(col, block);
+    public static <E> List<E> findAll(Iterable<E> collection, Fn1<E, Boolean> block) {
+        return select(collection, block);
     }
 
     /**
      * Returns a list of every element in collection for which pattern matches.
      */
-    public static <E> List<E> grep(Iterable<E> col, Pattern pattern) {
+    public static <E> List<E> grep(Iterable<E> collection, Pattern pattern) {
         List<E> result = new ArrayList<E>();
-        for (E each : col)
+        for (E each : collection)
             if (pattern.matcher(each.toString()).matches())
                 result.add(each);
         return result;
@@ -244,9 +244,9 @@ public class Enumerable {
      * Each matching element is passed to tje block, and its result is stored in
      * the output list.
      */
-    public static <E, R> List<R> grep(Iterable<E> col, Pattern pattern, Fn1<E, R> block) {
+    public static <E, R> List<R> grep(Iterable<E> collection, Pattern pattern, Fn1<E, R> block) {
         List<R> result = new ArrayList<R>();
-        for (E each : col)
+        for (E each : collection)
             if (pattern.matcher(each.toString()).matches())
                 result.add(block.call(each));
         return result;
@@ -255,15 +255,15 @@ public class Enumerable {
     /**
      * @see #grep(Iterable, Pattern)
      */
-    public static <E> List<E> grep(Iterable<E> col, String pattern) {
-        return grep(col, Pattern.compile(pattern));
+    public static <E> List<E> grep(Iterable<E> collection, String pattern) {
+        return grep(collection, Pattern.compile(pattern));
     }
 
     /**
      * @see #grep(Iterable, Pattern, Fn1)
      */
-    public static <E, R> List<R> grep(Iterable<E> col, String pattern, Fn1<E, R> block) {
-        return grep(col, Pattern.compile(pattern), block);
+    public static <E, R> List<R> grep(Iterable<E> collection, String pattern, Fn1<E, R> block) {
+        return grep(collection, Pattern.compile(pattern), block);
     }
 
     /**
@@ -279,8 +279,8 @@ public class Enumerable {
     /**
      * @see #member(Iterable, Object)
      */
-    public static <E> boolean includes(Iterable<E> col, Object obj) {
-        return toList(col).contains(obj);
+    public static <E> boolean includes(Iterable<E> collection, Object obj) {
+        return toList(collection).contains(obj);
     }
 
     /**
@@ -290,8 +290,8 @@ public class Enumerable {
      * of the collection as a the initial value (and skips that element while
      * iterating).
      */
-    public static <E> E inject(Iterable<E> col, Fn2<E, E, E> block) {
-        Iterator<E> i = col.iterator();
+    public static <E> E inject(Iterable<E> collection, Fn2<E, E, E> block) {
+        Iterator<E> i = collection.iterator();
         E initial = i.next();
         while (i.hasNext())
             initial = block.call(initial, i.next());
@@ -304,8 +304,8 @@ public class Enumerable {
      * set to the value returned by the block. This form lets you supply an
      * initial value for memo.
      */
-    public static <E, R> R inject(Iterable<E> col, R initial, Fn2<R, E, R> block) {
-        for (E each : col)
+    public static <E, R> R inject(Iterable<E> collection, R initial, Fn2<R, E, R> block) {
+        for (E each : collection)
             initial = block.call(initial, each);
         return initial;
     }
@@ -313,8 +313,8 @@ public class Enumerable {
     /**
      * @see #collect(Iterable, Fn1)
      */
-    public static <E, R> List<R> map(Iterable<E> col, Fn1<E, R> block) {
-        return collect(col, block);
+    public static <E, R> List<R> map(Iterable<E> collection, Fn1<E, R> block) {
+        return collect(collection, block);
     }
 
     /**
@@ -332,8 +332,8 @@ public class Enumerable {
      * Returns the object in collection with the maximum value. This form uses
      * the block to {@link Comparator#compare}.
      */
-    public static <E> E max(Iterable<E> col, Fn2<E, E, Integer> block) {
-        List<E> sorted = sort(col, block);
+    public static <E> E max(Iterable<E> collection, Fn2<E, E, Integer> block) {
+        List<E> sorted = sort(collection, block);
         if (sorted.isEmpty())
             return null;
         return sorted.get(sorted.size() - 1);
@@ -343,8 +343,8 @@ public class Enumerable {
      * Returns true if any member of collection equals obj. Equality is tested
      * using {@link Object#equals(Object)}.
      */
-    public static <E> boolean member(Iterable<E> col, Object obj) {
-        return includes(col, obj);
+    public static <E> boolean member(Iterable<E> collection, Object obj) {
+        return includes(collection, obj);
     }
 
     /**
@@ -362,8 +362,8 @@ public class Enumerable {
      * Returns the object in collection with the minimum value. This form uses
      * the block to {@link Comparator#compare}.
      */
-    public static <E> E min(Iterable<E> col, Fn2<E, E, Integer> block) {
-        List<E> sorted = sort(col, block);
+    public static <E> E min(Iterable<E> collection, Fn2<E, E, Integer> block) {
+        List<E> sorted = sort(collection, block);
         if (sorted.isEmpty())
             return null;
         return sorted.get(0);
@@ -373,10 +373,10 @@ public class Enumerable {
      * Returns two lists, the first containing the elements of collection for
      * which the block evaluates to true, the second containing the rest.
      */
-    public static <E> List<List<E>> partition(Iterable<E> col, Fn1<E, Boolean> block) {
+    public static <E> List<List<E>> partition(Iterable<E> collection, Fn1<E, Boolean> block) {
         List<E> selected = new ArrayList<E>();
         List<E> rejected = new ArrayList<E>();
-        for (E each : col)
+        for (E each : collection)
             if (block.call(each))
                 selected.add(each);
             else
@@ -388,32 +388,32 @@ public class Enumerable {
     }
 
     /**
-     * Returns an list containing all elements of collection for which block is
+     * Returns a list containing all elements of collection for which block is
      * false.
      */
-    public static <E> List<E> reject(Iterable<E> col, Fn1<E, Boolean> block) {
+    public static <E> List<E> reject(Iterable<E> collection, Fn1<E, Boolean> block) {
         List<E> result = new ArrayList<E>();
-        for (E each : col)
+        for (E each : collection)
             if (!block.call(each))
                 result.add(each);
         return result;
     }
 
     /**
-     * Returns an list containing all elements of collection for which block is
+     * Returns a list containing all elements of collection for which block is
      * not false.
      */
-    public static <E> List<E> select(Iterable<E> col, Fn1<E, Boolean> block) {
+    public static <E> List<E> select(Iterable<E> collection, Fn1<E, Boolean> block) {
         List<E> result = new ArrayList<E>();
-        for (E each : col)
+        for (E each : collection)
             if (block.call(each))
                 result.add(each);
         return result;
     }
 
     /**
-     * Returns an list containing all Map.Entry pairs for which the block
-     * returns true.
+     * Returns a list containing all Map.Entry pairs for which the block returns
+     * true.
      */
     public static <K, V> List<Map.Entry<K, V>> select(Map<K, V> map, Fn2<K, V, Boolean> block) {
         List<Map.Entry<K, V>> result = new ArrayList<Map.Entry<K, V>>();
@@ -427,12 +427,12 @@ public class Enumerable {
      * Returns a list containing the items in collection sorted, according to
      * their own compareTo method.
      */
-    public static <E extends Object & Comparable<? super E>> List<E> sort(Iterable<E> col) {
-        return sort(col, (Comparator<E>) null);
+    public static <E extends Object & Comparable<? super E>> List<E> sort(Iterable<E> collection) {
+        return sort(collection, (Comparator<E>) null);
     }
 
-    private static <E> List<E> sort(Iterable<E> col, Comparator<E> comparator) {
-        List<E> result = toList(col);
+    private static <E> List<E> sort(Iterable<E> collection, Comparator<E> comparator) {
+        List<E> result = toList(collection);
         Collections.sort(result, comparator);
         return result;
     }
@@ -442,16 +442,16 @@ public class Enumerable {
      * results of the supplied block.
      */
     @SuppressWarnings("unchecked")
-    public static <E> List<E> sort(Iterable<E> col, Fn2<E, E, Integer> block) {
-        return sort(col, block.as(Comparator.class));
+    public static <E> List<E> sort(Iterable<E> collection, Fn2<E, E, Integer> block) {
+        return sort(collection, block.as(Comparator.class));
     }
 
     /**
      * Sorts collection using a set of keys generated by mapping the values in
      * collection through the given block.
      */
-    public static <E, R extends Object & Comparable<? super R>> List<E> sortBy(Iterable<E> col, final Fn1<E, R> block) {
-        return sort(col, new Comparator<E>() {
+    public static <E, R extends Object & Comparable<? super R>> List<E> sortBy(Iterable<E> collection, final Fn1<E, R> block) {
+        return sort(collection, new Comparator<E>() {
             public int compare(E o1, E o2) {
                 return block.call(o1).compareTo(block.call(o2));
             }
@@ -482,8 +482,8 @@ public class Enumerable {
      * Creates a new Set containing the elements of the given collection, the
      * elements are preprocessed by the given block.
      */
-    public static <E, R> Set<R> toSet(Iterable<E> col, Fn1<E, R> block) {
-        return toSet(collect(col, block));
+    public static <E, R> Set<R> toSet(Iterable<E> collection, Fn1<E, R> block) {
+        return toSet(collect(collection, block));
     }
 
     /**
@@ -499,11 +499,11 @@ public class Enumerable {
      * effect.
      * </p>
      */
-    public static <E> List<List<?>> zip(Iterable<E> col, Iterable<?>... args) {
+    public static <E> List<List<?>> zip(Iterable<E> collection, Iterable<?>... args) {
         List<List<?>> allResults = new ArrayList<List<?>>();
 
         List<Iterator<?>> iterators = new ArrayList<Iterator<?>>();
-        iterators.add(col.iterator());
+        iterators.add(collection.iterator());
         for (Iterable<?> iterable : args)
             iterators.add(iterable.iterator());
 
