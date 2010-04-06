@@ -3,6 +3,7 @@ package lambda.enumerable;
 import static java.lang.Math.*;
 import static java.util.Arrays.*;
 import static lambda.Lambda.*;
+import static lambda.Lambda.Primitives.*;
 import static lambda.enumerable.Enumerable.*;
 
 import java.io.PrintStream;
@@ -11,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import lambda.Fn1;
-import lambda.Fn1IToI;
+import lambda.Lambda;
+import lambda.primitives.Fn1ItoI;
 
 public class EnumerableExample {
     public void example(PrintStream out) {
@@ -95,7 +97,7 @@ public class EnumerableExample {
          * Example of different primitives than int. Demonstrates call to static
          * method Math.sqrt.
          */
-        List<Double> squareRoots = collect(ints, λ(n, sqrt(n)));
+        List<Double> squareRoots = collect(ints, Lambda.λ(n, sqrt(n)));
         out.println(squareRoots);
 
         /*
@@ -198,7 +200,7 @@ public class EnumerableExample {
         /*
          * Once defined, lambdas can call themselves recursively.
          */
-        fib = λ(n, n <= 1 ? n : fib.call(n - 1) + fib.call(n - 2));
+        fib = fn(n, n <= 1 ? n : fib.call(n - 1) + fib.call(n - 2));
         out.println(fib.call(10));
 
         List<Integer> moreInts = asList(-1, 0, 1);
@@ -240,7 +242,7 @@ public class EnumerableExample {
         out.println(x);
     }
 
-    Fn1IToI fib;
+    Fn1ItoI fib;
 
     public static void main(String[] args) {
         new EnumerableExample().example(System.out);

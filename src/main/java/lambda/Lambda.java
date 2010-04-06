@@ -6,6 +6,9 @@ import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
 import lambda.annotation.Unused;
 import lambda.exception.LambdaWeavingNotEnabledException;
+import lambda.primitives.Fn1BtoB;
+import lambda.primitives.Fn1DtoD;
+import lambda.primitives.Fn1ItoI;
 
 /**
  * This class acts as a placeholder during compile time and is used to direct
@@ -89,42 +92,10 @@ public class Lambda {
      * @see #fn(Object, Object)
      */
     @NewLambda
-    public static Fn1IToI λ(int a1, int block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
-     * @see #fn(Object, Object)
-     */
-    @NewLambda
-    public static Fn1BToB λ(boolean a1, boolean block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
-     * @see #fn(Object, Object)
-     */
-    @NewLambda
     public static <A1, R> Fn1<A1, R> lambda(A1 a1, R block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
-    /**
-     * @see #fn(Object, Object)
-     */
-    @NewLambda
-    public static Fn1IToI lambda(int a1, int block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
-     * @see #fn(Object, Object)
-     */
-    @NewLambda
-    public static Fn1BToB lambda(boolean a1, boolean block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
- 
     /**
      * Creates a new lambda with one argument.
      */
@@ -133,22 +104,6 @@ public class Lambda {
         throw new LambdaWeavingNotEnabledException();
     }
 
-    /**
-     * @see #fn(Object, Object)
-     */
-    @NewLambda
-    public static Fn1IToI fn(int a1, int block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
-     * @see #fn(Object, Object)
-     */
-    @NewLambda
-    public static Fn1BToB fn(boolean a1, boolean block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
- 
     /**
      * @see #fn(Object, Object, Object)
      */
@@ -246,5 +201,82 @@ public class Lambda {
     @NewLambda
     static <A1, A2, A3, I> I delegate(A1 a1, A2 a2, A3 a3, Object block) {
         throw new LambdaWeavingNotEnabledException();
+    }
+    
+    public static class Primitives {
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1ItoI λ(int a1, int block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1BtoB λ(boolean a1, boolean block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1DtoD λ(double a1, double block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1ItoI lambda(int a1, int block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1BtoB lambda(boolean a1, boolean block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1DtoD lambda(double a1, double block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1ItoI fn(int a1, int block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1BtoB fn(boolean a1, boolean block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+        
+
+        /**
+         * @see #fn(Object, Object)
+         */
+        @NewLambda
+        public static Fn1DtoD fn(double a1, double block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
+
     }
 }

@@ -2,6 +2,7 @@ package lambda;
 
 import static java.lang.Thread.*;
 import static lambda.Lambda.*;
+import static lambda.Lambda.Primitives.*;
 import static org.junit.Assert.*;
 
 import java.awt.event.ActionEvent;
@@ -16,13 +17,14 @@ import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
 import lambda.annotation.Unused;
 import lambda.exception.LambdaWeavingNotEnabledException;
+import lambda.primitives.Fn1ItoI;
 
 import org.junit.Test;
 
 public class LambdaTest extends TestBase {
     @Test
     public void lambdaWithOnePrimitiveArgument() throws Exception {
-        Fn1IToI nTimesTwo = λ(n, n * 2);
+        Fn1ItoI nTimesTwo = λ(n, n * 2);
         assertEquals(4, nTimesTwo.call(2));
     }
 
@@ -147,7 +149,7 @@ public class LambdaTest extends TestBase {
         assertEquals("HELLO", λ(stringToString, stringToString.call("hello")).call(toUpperCase));
     }
 
-    Fn1IToI fib;
+    Fn1ItoI fib;
 
     @Test
     public void recursion() throws Exception {
