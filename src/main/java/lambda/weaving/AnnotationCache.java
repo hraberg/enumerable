@@ -25,7 +25,8 @@ class AnnotationCache {
             if (elementsToHasAnnotation.containsKey(key))
                 return elementsToHasAnnotation.get(key);
             AnnotationFinder finder = new AnnotationFinder(annotation, name, desc);
-            new ClassReader(getObjectType(owner).getClassName()).accept(finder, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+            new ClassReader(getObjectType(owner).getClassName()).accept(finder, SKIP_CODE | SKIP_DEBUG
+                    | SKIP_FRAMES);
             elementsToHasAnnotation.put(key, finder.found);
             return finder.found;
         } catch (IOException e) {

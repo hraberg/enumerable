@@ -20,15 +20,13 @@ class AnnotationFinder extends EmptyVisitor {
         this.desc = desc;
     }
 
-    public FieldVisitor visitField(int access, final String name, String
-            desc, String signature, Object value) {
+    public FieldVisitor visitField(int access, final String name, String desc, String signature, Object value) {
         if (this.name.equals(name))
             return this;
         return null;
     }
 
-    public MethodVisitor visitMethod(int access, String name, String
-            desc, String signature, String[] exceptions) {
+    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         if (this.name.equals(name) && this.desc.equals(desc))
             return this;
         return null;

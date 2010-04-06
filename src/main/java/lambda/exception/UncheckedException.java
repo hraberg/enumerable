@@ -1,9 +1,9 @@
 package lambda.exception;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 
 @SuppressWarnings("serial")
 public class UncheckedException extends RuntimeException {
@@ -38,7 +38,7 @@ public class UncheckedException extends RuntimeException {
         List<StackTraceElement> trace = new ArrayList<StackTraceElement>();
         for (StackTraceElement element : stackTrace)
             if (!isFilteredPackage(element))
-                    trace.add(element);
+                trace.add(element);
         return trace.toArray(new StackTraceElement[0]);
     }
 

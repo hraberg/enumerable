@@ -12,7 +12,8 @@ public class Version {
     public static Properties buildProperties = new Properties();
     static {
         ClassLoader loader = Enumerable.class.getClassLoader();
-        InputStream in = loader.getResourceAsStream(Version.class.getName().toLowerCase().replace('.', '/') + ".properties");
+        InputStream in = loader.getResourceAsStream(Version.class.getName().toLowerCase().replace('.', '/')
+                + ".properties");
         try {
             if (in != null)
                 buildProperties.load(in);

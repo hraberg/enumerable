@@ -1,6 +1,6 @@
 package lambda.enumerable.arrays;
 
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ public class EnumerableArrays {
      * Calls block for each item in array.
      */
     public static <E, R> E[] each(E[] array, Fn1<E, R> block) {
-        return Enumerable.toList(Enumerable.each(asList(array), block)).toArray(copyOf(array, 0));
+        return Enumerable.toList(Enumerable.each(asList(array), block)).toArray(newEmptyArray(array));
     }
 
     /**
@@ -89,14 +89,14 @@ public class EnumerableArrays {
      * array.
      */
     public static <E, R> E[] eachWithIndex(E[] array, Fn2<E, Integer, R> block) {
-        return Enumerable.toList(Enumerable.eachWithIndex(asList(array), block)).toArray(copyOf(array, 0));
+        return Enumerable.toList(Enumerable.eachWithIndex(asList(array), block)).toArray(newEmptyArray(array));
     }
 
     /**
      * @see #toList(Iterable)
      */
     public static <E> E[] entries(E[] array) {
-        return Enumerable.toList(asList(array)).toArray(copyOf(array, 0));
+        return Enumerable.toList(asList(array)).toArray(newEmptyArray(array));
     }
 
     /**
@@ -117,14 +117,14 @@ public class EnumerableArrays {
      * @see #select(Iterable, Fn1)
      */
     public static <E> E[] findAll(E[] array, Fn1<E, Boolean> block) {
-        return Enumerable.findAll(asList(array), block).toArray(copyOf(array, 0));
+        return Enumerable.findAll(asList(array), block).toArray(newEmptyArray(array));
     }
 
     /**
      * Returns an array of every element in array for which pattern matches.
      */
     public static <E> E[] grep(E[] array, Pattern pattern) {
-        return Enumerable.grep(asList(array), pattern).toArray(copyOf(array, 0));
+        return Enumerable.grep(asList(array), pattern).toArray(newEmptyArray(array));
     }
 
     /**
@@ -140,7 +140,7 @@ public class EnumerableArrays {
      * @see #grep(Iterable, Pattern)
      */
     public static <E> E[] grep(E[] array, String pattern) {
-        return Enumerable.grep(asList(array), pattern).toArray(copyOf(array, 0));
+        return Enumerable.grep(asList(array), pattern).toArray(newEmptyArray(array));
     }
 
     /**
@@ -234,8 +234,8 @@ public class EnumerableArrays {
 
         E[][] result = (E[][]) Array.newInstance(array.getClass(), 2);
 
-        result[0] = partition.get(0).toArray(copyOf(array, 0));
-        result[1] = partition.get(1).toArray(copyOf(array, 0));
+        result[0] = partition.get(0).toArray(newEmptyArray(array));
+        result[1] = partition.get(1).toArray(newEmptyArray(array));
 
         return result;
     }
@@ -245,7 +245,7 @@ public class EnumerableArrays {
      * false.
      */
     public static <E> E[] reject(E[] array, Fn1<E, Boolean> block) {
-        return Enumerable.reject(asList(array), block).toArray(copyOf(array, 0));
+        return Enumerable.reject(asList(array), block).toArray(newEmptyArray(array));
     }
 
     /**
@@ -253,7 +253,7 @@ public class EnumerableArrays {
      * false.
      */
     public static <E> E[] select(E[] array, Fn1<E, Boolean> block) {
-        return Enumerable.select(asList(array), block).toArray(copyOf(array, 0));
+        return Enumerable.select(asList(array), block).toArray(newEmptyArray(array));
     }
 
     /**
@@ -261,7 +261,7 @@ public class EnumerableArrays {
      * own compareTo method.
      */
     public static <E extends Object & Comparable<? super E>> E[] sort(E[] array) {
-        return Enumerable.sort(asList(array)).toArray(copyOf(array, 0));
+        return Enumerable.sort(asList(array)).toArray(newEmptyArray(array));
     }
 
     /**
@@ -269,7 +269,7 @@ public class EnumerableArrays {
      * results of the supplied block.
      */
     public static <E> E[] sort(E[] array, Fn2<E, E, Integer> block) {
-        return Enumerable.sort(asList(array), block).toArray(copyOf(array, 0));
+        return Enumerable.sort(asList(array), block).toArray(newEmptyArray(array));
     }
 
     /**
@@ -277,7 +277,7 @@ public class EnumerableArrays {
      * through the given block.
      */
     public static <E, R extends Object & Comparable<? super R>> E[] sortBy(E[] array, final Fn1<E, R> block) {
-        return Enumerable.sortBy(asList(array), block).toArray(copyOf(array, 0));
+        return Enumerable.sortBy(asList(array), block).toArray(newEmptyArray(array));
     }
 
     /**
@@ -326,5 +326,10 @@ public class EnumerableArrays {
         for (int i = 0; i < zip.size(); i++)
             result[i] = zip.get(i).toArray();
         return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T[] newEmptyArray(T[] array) {
+        return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
     }
 }

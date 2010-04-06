@@ -49,8 +49,8 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         }
     }
 
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
-            byte[] classfileBuffer) throws IllegalClassFormatException {
+    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+            ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         try {
             return transformClass(className.replace('/', '.'), new ByteArrayInputStream(classfileBuffer));
         } catch (Throwable t) {
@@ -63,15 +63,13 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         try {
             if (isNotToBeInstrumented(name) || tranformationFailed)
                 return null;
-            byte[] b = transformer.transform(name, in);
-            if (b != null)
-                new ClassInjector().dump(name, b);
-            return b;
+            return transformer.transform(name, in);
         } catch (Throwable t) {
             tranformationFailed = true;
             err.println(getVersionString());
-            err.println("caught throwable while transforming " + name
-                    + ", transformation is disabled from here on");
+            err
+                    .println("caught throwable while transforming " + name
+                            + ", transformation is disabled from here on");
             throw uncheck(t);
         }
     }
@@ -111,8 +109,8 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         }
     }
 
-    static Object launchApplication(String className, String[] args) throws ClassNotFoundException, NoSuchMethodException,
-            IllegalAccessException, InvocationTargetException {
+    static Object launchApplication(String className, String[] args) throws ClassNotFoundException,
+            NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Class<?> c = new LambdaLoader().loadClass(className);
         Method m = c.getMethod("main", String[].class);
         return m.invoke(null, new Object[] { args });

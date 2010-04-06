@@ -14,8 +14,7 @@ class MethodFinder extends EmptyVisitor {
         this.desc = desc;
     }
 
-    public MethodVisitor visitMethod(int access, String name, String
-            desc, String signature, String[] exceptions) {
+    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         if (isAbstract(access)) {
             if (Arrays.equals(getArgumentTypes(this.desc), getArgumentTypes(desc))) {
                 this.name = name;

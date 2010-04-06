@@ -14,25 +14,25 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  */
 public class Lambda {
     @LambdaParameter
-    public static Integer n;
+    public static int n;
     @LambdaParameter
-    public static Integer m;
+    public static int m;
     @LambdaParameter
-    public static Integer i;
+    public static int i;
     @LambdaParameter
-    public static Integer idx;
+    public static int idx;
     @LambdaParameter
-    public static Long l;
+    public static long l;
+    @LambdaParameter
+    public static double d;
+    @LambdaParameter
+    public static char c;
+    @LambdaParameter
+    public static boolean b;
     @LambdaParameter
     public static String s;
     @LambdaParameter
     public static String t;
-    @LambdaParameter
-    public static Double d;
-    @LambdaParameter
-    public static Character c;
-    @LambdaParameter
-    public static Boolean b;
     @LambdaParameter
     public static Collection<?> col;
     @LambdaParameter
@@ -44,6 +44,7 @@ public class Lambda {
      * <p>
      * For example, this function will always return 1, ignoring the argument:
      * </p>
+     * 
      * <pre>
      * fn(_, 1);
      * </pre>
@@ -171,7 +172,8 @@ public class Lambda {
 
     /**
      * Creates a new lambda implementing single method interface or class I
-     * taking one argument. See {@link #delegate(Unused, Object)} for an example.
+     * taking one argument. See {@link #delegate(Unused, Object)} for an
+     * example.
      */
     @NewLambda
     static <A1, I> I delegate(A1 a1, Object block) {
@@ -180,7 +182,8 @@ public class Lambda {
 
     /**
      * Creates a new lambda implementing single method interface or class I
-     * taking two arguments. See {@link #delegate(Unused, Object)} for an example.
+     * taking two arguments. See {@link #delegate(Unused, Object)} for an
+     * example.
      */
     @NewLambda
     static <A1, A2, I> I delegate(A1 a1, A2 a2, Object block) {

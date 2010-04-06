@@ -40,6 +40,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         Iterator<LambdaInfo> lambdas;
         LambdaInfo currentLambda;
         MethodInfo currentLambdaMethod;
+        Type typeToIgnoreValueOfCallOn = null;
 
         LambdaMethodVisitor(MethodVisitor mv, MethodInfo method) {
             super(mv);
@@ -81,6 +82,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     } else {
                         currentLambda.defineParameter(name);
+
+                        Type parameterType = currentLambda.getParameterType(name);
+                        if (!isReferenceType(parameterType))
+                            typeToIgnoreValueOfCallOn = getBoxedType(parameterType);
+
                     }
                 } else {
                     super.visitFieldInsn(opcode, owner, name, desc);
@@ -93,7 +99,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void debugLambdaStart() {
             String locals = "";
             if (!currentLambda.accessedLocals.isEmpty())
-                locals = " closing over " + method.getAccessedParametersAndLocalsString(currentLambda.accessedLocals);
+                locals = " closing over "
+                        + method.getAccessedParametersAndLocalsString(currentLambda.accessedLocals);
 
             debug("starting lambda" + currentLambda.getParametersString() + locals + " at " + sourceAndLine());
             debugIndent();
@@ -102,14 +109,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void ensureAllParametersAreDefined(String name) {
             if (!currentLambda.allParametersAreDefined())
                 throw new IllegalArgumentException("All parameters " + currentLambda.getParameters()
-                        + " have to be defined before accessing " + name + " "
-                        + sourceAndLine());
+                        + " have to be defined before accessing " + name + " " + sourceAndLine());
         }
 
         void ensureLambdaHasParameter(String name) {
             if (!currentLambda.hasParameter(name))
-                throw new IllegalArgumentException("Tried to access a undefined parameter " + name + " valid ones are "
-                        + currentLambda.getParameters() + " " + sourceAndLine());
+                throw new IllegalArgumentException("Tried to access a undefined parameter " + name
+                        + " valid ones are " + currentLambda.getParameters() + " " + sourceAndLine());
         }
 
         public void visitMethodInsn(int opcode, String owner, String name, String desc) {
@@ -121,6 +127,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     restoreOriginalMethodWriterAndInstantiateTheLambda();
 
                     debugDedent();
+
+                } else if (inLambda() && INVOKESTATIC == opcode && "valueOf".equals(name)
+                        && getObjectType(owner).equals(typeToIgnoreValueOfCallOn)) {
+                    typeToIgnoreValueOfCallOn = null;
+
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc);
                 }
@@ -160,12 +171,16 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void debugLocalVariableAccess(int opcode, int local, Type type, boolean readOnly) {
-            debug("variable " + method.getNameOfLocal(local) + " "
+            debug("variable "
+                    + method.getNameOfLocal(local)
+                    + " "
                     + getSimpleClassName(type)
-                    + (transformer.isStoreInstruction(opcode) ? (readOnly ? " initalized in" : " stored in") : " read from")
+                    + (transformer.isStoreInstruction(opcode) ? (readOnly ? " initalized in" : " stored in")
+                            : " read from")
                     + (readOnly ? " final" : " wrapped array in")
-                    + (inLambda() ? " lambda field " + currentLambda.getFieldNameForLocal(local)
-                    : (method.getAccessedParameters().contains(local) ? " method parameter " : " local ") + local));
+                    + (inLambda() ? " lambda field " + currentLambda.getFieldNameForLocal(local) : (method
+                            .getAccessedParameters().contains(local) ? " method parameter " : " local ")
+                            + local));
         }
 
         public void visitCode() {
@@ -252,8 +267,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void loadLambdaField(int local, Type type) {
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitFieldInsn(GETFIELD, currentLambdaClass(), currentLambda.getFieldNameForLocal(local),
-                    type.getDescriptor());
+            mv.visitFieldInsn(GETFIELD, currentLambdaClass(), currentLambda.getFieldNameForLocal(local), type
+                    .getDescriptor());
         }
 
         void loadArrayFromLocalOrLambdaField(int local, Type type) {
@@ -314,10 +329,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             debugLambdaParameterAccess(name, store, type);
 
             if (store) {
-                mv.visitVarInsn(ASTORE, index);
+                mv.visitVarInsn(type.getOpcode(ISTORE), index);
             } else {
-                mv.visitVarInsn(ALOAD, index);
-                mv.visitTypeInsn(CHECKCAST, type.getInternalName());
+                mv.visitVarInsn(type.getOpcode(ILOAD), index);
+                if (isReferenceType(type))
+                    mv.visitTypeInsn(CHECKCAST, type.getInternalName());
             }
         }
 
@@ -328,8 +344,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void createLambdaClass() {
             lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             lambdaWriter.visit(V1_5, ACC_FINAL | ACC_SYNTHETIC, currentLambdaClass(), null, getLambdaSuperType()
-                    .getInternalName(),
-                    getLambdaInterfaces());
+                    .getInternalName(), getLambdaInterfaces());
         }
 
         String[] getLambdaInterfaces() {
@@ -341,20 +356,29 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void createLambdaMethodAndRedirectMethodVisitorToIt() {
             String descriptor = getMethodDescriptor(getType(Object.class), currentLambda.getParameterTypes());
-            currentLambdaMethod = transformer.findMethodByParameterTypes(currentLambda.getType().getInternalName(), descriptor);
+            currentLambdaMethod = transformer.findMethodByParameterTypes(currentLambda.getType().getInternalName(),
+                    descriptor);
 
-            mv = lambdaWriter.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, currentLambdaMethod.name, currentLambdaMethod.desc, null, null);
+            mv = lambdaWriter.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, currentLambdaMethod.name,
+                    currentLambdaMethod.desc, null, null);
             mv.visitCode();
 
-            boxPrimitiveArguments();
+            convertMethodArgumentsToLambdaParameterTypes();
         }
 
-        void boxPrimitiveArguments() {
-            Type[] argumentTypes = getArgumentTypes(currentLambdaMethod.desc);
-            for (int i = 0; i < argumentTypes.length; i++) {
-                Type type = argumentTypes[i];
-                if (!isReferenceType(type))
-                    boxLocal(i + 1, type);
+        void convertMethodArgumentsToLambdaParameterTypes() {
+            Type[] methodParameterTypes = getArgumentTypes(currentLambdaMethod.desc);
+            Type[] lambdaParameterTypes = currentLambda.getParameterTypes();
+
+            for (int i = 0; i < methodParameterTypes.length; i++) {
+                Type methodParameterType = methodParameterTypes[i];
+                Type lambdaParameterType = lambdaParameterTypes[i];
+
+                if (!isReferenceType(methodParameterType) && isReferenceType(lambdaParameterType))
+                    boxLocal(i + 1, methodParameterType);
+
+                else if (isReferenceType(methodParameterType) && !isReferenceType(lambdaParameterType))
+                    unboxLocal(i + 1, lambdaParameterType);
             }
         }
 
@@ -383,6 +407,12 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitVarInsn(type.getOpcode(ILOAD), local);
             valueOf(type);
             mv.visitVarInsn(ASTORE, local);
+        }
+
+        void unboxLocal(int local, Type type) {
+            mv.visitVarInsn(ALOAD, local);
+            unbox(type);
+            mv.visitVarInsn(type.getOpcode(ISTORE), local);
         }
 
         Type getBoxedType(Type type) {
@@ -423,6 +453,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             }
             String descriptor = getMethodDescriptor(returnType, new Type[0]);
             String name = returnType.getClassName() + "Value";
+
+            mv.visitTypeInsn(CHECKCAST, type.getInternalName());
             mv.visitMethodInsn(INVOKEVIRTUAL, type.getInternalName(), name, descriptor);
         }
 
@@ -448,7 +480,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 String field = currentLambda.getFieldNameForLocal(locals.next());
                 Type type = parameters[i];
 
-                lambdaWriter.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, field, type.getDescriptor(), null, null).visitEnd();
+                lambdaWriter.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, field, type.getDescriptor(), null,
+                        null).visitEnd();
 
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitVarInsn(type.getOpcode(ILOAD), i + 1);
@@ -523,7 +556,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         String currentLambdaClass() {
             String lambdaClass = currentLambda.getType().getInternalName();
             lambdaClass = lambdaClass.substring(lambdaClass.lastIndexOf("/") + 1, lambdaClass.length());
-            return className + "$" + (currentLine > 0 ? String.format("%04d_", currentLine) : "") + lambdaClass + "_" + currentLambdaId;
+            return className + "$" + (currentLine > 0 ? String.format("%04d_", currentLine) : "") + lambdaClass
+                    + "_" + currentLambdaId;
         }
 
         boolean inLambda() {
@@ -548,7 +582,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         debug("transforming " + getObjectType(name).getClassName());
     }
 
-    public MethodVisitor visitMethod(int access, final String name, String desc, String signature, String[] exceptions) {
+    public MethodVisitor visitMethod(int access, final String name, String desc, String signature,
+            String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
         MethodInfo method = methodsByNameAndDesc.get(name + desc);
 

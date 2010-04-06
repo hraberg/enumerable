@@ -5,8 +5,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to mark static fields which can then be used in a
- * lambda to define parameters and access it's arguments. The field cannot be
- * primitive.
+ * lambda to define parameters and access it's arguments.
  * <p>
  * Example:
  * 

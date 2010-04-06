@@ -71,7 +71,7 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void applyWithOneArgumentWhenSecondArgumentIsNotUsed() throws Exception {
-        Fn2<Integer, Integer, Integer> firstArgument = λ(n, m, n);
+        Fn2<Integer, Object, Integer> firstArgument = λ(n, obj, n);
         assertEquals(2, (int) firstArgument.apply(2));
     }
 
@@ -89,7 +89,13 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void applyWithNoArgumentWhenArgumentIsNotUsed() throws Exception {
-        Fn1<Integer, Integer> firstArgument = λ(n, 2);
+        Fn0<Integer> firstArgument = λ(_, 2);
+        assertEquals(2, (int) firstArgument.apply());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void applyWithNoArgumentWhenArgumentIsPrimitiveThrowsNullPointerException() throws Exception {
+        Fn0<Integer> firstArgument = λ(n, 2);
         assertEquals(2, (int) firstArgument.apply());
     }
 
@@ -99,13 +105,13 @@ public class LambdaTest extends TestBase {
         assertNull(firstArgument.apply());
         Fn2<String, String, String> secondArgument = λ(s, t, t);
         assertNull(secondArgument.apply());
-        Fn3<Integer, String, String, String> thirdArgument = λ(n, s, t, t);
+        Fn3<Object, String, String, String> thirdArgument = λ(obj, s, t, t);
         assertNull(thirdArgument.apply());
     }
 
     @Test
     public void assignLambdaParameter() throws Exception {
-        assertEquals(1, (int) λ(n, n = 1).call());
+        assertEquals(1, (int) λ(n, n = 1).call(5));
     }
 
     @Test
@@ -211,9 +217,10 @@ public class LambdaTest extends TestBase {
         a.actionPerformed(event);
         assertSame(event, actual);
     }
-    
+
     @Test
-    public void createSingleMethodInterfaceTakingTwoArgumentsAndReturningPrimitiveUsingGenericDelegate() throws Exception {
+    public void createSingleMethodInterfaceTakingTwoArgumentsAndReturningPrimitiveUsingGenericDelegate()
+            throws Exception {
         Comparator<Integer> c = delegate(n, m, m - n);
         List<Integer> list = list(1, 2, 3);
         Collections.sort(list, c);
@@ -304,7 +311,6 @@ public class LambdaTest extends TestBase {
         thread.join();
         assertEquals("hello", string);
     }
-
 
     @Test
     public void lambdaInConstructor() throws Exception {

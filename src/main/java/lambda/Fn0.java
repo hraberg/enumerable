@@ -10,7 +10,6 @@ import java.lang.reflect.Proxy;
  */
 @SuppressWarnings("serial")
 public abstract class Fn0<R> implements Serializable {
-
     public abstract R call();
 
     /**
@@ -27,10 +26,13 @@ public abstract class Fn0<R> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public <I> I as(Class<I> anInterface) {
-        return (I) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { anInterface }, new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                return apply(args != null ? args : new Object[0]);
-            }
-        });
+        return (I) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { anInterface },
+                new ApplyMethodInvocationHandler());
+    }
+
+    class ApplyMethodInvocationHandler implements InvocationHandler {
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            return apply(args != null ? args : new Object[0]);
+        }
     }
 }

@@ -35,7 +35,8 @@ class LambdaTransformer implements Opcodes {
         return lambdaParameterFields.hasAnnotation(owner, name, "");
     }
 
-    boolean isNewLambdaMethod(String owner, String name, String desc) throws NoSuchMethodException, ClassNotFoundException {
+    boolean isNewLambdaMethod(String owner, String name, String desc) throws NoSuchMethodException,
+            ClassNotFoundException {
         return newLambdaMethods.hasAnnotation(owner, name, desc);
     }
 
@@ -44,7 +45,8 @@ class LambdaTransformer implements Opcodes {
             class IsInterfaceFinder extends EmptyVisitor {
                 boolean isInterface;
 
-                public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+                public void visit(int version, int access, String name, String signature, String superName,
+                        String[] interfaces) {
                     isInterface = (access & ACC_INTERFACE) != 0;
                 }
             }
@@ -93,12 +95,19 @@ class LambdaTransformer implements Opcodes {
         SecondPassClassVisitor visitor = new SecondPassClassVisitor(cw, firstPass, this);
         cr.accept(visitor, 0);
 
-        return cw.toByteArray();
+        byte[] bs = cw.toByteArray();
+
+        injector.dump(name, bs);
+        injector.verifyIfAsmUtilIsAvailable(bs);
+
+        return bs;
     }
 
     void newLambdaClass(String name, byte[] bs) {
         lambdasByClassName.put(name, bs);
+
         injector.dump(name, bs);
+        injector.verifyIfAsmUtilIsAvailable(bs);
         injector.inject(getClass().getClassLoader(), name.replace('/', '.'), bs);
     }
 }
