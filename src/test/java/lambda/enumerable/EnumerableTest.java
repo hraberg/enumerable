@@ -401,7 +401,7 @@ public class EnumerableTest extends TestBase {
     }
 
     @Test
-    public void zipMoreThanOneCollections() throws Exception {
+    public void zipMoreThanOneCollection() throws Exception {
         List<Integer> a = list(4, 5, 6);
         List<Integer> b = list(7, 8, 9);
 
