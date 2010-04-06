@@ -92,7 +92,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 locals = " closing over "
                         + method.getAccessedParametersAndLocalsString(currentLambda.accessedLocals);
 
-            debug("starting lambda" + currentLambda.getParametersString() + locals + " at " + sourceAndLine());
+            debug("starting lambda #" + getSimpleClassName(currentLambda.getExpressionType())
+                    + currentLambda.getParametersString() + locals + " at " + sourceAndLine());
             debugIndent();
         }
 
@@ -374,13 +375,19 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void returnFromLambdaMethod() {
             Type returnType = getReturnType(currentLambdaMethod.desc);
-//            unbox(returnType);
+            Type lambdaExpressionType = currentLambda.getExpressionType();
+            if (!isReferenceType(returnType) && isReferenceType(lambdaExpressionType))
+                unbox(returnType);
+
+            else if (isReferenceType(returnType) && !isReferenceType(lambdaExpressionType))
+                box(lambdaExpressionType);
+
             mv.visitInsn(returnType.getOpcode(IRETURN));
             mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
 
-        void valueOf(Type type) {
+        void box(Type type) {
             if (isReferenceType(type))
                 return;
             Type boxed = getBoxedType(type);
@@ -395,7 +402,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void boxLocal(int local, Type type) {
             mv.visitVarInsn(type.getOpcode(ILOAD), local);
-            valueOf(type);
+            box(type);
             mv.visitVarInsn(ASTORE, local);
         }
 

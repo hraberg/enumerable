@@ -87,6 +87,9 @@ class FirstPassClassVisitor extends EmptyVisitor {
         try {
             if (inLambda() && opcode == INVOKESTATIC) {
                 if (transformer.isNewLambdaMethod(owner, name, desc)) {
+                    Type[] argumentTypes = getArgumentTypes(desc);
+                    currentLambda.setExpressionType(argumentTypes[argumentTypes.length - 1]);
+
                     Type returnType = getReturnType(desc);
                     if (returnType.equals(getType(Object.class))) {
                         resolvingTypeUsingCheckCast = true;

@@ -10,11 +10,17 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  * This annotation is used to mark static methods that returns a {@link Fn0} or
  * one of it's subclasses so calls to it will be transformed at load time into
  * code that instantiates the new lambda as a {@link Fn0}.
+ * <p>
+ * The last argument to the method is the actual block expression. The other
+ * arguments have to be {@link LambdaParameter} marking the blocks signature.
+ * The first parameter can be {@link Unused} to create blocks that
+ * take no parameters.
+ * <p>
+ * The return type of the block is the type of the block expression parameter.
  * 
  * <p>
  * This method can also be used to create anonymous subclasses implementing
  * other interfaces, but several restrictions apply. Example:
- * </p>
  * 
  * <pre>
  *  &#064;NewLambda
@@ -31,7 +37,7 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  * 
  * <pre>
  * &#064;NewLambda
- *  public static &lt;I&gt; I delegate(Object none, Object block) {
+ *  public static &lt;I&gt; I delegate(Object o, Object block) {
  *      throw new LambdaWeavingNotEnabledException(); 
  *  }
  * 

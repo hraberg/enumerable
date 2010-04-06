@@ -130,6 +130,7 @@ class MethodInfo {
         Map<String, VariableInfo> parametersByName = new LinkedHashMap<String, VariableInfo>();
         Set<String> definedParameters = new HashSet<String>();
         Type type;
+        Type expressionType;
 
         void accessLocal(int operand) {
             VariableInfo local = accessedLocalsByIndex.get(operand);
@@ -203,6 +204,14 @@ class MethodInfo {
 
         Type getParameterType(String name) {
             return parametersByName.get(name).type;
+        }
+
+        Type getExpressionType() {
+            return expressionType;
+        }
+
+        public void setExpressionType(Type expresionType) {
+            this.expressionType = expresionType;
         }
     }
 }

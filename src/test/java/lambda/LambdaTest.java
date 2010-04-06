@@ -222,26 +222,24 @@ public class LambdaTest extends TestBase {
         assertSame(event, actual);
     }
 
-// Ignoring these tests for now as they interfer with the evolving primitive support
-    
-//    @Test
-//    public void createSingleMethodInterfaceTakingTwoArgumentsAndReturningPrimitiveUsingGenericDelegate()
-//            throws Exception {
-//        Comparator<Integer> c = delegate(n, m, m - n);
-//        List<Integer> list = list(1, 2, 3);
-//        Collections.sort(list, c);
-//        assertEquals(list(3, 2, 1), list);
-//    }
-//
-//    static interface TakesAndReturnsPrimtive {
-//        public double toDouble(int i);
-//    }
-//
-//    @Test
-//    public void createSingleMethodInterfaceWithPrimtiveArgumentAndReturnUsingGenericDelagate() throws Exception {
-//        TakesAndReturnsPrimtive t = delegate(n, n);
-//        assertEquals(2.0, t.toDouble(2), 0);
-//    }
+    @Test
+    public void createSingleMethodInterfaceTakingTwoArgumentsAndReturningPrimitiveUsingGenericDelegate()
+            throws Exception {
+        Comparator<Integer> c = delegate(n, m, m - n);
+        List<Integer> list = list(1, 2, 3);
+        Collections.sort(list, c);
+        assertEquals(list(3, 2, 1), list);
+    }
+
+    static interface TakesAndReturnsPrimtive {
+        public double toDouble(int i);
+    }
+
+    @Test
+    public void createSingleMethodInterfaceWithPrimtiveArgumentAndReturnUsingGenericDelagate() throws Exception {
+        TakesAndReturnsPrimtive t = delegate(n, n);
+        assertEquals(2.0, t.toDouble(2), 0);
+    }
 
     static abstract class SingleAbstractMethodNoArgumentsClass {
         public abstract String getMessage();
