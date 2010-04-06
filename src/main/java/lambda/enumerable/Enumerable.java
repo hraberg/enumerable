@@ -509,12 +509,11 @@ public class Enumerable {
 
         while (iterators.get(0).hasNext()) {
             List<Object> result = new ArrayList<Object>();
-            for (Iterator<?> iterator : iterators) {
+            for (Iterator<?> iterator : iterators)
                 if (iterator.hasNext())
                     result.add(iterator.next());
                 else
                     result.add(null);
-            }
             allResults.add(result);
         }
 
