@@ -64,14 +64,14 @@ public class Enumerable {
      * block is not false. If no object matches, it returns null.
      */
     public static <E> E detect(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return detect(collection, block, null);
+        return detect(collection, null, block);
     }
 
     /**
      * Passes each entry in collection to block. Returns the first for which
      * block is not false. If no object matches, it returns ifNone.
      */
-    public static <E> E detect(Iterable<E> collection, Fn1<E, Boolean> block, E ifNone) {
+    public static <E> E detect(Iterable<E> collection, E ifNone, Fn1<E, Boolean> block) {
         for (E each : collection)
             if (block.call(each))
                 return each;
@@ -203,10 +203,10 @@ public class Enumerable {
     }
 
     /**
-     * @see #detect(Iterable, Fn1, Object)
+     * @see #detect(Iterable, Object, Fn1)
      */
-    public static <E> E find(Iterable<E> collection, Fn1<E, Boolean> block, E ifNone) {
-        return detect(collection, block, ifNone);
+    public static <E> E find(Iterable<E> collection, E ifNone, Fn1<E, Boolean> block) {
+        return detect(collection, ifNone, block);
     }
 
     /**
@@ -257,8 +257,8 @@ public class Enumerable {
     /**
      * Named parameter for detect.
      * 
-     * @see #detect(Iterable, Fn1, Object)
-     * @see #find(Iterable, Fn1, Object)
+     * @see #detect(Iterable, Object, Fn1)
+     * @see #find(Iterable, Object, Fn1)
      */
     public static <R> R ifNone(R defaultValue) {
         return defaultValue;

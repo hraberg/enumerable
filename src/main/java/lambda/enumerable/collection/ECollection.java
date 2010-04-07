@@ -6,11 +6,11 @@ import java.util.Collection;
 public class ECollection<E> extends EIterable<E> implements Collection<E> {
     private final Collection<E> collection; 
 
-    ECollection() {
+    public ECollection() {
         this(new ArrayList<E>());
     }
 
-    ECollection(Collection<E> collection) {
+    public ECollection(Collection<E> collection) {
         super(collection);
         this.collection = collection;
     }

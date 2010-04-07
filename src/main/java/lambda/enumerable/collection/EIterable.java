@@ -67,8 +67,8 @@ public class EIterable<E> implements Iterable<E>, IEnumerable<E>  {
         return Enumerable.detect(iterable, block);
     }
 
-    public E detect(Fn1<E, Boolean> block, E ifNone) {
-        return Enumerable.detect(iterable, block, ifNone);
+    public E detect(E ifNone, Fn1<E, Boolean> block) {
+        return Enumerable.detect(iterable, ifNone, block);
     }
 
     public <R> EIterable<E> each(Fn1<E, R> block) {
@@ -95,8 +95,8 @@ public class EIterable<E> implements Iterable<E>, IEnumerable<E>  {
         return Enumerable.find(iterable, block);
     }
 
-    public E find(Fn1<E, Boolean> block, E ifNone) {
-        return Enumerable.find(iterable, block, ifNone);
+    public E find(E ifNone, Fn1<E, Boolean> block) {
+        return Enumerable.find(iterable, ifNone, block);
     }
 
     public EList<E> findAll(Fn1<E, Boolean> block) {

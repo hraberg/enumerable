@@ -133,7 +133,7 @@ public class EnumerableTest extends TestBase {
 
     @Test
     public void detectReturnsIfNoneValueIfNoMatch() throws Exception {
-        assertEquals(-1, (int) detect(oneToTen, λ(n, n < 0), ifNone(-1)));
+        assertEquals(-1, (int) detect(oneToTen, ifNone(-1), λ(n, n < 0)));
     }
 
     @Test

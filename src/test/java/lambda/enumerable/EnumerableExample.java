@@ -123,7 +123,7 @@ public class EnumerableExample {
         /*
          * Detect using ifNone, which returns a constant default value.
          */
-        int defaultValue = detect(ints, λ(n, n > 10), ifNone(-1));
+        int defaultValue = detect(ints, ifNone(-1), λ(n, n > 10));
         out.println(defaultValue);
 
         /*

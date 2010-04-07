@@ -36,7 +36,7 @@ public interface IEnumerable<E> extends Iterable<E> {
      * Passes each entry in collection to block. Returns the first for which
      * block is not false. If no object matches, it returns ifNone.
      */
-    E detect(Fn1<E, Boolean> block, E ifNone);
+    E detect(E ifNone, Fn1<E, Boolean> block);
 
     /**
      * Calls block for each item in collection.
@@ -65,14 +65,14 @@ public interface IEnumerable<E> extends Iterable<E> {
     EList<E> entries();
 
     /**
-     * @see #detect(Iterable, Fn1)
+     * @see #detect(Fn1, Iterable)
      */
     E find(Fn1<E, Boolean> block);
 
     /**
      * @see #detect(Iterable, Fn1, Object)
      */
-    E find(Fn1<E, Boolean> block, E ifNone);
+    E find(E ifNone, Fn1<E, Boolean> block);
 
     /**
      * @see #select(Iterable, Fn1)

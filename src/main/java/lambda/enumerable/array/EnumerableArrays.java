@@ -67,8 +67,8 @@ public class EnumerableArrays {
      * Passes each entry in array to block. Returns the first for which block is
      * not false. If no object matches, it returns ifNone.
      */
-    public static <E> E detect(E[] array, Fn1<E, Boolean> block, E ifNone) {
-        return Enumerable.detect(asList(array), block);
+    public static <E> E detect(E[] array, E ifNone, Fn1<E, Boolean> block) {
+        return Enumerable.detect(asList(array), ifNone, block);
     }
 
     /**
@@ -115,10 +115,10 @@ public class EnumerableArrays {
     }
 
     /**
-     * @see #detect(Iterable, Fn1, Object)
+     * @see #detect(Iterable, Object, Fn1)
      */
-    public static <E> E find(E[] array, Fn1<E, Boolean> block, E ifNone) {
-        return Enumerable.detect(asList(array), block);
+    public static <E> E find(E[] array, E ifNone, Fn1<E, Boolean> block) {
+        return Enumerable.detect(asList(array), ifNone, block);
     }
 
     /**
