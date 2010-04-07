@@ -104,6 +104,16 @@
         </java>
     </target>
 
+    <target name="microbench" depends="agent-jar">
+        <java fork="yes" classname="lambda.MicroBench">
+            <jvmarg value="-javaagent:target/enumerable-agent.jar" />
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
+            <classpath refid="enumerable.test.classpath" />
+        </java>
+    </target>
+
     <target name="source-jar">
         <jar jarfile="target/enumerable-${enumerable.version}-sources.jar">
             <fileset dir="src/main/java" />

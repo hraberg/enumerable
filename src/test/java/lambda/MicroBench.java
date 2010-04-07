@@ -5,12 +5,15 @@ import static lambda.enumerable.Enumerable.*;
 import lambda.Fn1;
 import lambda.Lambda;
 import lambda.primitives.Fn1ItoI;
+import lambda.weaving.Version;
 
 public class MicroBench {
     public static void main(String[] args) {
+        System.out.println("[microbench] " + Version.getVersionString());
+        
         assert fibo.getClass().isAssignableFrom(fibp.getClass());
         assert !fibp.getClass().isAssignableFrom(fibo.getClass());
-
+        
         int n = args.length > 0 ? Integer.parseInt(args[0]) : 32;
         int times = 5;
 
