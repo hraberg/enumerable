@@ -43,7 +43,7 @@ public class EnumerableInts {
      * Returns a new list with the results of running block once for every
      * element in array.
      */
-    public static <R> Object[] collect(int[] array, Fn1ItoX<R> block) {
+    public static <R> Object[] collect(int[] array, Fn1ItoO<R> block) {
         Object[] result = new Object[array.length];
         int i = 0;
         for (int each : array)
@@ -72,7 +72,7 @@ public class EnumerableInts {
      * element in array.
      */
     @SuppressWarnings("unchecked")
-    public static <R> R[] collect(int[] array, Fn1ItoX<R> block, Class<R> type) {
+    public static <R> R[] collect(int[] array, Fn1ItoO<R> block, Class<R> type) {
         R[] result = (R[]) Array.newInstance(type, array.length);
         int i = 0;
         for (int each : array)
@@ -102,7 +102,13 @@ public class EnumerableInts {
     /**
      * Calls block for each item in array.
      */
-    public static <R> int[] each(int[] array, Fn1ItoX<R> block) {
+    public static <R> int[] each(int[] array, Fn1ItoO<R> block) {
+        for (int each : array)
+            block.call(each);
+        return array;
+    }
+
+    public static int[] each(int[] array, Fn1ItoI block) {
         for (int each : array)
             block.call(each);
         return array;
@@ -124,7 +130,7 @@ public class EnumerableInts {
      * Calls block with two arguments, the item and its index, for each item in
      * array.
      */
-    public static <R> int[] eachWithIndex(int[] array, Fn2IItoX<R> block) {
+    public static <R> int[] eachWithIndex(int[] array, Fn2IItoO<R> block) {
         int idx = 0;
         for (int each : array)
             block.call(each, idx++);
@@ -201,7 +207,7 @@ public class EnumerableInts {
     /**
      * @see #collect(Iterable, Fn1)
      */
-    public static <R> Object[] map(int[] array, Fn1ItoX<R> block) {
+    public static <R> Object[] map(int[] array, Fn1ItoO<R> block) {
         return collect(array, block);
     }
 
@@ -347,7 +353,7 @@ public class EnumerableInts {
      * Creates a new Set containing the elements of the given array, the
      * elements are preprocessed by the given block.
      */
-    public static <R> Set<R> toSet(int[] array, Fn1ItoX<R> block) {
+    public static <R> Set<R> toSet(int[] array, Fn1ItoO<R> block) {
         return Enumerable.toSet(toList(array), block);
     }
 

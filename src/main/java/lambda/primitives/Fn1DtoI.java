@@ -1,8 +1,9 @@
 package lambda.primitives;
 
+import lambda.Fn1;
 
 @SuppressWarnings("serial")
-public abstract class Fn1DtoI extends Fn1DtoX<Integer> {
+public abstract class Fn1DtoI extends Fn1<Double, Integer> {
     public abstract int call(double a1);
 
     public Integer call(Double a1) {

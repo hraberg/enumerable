@@ -1,8 +1,9 @@
 package lambda.primitives;
 
+import lambda.Fn1;
 
 @SuppressWarnings("serial")
-public abstract class Fn1ItoO<R> extends Fn1ItoX<R> {
+public abstract class Fn1ItoO<R> extends Fn1<Integer, R> {
     public abstract R call(int a1);
 
     public R call(Integer a1) {

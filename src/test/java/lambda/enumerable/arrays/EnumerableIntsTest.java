@@ -36,10 +36,10 @@ public class EnumerableIntsTest extends TestBase {
     public void eachReturnsArray() throws Exception {
         assertArrayEquals(intsOneToFive, each(intsOneToFive, λ(n, n)));
     }
-    
+
     @LambdaParameter
     public static int[] ints;
-    
+
     @Test
     public void collectElementsToDifferentType() throws Exception {
         String[] expected = new String[] { "#1", "#2", "#3", "#4", "#5" };
@@ -84,10 +84,10 @@ public class EnumerableIntsTest extends TestBase {
         int[] selected = select(intsOneToFive, λ(n, n % 2 == 0));
         assertArrayEquals(new int[] { 2, 4 }, selected);
     }
-    
+
     @Test
     public void rejectMatchingElements() throws Exception {
-        int[] odd = {1, 3, 5};
+        int[] odd = { 1, 3, 5 };
         assertArrayEquals(odd, reject(intsOneToFive, λ(n, n % 2 == 0)));
     }
 
@@ -95,7 +95,7 @@ public class EnumerableIntsTest extends TestBase {
     public void sortUsingNaturalOrder() throws Exception {
         assertArrayEquals(intsOneToFive, sort(new int[] { 5, 4, 3, 2, 1 }));
     }
-    
+
     @Test
     public void injectUsingInitialValue() throws Exception {
         assertEquals(15, inject(intsOneToFive, 0, λ(n, m, n + m)));
@@ -120,7 +120,7 @@ public class EnumerableIntsTest extends TestBase {
     public void anyNotMatchingPredicate() throws Exception {
         assertFalse(any(intsOneToFive, λ(n, n > 5)));
     }
-    
+
     @Test
     public void allMatchingPredicate() throws Exception {
         assertTrue(all(intsOneToFive, λ(n, n > 0)));
@@ -174,13 +174,13 @@ public class EnumerableIntsTest extends TestBase {
     @Test
     public void toSetCreatesIntegerSetFromIntArray() throws Exception {
         Set<Integer> expected = new HashSet<Integer>(list(1, 2, 3, 4));
-        assertEquals(expected, toSet(new int[] {1, 2, 2, 3, 4, 4}));
+        assertEquals(expected, toSet(new int[] { 1, 2, 2, 3, 4, 4 }));
     }
 
     @Test
     public void toSetCreatesIntegerSetFromIntArrayUsingBlock() throws Exception {
         Set<String> expected = new HashSet<String>(list("1", "2", "3", "4"));
-        assertEquals(expected, toSet(new int[] {1, 2, 2, 3, 4, 4}, λ(n, n + "")));
+        assertEquals(expected, toSet(new int[] { 1, 2, 2, 3, 4, 4 }, λ(n, n + "")));
     }
 
     @Test

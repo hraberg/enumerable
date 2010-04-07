@@ -43,7 +43,7 @@ public class EnumerableDoubles {
      * Returns a new list with the results of running block once for every
      * element in array.
      */
-    public static <R> Object[] collect(double[] array, Fn1DtoX<R> block) {
+    public static <R> Object[] collect(double[] array, Fn1DtoO<R> block) {
         Object[] result = new Object[array.length];
         int i = 0;
         for (double each : array)
@@ -78,7 +78,7 @@ public class EnumerableDoubles {
      * element in array.
      */
     @SuppressWarnings("unchecked")
-    public static <R> R[] collect(double[] array, Fn1DtoX<R> block, Class<R> type) {
+    public static <R> R[] collect(double[] array, Fn1DtoO<R> block, Class<R> type) {
         R[] result = (R[]) Array.newInstance(type, array.length);
         int i = 0;
         for (double each : array)
@@ -108,7 +108,7 @@ public class EnumerableDoubles {
     /**
      * Calls block for each item in array.
      */
-    public static <R> double[] each(double[] array, Fn1DtoX<R> block) {
+    public static <R> double[] each(double[] array, Fn1DtoO<R> block) {
         for (double each : array)
             block.call(each);
         return array;
@@ -136,7 +136,7 @@ public class EnumerableDoubles {
      * Calls block with two arguments, the item and its index, for each item in
      * array.
      */
-    public static <R> double[] eachWithIndex(double[] array, Fn2DDtoX<R> block) {
+    public static <R> double[] eachWithIndex(double[] array, Fn2DDtoO<R> block) {
         double idx = 0;
         for (double each : array)
             block.call(each, idx++);
@@ -144,7 +144,7 @@ public class EnumerableDoubles {
     }
 
     /**
-     * @see #eachWithIndex(double[], Fn2DDtoX)
+     * @see #eachWithIndex(double[], Fn2DDtoO)
      */
     public static double[] eachWithIndex(double[] array, Fn2DDtoD block) {
         double idx = 0;
@@ -216,7 +216,7 @@ public class EnumerableDoubles {
     /**
      * @see #collect(double[], Fn1)
      */
-    public static <R> Object[] map(double[] array, Fn1DtoX<R> block) {
+    public static <R> Object[] map(double[] array, Fn1DtoO<R> block) {
         return collect(array, block);
     }
 
@@ -361,7 +361,7 @@ public class EnumerableDoubles {
      * Creates a new Set containing the elements of the given array, the
      * elements are preprocessed by the given block.
      */
-    public static <R> Set<R> toSet(double[] array, Fn1DtoX<R> block) {
+    public static <R> Set<R> toSet(double[] array, Fn1DtoO<R> block) {
         return Enumerable.toSet(toList(array), block);
     }
 
