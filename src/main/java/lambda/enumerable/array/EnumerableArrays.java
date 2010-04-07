@@ -258,7 +258,7 @@ public class EnumerableArrays {
      * the end object.
      */
     public static Integer[] range(int start, int end) {
-        return range(start, end, false);
+        return Enumerable.range(start, end).toArray();
     }
 
     /**
@@ -267,7 +267,7 @@ public class EnumerableArrays {
      * excluded.
      */
     public static Integer[] range(int start, int end, boolean exclusive) {
-        return ((List<Integer>) Enumerable.range(start, end, exclusive)).toArray(new Integer[0]);
+        return Enumerable.range(start, end, exclusive).toArray();
     }
 
     /**

@@ -378,7 +378,7 @@ public class Enumerable {
      * Constructs a range using the given start and end. The range will include
      * the end object.
      */
-    public static Iterable<Integer> range(int start, int end) {
+    public static Range range(int start, int end) {
         return range(start, end, false);
     }
 
@@ -387,13 +387,10 @@ public class Enumerable {
      * is false, the range will include the end object; otherwise, it will be
      * excluded.
      */
-    public static Iterable<Integer> range(int start, int end, boolean exclusive) {
-        List<Integer> result = new ArrayList<Integer>();
-        for (int x = start; exclusive ? x < end : x <= end; x++)
-            result.add(x);
-        return result;
+    public static Range range(int start, int end, boolean exclusive) {
+        return new Range(start, end, exclusive);
     }
-
+    
     /**
      * Returns a list containing all elements of collection for which block is
      * false.
