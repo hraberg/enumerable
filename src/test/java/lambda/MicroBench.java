@@ -38,7 +38,7 @@ public class MicroBench {
         fibp = Lambda.Primitives.λ(n, n <= 1 ? n : fibp.call(n - 1) + fibp.call(n - 2));
     }
 
-    static int fibo(Integer n) {
+    static Integer fibo(Integer n) {
         return n <= 1 ? n : fibo(n - 1) + fibo(n - 2);
     }
 

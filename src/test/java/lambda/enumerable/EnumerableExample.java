@@ -8,6 +8,7 @@ import java.util.Map;
 import lambda.Fn1;
 import lambda.enumerable.collection.EList;
 import lambda.primitives.Fn1ItoI;
+import lambda.weaving.Version;
 import static java.lang.Math.*;
 import static java.util.Arrays.*;
 import static lambda.Lambda.*;
@@ -245,6 +246,7 @@ public class EnumerableExample {
     Fn1ItoI fib;
 
     public static void main(String[] args) {
+        System.out.println("[example] " + Version.getVersionString());
         new EnumerableExample().example(System.out);
     }
 }
