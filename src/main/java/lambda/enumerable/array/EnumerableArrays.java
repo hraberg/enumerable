@@ -315,14 +315,14 @@ public class EnumerableArrays {
     /**
      * Returns a list containing the items in array.
      */
-    public static <E> EList<E> toList(E[] array) {
+    public static <E> EList<E> toList(E... array) {
         return Enumerable.toList(asList(array));
     }
 
     /**
      * Creates a new Set containing the elements of the given array.
      */
-    public static <E> ESet<E> toSet(E[] array) {
+    public static <E> ESet<E> toSet(E... array) {
         return Enumerable.toSet(asList(array));
     }
 
