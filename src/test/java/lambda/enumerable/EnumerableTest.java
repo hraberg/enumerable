@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
+import lambda.enumerable.collection.EList;
 
 import org.junit.Test;
 
@@ -138,7 +139,7 @@ public class EnumerableTest extends TestBase {
         List<Integer> even = list(2, 4, 6, 8, 10);
         List<Integer> odd = list(1, 3, 5, 7, 9);
 
-        List<List<Integer>> partition = partition(oneToTen, λ(n, n % 2 == 0));
+        List<EList<Integer>> partition = partition(oneToTen, λ(n, n % 2 == 0));
 
         assertEquals(even, partition.get(0));
         assertEquals(odd, partition.get(1));
@@ -420,7 +421,7 @@ public class EnumerableTest extends TestBase {
         List<Integer> a = list(4, 5, 6);
         List<Integer> b = list(7, 8, 9);
 
-        List<List<?>> result = zip(list(1, 2, 3), a, b);
+        List<EList<?>> result = zip(list(1, 2, 3), a, b);
 
         assertEquals(list(1, 4, 7), result.get(0));
         assertEquals(list(2, 5, 8), result.get(1));
@@ -432,7 +433,7 @@ public class EnumerableTest extends TestBase {
         List<Integer> a = list(4, 5);
         List<Integer> b = list(7);
 
-        List<List<?>> result = zip(list(1, 2, 3), a, b);
+        List<EList<?>> result = zip(list(1, 2, 3), a, b);
 
         assertEquals(list(1, 4, 7), result.get(0));
         assertEquals(list(2, 5, null), result.get(1));
@@ -444,7 +445,7 @@ public class EnumerableTest extends TestBase {
         List<Integer> a = list(4);
         List<Integer> b = list(7, 8, 9);
 
-        List<List<?>> result = zip(list(1, 2), a, b);
+        List<EList<?>> result = zip(list(1, 2), a, b);
         assertEquals(2, result.size());
 
         assertEquals(list(1, 4, 7), result.get(0));
@@ -456,7 +457,7 @@ public class EnumerableTest extends TestBase {
         List<String> a = list("4", "5", "6");
         List<Boolean> b = list(true, false, true);
 
-        List<List<?>> result = zip(list(1, 2, 3), a, b);
+        List<EList<?>> result = zip(list(1, 2, 3), a, b);
 
         assertEquals(list(1, "4", true), result.get(0));
         assertEquals(list(2, "5", false), result.get(1));

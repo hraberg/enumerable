@@ -1,15 +1,18 @@
 package lambda;
 
-import static java.util.Arrays.*;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lambda.enumerable.collection.EList;
+import static java.util.Arrays.*;
+
+import static lambda.enumerable.Enumerable.*;
+
 public class TestBase {
-    public List<Integer> oneToTen = asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-    public List<Integer> oneToFive = oneToTen.subList(0, 5);
+    public EList<Integer> oneToTen = toList(list(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+    public EList<Integer> oneToFive = oneToTen.subList(0, 5);
     public HashMap<String, Integer> stringsToInts = new HashMap<String, Integer>();
 
     {

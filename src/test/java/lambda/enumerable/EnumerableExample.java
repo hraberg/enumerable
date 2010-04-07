@@ -1,18 +1,19 @@
 package lambda.enumerable;
 
-import static java.lang.Math.*;
-import static java.util.Arrays.*;
-import static lambda.Lambda.*;
-import static lambda.Lambda.Primitives.*;
-import static lambda.enumerable.Enumerable.*;
-
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import lambda.Fn1;
+import lambda.enumerable.collection.EList;
 import lambda.primitives.Fn1ItoI;
+import static java.lang.Math.*;
+import static java.util.Arrays.*;
+import static lambda.Lambda.*;
+import static lambda.Lambda.Primitives.*;
+
+import static lambda.enumerable.Enumerable.*;
 
 public class EnumerableExample {
     public void example(PrintStream out) {
@@ -147,7 +148,7 @@ public class EnumerableExample {
          * Partition is select and reject rolled into one, returning a list with
          * two collections, [selected, rejected].
          */
-        List<List<Integer>> partitioned = partition(ints, λ(n, n % 2 == 0));
+        List<EList<Integer>> partitioned = partition(ints, λ(n, n % 2 == 0));
         out.println(partitioned);
 
         /*
@@ -217,7 +218,7 @@ public class EnumerableExample {
          * but you can use more than one in the same larger expression like
          * this.
          */
-        List<Integer> oddTimesSum = select(collect(ints, λ(n, n * sum)), λ(n, n % 2 == 1));
+        List<Integer> oddTimesSum = collect(ints, λ(n, n * sum)).select(λ(n, n % 2 == 1));
         out.println(oddTimesSum);
 
         /*

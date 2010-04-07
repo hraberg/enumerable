@@ -1,14 +1,16 @@
 package lambda.enumerable.array;
 
-import static java.util.Arrays.*;
-
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import lambda.Fn1;
 import lambda.Fn2;
 import lambda.enumerable.Enumerable;
+import lambda.enumerable.collection.EList;
+import lambda.enumerable.collection.ESet;
+import static java.util.Arrays.*;
 
 /**
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
@@ -243,7 +245,7 @@ public class EnumerableArrays {
      */
     @SuppressWarnings("unchecked")
     public static <E> E[][] partition(E[] array, Fn1<E, Boolean> block) {
-        List<List<E>> partition = Enumerable.partition(asList(array), block);
+        List<EList<E>> partition = Enumerable.partition(asList(array), block);
 
         E[][] result = (E[][]) Array.newInstance(array.getClass(), 2);
 
@@ -313,14 +315,14 @@ public class EnumerableArrays {
     /**
      * Returns a list containing the items in array.
      */
-    public static <E> List<E> toList(E[] array) {
-        return new ArrayList<E>(asList(array));
+    public static <E> EList<E> toList(E[] array) {
+        return Enumerable.toList(asList(array));
     }
 
     /**
      * Creates a new Set containing the elements of the given array.
      */
-    public static <E> Set<E> toSet(E[] array) {
+    public static <E> ESet<E> toSet(E[] array) {
         return Enumerable.toSet(asList(array));
     }
 
@@ -328,7 +330,7 @@ public class EnumerableArrays {
      * Creates a new Set containing the elements of the given array, the
      * elements are preprocessed by the given block.
      */
-    public static <E, R> Set<R> toSet(E[] array, Fn1<E, R> block) {
+    public static <E, R> ESet<R> toSet(E[] array, Fn1<E, R> block) {
         return Enumerable.toSet(asList(array), block);
     }
 
@@ -350,7 +352,7 @@ public class EnumerableArrays {
         for (int i = 0; i < args.length; i++)
             lists[i] = asList(args[i]);
 
-        List<List<?>> zip = Enumerable.zip(asList(array), lists);
+        List<EList<?>> zip = Enumerable.zip(asList(array), lists);
 
         Object[][] result = new Object[zip.size()][];
         for (int i = 0; i < zip.size(); i++)

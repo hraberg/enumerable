@@ -1,8 +1,5 @@
 package lambda.enumerable;
 
-import static java.lang.Boolean.*;
-import static lambda.exception.UncheckedException.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -11,6 +8,9 @@ import java.util.regex.Pattern;
 import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
+import lambda.enumerable.collection.*;
+import static java.lang.Boolean.*;
+import static lambda.exception.UncheckedException.*;
 
 /**
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
@@ -52,8 +52,8 @@ public class Enumerable {
      * Returns a new list with the results of running block once for every
      * element in collection.
      */
-    public static <E, R> List<R> collect(Iterable<E> collection, Fn1<E, R> block) {
-        List<R> result = new ArrayList<R>();
+    public static <E, R> EList<R> collect(Iterable<E> collection, Fn1<E, R> block) {
+        EList<R> result = new EArrayList<R>();
         for (E each : collection)
             result.add(block.call(each));
         return result;
@@ -81,20 +81,20 @@ public class Enumerable {
     /**
      * Calls block for each item in collection.
      */
-    public static <E, R> Iterable<E> each(Iterable<E> collection, Fn1<E, R> block) {
+    public static <E, R> EIterable<E> each(Iterable<E> collection, Fn1<E, R> block) {
         for (E each : collection)
             block.call(each);
-        return collection;
+        return toList(collection);
     }
 
     /**
      * Calls block once for each key in map, passing the key and value to the
      * block as parameters.
      */
-    public static <K, V, R> Map<K, V> each(Map<K, V> map, Fn2<K, V, R> block) {
+    public static <K, V, R> EMap<K, V> each(Map<K, V> map, Fn2<K, V, R> block) {
         for (Entry<K, V> each : map.entrySet())
             block.call(each.getKey(), each.getValue());
-        return map;
+        return new EHashMap<K, V>(map);
     }
 
     /**
@@ -111,9 +111,9 @@ public class Enumerable {
     /**
      * Calls block once for each key in map, passing the key as parameter.
      */
-    public static <K, V, R> Map<K, V> eachKey(Map<K, V> map, Fn1<K, R> block) {
+    public static <K, V, R> EMap<K, V> eachKey(Map<K, V> map, Fn1<K, R> block) {
         each(map.keySet(), block);
-        return map;
+        return new EHashMap<K, V>(map);
     }
 
     /**
@@ -172,26 +172,26 @@ public class Enumerable {
     /**
      * Calls block once for each value in map, passing the key as parameter.
      */
-    public static <K, V, R> Map<K, V> eachValue(Map<K, V> map, Fn1<V, R> block) {
+    public static <K, V, R> EMap<K, V> eachValue(Map<K, V> map, Fn1<V, R> block) {
         each(map.values(), block);
-        return map;
+        return new EHashMap<K, V>(map);
     }
 
     /**
      * Calls block with two arguments, the item and its index, for each item in
      * collection.
      */
-    public static <E, R> Iterable<E> eachWithIndex(Iterable<E> collection, Fn2<E, Integer, R> block) {
+    public static <E, R> EIterable<E> eachWithIndex(Iterable<E> collection, Fn2<E, Integer, R> block) {
         int i = 0;
         for (E each : collection)
             block.call(each, i++);
-        return collection;
+        return toList(collection);
     }
 
     /**
      * @see #toList(Iterable)
      */
-    public static <E> List<E> entries(Iterable<E> col) {
+    public static <E> EList<E> entries(Iterable<E> col) {
         return toList(col);
     }
 
@@ -212,15 +212,15 @@ public class Enumerable {
     /**
      * @see #select(Iterable, Fn1)
      */
-    public static <E> List<E> findAll(Iterable<E> collection, Fn1<E, Boolean> block) {
+    public static <E> EList<E> findAll(Iterable<E> collection, Fn1<E, Boolean> block) {
         return select(collection, block);
     }
 
     /**
      * Returns a list of every element in collection for which pattern matches.
      */
-    public static <E> List<E> grep(Iterable<E> collection, Pattern pattern) {
-        List<E> result = new ArrayList<E>();
+    public static <E> EList<E> grep(Iterable<E> collection, Pattern pattern) {
+        EList<E> result = new EArrayList<E>();
         for (E each : collection)
             if (pattern.matcher(each.toString()).matches())
                 result.add(each);
@@ -232,8 +232,8 @@ public class Enumerable {
      * Each matching element is passed to tje block, and its result is stored in
      * the output list.
      */
-    public static <E, R> List<R> grep(Iterable<E> collection, Pattern pattern, Fn1<E, R> block) {
-        List<R> result = new ArrayList<R>();
+    public static <E, R> EList<R> grep(Iterable<E> collection, Pattern pattern, Fn1<E, R> block) {
+        EList<R> result = new EArrayList<R>();
         for (E each : collection)
             if (pattern.matcher(each.toString()).matches())
                 result.add(block.call(each));
@@ -243,14 +243,14 @@ public class Enumerable {
     /**
      * @see #grep(Iterable, Pattern)
      */
-    public static <E> List<E> grep(Iterable<E> collection, String pattern) {
+    public static <E> EList<E> grep(Iterable<E> collection, String pattern) {
         return grep(collection, Pattern.compile(pattern));
     }
 
     /**
      * @see #grep(Iterable, Pattern, Fn1)
      */
-    public static <E, R> List<R> grep(Iterable<E> collection, String pattern, Fn1<E, R> block) {
+    public static <E, R> EList<R> grep(Iterable<E> collection, String pattern, Fn1<E, R> block) {
         return grep(collection, Pattern.compile(pattern), block);
     }
 
@@ -301,7 +301,7 @@ public class Enumerable {
     /**
      * @see #collect(Iterable, Fn1)
      */
-    public static <E, R> List<R> map(Iterable<E> collection, Fn1<E, R> block) {
+    public static <E, R> EList<R> map(Iterable<E> collection, Fn1<E, R> block) {
         return collect(collection, block);
     }
 
@@ -361,15 +361,15 @@ public class Enumerable {
      * Returns two lists, the first containing the elements of collection for
      * which the block evaluates to true, the second containing the rest.
      */
-    public static <E> List<List<E>> partition(Iterable<E> collection, Fn1<E, Boolean> block) {
-        List<E> selected = new ArrayList<E>();
-        List<E> rejected = new ArrayList<E>();
+    public static<E> EList<EList<E>> partition(Iterable<E> collection, Fn1<E, Boolean> block) {
+        EList<E> selected = new EArrayList<E>();
+        EList<E> rejected = new EArrayList<E>();
         for (E each : collection)
             if (block.call(each))
                 selected.add(each);
             else
                 rejected.add(each);
-        List<List<E>> result = new ArrayList<List<E>>();
+        EList<EList<E>> result = new EArrayList<EList<E>>();
         result.add(selected);
         result.add(rejected);
         return result;
@@ -414,8 +414,8 @@ public class Enumerable {
      * Returns a list containing all elements of collection for which block is
      * false.
      */
-    public static <E> List<E> reject(Iterable<E> collection, Fn1<E, Boolean> block) {
-        List<E> result = new ArrayList<E>();
+    public static<E> EList<E> reject(Iterable<E> collection, Fn1<E, Boolean> block) {
+        EList<E> result = new EArrayList<E>();
         for (E each : collection)
             if (!block.call(each))
                 result.add(each);
@@ -426,8 +426,8 @@ public class Enumerable {
      * Returns a list containing all elements of collection for which block is
      * not false.
      */
-    public static <E> List<E> select(Iterable<E> collection, Fn1<E, Boolean> block) {
-        List<E> result = new ArrayList<E>();
+    public static <E> EList<E> select(Iterable<E> collection, Fn1<E, Boolean> block) {
+        EList<E> result = new EArrayList<E>();
         for (E each : collection)
             if (block.call(each))
                 result.add(each);
@@ -438,8 +438,8 @@ public class Enumerable {
      * Returns a list containing all Map.Entry pairs for which the block returns
      * true.
      */
-    public static <K, V> List<Map.Entry<K, V>> select(Map<K, V> map, Fn2<K, V, Boolean> block) {
-        List<Map.Entry<K, V>> result = new ArrayList<Map.Entry<K, V>>();
+    public static <K, V> EList<Map.Entry<K, V>> select(Map<K, V> map, Fn2<K, V, Boolean> block) {
+        EList<Map.Entry<K, V>> result = new EArrayList<Map.Entry<K, V>>();
         for (Map.Entry<K, V> each : map.entrySet())
             if (block.call(each.getKey(), each.getValue()))
                 result.add(each);
@@ -450,12 +450,12 @@ public class Enumerable {
      * Returns a list containing the items in collection sorted, according to
      * their own compareTo method.
      */
-    public static <E extends Object & Comparable<? super E>> List<E> sort(Iterable<E> collection) {
+    public static <E extends Object & Comparable<? super E>> EList<E> sort(Iterable<E> collection) {
         return sort(collection, (Comparator<E>) null);
     }
 
-    private static <E> List<E> sort(Iterable<E> collection, Comparator<E> comparator) {
-        List<E> result = toList(collection);
+    private static<E> EList<E> sort(Iterable<E> collection, Comparator<E> comparator) {
+        EList<E> result = toList(collection);
         Collections.sort(result, comparator);
         return result;
     }
@@ -465,7 +465,7 @@ public class Enumerable {
      * results of the supplied block.
      */
     @SuppressWarnings("unchecked")
-    public static <E> List<E> sort(Iterable<E> collection, Fn2<E, E, Integer> block) {
+    public static<E> EList<E> sort(Iterable<E> collection, Fn2<E, E, Integer> block) {
         return sort(collection, block.as(Comparator.class));
     }
 
@@ -473,7 +473,7 @@ public class Enumerable {
      * Sorts collection using a set of keys generated by mapping the values in
      * collection through the given block.
      */
-    public static <E, R extends Object & Comparable<? super R>> List<E> sortBy(Iterable<E> collection,
+    public static <E, R extends Object & Comparable<? super R>> EList<E> sortBy(Iterable<E> collection,
             final Fn1<E, R> block) {
         return sort(collection, new Comparator<E>() {
             public int compare(E o1, E o2) {
@@ -485,11 +485,11 @@ public class Enumerable {
     /**
      * Returns a list containing the items in collection.
      */
-    public static <E> List<E> toList(Iterable<E> col) {
+    public static <E> EList<E> toList(Iterable<E> col) {
         if (col instanceof Collection<?>)
-            return new ArrayList<E>((Collection<E>) col);
+            return new EArrayList<E>((Collection<E>) col);
 
-        List<E> result = new ArrayList<E>();
+        EList<E> result = new EArrayList<E>();
         for (E each : col)
             result.add(each);
         return result;
@@ -498,15 +498,18 @@ public class Enumerable {
     /**
      * Creates a new Set containing the elements of the given collection.
      */
-    public static <E> Set<E> toSet(Iterable<E> col) {
-        return new HashSet<E>(toList(col));
+    public static <E> ESet<E> toSet(Iterable<E> col) {
+        if (col instanceof Collection<?>)
+            return new EHashSet<E>((Collection<E>) col);
+
+        return new EHashSet<E>(toList(col));
     }
 
     /**
      * Creates a new Set containing the elements of the given collection, the
      * elements are preprocessed by the given block.
      */
-    public static <E, R> Set<R> toSet(Iterable<E> collection, Fn1<E, R> block) {
+    public static <E, R> ESet<R> toSet(Iterable<E> collection, Fn1<E, R> block) {
         return toSet(collect(collection, block));
     }
 
@@ -523,8 +526,8 @@ public class Enumerable {
      * effect.
      * </p>
      */
-    public static <E> List<List<?>> zip(Iterable<E> collection, Iterable<?>... args) {
-        List<List<?>> allResults = new ArrayList<List<?>>();
+    public static<E> EList<EList<?>> zip(Iterable<E> collection, Iterable<?>... args) {
+        EList<EList<?>> allResults = new EArrayList<EList<?>>();
 
         List<Iterator<?>> iterators = new ArrayList<Iterator<?>>();
         iterators.add(collection.iterator());
@@ -532,7 +535,7 @@ public class Enumerable {
             iterators.add(iterable.iterator());
 
         while (iterators.get(0).hasNext()) {
-            List<Object> result = new ArrayList<Object>();
+            EList<Object> result = new EArrayList<Object>();
             for (Iterator<?> iterator : iterators)
                 if (iterator.hasNext())
                     result.add(iterator.next());
