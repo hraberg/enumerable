@@ -160,6 +160,13 @@ class MethodInfo {
             return toParameterString(getParameters());
         }
 
+        String getTypedParametersString() {
+            List<String> result = new ArrayList<String>();
+            for (String parameter : getParameters())
+                result.add(getSimpleClassName(getParameterType(parameter)) + " " + parameter);
+            return toParameterString(result);
+        }
+
         int getParameterIndex(String name) {
             return new ArrayList<String>(getParameters()).indexOf(name) + 1;
         }

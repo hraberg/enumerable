@@ -107,7 +107,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                         + method.getAccessedParametersAndLocalsString(currentLambda.accessedLocals);
 
             debug("starting lambda #" + getSimpleClassName(currentLambda.getExpressionType())
-                    + currentLambda.getParametersString() + locals + " at " + sourceAndLine());
+                    + currentLambda.getTypedParametersString() + locals + " at " + sourceAndLine());
             debugIndent();
         }
 
