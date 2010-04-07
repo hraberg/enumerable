@@ -9,7 +9,7 @@ import lambda.enumerable.Enumerable;
 
 public class EArrayList<E> extends ArrayList<E> implements EList<E> {
     private static final long serialVersionUID = 9062845492685739292L;
-    
+
     public EArrayList() {
     }
 
@@ -20,7 +20,7 @@ public class EArrayList<E> extends ArrayList<E> implements EList<E> {
     public EArrayList(Collection<? extends E> c) {
         super(c);
     }
-    
+
     public EList<E> subList(int fromIndex, int toIndex) {
         return new EArrayList<E>(super.subList(fromIndex, toIndex));
     }
@@ -70,7 +70,7 @@ public class EArrayList<E> extends ArrayList<E> implements EList<E> {
     }
 
     public E find(Fn1<E, Boolean> block, E ifNone) {
-        return Enumerable.find(this, block,ifNone);
+        return Enumerable.find(this, block, ifNone);
     }
 
     public EList<E> findAll(Fn1<E, Boolean> block) {
@@ -111,7 +111,7 @@ public class EArrayList<E> extends ArrayList<E> implements EList<E> {
 
     @SuppressWarnings("unchecked")
     public E max() {
-        return (E) Enumerable.max((EIterable<Comparable>) this);
+        return (E) Enumerable.max((EIterable<? extends Comparable>) this);
     }
 
     public E max(Fn2<E, E, Integer> block) {
@@ -124,7 +124,7 @@ public class EArrayList<E> extends ArrayList<E> implements EList<E> {
 
     @SuppressWarnings("unchecked")
     public E min() {
-        return (E) Enumerable.max((EIterable<Comparable>) this);
+        return (E) Enumerable.max((EIterable<? extends Comparable>) this);
     }
 
     public E min(Fn2<E, E, Integer> block) {
@@ -145,7 +145,7 @@ public class EArrayList<E> extends ArrayList<E> implements EList<E> {
 
     @SuppressWarnings("unchecked")
     public EList<E> sort() {
-        return Enumerable.sort((EIterable<Comparable>) this);
+        return Enumerable.sort((EIterable<? extends Comparable>) this);
     }
 
     public EList<E> sort(Fn2<E, E, Integer> block) {

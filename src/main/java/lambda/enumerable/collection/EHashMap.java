@@ -1,13 +1,11 @@
 package lambda.enumerable.collection;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
 import lambda.Fn1;
 import lambda.Fn2;
 import lambda.enumerable.Enumerable;
-
 
 public class EHashMap<K, V> extends HashMap<K, V> implements EMap<K, V> {
     private static final long serialVersionUID = 4713034666368384525L;
@@ -17,6 +15,18 @@ public class EHashMap<K, V> extends HashMap<K, V> implements EMap<K, V> {
 
     public EHashMap(Map<? extends K, ? extends V> m) {
         super(m);
+    }
+
+    public ESet<Map.Entry<K, V>> entrySet() {
+        return new EHashSet<Map.Entry<K, V>>(super.entrySet());
+    }
+
+    public ESet<K> keySet() {
+        return new EHashSet<K>(super.keySet());
+    }
+
+    public ECollection<V> values() {
+        return new EArrayList<V>(super.values());
     }
 
     public <R> EMap<K, V> each(Fn2<K, V, R> block) {

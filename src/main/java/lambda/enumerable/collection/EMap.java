@@ -5,7 +5,13 @@ import java.util.Map;
 import lambda.Fn1;
 import lambda.Fn2;
 
-public interface EMap<K, V> extends Map<K, V>{
+public interface EMap<K, V> extends Map<K, V> {
+    ESet<Map.Entry<K, V>> entrySet();
+
+    ESet<K> keySet();
+
+    ECollection<V> values();
+
     /**
      * Calls block once for each key in map, passing the key and value to the
      * block as parameters.
@@ -17,7 +23,6 @@ public interface EMap<K, V> extends Map<K, V>{
      */
     public <R> EMap<K, V> eachValue(Fn1<V, R> block);
 
-    
     /**
      * Calls block once for each key in map, passing the key as parameter.
      */

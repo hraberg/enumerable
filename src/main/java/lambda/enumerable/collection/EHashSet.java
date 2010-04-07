@@ -11,7 +11,7 @@ import lambda.enumerable.Enumerable;
 
 public class EHashSet<E> extends HashSet<E> implements ESet<E> {
     private static final long serialVersionUID = -6762214805341334934L;
-    
+
     public EHashSet() {
     }
 
@@ -68,7 +68,7 @@ public class EHashSet<E> extends HashSet<E> implements ESet<E> {
     }
 
     public E find(Fn1<E, Boolean> block, E ifNone) {
-        return Enumerable.find(this, block,ifNone);
+        return Enumerable.find(this, block, ifNone);
     }
 
     public EList<E> findAll(Fn1<E, Boolean> block) {
@@ -109,7 +109,7 @@ public class EHashSet<E> extends HashSet<E> implements ESet<E> {
 
     @SuppressWarnings("unchecked")
     public E max() {
-        return (E) Enumerable.max((EIterable<Comparable>) this);
+        return (E) Enumerable.max((EIterable<? extends Comparable>) this);
     }
 
     public E max(Fn2<E, E, Integer> block) {
@@ -122,7 +122,7 @@ public class EHashSet<E> extends HashSet<E> implements ESet<E> {
 
     @SuppressWarnings("unchecked")
     public E min() {
-        return (E) Enumerable.max((EIterable<Comparable>) this);
+        return (E) Enumerable.max((EIterable<? extends Comparable>) this);
     }
 
     public E min(Fn2<E, E, Integer> block) {
