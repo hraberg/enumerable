@@ -106,7 +106,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 locals = " closing over "
                         + method.getAccessedParametersAndLocalsString(currentLambda.accessedLocals);
 
-            debug("starting lambda #" + getSimpleClassName(currentLambda.getExpressionType())
+            debug("lambda #" + getSimpleClassName(currentLambda.getExpressionType())
                     + currentLambda.getTypedParametersString() + locals + " at " + sourceAndLine());
             debugIndent();
         }
@@ -396,7 +396,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             int localIndex = currentLambda.getParameterRealLocalIndex(currentLambda
                     .getParameterByIndex(parameterIndex));
 
-            debug("parameter " + currentLambda.getParameterByIndex(parameterIndex) + " needs converstion from "
+            debug("parameter " + currentLambda.getParameterByIndex(parameterIndex) + " needs conversion from "
                     + getSimpleClassName(methodParameterType) + " to " + getSimpleClassName(lambdaParameterType)
                     + " in lambda local " + localIndex);
 

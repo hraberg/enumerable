@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import lambda.Fn1;
-import lambda.Lambda;
 import lambda.primitives.Fn1ItoI;
 
 public class EnumerableExample {
@@ -97,7 +96,7 @@ public class EnumerableExample {
          * Example of different primitives than int. Demonstrates call to static
          * method Math.sqrt.
          */
-        List<Double> squareRoots = collect(ints, Lambda.λ(n, sqrt(n)));
+        List<Double> squareRoots = collect(ints, λ(n, sqrt(n)));
         out.println(squareRoots);
 
         /*
