@@ -1,6 +1,6 @@
 package lambda.enumerable.collection;
 
-import java.util.List;
+import java.util.*;
 
 import lambda.TestBase;
 
@@ -31,10 +31,48 @@ public class EnumerableCollectionsTest extends TestBase {
         assertEquals(oneToFive, toList(4, 5, 3, 1, 2).sort());
     }
 
+    @Test(expected = ClassCastException.class)
+    public void sortThrowsClassCastExceptionIfContainingElementsAreNotComparable() throws Exception {
+        toList(new Object(), new Object()).sort();
+    }
+
     @Test
     public void toListReturnsANewCopy() throws Exception {
         EList<Integer> list = oneToFive.toList();
         assertEquals(oneToFive, list);
         assertNotSame(oneToFive, list);
+    }
+
+    @Test
+    public void wrappingIterablesUsingEIterableFrom() throws Exception {
+        assertEquals(ESet.class, EIterable.from(new HashSet<Object>()).getClass());
+        assertEquals(ECollection.class, EIterable.from(new HashMap<Object, Object>().values()).getClass());
+
+        EList<Object> list = EIterable.from(new ArrayList<Object>());
+        assertEquals(EList.class, list.getClass());
+
+        AnIterable anIterable = new AnIterable();
+        EIterable<Object> eIterable = EIterable.from(anIterable);
+        assertSame(eIterable, EIterable.from(eIterable));
+        assertSame(anIterable, eIterable.delegate());
+    }
+
+    @Test
+    public void enumerableCollectionForwardsAllCallsToBackingCollection() throws Exception {
+        ArrayList<Object> original = new ArrayList<Object>();
+        ECollection<Object> collection = EIterable.from(original);
+        assertTrue(original.isEmpty());
+        
+        collection.add("hello");
+        assertEquals(1, original.size());
+
+        original.add("hello");
+        assertEquals(2, collection.size());
+    }
+
+    class AnIterable implements Iterable<Object> {
+        public Iterator<Object> iterator() {
+            return null;
+        }
     }
 }

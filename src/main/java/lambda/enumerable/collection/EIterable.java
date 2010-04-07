@@ -1,227 +1,200 @@
 package lambda.enumerable.collection;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import lambda.Fn1;
 import lambda.Fn2;
+import lambda.enumerable.Enumerable;
 
-public interface EIterable<E> extends Iterable<E> {
-    /**
-     * Passes each element of the collection to the given block. The method
-     * returns true if the block never returns false or null.
-     */
-    boolean all(Fn1<E, ?> block);
+public class EIterable<E> implements Iterable<E>, IEnumerable<E>  {
+    @SuppressWarnings("unchecked")
+    public static <T, R extends EIterable<T>> R from(Iterable<T> iterable) {
+        if (iterable instanceof EIterable<?>)
+            return (R) iterable;
+        if (iterable instanceof List<?>)
+            return (R) new EList<T>((List<T>) iterable);
+        if (iterable instanceof Set<?>)
+            return (R) new ESet<T>((Set<T>) iterable);
+        if (iterable instanceof Collection<?>)
+            return (R) new ECollection<T>((Collection<T>) iterable);
+        return (R) new EIterable<T>(iterable);
+    }
+    
+    private final Iterable<E> iterable;
 
-    /**
-     * Passes each element of the collection to the given block. The method
-     * returns true if the block ever returns a value other than false or null.
-     */
-    boolean any(Fn1<E, ?> block);
+    public EIterable(Iterable<E> iterable) {
+        this.iterable = iterable;
+    }
 
-    /**
-     * Returns a new list with the results of running block once for every
-     * element in collection.
-     */
-    <R> EList<R> collect(Fn1<E, R> block);
+    public Iterable<E> delegate() {
+        return iterable;
+    }
 
-    /**
-     * Passes each entry in collection to block. Returns the first for which
-     * block is not false. If no object matches, it returns null.
-     */
-    E detect(Fn1<E, Boolean> block);
+    public Iterator<E> iterator() {
+        return iterable.iterator();
+    }
 
-    /**
-     * Passes each entry in collection to block. Returns the first for which
-     * block is not false. If no object matches, it returns ifNone.
-     */
-    E detect(Fn1<E, Boolean> block, E ifNone);
+    public boolean equals(Object obj) {
+        if (obj instanceof EIterable<?>)
+            return this.iterable.equals(((EIterable<?>) obj).iterable);
+        if (obj instanceof Iterable<?>)
+            return this.iterable.equals((Iterable<?>) obj);
+        return false;
+    }
 
-    /**
-     * Calls block for each item in collection.
-     */
-    <R> EIterable<E> each(Fn1<E, R> block);
+    public int hashCode() {
+        return iterable.hashCode();
+    }
 
-    /**
-     * Iterates the given block for each list of consecutive n elements.
-     */
-    <R> Object eachCons(int n, Fn1<List<E>, R> block);
+    public String toString() {
+        return iterable.toString();
+    }
 
-    /**
-     * Iterates the given block for each slice of n elements.
-     */
-    <R> Object eachSlice(int n, Fn1<List<E>, R> block);
+    public boolean all(Fn1<E, ?> block) {
+        return Enumerable.all(iterable, block);
+    }
 
-    /**
-     * Calls block with two arguments, the item and its index, for each item in
-     * collection.
-     */
-    <R> EIterable<E> eachWithIndex(Fn2<E, Integer, R> block);
+    public boolean any(Fn1<E, ?> block) {
+        return Enumerable.any(iterable, block);
+    }
 
-    /**
-     * @see #toList(Iterable)
-     */
-    EList<E> entries();
+    public <R> EList<R> collect(Fn1<E, R> block) {
+        return Enumerable.collect(iterable, block);
+    }
 
-    /**
-     * @see #detect(Iterable, Fn1)
-     */
-    E find(Fn1<E, Boolean> block);
+    public E detect(Fn1<E, Boolean> block) {
+        return Enumerable.detect(iterable, block);
+    }
 
-    /**
-     * @see #detect(Iterable, Fn1, Object)
-     */
-    E find(Fn1<E, Boolean> block, E ifNone);
+    public E detect(Fn1<E, Boolean> block, E ifNone) {
+        return Enumerable.detect(iterable, block, ifNone);
+    }
 
-    /**
-     * @see #select(Iterable, Fn1)
-     */
-    EList<E> findAll(Fn1<E, Boolean> block);
+    public <R> EIterable<E> each(Fn1<E, R> block) {
+        return Enumerable.each(iterable, block);
+    }
 
-    /**
-     * Returns a list of every element in collection for which pattern matches.
-     */
-    EList<E> grep(Pattern pattern);
+    public <R> Object eachCons(int n, Fn1<List<E>, R> block) {
+        return Enumerable.eachCons(iterable, n, block);
+    }
 
-    /**
-     * Returns a list of every element in collection for which pattern matches.
-     * Each matching element is passed to tje block, and its result is stored in
-     * the output list.
-     */
-    <R> EList<R> grep(Pattern pattern, Fn1<E, R> block);
+    public <R> Object eachSlice(int n, Fn1<List<E>, R> block) {
+        return Enumerable.eachSlice(iterable, n, block);
+    }
 
-    /**
-     * @see #grep(Iterable, Pattern)
-     */
-    EList<E> grep(String pattern);
+    public <R> EIterable<E> eachWithIndex(Fn2<E, Integer, R> block) {
+        return Enumerable.eachWithIndex(iterable, block);
+    }
 
-    /**
-     * @see #grep(Iterable, Pattern, Fn1)
-     */
-    <R> EList<R> grep(String pattern, Fn1<E, R> block);
+    public EList<E> entries() {
+        return Enumerable.entries(iterable);
+    }
 
-    /**
-     * @see #member(Iterable, Object)
-     */
-    boolean includes(Object obj);
+    public E find(Fn1<E, Boolean> block) {
+        return Enumerable.find(iterable, block);
+    }
 
-    /**
-     * Combines the elements of collection by applying the block to an
-     * accumulator value (memo) and each element in turn. At each step, memo is
-     * set to the value returned by the block. This form uses the first element
-     * of the collection as a the initial value (and skips that element while
-     * iterating).
-     */
-    E inject(Fn2<E, E, E> block);
+    public E find(Fn1<E, Boolean> block, E ifNone) {
+        return Enumerable.find(iterable, block, ifNone);
+    }
 
-    /**
-     * Combines the elements of collection by applying the block to an
-     * accumulator value (memo) and each element in turn. At each step, memo is
-     * set to the value returned by the block. This form lets you supply an
-     * initial value for memo.
-     */
-    <R> R inject(R initial, Fn2<R, E, R> block);
+    public EList<E> findAll(Fn1<E, Boolean> block) {
+        return Enumerable.findAll(iterable, block);
+    }
 
-    /**
-     * @see #collect(Iterable, Fn1)
-     */
-    <R> EList<R> map(Fn1<E, R> block);
+    public EList<E> grep(Pattern pattern) {
+        return Enumerable.grep(iterable, pattern);
+    }
 
-    /**
-     * Returns the object in collection with the maximum value. This form
-     * assumes all objects implement {@link Comparable}
-     */
-    E max();
+    public <R> EList<R> grep(Pattern pattern, Fn1<E, R> block) {
+        return Enumerable.grep(iterable, pattern, block);
+    }
 
-    /**
-     * Returns the object in collection with the maximum value. This form uses
-     * the block to {@link Comparator#compare}.
-     */
-    E max(Fn2<E, E, Integer> block);
+    public EList<E> grep(String pattern) {
+        return Enumerable.grep(iterable, pattern);
+    }
 
-    /**
-     * Returns true if any member of collection equals obj. Equality is tested
-     * using {@link Object#equals(Object)}.
-     */
-    boolean member(Object obj);
+    public <R> EList<R> grep(String pattern, Fn1<E, R> block) {
+        return Enumerable.grep(iterable, pattern, block);
+    }
 
-    /**
-     * Returns the object in collection with the minimum value. This form
-     * assumes all objects implement {@link Comparable}.
-     */
-    E min();
+    public boolean includes(Object obj) {
+        return Enumerable.includes(iterable, obj);
+    }
 
-    /**
-     * Returns the object in collection with the minimum value. This form uses
-     * the block to {@link Comparator#compare}.
-     */
-    E min(Fn2<E, E, Integer> block);
+    public E inject(Fn2<E, E, E> block) {
+        return Enumerable.inject(iterable, block);
+    }
 
-    /**
-     * Returns two lists, the first containing the elements of collection for
-     * which the block evaluates to true, the second containing the rest.
-     */
-    EList<EList<E>> partition(Fn1<E, Boolean> block);
+    public <R> R inject(R initial, Fn2<R, E, R> block) {
+        return Enumerable.inject(iterable, initial, block);
+    }
 
-    /**
-     * Returns a list containing all elements of collection for which block is
-     * false.
-     */
-    EList<E> reject(Fn1<E, Boolean> block);
+    public <R> EList<R> map(Fn1<E, R> block) {
+        return Enumerable.map(iterable, block);
+    }
 
-    /**
-     * Returns a list containing all elements of collection for which block is
-     * not false.
-     */
-    EList<E> select(Fn1<E, Boolean> block);
+    @SuppressWarnings("unchecked")
+    public E max() {
+        return (E) Enumerable.max((EIterable<? extends Comparable>) iterable);
+    }
 
-    /**
-     * Returns a list containing the items in collection sorted, according to
-     * their own compareTo method.
-     */
-    EList<E> sort();
+    public E max(Fn2<E, E, Integer> block) {
+        return Enumerable.max(iterable, block);
+    }
 
-    /**
-     * Returns a list containing the items in collection sorted by using the
-     * results of the supplied block.
-     */
-    EList<E> sort(Fn2<E, E, Integer> block);
+    public boolean member(Object obj) {
+        return Enumerable.member(iterable, obj);
+    }
 
-    /**
-     * Sorts collection using a set of keys generated by mapping the values in
-     * collection through the given block.
-     */
-    <R extends Object & Comparable<? super R>> EList<E> sortBy(Fn1<E, R> block);
+    @SuppressWarnings("unchecked")
+    public E min() {
+        return (E) Enumerable.max((EIterable<? extends Comparable>) iterable);
+    }
 
-    /**
-     * Returns a list containing the items in collection.
-     */
-    EList<E> toList();
+    public E min(Fn2<E, E, Integer> block) {
+        return Enumerable.min(iterable, block);
+    }
 
-    /**
-     * Creates a new Set containing the elements of the given collection.
-     */
-    ESet<E> toSet();
+    public EList<EList<E>> partition(Fn1<E, Boolean> block) {
+        return Enumerable.partition(iterable, block);
+    }
 
-    /**
-     * Creates a new Set containing the elements of the given collection, the
-     * elements are preprocessed by the given block.
-     */
-    <R> ESet<R> toSet(Fn1<E, R> block);
+    public EList<E> reject(Fn1<E, Boolean> block) {
+        return Enumerable.reject(iterable, block);
+    }
 
-    /**
-     * Converts any arguments to iterators, then merges elements of collection
-     * with corresponding elements from each argument. This generates a sequence
-     * of collection#size n-element list, where n is one more that the count of
-     * arguments. If the size of any argument is less than collection#size, null
-     * values are supplied.
-     * 
-     * <p>
-     * Due to varargs this version doesn't support taking a block like in Ruby.
-     * Feed the result into {@link #collect(Iterable, Fn1) to achieve the same
-     * effect.
-     * </p>
-     */
-    EList<EList<?>> zip(Iterable<?>... args);
+    public EList<E> select(Fn1<E, Boolean> block) {
+        return Enumerable.select(iterable, block);
+    }
+
+    @SuppressWarnings("unchecked")
+    public EList<E> sort() {
+        return Enumerable.sort((Iterable<? extends Comparable>) iterable);
+    }
+
+    public EList<E> sort(Fn2<E, E, Integer> block) {
+        return Enumerable.sort(iterable, block);
+    }
+
+    public <R extends Object & Comparable<? super R>> EList<E> sortBy(Fn1<E, R> block) {
+        return Enumerable.sortBy(iterable, block);
+    }
+
+    public EList<E> toList() {
+        return Enumerable.toList(iterable);
+    }
+
+    public ESet<E> toSet() {
+        return Enumerable.toSet(iterable);
+    }
+
+    public <R> ESet<R> toSet(Fn1<E, R> block) {
+        return Enumerable.toSet(iterable, block);
+    }
+
+    public EList<EList<?>> zip(Iterable<?>... args) {
+        return Enumerable.zip(iterable, args);
+    }
 }

@@ -1,10 +1,5 @@
 package lambda.enumerable;
 
-import static java.util.Arrays.*;
-import static lambda.Lambda.*;
-import static lambda.enumerable.Enumerable.*;
-import static org.junit.Assert.*;
-
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -14,6 +9,13 @@ import lambda.annotation.LambdaParameter;
 import lambda.enumerable.collection.EList;
 
 import org.junit.Test;
+
+import static java.util.Arrays.*;
+import static lambda.Lambda.*;
+
+import static lambda.enumerable.Enumerable.*;
+
+import static org.junit.Assert.*;
 
 @SuppressWarnings("unchecked")
 public class EnumerableTest extends TestBase {
@@ -61,7 +63,7 @@ public class EnumerableTest extends TestBase {
 
     @Test
     public void eachReturnsIterable() throws Exception {
-        assertEquals(oneToTen, each(oneToTen, λ(n, n)));
+        assertEquals(new EList(oneToTen), each(oneToTen, λ(n, n)));
     }
 
     @Test
