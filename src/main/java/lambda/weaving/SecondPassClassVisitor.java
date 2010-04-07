@@ -441,7 +441,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void box(Type type) {
             if (isReferenceType(type))
                 return;
-           
+
             Type boxed = getBoxedType(type);
             String descriptor = getMethodDescriptor(boxed, new Type[] { type });
             String name = "valueOf";

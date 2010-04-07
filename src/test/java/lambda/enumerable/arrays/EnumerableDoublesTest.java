@@ -12,6 +12,7 @@ import java.util.Set;
 import lambda.TestBase;
 import lambda.Lambda.Primitives;
 import lambda.annotation.LambdaParameter;
+import lambda.enumerable.array.EnumerableArrays;
 
 import org.junit.Test;
 
@@ -22,6 +23,13 @@ public class EnumerableDoublesTest extends TestBase {
     public void callsBlockOnceForEachElement() throws Exception {
         List<Double> actual = list();
         each(doublesOneToFive, λ(d, actual.add(d)));
+        assertEquals(toList(doublesOneToFive), actual);
+    }
+
+    @Test
+    public void canUsePrimitiveLambdaWithMatchingObjectVersion() throws Exception {
+        List<Double> actual = list();
+        EnumerableArrays.each(new Double[] {1.0, 2.0, 3.0, 4.0, 5.0}, λ(d, actual.add(d)));
         assertEquals(toList(doublesOneToFive), actual);
     }
 
@@ -41,6 +49,7 @@ public class EnumerableDoublesTest extends TestBase {
     public static int[] ints;
     
     @Test
+
     public void collectElementsToDifferentType() throws Exception {
         String[] expected = new String[] { "#1.0", "#2.0", "#3.0", "#4.0", "#5.0" };
         Object[] actual = collect(doublesOneToFive, λ(d, "#" + d));

@@ -51,6 +51,22 @@ public class EnumerableInts {
         return result;
     }
 
+    public static int[] collect(int[] array, Fn1ItoI block) {
+        int[] result = new int[array.length];
+        int i = 0;
+        for (int each : array)
+            result[i++] = block.call(each);
+        return result;
+    }
+
+    public static double[] collect(int[] array, Fn1ItoD block) {
+        double[] result = new double[array.length];
+        int i = 0;
+        for (int each : array)
+            result[i++] = block.call(each);
+        return result;
+    }
+
     /**
      * Returns a new list with the results of running block once for every
      * element in array.
@@ -92,11 +108,30 @@ public class EnumerableInts {
         return array;
     }
 
+    public static int[] each(int[] array, Fn1ItoD block) {
+        for (int each : array)
+            block.call(each);
+        return array;
+    }
+
+    public static int[] each(int[] array, Fn1ItoB block) {
+        for (int each : array)
+            block.call(each);
+        return array;
+    }
+
     /**
      * Calls block with two arguments, the item and its index, for each item in
      * array.
      */
     public static <R> int[] eachWithIndex(int[] array, Fn2IItoX<R> block) {
+        int idx = 0;
+        for (int each : array)
+            block.call(each, idx++);
+        return array;
+    }
+
+    public static int[] eachWithIndex(int[] array, Fn2IItoI block) {
         int idx = 0;
         for (int each : array)
             block.call(each, idx++);
@@ -167,6 +202,14 @@ public class EnumerableInts {
      * @see #collect(Iterable, Fn1)
      */
     public static <R> Object[] map(int[] array, Fn1ItoX<R> block) {
+        return collect(array, block);
+    }
+
+    public static int[] map(int[] array, Fn1ItoI block) {
+        return collect(array, block);
+    }
+
+    public static double[] map(int[] array, Fn1ItoD block) {
         return collect(array, block);
     }
 

@@ -52,6 +52,28 @@ public class EnumerableDoubles {
     }
 
     /**
+     * @see #collect(double[], Fn1)
+     */
+    public static double[] collect(double[] array, Fn1DtoD block) {
+        double[] result = new double[array.length];
+        int i = 0;
+        for (double each : array)
+            result[i++] = block.call(each);
+        return result;
+    }
+
+    /**
+     * @see #collect(double[], Fn1)
+     */
+    public static int[] collect(double[] array, Fn1DtoI block) {
+        int[] result = new int[array.length];
+        int i = 0;
+        for (double each : array)
+            result[i++] = block.call(each);
+        return result;
+    }
+
+    /**
      * Returns a new list with the results of running block once for every
      * element in array.
      */
@@ -92,6 +114,24 @@ public class EnumerableDoubles {
         return array;
     }
 
+    public static double[] each(double[] array, Fn1DtoD block) {
+        for (double each : array)
+            block.call(each);
+        return array;
+    }
+
+    public static double[] each(double[] array, Fn1DtoI block) {
+        for (double each : array)
+            block.call(each);
+        return array;
+    }
+    
+    public static double[] each(double[] array, Fn1DtoB block) {
+        for (double each : array)
+            block.call(each);
+        return array;
+    }
+
     /**
      * Calls block with two arguments, the item and its index, for each item in
      * array.
@@ -104,35 +144,45 @@ public class EnumerableDoubles {
     }
 
     /**
-     * @see #toList(Iterable)
+     * @see #eachWithIndex(double[], Fn2DDtoX)
+     */
+    public static double[] eachWithIndex(double[] array, Fn2DDtoD block) {
+        double idx = 0;
+        for (double each : array)
+            block.call(each, idx++);
+        return array;
+    }
+
+    /**
+     * @see #toList(double[])
      */
     public static <E> List<Double> entries(double[] array) {
         return toList(array);
     }
 
     // /**
-    // * @see #detect(Iterable, Fn1)
+    // * @see #detect(double[], Fn1)
     // */
     // public static <E> E find(double[] array, Fn1<E, Boolean> block) {
     // return Enumerable.detect(asList(array), block);
     // }
     //
     // /**
-    // * @see #detect(Iterable, Fn1, Object)
+    // * @see #detect(double[], Fn1, Object)
     // */
     // public static <E> E find(double[] array, Fn1<E, Boolean> block, E ifNone) {
     // return Enumerable.detect(asList(array), block);
     // }
     //
     /**
-     * @see #select(Iterable, Fn1)
+     * @see #select(double[], Fn1)
      */
     public static double[] findAll(double[] array, Fn1DtoB block) {
         return select(array, block);
     }
 
     /**
-     * @see #member(Iterable, Object)
+     * @see #member(double[], Object)
      */
     public static boolean includes(double[] array, double i) {
         return member(array, i);
@@ -164,9 +214,16 @@ public class EnumerableDoubles {
     }
 
     /**
-     * @see #collect(Iterable, Fn1)
+     * @see #collect(double[], Fn1)
      */
     public static <R> Object[] map(double[] array, Fn1DtoX<R> block) {
+        return collect(array, block);
+    }
+
+    /**
+     * @see #collect(double[], Fn1)
+     */
+    public static double[] map(double[] array, Fn1DtoD block) {
         return collect(array, block);
     }
 
@@ -318,7 +375,7 @@ public class EnumerableDoubles {
     // * <p>
     // * Due to varargs this version doesn't support taking a block like in
     // Ruby.
-    // * Feed the result into {@link #collect(Iterable, Fn1) to achieve the same
+    // * Feed the result into {@link #collect(double[], Fn1) to achieve the same
     // * effect.
     // * </p>
     // */
