@@ -228,6 +228,17 @@ public class EnumerableDoubles {
     }
 
     /**
+     * @see #collect(double[], Fn1)
+     */
+    public static int[] map(double[] array, Fn1DtoI block) {
+        return collect(array, block);
+    }
+
+    public static <R> R[] map(double[] array, Fn1DtoO<R> block, Class<R> type) {
+        return collect(array, block, type);
+    }
+    
+    /**
      * Returns the object in array with the maximum value. This form assumes all
      * objects implement {@link Comparable}
      */
@@ -304,12 +315,12 @@ public class EnumerableDoubles {
     }
 
     private static double[] selectOrReject(double[] array, Fn1DtoB block, boolean select) {
-        double[] acc = new double[array.length];
+        double[] result = new double[array.length];
         int i = 0;
         for (double each : array)
             if (block.call(each) == select)
-                acc[i++] = each;
-        return copy(acc, i);
+                result[i++] = each;
+        return copy(result, i);
     }
 
     /**
@@ -344,7 +355,7 @@ public class EnumerableDoubles {
      * Returns a list containing the items in array.
      */
     public static List<Double> toList(double[] array) {
-        List<Double> result = new ArrayList<Double>();
+        List<Double> result = new ArrayList<Double>(array.length);
         for (double each : array)
             result.add(each);
         return result;
@@ -392,9 +403,9 @@ public class EnumerableDoubles {
     // return result;
     // }
 
-    private static double[] copy(double[] acc, int length) {
+    private static double[] copy(double[] array, int length) {
         double[] result = new double[length];
-        System.arraycopy(acc, 0, result, 0, length);
+        System.arraycopy(array, 0, result, 0, length);
         return result;
     }
 }

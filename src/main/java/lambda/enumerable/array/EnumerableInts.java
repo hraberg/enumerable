@@ -218,6 +218,10 @@ public class EnumerableInts {
     public static double[] map(int[] array, Fn1ItoD block) {
         return collect(array, block);
     }
+    
+    public static <R> R[] map(int[] array, Fn1ItoO<R> block, Class<R> type) {
+        return collect(array, block, type);
+    }
 
     /**
      * Returns the object in array with the maximum value. This form assumes all
@@ -296,12 +300,12 @@ public class EnumerableInts {
     }
 
     private static int[] selectOrReject(int[] array, Fn1ItoB block, boolean select) {
-        int[] acc = new int[array.length];
+        int[] result = new int[array.length];
         int i = 0;
         for (int each : array)
             if (block.call(each) == select)
-                acc[i++] = each;
-        return copy(acc, i);
+                result[i++] = each;
+        return copy(result, i);
     }
 
     /**
@@ -336,7 +340,7 @@ public class EnumerableInts {
      * Returns a list containing the items in array.
      */
     public static List<Integer> toList(int[] array) {
-        List<Integer> result = new ArrayList<Integer>();
+        List<Integer> result = new ArrayList<Integer>(array.length);
         for (int each : array)
             result.add(each);
         return result;
@@ -384,9 +388,9 @@ public class EnumerableInts {
     // return result;
     // }
 
-    private static int[] copy(int[] acc, int length) {
+    private static int[] copy(int[] array, int length) {
         int[] result = new int[length];
-        System.arraycopy(acc, 0, result, 0, length);
+        System.arraycopy(array, 0, result, 0, length);
         return result;
     }
 }
