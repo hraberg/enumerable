@@ -254,6 +254,23 @@ public class EnumerableArrays {
     }
 
     /**
+     * Constructs a range using the given start and end. The range will include
+     * the end object.
+     */
+    public static Integer[] range(int start, int end) {
+        return range(start, end, false);
+    }
+
+    /**
+     * Constructs a range using the given start and end. If the third parameter
+     * is false, the range will include the end object; otherwise, it will be
+     * excluded.
+     */
+    public static Integer[] range(int start, int end, boolean exclusive) {
+        return ((List<Integer>) Enumerable.range(start, end, exclusive)).toArray(new Integer[0]);
+    }
+
+    /**
      * Returns an array containing all elements of array for which block is
      * false.
      */

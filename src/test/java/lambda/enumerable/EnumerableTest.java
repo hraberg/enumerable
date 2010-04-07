@@ -100,6 +100,24 @@ public class EnumerableTest extends TestBase {
     }
 
     @Test
+    public void inclusiveRanges() throws Exception {
+        assertEquals(oneToFive, collect(range(1, 5), λ(n, n)));        
+        assertEquals(list(), collect(range(-1, -5), λ(n, n)));        
+        assertEquals(list(-5, -4, -3, -2, -1), collect(range(-5, -1), λ(n, n)));        
+        assertEquals(list(1), collect(range(1, 1), λ(n, n)));        
+        assertEquals(list(-1), collect(range(-1, -1), λ(n, n)));        
+    }
+
+    @Test
+    public void exclusiveRanges() throws Exception {
+        assertEquals(list(1, 2, 3, 4), collect(range(1, 5, true), λ(n, n)));        
+        assertEquals(list(), collect(range(-1, -5, true), λ(n, n)));        
+        assertEquals(list(-5, -4, -3, -2), collect(range(-5, -1, true), λ(n, n)));        
+        assertEquals(list(), collect(range(1, 1, true), λ(n, n)));        
+        assertEquals(list(), collect(range(-1, -1, true), λ(n, n)));        
+    }
+
+    @Test
     public void rejectMatchingElements() throws Exception {
         List<Integer> odd = list(1, 3, 5, 7, 9);
         assertEquals(odd, reject(oneToTen, λ(n, n % 2 == 0)));

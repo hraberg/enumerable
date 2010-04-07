@@ -278,9 +278,9 @@ public class Lambda {
     public static Unused _;
 
     /**
-     * Creates a new lambda implementing single method interface or class I
-     * taking three arguments. See {@link #delegate(Unused, Object)} for an
-     * example.
+     * Creates a new lambda implementing single abstract method interface or
+     * class I taking three arguments. See {@link #delegate(Unused, Object)} for
+     * an example.
      */
     @NewLambda
     static <A1, A2, A3, I> I delegate(A1 a1, A2 a2, A3 a3, Object block) {
@@ -288,9 +288,9 @@ public class Lambda {
     }
 
     /**
-     * Creates a new lambda implementing single method interface or class I
-     * taking two arguments. See {@link #delegate(Unused, Object)} for an
-     * example.
+     * Creates a new lambda implementing single abstract method interface or
+     * class I taking two arguments. See {@link #delegate(Unused, Object)} for
+     * an example.
      */
     @NewLambda
     static <A1, A2, I> I delegate(A1 a1, A2 a2, Object block) {
@@ -298,8 +298,8 @@ public class Lambda {
     }
 
     /**
-     * Creates a new lambda implementing single method interface or class I
-     * taking one argument. See {@link #delegate(Unused, Object)} for an
+     * Creates a new lambda implementing single abstract method interface or
+     * class I taking one argument. See {@link #delegate(Unused, Object)} for an
      * example.
      */
     @NewLambda
@@ -308,8 +308,8 @@ public class Lambda {
     }
 
     /**
-     * Creates a new lambda implementing single method interface or class I
-     * taking no arguments.
+     * Creates a new lambda implementing single abstract method interface or
+     * class I taking no arguments.
      * 
      * <p>
      * Example:

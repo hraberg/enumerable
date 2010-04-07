@@ -39,6 +39,15 @@ public class EnumerableArraysTest extends TestBase {
     }
 
     @Test
+    public void inclusiveRanges() throws Exception {
+        assertArrayEquals(oneToFive, range(1, 5));        
+    }
+
+    @Test
+    public void exclusiveRanges() throws Exception {
+        assertArrayEquals(list(1, 2, 3, 4).toArray(), range(1, 5, true));        
+    }
+    @Test
     public void selectMatchingElements() throws Exception {
         Integer[] selected = select(oneToFive, λ(n, n % 2 == 0));
         assertArrayEquals(new Integer[] { 2, 4 }, selected);
