@@ -269,7 +269,7 @@ public class EnumerableArrays {
     public static Integer[] range(int start, int end, boolean exclusive) {
         return Enumerable.range(start, end, exclusive).toArray();
     }
-
+    
     /**
      * Returns an array containing all elements of array for which block is
      * false.

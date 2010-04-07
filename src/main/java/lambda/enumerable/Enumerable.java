@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
 
@@ -391,6 +392,24 @@ public class Enumerable {
         return new Range(start, end, exclusive);
     }
     
+    /**
+     * @see #times(int,  Fn1)
+     */
+    public static int times(int i, Fn0<?> block) {
+        Iterator<Integer> range = range(0, i, true).iterator();
+        for (; range.hasNext(); range.next())
+            block.call();
+        return i;
+    }
+
+    /**
+     * Iterates block i times, passing in values from zero to int - 1.
+     */
+    public static int times(int i, Fn1<Integer, ?> block) {
+        each(range(0, i, true), block);
+        return i;
+    }
+
     /**
      * Returns a list containing all elements of collection for which block is
      * false.
