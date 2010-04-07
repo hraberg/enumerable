@@ -68,9 +68,16 @@ public class EnumerableDoublesTest extends TestBase {
     }
 
     @Test
-    public void eachWithIndexUsingMixedPrimitives() throws Exception {
+    public void eachWithIndexUsingMixedPrimitivesDoubleAndInt() throws Exception {
         int totalIndex = 0;
         eachWithIndex(doublesOneToFive, Primitives.λ(d, idx, totalIndex += idx));
+        assertEquals(10, totalIndex);
+    }
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesDoubleAndLong() throws Exception {
+        int totalIndex = 0;
+        eachWithIndex(doublesOneToFive, Primitives.λ(d, l, totalIndex += l));
         assertEquals(10, totalIndex);
     }
 
@@ -176,12 +183,12 @@ public class EnumerableDoublesTest extends TestBase {
     }
 
     @Test
-    public void toListCreatesIntegerListFromIntArray() throws Exception {
+    public void toListCreatesIntegerListFromDoubleArray() throws Exception {
         assertEquals(list(1.0, 2.0, 3.0, 4.0, 5.0), toList(doublesOneToFive));
     }
 
     @Test
-    public void toSetCreatesIntegerSetFromIntArray() throws Exception {
+    public void toSetCreatesIntegerSetFromDoubleArray() throws Exception {
         Set<Double> expected = new HashSet<Double>(list(1.0, 2.0, 3.0, 4.0));
         assertEquals(expected, toSet(new double[] {1, 2, 2, 3, 4, 4}));
     }

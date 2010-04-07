@@ -386,6 +386,8 @@ public class Lambda {
     @LambdaParameter
     public static int idx;
     @LambdaParameter
+    public static long k;
+    @LambdaParameter
     public static long l;
     @LambdaParameter
     public static double d;

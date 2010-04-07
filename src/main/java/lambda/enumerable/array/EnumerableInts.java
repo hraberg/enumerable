@@ -67,6 +67,14 @@ public class EnumerableInts {
         return result;
     }
 
+    public static long[] collect(int[] array, Fn1ItoL block) {
+        long[] result = new long[array.length];
+        int i = 0;
+        for (int each : array)
+            result[i++] = block.call(each);
+        return result;
+    }
+
     /**
      * Returns a new list with the results of running block once for every
      * element in array.
@@ -115,6 +123,12 @@ public class EnumerableInts {
     }
 
     public static int[] each(int[] array, Fn1ItoD block) {
+        for (int each : array)
+            block.call(each);
+        return array;
+    }
+
+    public static int[] each(int[] array, Fn1ItoL block) {
         for (int each : array)
             block.call(each);
         return array;
@@ -219,6 +233,10 @@ public class EnumerableInts {
         return collect(array, block);
     }
     
+    public static long[] map(int[] array, Fn1ItoL block) {
+        return collect(array, block);
+    }
+
     public static <R> R[] map(int[] array, Fn1ItoO<R> block, Class<R> type) {
         return collect(array, block, type);
     }

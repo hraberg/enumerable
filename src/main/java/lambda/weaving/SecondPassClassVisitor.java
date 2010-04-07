@@ -97,6 +97,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 else if (bothArePrimitive(parameterType, methodParameterType))
                     if (methodParameterType == DOUBLE_TYPE && parameterType == INT_TYPE)
                         primitiveCastToIgnore = I2D;
+                    else if (methodParameterType == LONG_TYPE && parameterType == INT_TYPE)
+                        primitiveCastToIgnore = I2L;
+                    else if (methodParameterType == DOUBLE_TYPE && parameterType == LONG_TYPE)
+                        primitiveCastToIgnore = L2D;
+
             }
         }
 
@@ -411,6 +416,14 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == INT_TYPE) {
                 mv.visitVarInsn(methodParameterType.getOpcode(ILOAD), localIndex);
                 mv.visitInsn(D2I);
+                mv.visitVarInsn(lambdaParameterType.getOpcode(ISTORE), localIndex);
+            } else if (methodParameterType == LONG_TYPE && lambdaParameterType == INT_TYPE) {
+                mv.visitVarInsn(methodParameterType.getOpcode(ILOAD), localIndex);
+                mv.visitInsn(L2I);
+                mv.visitVarInsn(lambdaParameterType.getOpcode(ISTORE), localIndex);
+            } else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == LONG_TYPE) {
+                mv.visitVarInsn(methodParameterType.getOpcode(ILOAD), localIndex);
+                mv.visitInsn(D2L);
                 mv.visitVarInsn(lambdaParameterType.getOpcode(ISTORE), localIndex);
             }
         }
