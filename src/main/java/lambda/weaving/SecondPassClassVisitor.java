@@ -95,11 +95,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     typeToIgnoreValueOfCallOn = getBoxedType(parameterType);
 
                 else if (bothArePrimitive(parameterType, methodParameterType))
-                    if (methodParameterType == DOUBLE_TYPE && parameterType == INT_TYPE)
+                    if (parameterType == INT_TYPE && methodParameterType == DOUBLE_TYPE)
                         primitiveCastToIgnore = I2D;
-                    else if (methodParameterType == LONG_TYPE && parameterType == INT_TYPE)
+
+                    else if (parameterType == INT_TYPE && methodParameterType == LONG_TYPE )
                         primitiveCastToIgnore = I2L;
-                    else if (methodParameterType == DOUBLE_TYPE && parameterType == LONG_TYPE)
+                    
+                    else if (parameterType == LONG_TYPE && methodParameterType == DOUBLE_TYPE)
                         primitiveCastToIgnore = L2D;
 
             }
@@ -413,19 +415,20 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void convertBetweenPrimitives(Type methodParameterType, Type lambdaParameterType, int localIndex) {
-            if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == INT_TYPE) {
-                mv.visitVarInsn(methodParameterType.getOpcode(ILOAD), localIndex);
-                mv.visitInsn(D2I);
-                mv.visitVarInsn(lambdaParameterType.getOpcode(ISTORE), localIndex);
-            } else if (methodParameterType == LONG_TYPE && lambdaParameterType == INT_TYPE) {
-                mv.visitVarInsn(methodParameterType.getOpcode(ILOAD), localIndex);
-                mv.visitInsn(L2I);
-                mv.visitVarInsn(lambdaParameterType.getOpcode(ISTORE), localIndex);
-            } else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == LONG_TYPE) {
-                mv.visitVarInsn(methodParameterType.getOpcode(ILOAD), localIndex);
-                mv.visitInsn(D2L);
-                mv.visitVarInsn(lambdaParameterType.getOpcode(ISTORE), localIndex);
-            }
+            if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == INT_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
+            
+            else if (methodParameterType == LONG_TYPE && lambdaParameterType == INT_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
+            
+            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == LONG_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2L);
+        }
+
+        void castPrimitive(Type from, Type to, int local, int opcode) {
+            mv.visitVarInsn(from.getOpcode(ILOAD), local);
+            mv.visitInsn(opcode);
+            mv.visitVarInsn(to.getOpcode(ISTORE), local);
         }
 
         boolean bothArePrimitive(Type methodParameterType, Type lambdaParameterType) {

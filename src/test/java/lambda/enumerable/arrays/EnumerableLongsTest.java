@@ -68,7 +68,7 @@ public class EnumerableLongsTest extends TestBase {
     }
 
     @Test
-    public void eachWithIndexUsingMixedPrimitives() throws Exception {
+    public void eachWithIndexUsingMixedPrimitivesLongAndInt() throws Exception {
         int totalIndex = 0;
         eachWithIndex(longsOneToFive, Primitives.λ(l, idx, totalIndex += idx));
         assertEquals(10, totalIndex);
