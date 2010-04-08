@@ -1,4 +1,4 @@
-package lambda.enumerable.array;
+package lambda.enumerable.primitives;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +11,7 @@ import lambda.primitives.LambdaPrimitives;
 import org.junit.Test;
 
 import static lambda.Lambda.*;
-import static lambda.enumerable.array.EnumerableInts.*;
+import static lambda.enumerable.primitives.EnumerableInts.*;
 import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
 

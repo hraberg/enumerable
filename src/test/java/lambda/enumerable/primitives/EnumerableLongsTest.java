@@ -1,4 +1,4 @@
-package lambda.enumerable.array;
+package lambda.enumerable.primitives;
 
 import java.util.HashSet;
 import java.util.List;
@@ -6,13 +6,13 @@ import java.util.Set;
 
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
-import lambda.enumerable.array.EnumerableArrays;
+import lambda.enumerable.EnumerableArrays;
 import lambda.primitives.LambdaPrimitives;
 
 import org.junit.Test;
 
 import static lambda.Lambda.*;
-import static lambda.enumerable.array.EnumerableLongs.*;
+import static lambda.enumerable.primitives.EnumerableLongs.*;
 import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
 

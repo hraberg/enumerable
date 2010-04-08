@@ -1,7 +1,6 @@
-package lambda.enumerable.array;
+package lambda.enumerable;
 
 import static lambda.Lambda.*;
-import static lambda.enumerable.array.EnumerableArrays.*;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -9,6 +8,8 @@ import java.util.List;
 import lambda.TestBase;
 
 import org.junit.Test;
+
+import static lambda.enumerable.EnumerableArrays.*;
 
 public class EnumerableArraysTest extends TestBase {
     Integer[] oneToFive = new Integer[] { 1, 2, 3, 4, 5 };

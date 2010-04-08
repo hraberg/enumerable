@@ -1,4 +1,4 @@
-package lambda.enumerable.array;
+package lambda.enumerable;
 
 import java.lang.reflect.Array;
 import java.util.Comparator;
@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import lambda.Fn1;
 import lambda.Fn2;
-import lambda.enumerable.Enumerable;
 import lambda.enumerable.collection.EList;
 import lambda.enumerable.collection.ESet;
 import static java.util.Arrays.*;

@@ -1,4 +1,4 @@
-package lambda.enumerable.array;
+package lambda.enumerable.primitives;
 
 import java.lang.reflect.Array;
 import java.util.*;
