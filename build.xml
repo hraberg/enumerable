@@ -143,7 +143,7 @@
 	    </jarjar>
 	</target>
     	
-    <target name="jars" depends="agent-jar, source-jar, test-source-jar, javadoc-jar, enumerable-asm-all-jar" unless="dist.skip.jars"/>
+    <target name="jars" depends="agent-jar, source-jar, test-source-jar, javadoc-jar, enumerable-asm-all-jar" />
 
     <target name="dist" depends="tests, jars">
         <property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}"/>

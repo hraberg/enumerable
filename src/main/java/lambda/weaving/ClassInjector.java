@@ -32,15 +32,14 @@ class ClassInjector {
         }
 
         try {
-            Class<?> checkClassAdapter;
             try{
-                checkClassAdapter = Class.forName("org.objectweb.asm.util.CheckClassAdapter");
+                Class<?> checkClassAdapter = Class.forName("org.objectweb.asm.util.CheckClassAdapter");
+                verify = checkClassAdapter.getMethod("verify", Class.forName("org.objectweb.asm.ClassReader"), Boolean.TYPE, PrintWriter.class);
             } catch (ClassNotFoundException e) {                
-                checkClassAdapter = Class.forName("lambda.asm.util.CheckClassAdapter");
+                Class<?> checkClassAdapter = Class.forName("lambda.asm.util.CheckClassAdapter");
+                verify = checkClassAdapter.getMethod("verify", Class.forName("lambda.asm.ClassReader"), Boolean.TYPE, PrintWriter.class);
             }
             
-            verify = checkClassAdapter.getMethod("verify", ClassReader.class, Boolean.TYPE, PrintWriter.class);
-
             debug("asm-util is avaialbe, will pre-verify generated classes");
 
         } catch (Exception ignore) {
