@@ -26,9 +26,20 @@ public class Version {
         }
     }
 
+    public static String getVersion() {
+        return (String) buildProperties.get("enumerable.version");
+    }
+
+    public static String getBuildDate() {
+        return buildProperties.getProperty("enumerable.build.date");
+    }
+
+    public static String getGitCommit() {
+        return buildProperties.getProperty("enumerable.git.commit");
+    }
+
     public static String getVersionString() {
-        return "Enumerable.java version " + buildProperties.get("enumerable.version") + " (built on "
-                + buildProperties.getProperty("enumerable.build.date") + " from "
-                + buildProperties.getProperty("enumerable.git.commit") + ")";
+        return "Enumerable.java version " + getVersion() + " (built on " + getBuildDate() + " from "
+                + getGitCommit() + ")";
     }
 }

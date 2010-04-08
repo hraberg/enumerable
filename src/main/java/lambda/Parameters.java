@@ -4,6 +4,11 @@ import java.util.Collection;
 
 import lambda.annotation.LambdaParameter;
 
+/**
+ * A set of default parameters to use in Lambda definitions.
+ * 
+ * @see LambdaParameter
+ */
 public class Parameters {
     @LambdaParameter
     public static int n;

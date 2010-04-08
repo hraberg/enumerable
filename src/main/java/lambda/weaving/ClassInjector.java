@@ -32,7 +32,13 @@ class ClassInjector {
         }
 
         try {
-            Class<?> checkClassAdapter = Class.forName("org.objectweb.asm.util.CheckClassAdapter");
+            Class<?> checkClassAdapter;
+            try{
+                checkClassAdapter = Class.forName("org.objectweb.asm.util.CheckClassAdapter");
+            } catch (ClassNotFoundException e) {                
+                checkClassAdapter = Class.forName("lambda.asm.util.CheckClassAdapter");
+            }
+            
             verify = checkClassAdapter.getMethod("verify", ClassReader.class, Boolean.TYPE, PrintWriter.class);
 
             debug("asm-util is avaialbe, will pre-verify generated classes");

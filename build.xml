@@ -124,13 +124,26 @@
         </jar>
     </target>
 
-    <target name="javadoc-jar" depends="javadoc">
+    <target name="test-source-jar">
+        <jar jarfile="target/enumerable-${enumerable.version}-test-sources.jar">
+            <fileset dir="src/test/java" />
+        </jar>
+    </target>
+
+	<target name="javadoc-jar" depends="javadoc">
         <jar jarfile="target/enumerable-${enumerable.version}-javadoc.jar">
             <fileset dir="target/apidocs" />
         </jar>
     </target>
-
-    <target name="jars" depends="agent-jar, source-jar, javadoc-jar" />
+	
+	<target name="enumerable-asm-all-jar">
+		<jarjar jarfile="target/enumerable-asm-all-3.2.jar">
+	        <zipfileset src="lib/asm-all-3.2.jar" />
+	        <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
+	    </jarjar>
+	</target>
+    	
+    <target name="jars" depends="agent-jar, source-jar, test-source-jar, javadoc-jar, enumerable-asm-all-jar" unless="dist.skip.jars"/>
 
     <target name="dist" depends="tests, jars">
         <property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}"/>
@@ -138,9 +151,11 @@
             <tarfileset dir="target" fullpath="${enumerable.dist.name}/enumerable-${enumerable.version}-agent.jar">
                 <include name="enumerable-agent.jar" />
             </tarfileset>
-            <tarfileset dir="target" prefix="${enumerable.dist.name}">
-                <include name="*.jar" />
-                <exclude name="enumerable-agent.jar" />
+            <tarfileset dir="target" prefix="${enumerable.dist.name}/src">
+                <include name="enumerable-*-sources.jar" />
+            </tarfileset>
+            <tarfileset dir="target" prefix="${enumerable.dist.name}/verifier">
+                <include name="enumerable-asm-all-3.2.jar" />
             </tarfileset>
             <tarfileset dir="." prefix="${enumerable.dist.name}">
                 <include name="README.markdown" />
@@ -164,6 +179,6 @@
             <bottom>
                 <![CDATA[<i>Copyright &#169; 2010 Håkan Råberg</i>]]>
             </bottom>
-        </javadoc>
+    	</javadoc>
     </target>
 </project>

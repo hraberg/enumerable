@@ -1,8 +1,12 @@
 package lambda.primitives;
 
+import lambda.Lambda;
 import lambda.annotation.NewLambda;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
+/**
+ * This is the primitive version of {@link Lambda}.
+ */
 public class LambdaPrimitives {
     /**
      * @see lambda.Lambda#fn(Object, Object)

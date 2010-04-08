@@ -19,7 +19,17 @@ import static lambda.weaving.Debug.*;
 import static lambda.weaving.Version.*;
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
-    public static boolean tranformationFailed;
+    private static boolean isActive;
+    private static boolean tranformationFailed;
+
+    public static boolean isActive() {
+        return isActive && !tranformationFailed;
+    }
+    
+    public static void ensureIsActive() {
+        if (!isActive())
+            throw new IllegalStateException(getNotActiveMessage());
+    }
 
     static Set<String> packagesToSkip = new HashSet<String>();
     static {
@@ -91,6 +101,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
     public static void premain(String agentArgs, Instrumentation instrumentation) {
         debug("[premain] " + getVersionString());
+        isActive = true;
         addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
         instrumentation.addTransformer(new LambdaLoader());
     }
@@ -102,6 +113,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                 return;
             }
             debug("[main] " + getVersionString());
+            isActive = true;
             addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
             launchApplication(args[0], copyOfRange(args, 1, args.length));
         } catch (InvocationTargetException e) {
@@ -114,5 +126,9 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         Class<?> c = new LambdaLoader().loadClass(className);
         Method m = c.getMethod("main", String[].class);
         return m.invoke(null, new Object[] { args });
+    }
+
+    public static String getNotActiveMessage() {
+        return "Lambda weaving is not enabled, please start the JVM with -javaagent:enumerable-" + Version.getVersion() + "-agent.jar";
     }
 }

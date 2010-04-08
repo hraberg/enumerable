@@ -8,6 +8,7 @@ import java.util.Map;
 import lambda.Fn1;
 import lambda.enumerable.collection.EList;
 import lambda.primitives.Fn1ItoI;
+import lambda.weaving.LambdaLoader;
 import lambda.weaving.Version;
 import static java.lang.Math.*;
 import static java.util.Arrays.*;
@@ -249,6 +250,10 @@ public class EnumerableExample {
 
     public static void main(String[] args) {
         System.out.println("[example] " + Version.getVersionString());
-        new EnumerableExample().example(System.out);
+        if (!LambdaLoader.isActive()) {
+            System.out.println(LambdaLoader.getNotActiveMessage());
+            System.exit(1);
+        }
+       new EnumerableExample().example(System.out);
     }
 }
