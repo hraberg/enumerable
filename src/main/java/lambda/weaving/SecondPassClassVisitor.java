@@ -121,11 +121,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void debugLambdaParameterDefinitionSkippedConversions(String name, Type methodParameterType,
                 Type lambdaParameterType) {
             if (lambdaParameterTypeDefinitionToIgnoreValueOfCallOn != null)
-                debug("parameter " + name + " " + getSimpleClassName(lambdaParameterType) + " is really boxed as "
-                        + getSimpleClassName(methodParameterType) + " in lambda method definition");
+                debug("parameter " + name + " " + getSimpleClassName(lambdaParameterType) + " is boxed as "
+                        + getSimpleClassName(getBoxedType(lambdaParameterType)) + " in lambda method definition");
 
             if (lambdaParameterDefinitionPrimitiveConversionToIgnore > 0)
-                debug("parameter " + name + " " + getSimpleClassName(lambdaParameterType) + " is really the wider "
+                debug("parameter " + name + " " + getSimpleClassName(lambdaParameterType) + " is the wider "
                         + getSimpleClassName(methodParameterType) + " in lambda method definition");
         }
 
@@ -505,11 +505,14 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void handleBoxingAndUnboxing(Type returnType, Type lambdaExpressionType) {
-            if (isPrimitive(returnType) && isReference(lambdaExpressionType))
+            if (isPrimitive(returnType) && isReference(lambdaExpressionType)) {
                 unbox(returnType);
-
-            else if (isReference(returnType) && isPrimitive(lambdaExpressionType))
+                debug("unboxed return value with type " + getSimpleClassName(lambdaExpressionType) + " as " + getSimpleClassName(returnType));
+            }
+            if (isReference(returnType) && isPrimitive(lambdaExpressionType)) {                
                 box(lambdaExpressionType);
+                debug("boxed return value with type " + getSimpleClassName(lambdaExpressionType) + " as " + getSimpleClassName(returnType));
+            }
         }
 
         void box(Type type) {
