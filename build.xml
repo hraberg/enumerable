@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="enumerable">
-    <property name="enumerable.version" value="0.1" />
+	<description>
+		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
+	</description>
+
+	<property name="enumerable.version" value="0.1" />
     <property file="lambda.weaving.properties" />
     <tstamp />
 
