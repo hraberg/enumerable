@@ -101,28 +101,28 @@ public class EnumerableArrays {
     }
 
     /**
-     * @see #toList(Iterable)
+     * @see #toList(Object...)
      */
-    public static <E> E[] entries(E[] array) {
+    public static <E> E[] entries(E... array) {
         return Enumerable.toList(asList(array)).toArray(newEmptyArray(array));
     }
 
     /**
-     * @see #detect(Iterable, Fn1)
+     * @see #detect(Object[], Fn1)
      */
     public static <E> E find(E[] array, Fn1<E, Boolean> block) {
         return Enumerable.detect(asList(array), block);
     }
 
     /**
-     * @see #detect(Iterable, Object, Fn1)
+     * @see #detect(Object[], Object, Fn1)
      */
     public static <E> E find(E[] array, E ifNone, Fn1<E, Boolean> block) {
         return Enumerable.detect(asList(array), ifNone, block);
     }
 
     /**
-     * @see #select(Iterable, Fn1)
+     * @see #select(Object[], Fn1)
      */
     public static <E> E[] findAll(E[] array, Fn1<E, Boolean> block) {
         return Enumerable.findAll(asList(array), block).toArray(newEmptyArray(array));
@@ -145,21 +145,21 @@ public class EnumerableArrays {
     }
 
     /**
-     * @see #grep(Iterable, Pattern)
+     * @see #grep(Object[], Pattern)
      */
     public static <E> E[] grep(E[] array, String pattern) {
         return Enumerable.grep(asList(array), pattern).toArray(newEmptyArray(array));
     }
 
     /**
-     * @see #grep(Iterable, Pattern, Fn1)
+     * @see #grep(Object[], Pattern, Fn1)
      */
     public static <E, R> Object[] grep(E[] array, String pattern, Fn1<E, R> block) {
         return Enumerable.grep(asList(array), pattern, block).toArray();
     }
 
     /**
-     * @see #member(Iterable, Object)
+     * @see #member(Object[], Object)
      */
     public static <E> boolean includes(E[] array, Object obj) {
         return Enumerable.includes(asList(array), obj);
@@ -186,14 +186,14 @@ public class EnumerableArrays {
     }
 
     /**
-     * @see #collect(Iterable, Fn1)
+     * @see #collect(Object[], Fn1)
      */
     public static <E, R> Object[] map(E[] array, Fn1<E, R> block) {
         return Enumerable.map(asList(array), block).toArray();
     }
 
     /**
-     * @see #collect(Iterable, Fn1)
+     * @see #collect(Object[], Fn1, Class)
      */
     public static <E, R> R[] map(E[] array, Fn1<E, R> block, Class<R> type) {
         return collect(array, block, type);
@@ -343,7 +343,7 @@ public class EnumerableArrays {
      * 
      * <p>
      * Due to varargs this version doesn't support taking a block like in Ruby.
-     * Feed the result into {@link #collect(Iterable, Fn1) to achieve the same
+     * Feed the result into {@link #collect(Object[], Fn1)} to achieve the same
      * effect.
      * </p>
      */

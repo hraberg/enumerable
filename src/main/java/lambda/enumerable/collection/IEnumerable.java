@@ -60,22 +60,22 @@ public interface IEnumerable<E> extends Iterable<E> {
     <R> IEnumerable<E> eachWithIndex(Fn2<E, Integer, R> block);
 
     /**
-     * @see #toList(Iterable)
+     * @see #toList()
      */
     EList<E> entries();
 
     /**
-     * @see #detect(Fn1, Iterable)
+     * @see #detect(Fn1)
      */
     E find(Fn1<E, Boolean> block);
 
     /**
-     * @see #detect(Iterable, Fn1, Object)
+     * @see #detect(Object, Fn1)
      */
     E find(E ifNone, Fn1<E, Boolean> block);
 
     /**
-     * @see #select(Iterable, Fn1)
+     * @see #select(Fn1)
      */
     EList<E> findAll(Fn1<E, Boolean> block);
 
@@ -92,17 +92,17 @@ public interface IEnumerable<E> extends Iterable<E> {
     <R> EList<R> grep(Pattern pattern, Fn1<E, R> block);
 
     /**
-     * @see #grep(Iterable, Pattern)
+     * @see #grep(Pattern)
      */
     EList<E> grep(String pattern);
 
     /**
-     * @see #grep(Iterable, Pattern, Fn1)
+     * @see #grep(Pattern, Fn1)
      */
     <R> EList<R> grep(String pattern, Fn1<E, R> block);
 
     /**
-     * @see #member(Iterable, Object)
+     * @see #member(Object)
      */
     boolean includes(Object obj);
 
@@ -124,7 +124,7 @@ public interface IEnumerable<E> extends Iterable<E> {
     <R> R inject(R initial, Fn2<R, E, R> block);
 
     /**
-     * @see #collect(Iterable, Fn1)
+     * @see #collect(Fn1)
      */
     <R> EList<R> map(Fn1<E, R> block);
 
@@ -219,7 +219,7 @@ public interface IEnumerable<E> extends Iterable<E> {
      * 
      * <p>
      * Due to varargs this version doesn't support taking a block like in Ruby.
-     * Feed the result into {@link #collect(Iterable, Fn1) to achieve the same
+     * Feed the result into {@link #collect(Fn1)} to achieve the same
      * effect.
      * </p>
      */

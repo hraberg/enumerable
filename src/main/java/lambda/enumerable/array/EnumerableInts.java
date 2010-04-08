@@ -3,7 +3,6 @@ package lambda.enumerable.array;
 import java.lang.reflect.Array;
 import java.util.*;
 
-import lambda.Fn1;
 import lambda.enumerable.Enumerable;
 import lambda.primitives.*;
 
@@ -51,6 +50,9 @@ public class EnumerableInts {
         return result;
     }
 
+    /**
+     * @see #collect(int[], Fn1ItoO)
+     */
     public static int[] collect(int[] array, Fn1ItoI block) {
         int[] result = new int[array.length];
         int i = 0;
@@ -59,6 +61,9 @@ public class EnumerableInts {
         return result;
     }
 
+    /**
+     * @see #collect(int[], Fn1ItoO)
+     */
     public static double[] collect(int[] array, Fn1ItoD block) {
         double[] result = new double[array.length];
         int i = 0;
@@ -67,6 +72,9 @@ public class EnumerableInts {
         return result;
     }
 
+    /**
+     * @see #collect(int[], Fn1ItoO)
+     */
     public static long[] collect(int[] array, Fn1ItoL block) {
         long[] result = new long[array.length];
         int i = 0;
@@ -116,24 +124,36 @@ public class EnumerableInts {
         return array;
     }
 
+    /**
+     * @see #each(int[], Fn1ItoO)
+     */
     public static int[] each(int[] array, Fn1ItoI block) {
         for (int each : array)
             block.call(each);
         return array;
     }
 
+    /**
+     * @see #each(int[], Fn1ItoO)
+     */
     public static int[] each(int[] array, Fn1ItoD block) {
         for (int each : array)
             block.call(each);
         return array;
     }
 
+    /**
+     * @see #each(int[], Fn1ItoO)
+     */
     public static int[] each(int[] array, Fn1ItoL block) {
         for (int each : array)
             block.call(each);
         return array;
     }
 
+    /**
+     * @see #each(int[], Fn1ItoO)
+     */
     public static int[] each(int[] array, Fn1ItoB block) {
         for (int each : array)
             block.call(each);
@@ -151,6 +171,9 @@ public class EnumerableInts {
         return array;
     }
 
+    /**
+     * @see #eachWithIndex(int[], Fn2IItoO)
+     */
     public static int[] eachWithIndex(int[] array, Fn2IItoI block) {
         int idx = 0;
         for (int each : array)
@@ -159,7 +182,7 @@ public class EnumerableInts {
     }
 
     /**
-     * @see #toList(Iterable)
+     * @see #toList(int[])
      */
     public static <E> List<Integer> entries(int[] array) {
         return toList(array);
@@ -180,14 +203,14 @@ public class EnumerableInts {
     // }
     //
     /**
-     * @see #select(Iterable, Fn1)
+     * @see #select(int[], Fn1ItoB)
      */
     public static int[] findAll(int[] array, Fn1ItoB block) {
         return select(array, block);
     }
 
     /**
-     * @see #member(Iterable, Object)
+     * @see #member(int[], int)
      */
     public static boolean includes(int[] array, int i) {
         return member(array, i);
@@ -219,24 +242,36 @@ public class EnumerableInts {
     }
 
     /**
-     * @see #collect(Iterable, Fn1)
+     * @see #collect(int[], Fn1ItoO)
      */
     public static <R> Object[] map(int[] array, Fn1ItoO<R> block) {
         return collect(array, block);
     }
 
+    /**
+     * @see #collect(int[], Fn1ItoO)
+     */
     public static int[] map(int[] array, Fn1ItoI block) {
         return collect(array, block);
     }
 
+    /**
+     * @see #collect(int[], Fn1ItoO)
+     */
     public static double[] map(int[] array, Fn1ItoD block) {
         return collect(array, block);
     }
     
+    /**
+     * @see #collect(int[], Fn1ItoO)
+     */
     public static long[] map(int[] array, Fn1ItoL block) {
         return collect(array, block);
     }
 
+    /**
+     * @see #collect(int[], Fn1ItoO, Class)
+     */
     public static <R> R[] map(int[] array, Fn1ItoO<R> block, Class<R> type) {
         return collect(array, block, type);
     }

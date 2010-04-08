@@ -3,7 +3,6 @@ package lambda.enumerable.array;
 import java.lang.reflect.Array;
 import java.util.*;
 
-import lambda.Fn1;
 import lambda.enumerable.Enumerable;
 import lambda.primitives.*;
 
@@ -51,6 +50,9 @@ public class EnumerableLongs {
         return result;
     }
 
+    /**
+     * @see #collect(long[], Fn1LtoO)
+     */
     public static long[] collect(long[] array, Fn1LtoL block) {
         long[] result = new long[array.length];
         int i = 0;
@@ -59,6 +61,9 @@ public class EnumerableLongs {
         return result;
     }
 
+    /**
+     * @see #collect(long[], Fn1LtoO)
+     */
     public static double[] collect(long[] array, Fn1LtoD block) {
         double[] result = new double[array.length];
         int i = 0;
@@ -67,6 +72,9 @@ public class EnumerableLongs {
         return result;
     }
 
+    /**
+     * @see #collect(long[], Fn1LtoO)
+     */
     public static int[] collect(long[] array, Fn1LtoI block) {
         int[] result = new int[array.length];
         int i = 0;
@@ -115,25 +123,37 @@ public class EnumerableLongs {
             block.call(each);
         return array;
     }
-
+    
+    /**
+     * @see #each(long[], Fn1LtoO)
+     */
     public static long[] each(long[] array, Fn1LtoI block) {
         for (long each : array)
             block.call(each);
         return array;
     }
 
+    /**
+     * @see #each(long[], Fn1LtoO)
+     */
     public static long[] each(long[] array, Fn1LtoD block) {
         for (long each : array)
             block.call(each);
         return array;
     }
 
+    /**
+     * @see #each(long[], Fn1LtoO)
+     */
     public static long[] each(long[] array, Fn1LtoL block) {
         for (long each : array)
             block.call(each);
         return array;
     }
 
+    /**
+     * @see #each(long[], Fn1LtoO)
+     */
     public static long[] each(long[] array, Fn1LtoB block) {
         for (long each : array)
             block.call(each);
@@ -151,6 +171,9 @@ public class EnumerableLongs {
         return array;
     }
 
+    /**
+     * @see #eachWithIndex(long[], Fn2LLtoO)
+     */
     public static long[] eachWithIndex(long[] array, Fn2LLtoL block) {
         int idx = 0;
         for (long each : array)
@@ -159,7 +182,7 @@ public class EnumerableLongs {
     }
 
     /**
-     * @see #toList(Iterable)
+     * @see #toList(long[])
      */
     public static <E> List<Long> entries(long[] array) {
         return toList(array);
@@ -180,17 +203,17 @@ public class EnumerableLongs {
     // }
     //
     /**
-     * @see #select(Iterable, Fn1)
+     * @see #select(long[], Fn1LtoB)
      */
     public static long[] findAll(long[] array, Fn1LtoB block) {
         return select(array, block);
     }
 
     /**
-     * @see #member(Iterable, Object)
+     * @see #member(long[], long)
      */
-    public static boolean includes(long[] array, int i) {
-        return member(array, i);
+    public static boolean includes(long[] array, long l) {
+        return member(array, l);
     }
 
     /**
@@ -219,24 +242,36 @@ public class EnumerableLongs {
     }
 
     /**
-     * @see #collect(Iterable, Fn1)
+     * @see #map(long[], Fn1LtoO)
      */
     public static <R> Object[] map(long[] array, Fn1LtoO<R> block) {
         return collect(array, block);
     }
 
+    /**
+     * @see #map(long[], Fn1LtoO)
+     */
     public static long[] map(long[] array, Fn1LtoL block) {
         return collect(array, block);
     }
 
+    /**
+     * @see #map(long[], Fn1LtoO)
+     */
     public static double[] map(long[] array, Fn1LtoD block) {
         return collect(array, block);
     }
     
+    /**
+     * @see #map(long[], Fn1LtoO)
+     */
     public static int[] map(long[] array, Fn1LtoI block) {
         return collect(array, block);
     }
 
+    /**
+     * @see #map(long[], Fn1LtoO, Class)
+     */
     public static <R> R[] map(long[] array, Fn1LtoO<R> block, Class<R> type) {
         return collect(array, block, type);
     }
@@ -265,8 +300,8 @@ public class EnumerableLongs {
      * Returns true if any member of array equals obj. Equality is tested using
      * {@link Object#equals(Object)}.
      */
-    public static boolean member(long[] array, int i) {
-        return Arrays.binarySearch(sort(array), i) >= 0;
+    public static boolean member(long[] array, long l) {
+        return Arrays.binarySearch(sort(array), l) >= 0;
     }
 
     /**

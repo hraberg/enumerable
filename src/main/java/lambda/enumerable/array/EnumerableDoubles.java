@@ -3,7 +3,6 @@ package lambda.enumerable.array;
 import java.lang.reflect.Array;
 import java.util.*;
 
-import lambda.Fn1;
 import lambda.enumerable.Enumerable;
 import lambda.primitives.*;
 
@@ -52,7 +51,7 @@ public class EnumerableDoubles {
     }
 
     /**
-     * @see #collect(double[], Fn1)
+     * @see #collect(double[], Fn1DtoO)
      */
     public static double[] collect(double[] array, Fn1DtoD block) {
         double[] result = new double[array.length];
@@ -63,7 +62,7 @@ public class EnumerableDoubles {
     }
 
     /**
-     * @see #collect(double[], Fn1)
+     * @see #collect(double[], Fn1DtoO)
      */
     public static int[] collect(double[] array, Fn1DtoI block) {
         int[] result = new int[array.length];
@@ -74,7 +73,7 @@ public class EnumerableDoubles {
     }
 
     /**
-     * @see #collect(double[], Fn1)
+     * @see #collect(double[], Fn1DtoO)
      */
     public static long[] collect(double[] array, Fn1DtoL block) {
         long[] result = new long[array.length];
@@ -125,24 +124,36 @@ public class EnumerableDoubles {
         return array;
     }
 
+    /**
+     * @see #each(double[], Fn1DtoO)
+     */
     public static double[] each(double[] array, Fn1DtoD block) {
         for (double each : array)
             block.call(each);
         return array;
     }
 
+    /**
+     * @see #each(double[], Fn1DtoO)
+     */
     public static double[] each(double[] array, Fn1DtoI block) {
         for (double each : array)
             block.call(each);
         return array;
     }
     
+    /**
+     * @see #each(double[], Fn1DtoO)
+     */
     public static double[] each(double[] array, Fn1DtoL block) {
         for (double each : array)
             block.call(each);
         return array;
     }
     
+    /**
+     * @see #each(double[], Fn1DtoO)
+     */
     public static double[] each(double[] array, Fn1DtoB block) {
         for (double each : array)
             block.call(each);
@@ -192,17 +203,17 @@ public class EnumerableDoubles {
     // }
     //
     /**
-     * @see #select(double[], Fn1)
+     * @see #select(double[], Fn1DtoB)
      */
     public static double[] findAll(double[] array, Fn1DtoB block) {
         return select(array, block);
     }
 
     /**
-     * @see #member(double[], Object)
+     * @see #member(double[], double)
      */
-    public static boolean includes(double[] array, double i) {
-        return member(array, i);
+    public static boolean includes(double[] array, double d) {
+        return member(array, d);
     }
 
     /**
@@ -231,33 +242,36 @@ public class EnumerableDoubles {
     }
 
     /**
-     * @see #collect(double[], Fn1)
+     * @see #collect(double[], Fn1DtoO)
      */
     public static <R> Object[] map(double[] array, Fn1DtoO<R> block) {
         return collect(array, block);
     }
 
     /**
-     * @see #collect(double[], Fn1)
+     * @see #collect(double[], Fn1DtoO)
      */
     public static double[] map(double[] array, Fn1DtoD block) {
         return collect(array, block);
     }
 
     /**
-     * @see #collect(double[], Fn1)
+     * @see #collect(double[], Fn1DtoO)
      */
     public static int[] map(double[] array, Fn1DtoI block) {
         return collect(array, block);
     }
 
     /**
-     * @see #collect(double[], Fn1)
+     * @see #collect(double[], Fn1DtoO)
      */
     public static long[] map(double[] array, Fn1DtoL block) {
         return collect(array, block);
     }
 
+    /**
+     * @see #collect(double[], Fn1DtoO, Class)
+     */
     public static <R> R[] map(double[] array, Fn1DtoO<R> block, Class<R> type) {
         return collect(array, block, type);
     }
@@ -286,8 +300,8 @@ public class EnumerableDoubles {
      * Returns true if any member of array equals obj. Equality is tested using
      * {@link Object#equals(Object)}.
      */
-    public static boolean member(double[] array, double i) {
-        return Arrays.binarySearch(sort(array), i) >= 0;
+    public static boolean member(double[] array, double d) {
+        return Arrays.binarySearch(sort(array), d) >= 0;
     }
 
     /**

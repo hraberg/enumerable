@@ -513,7 +513,7 @@ public class Enumerable {
      * 
      * <p>
      * Due to varargs this version doesn't support taking a block like in Ruby.
-     * Feed the result into {@link #collect(Iterable, Fn1) to achieve the same
+     * Feed the result into {@link #collect(Iterable, Fn1)} to achieve the same
      * effect.
      * </p>
      */
