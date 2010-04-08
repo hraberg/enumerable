@@ -2,7 +2,6 @@ package lambda;
 
 import static java.lang.Thread.*;
 import static lambda.Lambda.*;
-import static lambda.Lambda.Primitives.*;
 import static org.junit.Assert.*;
 
 import java.awt.event.ActionEvent;
@@ -20,6 +19,8 @@ import lambda.exception.LambdaWeavingNotEnabledException;
 import lambda.primitives.Fn1ItoI;
 
 import org.junit.Test;
+
+import static lambda.primitives.LambdaPrimitives.*;
 
 public class LambdaTest extends TestBase {
     @Test

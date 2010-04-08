@@ -1,19 +1,19 @@
 package lambda.enumerable.array;
 
-import static lambda.Lambda.*;
-import static lambda.Lambda.Primitives.*;
-import static lambda.enumerable.array.EnumerableInts.*;
-import static org.junit.Assert.*;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import lambda.TestBase;
-import lambda.Lambda.Primitives;
 import lambda.annotation.LambdaParameter;
+import lambda.primitives.LambdaPrimitives;
 
 import org.junit.Test;
+
+import static lambda.Lambda.*;
+import static lambda.enumerable.array.EnumerableInts.*;
+import static lambda.primitives.LambdaPrimitives.*;
+import static org.junit.Assert.*;
 
 public class EnumerableIntsTest extends TestBase {
     int[] intsOneToFive = new int[] { 1, 2, 3, 4, 5 };
@@ -61,7 +61,7 @@ public class EnumerableIntsTest extends TestBase {
     @Test
     public void eachWithIndexUsingAllPrimitives() throws Exception {
         int totalIndex = 0;
-        eachWithIndex(intsOneToFive, Primitives.λ(n, idx, totalIndex += idx));
+        eachWithIndex(intsOneToFive, LambdaPrimitives.λ(n, idx, totalIndex += idx));
         assertEquals(10, totalIndex);
     }
 
@@ -98,7 +98,7 @@ public class EnumerableIntsTest extends TestBase {
     @Test
     public void eachWithIndexIsZeroBased() throws Exception {
         List<Integer> actual = list();
-        eachWithIndex(intsOneToFive, Primitives.λ(n, idx, actual.add(idx + 1)));
+        eachWithIndex(intsOneToFive, LambdaPrimitives.λ(n, idx, actual.add(idx + 1)));
         assertEquals(toList(intsOneToFive), actual);
     }
 

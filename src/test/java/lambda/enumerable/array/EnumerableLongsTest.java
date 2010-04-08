@@ -5,15 +5,15 @@ import java.util.List;
 import java.util.Set;
 
 import lambda.TestBase;
-import lambda.Lambda.Primitives;
 import lambda.annotation.LambdaParameter;
 import lambda.enumerable.array.EnumerableArrays;
+import lambda.primitives.LambdaPrimitives;
 
 import org.junit.Test;
 
 import static lambda.Lambda.*;
-import static lambda.Lambda.Primitives.*;
 import static lambda.enumerable.array.EnumerableLongs.*;
+import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
 
 public class EnumerableLongsTest extends TestBase {
@@ -114,7 +114,7 @@ public class EnumerableLongsTest extends TestBase {
     @Test
     public void eachWithIndexIsZeroBased() throws Exception {
         List<Long> actual = list();
-        eachWithIndex(longsOneToFive, Primitives.λ(l, k, actual.add(k + 1)));
+        eachWithIndex(longsOneToFive, LambdaPrimitives.λ(l, k, actual.add(k + 1)));
         assertEquals(list(1L, 2L, 3L, 4L, 5L), actual);
     }
 

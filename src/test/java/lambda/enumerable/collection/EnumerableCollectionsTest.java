@@ -7,8 +7,8 @@ import lambda.TestBase;
 import org.junit.Test;
 
 import static lambda.Lambda.*;
-import static lambda.Lambda.Primitives.*;
 import static lambda.enumerable.array.EnumerableArrays.*;
+import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
 
 public class EnumerableCollectionsTest extends TestBase {

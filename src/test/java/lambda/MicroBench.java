@@ -4,6 +4,7 @@ import static java.lang.System.*;
 import static lambda.Lambda.*;
 import static lambda.enumerable.Enumerable.*;
 import lambda.primitives.Fn1ItoI;
+import lambda.primitives.LambdaPrimitives;
 import lambda.weaving.Version;
 
 public class MicroBench {
@@ -35,7 +36,7 @@ public class MicroBench {
 
     static {
         fibo = Lambda.λ(n, n <= 1 ? n : fibo.call(n - 1) + fibo.call(n - 2));
-        fibp = Lambda.Primitives.λ(n, n <= 1 ? n : fibp.call(n - 1) + fibp.call(n - 2));
+        fibp = LambdaPrimitives.λ(n, n <= 1 ? n : fibp.call(n - 1) + fibp.call(n - 2));
     }
 
     static Integer fibo(Integer n) {

@@ -12,9 +12,10 @@ import lambda.weaving.Version;
 import static java.lang.Math.*;
 import static java.util.Arrays.*;
 import static lambda.Lambda.*;
-import static lambda.Lambda.Primitives.*;
 
 import static lambda.enumerable.Enumerable.*;
+
+import static lambda.primitives.LambdaPrimitives.*;
 
 public class EnumerableExample {
     public void example(PrintStream out) {
