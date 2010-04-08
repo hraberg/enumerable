@@ -31,8 +31,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         LambdaInfo currentLambda;
         MethodInfo currentLambdaMethod;
 
-        Type typeToIgnoreValueOfCallOn = null;
-        int primitiveCastToIgnore = -1;
+        Type lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = null;
+        int lambdaParameterDefinitionPrimitiveConversionToIgnore = -1;
 
         LambdaMethodVisitor(MethodVisitor mv, MethodInfo method) {
             super(mv);
@@ -75,7 +75,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     } else {
                         currentLambda.defineParameter(name);
 
-                        handleValidButNotExactMatchBetweenTypeOfMethodArgumentAndLambdaParameter(name);
+                        skipValidImplictCastBetweenTypeOfMethodArgumentAndLambdaParameterAtDefinition(name);
                     }
                 } else {
                     super.visitFieldInsn(opcode, owner, name, desc);
@@ -85,47 +85,47 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             }
         }
 
-        void handleValidButNotExactMatchBetweenTypeOfMethodArgumentAndLambdaParameter(String name) {
+        void skipValidImplictCastBetweenTypeOfMethodArgumentAndLambdaParameterAtDefinition(String name) {
             Type[] methodParameterTypes = getArgumentTypes(currentLambda.getLambdaMethod().desc);
             Type methodParameterType = methodParameterTypes[currentLambda.getParameterIndex(name) - 1];
-            Type parameterType = currentLambda.getParameterType(name);
+            Type lambdaParameterType = currentLambda.getParameterType(name);
 
-            if (!methodParameterType.equals(parameterType)) {
-                if (!isReferenceType(parameterType) && isReferenceType(methodParameterType))
-                    typeToIgnoreValueOfCallOn = getBoxedType(parameterType);
+            if (!methodParameterType.equals(lambdaParameterType))
+                if (!isReferenceType(lambdaParameterType) && isReferenceType(methodParameterType))
+                    lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = getBoxedType(lambdaParameterType);
 
-                else if (bothArePrimitive(parameterType, methodParameterType))
-                    if (parameterType == INT_TYPE && methodParameterType == DOUBLE_TYPE)
-                        primitiveCastToIgnore = I2D;
+                else if (bothArePrimitive(lambdaParameterType, methodParameterType))
+                    skipImplicitWideningPrimitiveConversionAtLambdaParameterDefinition(methodParameterType, lambdaParameterType);
 
-                    else if (parameterType == BYTE_TYPE && methodParameterType == DOUBLE_TYPE)
-                        primitiveCastToIgnore = I2D;
+//            if (typeToIgnoreValueOfCallOn != null) 
+//                debug("parameter " + name + " " + getSimpleClassName(lambdaParameterType) + " is really boxed as "
+//                        + getSimpleClassName(methodParameterType) + " in lambda method definition");
+//
+//            if (primitiveCastToIgnore > 0) 
+//                debug("parameter " + name + " " + getSimpleClassName(lambdaParameterType) + " is really the wider "
+//                        + getSimpleClassName(methodParameterType) + " in lambda method definition");
+        }
 
-                    else if (parameterType == CHAR_TYPE && methodParameterType == DOUBLE_TYPE)
-                        primitiveCastToIgnore = I2D;
-
-                    else if (parameterType == SHORT_TYPE && methodParameterType == DOUBLE_TYPE)
-                        primitiveCastToIgnore = I2D;
-                    
-                    else if (parameterType == LONG_TYPE && methodParameterType == DOUBLE_TYPE)
-                        primitiveCastToIgnore = L2D;
-
-                    else if (parameterType == FLOAT_TYPE && methodParameterType == DOUBLE_TYPE)
-                        primitiveCastToIgnore = F2D;
-
-                    else if (parameterType == INT_TYPE && methodParameterType == LONG_TYPE )
-                        primitiveCastToIgnore = I2L;
-
-                    else if (parameterType == BYTE_TYPE && methodParameterType == LONG_TYPE)
-                        primitiveCastToIgnore = I2L;
-
-                    else if (parameterType == CHAR_TYPE && methodParameterType == LONG_TYPE)
-                        primitiveCastToIgnore = I2L;
-
-                    else if (parameterType == SHORT_TYPE && methodParameterType == LONG_TYPE)
-                        primitiveCastToIgnore = I2L;
-                    
-}
+        private void skipImplicitWideningPrimitiveConversionAtLambdaParameterDefinition(Type methodParameterType,
+                Type lambdaParameterType) {
+            if (DOUBLE_TYPE == methodParameterType)
+                switch (lambdaParameterType.getSort()) {
+                case BYTE:
+                case CHAR:
+                case SHORT:
+                case INT:
+                    lambdaParameterDefinitionPrimitiveConversionToIgnore = I2D;
+                    break;
+                case Type.FLOAT:
+                    lambdaParameterDefinitionPrimitiveConversionToIgnore = F2D;
+                    break;
+                case Type.LONG:
+                    lambdaParameterDefinitionPrimitiveConversionToIgnore = L2D;
+                    break;
+                }
+            else if (LONG_TYPE == methodParameterType)
+                lambdaParameterDefinitionPrimitiveConversionToIgnore = I2L;
+            
         }
 
         void debugLambdaStart() {
@@ -162,8 +162,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     debugDedent();
 
                 } else if (inLambda() && INVOKESTATIC == opcode && "valueOf".equals(name)
-                        && getObjectType(owner).equals(typeToIgnoreValueOfCallOn)) {
-                    typeToIgnoreValueOfCallOn = null;
+                        && getObjectType(owner).equals(lambdaParameterTypeDefinitionToIgnoreValueOfCallOn)) {
+                    lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = null;
 
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc);
@@ -174,8 +174,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         public void visitInsn(int opcode) {
-            if (opcode == primitiveCastToIgnore)
-                primitiveCastToIgnore = -1;
+            if (opcode == lambdaParameterDefinitionPrimitiveConversionToIgnore)
+                lambdaParameterDefinitionPrimitiveConversionToIgnore = -1;
             else
                 super.visitInsn(opcode);
         }
@@ -432,42 +432,30 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 unboxLocal(localIndex, lambdaParameterType);
 
             else if (bothArePrimitive(methodParameterType, lambdaParameterType))
-                convertBetweenPrimitives(methodParameterType, lambdaParameterType, localIndex);
+                convertNarrowlyBetweenPrimitiveWiderMethodArgumentTypeIntoLambdaParameterType(methodParameterType, lambdaParameterType, localIndex);
         }
 
-        void convertBetweenPrimitives(Type methodParameterType, Type lambdaParameterType, int localIndex) {
-            if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == INT_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
-            
-            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == BYTE_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
-
-            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == CHAR_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
-
-            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == SHORT_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
-            
-            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == LONG_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2L);
-
-            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == FLOAT_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2F);
-
-            else if (methodParameterType == LONG_TYPE && lambdaParameterType == INT_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
-
-            else if (methodParameterType == LONG_TYPE && lambdaParameterType == BYTE_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
-
-            else if (methodParameterType == LONG_TYPE && lambdaParameterType == CHAR_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
-
-            else if (methodParameterType == LONG_TYPE && lambdaParameterType == SHORT_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
+        void convertNarrowlyBetweenPrimitiveWiderMethodArgumentTypeIntoLambdaParameterType(Type methodParameterType, Type lambdaParameterType, int localIndex) {
+            if (DOUBLE_TYPE == methodParameterType)
+                switch (lambdaParameterType.getSort()) {
+                case BYTE:
+                case CHAR:
+                case SHORT:
+                case INT:
+                    convertPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
+                    break;
+                case Type.FLOAT:
+                    convertPrimitive(methodParameterType, lambdaParameterType, localIndex, D2F);
+                    break;
+                case Type.LONG:
+                    convertPrimitive(methodParameterType, lambdaParameterType, localIndex, D2L);
+                    break;
+                }
+            else if (LONG_TYPE == methodParameterType)
+                convertPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
         }
 
-        void castPrimitive(Type from, Type to, int local, int opcode) {
+        void convertPrimitive(Type from, Type to, int local, int opcode) {
             mv.visitVarInsn(from.getOpcode(ILOAD), local);
             mv.visitInsn(opcode);
             mv.visitVarInsn(to.getOpcode(ISTORE), local);
