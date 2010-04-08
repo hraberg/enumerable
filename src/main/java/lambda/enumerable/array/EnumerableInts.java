@@ -302,6 +302,23 @@ public class EnumerableInts {
     }
 
     /**
+     * Constructs a range using the given start and end. The range will include
+     * the end object.
+     */
+    public static int[] range(int start, int end) {
+        return Enumerable.range(start, end).toArray();
+    }
+
+    /**
+     * Constructs a range using the given start and end. If the third parameter
+     * is false, the range will include the end object; otherwise, it will be
+     * excluded.
+     */
+    public static int[] range(int start, int end, boolean exclusive) {
+        return Enumerable.range(start, end, exclusive).toArray();
+    }
+    
+    /**
      * Returns an array containing all elements of array for which block is
      * false.
      */

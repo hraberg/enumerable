@@ -3,16 +3,15 @@
  */
 package lambda.enumerable;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
+import java.util.NoSuchElementException;
+
+import lambda.enumerable.collection.EList;
 
 public class Range implements Iterable<Integer> {
     public final int start, end;
     public final boolean exclusive;
 
-    private final List<Integer> range = new ArrayList<Integer>();
-    
     public Range(int start, int end) {
         this(start, end, false);
     }
@@ -21,16 +20,40 @@ public class Range implements Iterable<Integer> {
         this.start = start;
         this.end = end;
         this.exclusive = exclusive;
+    }
 
-        for (int x = start; exclusive ? x < end : x <= end; x++)
-            range.add(x);
+    public EList<Integer> toList() {
+        EList<Integer> result = new EList<Integer>();
+        for (Integer integer : this)
+            result.add(integer);
+        return result;
     }
     
-    public Integer[] toArray() {
-        return range.toArray(new Integer[0]);
+    public int[] toArray() {
+        int[] array = new int[(exclusive ? end : end + 1) - start];
+        int i = 0;
+        for (Integer integer : this)
+            array[i++] = integer;
+        return array;
     }
 
     public Iterator<Integer> iterator() {
-        return range.iterator();
+        return new Iterator<Integer>() {
+            int x = start;
+
+            public boolean hasNext() {
+                return exclusive ? x < end : x <= end;
+            }
+
+            public Integer next() {
+                if (!hasNext())
+                    throw new NoSuchElementException();
+                return x++;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 }

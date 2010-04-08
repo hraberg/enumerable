@@ -21,7 +21,7 @@ public class EIterable<E> implements Iterable<E>, IEnumerable<E>  {
         return (R) new EIterable<T>(iterable);
     }
     
-    private final Iterable<E> iterable;
+    protected final Iterable<E> iterable;
 
     public EIterable(Iterable<E> iterable) {
         this.iterable = iterable;

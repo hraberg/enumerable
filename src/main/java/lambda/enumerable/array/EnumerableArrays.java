@@ -260,7 +260,7 @@ public class EnumerableArrays {
      * the end object.
      */
     public static Integer[] range(int start, int end) {
-        return Enumerable.range(start, end).toArray();
+        return Enumerable.range(start, end).toList().toArray(new Integer[0]);
     }
 
     /**
@@ -269,7 +269,7 @@ public class EnumerableArrays {
      * excluded.
      */
     public static Integer[] range(int start, int end, boolean exclusive) {
-        return Enumerable.range(start, end, exclusive).toArray();
+        return Enumerable.range(start, end, exclusive).toList().toArray(new Integer[0]);
     }
     
     /**
