@@ -1,4 +1,4 @@
-package lambda.enumerable.arrays;
+package lambda.enumerable.array;
 
 import static lambda.Lambda.*;
 import static lambda.enumerable.array.EnumerableArrays.*;

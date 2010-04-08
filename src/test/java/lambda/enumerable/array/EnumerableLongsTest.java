@@ -1,4 +1,4 @@
-package lambda.enumerable.arrays;
+package lambda.enumerable.array;
 
 import java.util.HashSet;
 import java.util.List;
