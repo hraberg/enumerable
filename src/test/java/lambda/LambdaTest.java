@@ -232,17 +232,15 @@ public class LambdaTest extends TestBase {
         assertEquals(list(3, 2, 1), list);
     }
 
-    // TODO: This test does something the new primitive logic doesn't handle. Will try to resurrect later.
-    
-//    static interface TakesAndReturnsPrimtive {
-//        public double toDouble(int i);
-//    }
+    static interface TakesAndReturnsPrimtive {
+        public double toDouble(int i);
+    }
 
-//    @Test
-//    public void createSingleMethodInterfaceWithPrimtiveArgumentAndReturnUsingGenericDelagate() throws Exception {
-//        TakesAndReturnsPrimtive t = delegate(n, n);
-//        assertEquals(2.0, t.toDouble(2), 0);
-//    }
+    @Test
+    public void createSingleMethodInterfaceWithPrimtiveArgumentAndReturnUsingGenericDelagate() throws Exception {
+        TakesAndReturnsPrimtive t = delegate(n, n);
+        assertEquals(2.0, t.toDouble(2), 0);
+    }
 
     static abstract class SingleAbstractMethodNoArgumentsClass {
         public abstract String getMessage();

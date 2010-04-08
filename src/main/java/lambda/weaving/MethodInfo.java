@@ -1,10 +1,12 @@
 package lambda.weaving;
 
-import static org.objectweb.asm.Type.*;
-
 import java.util.*;
 
+import lambda.annotation.Unused;
+
 import org.objectweb.asm.Type;
+
+import static org.objectweb.asm.Type.*;
 
 class MethodInfo {
     String name;
@@ -130,8 +132,8 @@ class MethodInfo {
         Map<String, VariableInfo> parametersByName = new LinkedHashMap<String, VariableInfo>();
         Set<String> definedParameters = new HashSet<String>();
         Type type;
-        Type expressionType;
         MethodInfo method;
+        Type[] newLambdaParameterTypes;
 
         void accessLocal(int operand) {
             VariableInfo local = accessedLocalsByIndex.get(operand);
@@ -168,7 +170,7 @@ class MethodInfo {
         }
 
         int getParameterIndex(String name) {
-            return new ArrayList<String>(getParameters()).indexOf(name) + 1;
+            return new ArrayList<String>(getParameters()).indexOf(name);
         }
 
         boolean isParameterDefined(String name) {
@@ -215,11 +217,7 @@ class MethodInfo {
         }
 
         Type getExpressionType() {
-            return expressionType;
-        }
-
-        public void setExpressionType(Type expresionType) {
-            this.expressionType = expresionType;
+            return newLambdaParameterTypes[newLambdaParameterTypes.length -1];
         }
 
         void setLambdaMethod(MethodInfo method) {
@@ -234,7 +232,7 @@ class MethodInfo {
             Type[] parameterTypes = getParameterTypes();
             int index = 1;
             for (int i = 0; i < parameterTypes.length; i++)
-                if (getParameterIndex(name) == i + 1)
+                if (getParameterIndex(name) == i)
                     break;
                 else
                     index += parameterTypes[i].getSize();
@@ -243,6 +241,23 @@ class MethodInfo {
 
         String getParameterByIndex(int index) {
             return new ArrayList<String>(getParameters()).get(index - 1);
+        }
+
+        void setNewLambdaParameterTypes(Type[] newLambdaParameterTypes) {
+            this.newLambdaParameterTypes = newLambdaParameterTypes;
+        }
+
+        Type getNewMethodParameterType(String name) {
+            int parameterIndex = getParameterIndex(name);
+            int i = 0;
+            for (Type type : newLambdaParameterTypes) {
+                if (type != Type.getType(Unused.class))
+                    if (i == parameterIndex)
+                        return type;
+                    else
+                        i++;
+            }
+            return null;
         }
     }
 }

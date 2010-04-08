@@ -32,7 +32,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         MethodInfo currentLambdaMethod;
         boolean inLambdaDefinition;
 
-        Type lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = null;
+        Type lambdaParameterTypeDefinitionToIgnoreValueOfCallOn;
         int lambdaParameterDefinitionPrimitiveConversionToIgnore = -1;
 
         LambdaMethodVisitor(MethodVisitor mv, MethodInfo method) {
@@ -73,7 +73,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     } else {
                         currentLambda.defineParameter(name);
- 
+
                         skipValidImplictCastBetweenTypeOfMethodArgumentAndLambdaParameterAtDefinition(name);
 
                         if (currentLambda.allParametersAreDefined())
@@ -89,7 +89,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void createLambda() {
             inLambdaDefinition = false;
-            
+
             createLambdaClass();
             createLambdaConstructor();
 
@@ -97,18 +97,29 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void skipValidImplictCastBetweenTypeOfMethodArgumentAndLambdaParameterAtDefinition(String name) {
-            Type[] methodParameterTypes = getArgumentTypes(currentLambda.getLambdaMethod().desc);
-            Type methodParameterType = methodParameterTypes[currentLambda.getParameterIndex(name) - 1];
             Type lambdaParameterType = currentLambda.getParameterType(name);
 
-            if (!methodParameterType.equals(lambdaParameterType))
-                if (!isReferenceType(lambdaParameterType) && isReferenceType(methodParameterType))
-                    lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = getBoxedType(lambdaParameterType);
+            if (isPrimitive(lambdaParameterType) && isReference(currentLambda.getNewMethodParameterType(name)))
+                lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = getBoxedType(lambdaParameterType);
 
-                else if (bothArePrimitive(lambdaParameterType, methodParameterType))
+            
+            Type[] methodParameterTypes = getArgumentTypes(currentLambda.getLambdaMethod().desc);
+            Type methodParameterType = methodParameterTypes[currentLambda.getParameterIndex(name)];
+
+            if (!methodParameterType.equals(lambdaParameterType)) {
+                if (isPrimitive(lambdaParameterType) && isPrimitive(methodParameterType))
                     skipImplicitWideningPrimitiveConversionAtLambdaParameterDefinition(methodParameterType,
                             lambdaParameterType);
 
+                else if (isPrimitive(lambdaParameterType) && isReference(methodParameterType))
+                    lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = getBoxedType(lambdaParameterType);
+            }
+
+            debugLambdaParameterDefinitionSkippedConversions(name, methodParameterType, lambdaParameterType);
+        }
+
+        void debugLambdaParameterDefinitionSkippedConversions(String name, Type methodParameterType,
+                Type lambdaParameterType) {
             if (lambdaParameterTypeDefinitionToIgnoreValueOfCallOn != null)
                 debug("parameter " + name + " " + getSimpleClassName(lambdaParameterType) + " is really boxed as "
                         + getSimpleClassName(methodParameterType) + " in lambda method definition");
@@ -118,7 +129,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                         + getSimpleClassName(methodParameterType) + " in lambda method definition");
         }
 
-        private void skipImplicitWideningPrimitiveConversionAtLambdaParameterDefinition(Type methodParameterType,
+        void skipImplicitWideningPrimitiveConversionAtLambdaParameterDefinition(Type methodParameterType,
                 Type lambdaParameterType) {
             if (DOUBLE_TYPE == methodParameterType)
                 switch (lambdaParameterType.getSort()) {
@@ -147,9 +158,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                         + method.getAccessedParametersAndLocalsString(currentLambda.accessedLocals);
 
             debug("lambda #" + getSimpleClassName(currentLambda.getExpressionType())
-                    + currentLambda.getTypedParametersString() + locals + " as "
-                    + currentLambda.getLambdaMethod() + " in " + getSimpleClassName(currentLambda.getType()) + " at "
-                    + sourceAndLine());
+                    + currentLambda.getTypedParametersString() + locals + " as " + currentLambda.getLambdaMethod()
+                    + " in " + getSimpleClassName(currentLambda.getType()) + " at " + sourceAndLine());
             debugIndent();
         }
 
@@ -175,8 +185,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                     debugDedent();
 
-                } else if (inLambda() && INVOKESTATIC == opcode && "valueOf".equals(name)
-                        && getObjectType(owner).equals(lambdaParameterTypeDefinitionToIgnoreValueOfCallOn)) {
+                } else if (isValueOfCallToIgnore(opcode, owner, name)) {
                     lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = null;
 
                 } else {
@@ -185,6 +194,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             } catch (Exception e) {
                 throw uncheck(e);
             }
+        }
+
+        boolean isValueOfCallToIgnore(int opcode, String owner, String name) {
+            return inLambda() && INVOKESTATIC == opcode && "valueOf".equals(name)
+                    && getObjectType(owner).equals(lambdaParameterTypeDefinitionToIgnoreValueOfCallOn);
         }
 
         public void visitInsn(int opcode) {
@@ -386,7 +400,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 mv.visitVarInsn(type.getOpcode(ISTORE), realLocalIndex);
             } else {
                 mv.visitVarInsn(type.getOpcode(ILOAD), realLocalIndex);
-                if (isReferenceType(type))
+                if (isReference(type))
                     mv.visitTypeInsn(CHECKCAST, type.getInternalName());
             }
         }
@@ -428,7 +442,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 Type lambdaParameterType = lambdaParameterTypes[i];
 
                 if (!methodParameterType.equals(lambdaParameterType)
-                        && !(isReferenceType(methodParameterType) && isReferenceType(lambdaParameterType)))
+                        && !(isReference(methodParameterType) && isReference(lambdaParameterType)))
                     convertMethodArgumentIntoLambdaParameterType(i + 1, methodParameterType, lambdaParameterType);
             }
         }
@@ -442,10 +456,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     + getSimpleClassName(methodParameterType) + " to " + getSimpleClassName(lambdaParameterType)
                     + " in lambda local " + localIndex);
 
-            if (isReferenceType(methodParameterType) && !isReferenceType(lambdaParameterType))
+            if (isReference(methodParameterType) && isPrimitive(lambdaParameterType))
                 unboxLocal(localIndex, lambdaParameterType);
 
-            else if (bothArePrimitive(methodParameterType, lambdaParameterType))
+            else if (isPrimitive(methodParameterType) && isPrimitive(lambdaParameterType))
                 convertNarrowlyBetweenPrimitiveWiderMethodArgumentTypeIntoLambdaParameterType(methodParameterType,
                         lambdaParameterType, localIndex);
         }
@@ -477,10 +491,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitVarInsn(to.getOpcode(ISTORE), local);
         }
 
-        boolean bothArePrimitive(Type methodParameterType, Type lambdaParameterType) {
-            return !isReferenceType(methodParameterType) && !isReferenceType(lambdaParameterType);
-        }
-
         void returnFromLambdaMethod() {
             Type returnType = getReturnType(currentLambdaMethod.desc);
             Type lambdaExpressionType = currentLambda.getExpressionType();
@@ -490,20 +500,20 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitInsn(returnType.getOpcode(IRETURN));
             mv.visitMaxs(0, 0);
             mv.visitEnd();
-            
+
             currentLambdaMethod = null;
         }
 
         void handleBoxingAndUnboxing(Type returnType, Type lambdaExpressionType) {
-            if (!isReferenceType(returnType) && isReferenceType(lambdaExpressionType))
+            if (isPrimitive(returnType) && isReference(lambdaExpressionType))
                 unbox(returnType);
 
-            else if (isReferenceType(returnType) && !isReferenceType(lambdaExpressionType))
+            else if (isReference(returnType) && isPrimitive(lambdaExpressionType))
                 box(lambdaExpressionType);
         }
 
         void box(Type type) {
-            if (isReferenceType(type))
+            if (isReference(type))
                 return;
 
             Type boxed = getBoxedType(type);
@@ -512,8 +522,12 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitMethodInsn(INVOKESTATIC, boxed.getInternalName(), name, descriptor);
         }
 
-        boolean isReferenceType(Type type) {
+        boolean isReference(Type type) {
             return type.getSort() == OBJECT || type.getSort() == ARRAY;
+        }
+
+        boolean isPrimitive(Type type) {
+            return !isReference(type);
         }
 
         void boxLocal(int local, Type type) {
