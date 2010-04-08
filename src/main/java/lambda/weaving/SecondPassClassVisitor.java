@@ -592,19 +592,19 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             Type[] parameters = getLambdaConstructorParameters();
             String descriptor = getMethodDescriptor(VOID_TYPE, parameters);
 
-            mv = lambdaWriter.visitMethod(ACC_PUBLIC, "<init>", descriptor, null, null);
+            MethodVisitor mv = lambdaWriter.visitMethod(ACC_PUBLIC, "<init>", descriptor, null, null);
             mv.visitCode();
 
-            createAndInitializeFieldsWithAccessedLocals(parameters);
+            createAndInitializeFieldsWithAccessedLocals(mv, parameters);
 
-            invokeSuperConstructor();
+            invokeSuperConstructor(mv);
 
             mv.visitInsn(RETURN);
             mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
 
-        void createAndInitializeFieldsWithAccessedLocals(Type[] parameters) {
+        void createAndInitializeFieldsWithAccessedLocals(MethodVisitor mv, Type[] parameters) {
             Iterator<Integer> locals = currentLambda.accessedLocals.iterator();
             for (int i = 0; locals.hasNext(); i++) {
                 String field = currentLambda.getFieldNameForLocal(locals.next());
@@ -619,7 +619,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             }
         }
 
-        void invokeSuperConstructor() {
+        void invokeSuperConstructor(MethodVisitor mv) {
             mv.visitVarInsn(ALOAD, 0);
             mv.visitMethodInsn(INVOKESPECIAL, getLambdaSuperType().getInternalName(), "<init>", "()V");
         }
