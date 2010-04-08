@@ -1,10 +1,5 @@
 package lambda.enumerable.arrays;
 
-import static lambda.Lambda.*;
-import static lambda.Lambda.Primitives.*;
-import static lambda.enumerable.array.EnumerableLongs.*;
-import static org.junit.Assert.*;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +10,11 @@ import lambda.annotation.LambdaParameter;
 import lambda.enumerable.array.EnumerableArrays;
 
 import org.junit.Test;
+
+import static lambda.Lambda.*;
+import static lambda.Lambda.Primitives.*;
+import static lambda.enumerable.array.EnumerableLongs.*;
+import static org.junit.Assert.*;
 
 public class EnumerableLongsTest extends TestBase {
     long[] longsOneToFive = new long[] { 1, 2, 3, 4, 5 };
@@ -32,9 +32,9 @@ public class EnumerableLongsTest extends TestBase {
         EnumerableArrays.each(new Long[] {1L, 2L, 3L, 4L, 5L}, λ(l, actual.add(l)));
         assertEquals(toList(longsOneToFive), actual);
     }
-
+    
     @Test
-    public void callsBlockOnceForEachElementWithDoubleReturn() throws Exception {
+    public void callsBlockOnceForEachElementWithLongReturn() throws Exception {
         long result = 1;
         each(longsOneToFive, λ(l, result *= 314 * l));
         assertEquals(366293731418880L, result);
@@ -70,7 +70,44 @@ public class EnumerableLongsTest extends TestBase {
     @Test
     public void eachWithIndexUsingMixedPrimitivesLongAndInt() throws Exception {
         int totalIndex = 0;
-        eachWithIndex(longsOneToFive, Primitives.λ(l, idx, totalIndex += idx));
+        eachWithIndex(longsOneToFive, λ(l, idx, totalIndex += idx));
+        assertEquals(10, totalIndex);
+    }
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesIntAndLong() throws Exception {
+        int total = 0;
+        eachWithIndex(longsOneToFive, λ(i, l, total += i));
+        assertEquals(15, total);
+    }
+    
+    @LambdaParameter
+    static short aShort;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesLongAndShort() throws Exception {
+        short totalIndex = 0;
+        eachWithIndex(longsOneToFive, λ(l, aShort, totalIndex += aShort));
+        assertEquals(10, totalIndex);
+    }
+
+    @LambdaParameter
+    static byte aByte;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesLongAndByte() throws Exception {
+        byte totalIndex = 0;
+        eachWithIndex(longsOneToFive, λ(l, aByte, totalIndex += aByte));
+        assertEquals(10, totalIndex);
+    }
+
+    @LambdaParameter
+    static char aChar;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesLongAndChar() throws Exception {
+        char totalIndex = 0;
+        eachWithIndex(longsOneToFive, λ(l, aChar, totalIndex += aChar));
         assertEquals(10, totalIndex);
     }
 

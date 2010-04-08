@@ -65,6 +65,36 @@ public class EnumerableIntsTest extends TestBase {
         assertEquals(10, totalIndex);
     }
 
+    @LambdaParameter
+    static short aShort;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesIntAndShort() throws Exception {
+        short totalIndex = 0;
+        eachWithIndex(intsOneToFive, λ(n, aShort, totalIndex += aShort));
+        assertEquals(10, totalIndex);
+    }
+
+    @LambdaParameter
+    static byte aByte;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesIntAndByte() throws Exception {
+        byte totalIndex = 0;
+        eachWithIndex(intsOneToFive, λ(n, aByte, totalIndex += aByte));
+        assertEquals(10, totalIndex);
+    }
+
+    @LambdaParameter
+    static char aChar;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesIntAndChar() throws Exception {
+        char totalIndex = 0;
+        eachWithIndex(intsOneToFive, λ(n, aChar, totalIndex += aChar));
+        assertEquals(10, totalIndex);
+    }
+
     @Test
     public void eachWithIndexIsZeroBased() throws Exception {
         List<Integer> actual = list();

@@ -98,13 +98,34 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     if (parameterType == INT_TYPE && methodParameterType == DOUBLE_TYPE)
                         primitiveCastToIgnore = I2D;
 
-                    else if (parameterType == INT_TYPE && methodParameterType == LONG_TYPE )
-                        primitiveCastToIgnore = I2L;
+                    else if (parameterType == BYTE_TYPE && methodParameterType == DOUBLE_TYPE)
+                        primitiveCastToIgnore = I2D;
+
+                    else if (parameterType == CHAR_TYPE && methodParameterType == DOUBLE_TYPE)
+                        primitiveCastToIgnore = I2D;
+
+                    else if (parameterType == SHORT_TYPE && methodParameterType == DOUBLE_TYPE)
+                        primitiveCastToIgnore = I2D;
                     
                     else if (parameterType == LONG_TYPE && methodParameterType == DOUBLE_TYPE)
                         primitiveCastToIgnore = L2D;
 
-            }
+                    else if (parameterType == FLOAT_TYPE && methodParameterType == DOUBLE_TYPE)
+                        primitiveCastToIgnore = F2D;
+
+                    else if (parameterType == INT_TYPE && methodParameterType == LONG_TYPE )
+                        primitiveCastToIgnore = I2L;
+
+                    else if (parameterType == BYTE_TYPE && methodParameterType == LONG_TYPE)
+                        primitiveCastToIgnore = I2L;
+
+                    else if (parameterType == CHAR_TYPE && methodParameterType == LONG_TYPE)
+                        primitiveCastToIgnore = I2L;
+
+                    else if (parameterType == SHORT_TYPE && methodParameterType == LONG_TYPE)
+                        primitiveCastToIgnore = I2L;
+                    
+}
         }
 
         void debugLambdaStart() {
@@ -418,11 +439,32 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == INT_TYPE)
                 castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
             
-            else if (methodParameterType == LONG_TYPE && lambdaParameterType == INT_TYPE)
-                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
+            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == BYTE_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
+
+            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == CHAR_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
+
+            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == SHORT_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2I);
             
             else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == LONG_TYPE)
                 castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2L);
+
+            else if (methodParameterType == DOUBLE_TYPE && lambdaParameterType == FLOAT_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, D2F);
+
+            else if (methodParameterType == LONG_TYPE && lambdaParameterType == INT_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
+
+            else if (methodParameterType == LONG_TYPE && lambdaParameterType == BYTE_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
+
+            else if (methodParameterType == LONG_TYPE && lambdaParameterType == CHAR_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
+
+            else if (methodParameterType == LONG_TYPE && lambdaParameterType == SHORT_TYPE)
+                castPrimitive(methodParameterType, lambdaParameterType, localIndex, L2I);
         }
 
         void castPrimitive(Type from, Type to, int local, int opcode) {

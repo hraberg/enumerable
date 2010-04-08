@@ -1,10 +1,5 @@
 package lambda.enumerable.arrays;
 
-import static lambda.Lambda.*;
-import static lambda.Lambda.Primitives.*;
-import static lambda.enumerable.array.EnumerableDoubles.*;
-import static org.junit.Assert.*;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +10,11 @@ import lambda.annotation.LambdaParameter;
 import lambda.enumerable.array.EnumerableArrays;
 
 import org.junit.Test;
+
+import static lambda.Lambda.*;
+import static lambda.Lambda.Primitives.*;
+import static lambda.enumerable.array.EnumerableDoubles.*;
+import static org.junit.Assert.*;
 
 public class EnumerableDoublesTest extends TestBase {
     double[] doublesOneToFive = new double[] { 1, 2, 3, 4, 5 };
@@ -79,6 +79,60 @@ public class EnumerableDoublesTest extends TestBase {
         int totalIndex = 0;
         eachWithIndex(doublesOneToFive, Primitives.λ(d, l, totalIndex += l));
         assertEquals(10, totalIndex);
+    }
+
+    @LambdaParameter
+    static float aFloat;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesDoubleAndFloat() throws Exception {
+        float totalIndex = 0;
+        eachWithIndex(doublesOneToFive, λ(d, aFloat, totalIndex += aFloat));
+        assertEquals(10, totalIndex, 0.0);
+    }
+
+    @LambdaParameter
+    static short aShort;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesDoubleAndShort() throws Exception {
+        short totalIndex = 0;
+        eachWithIndex(doublesOneToFive, λ(d, aShort, totalIndex += aShort));
+        assertEquals(10, totalIndex);
+    }
+
+    @LambdaParameter
+    static byte aByte;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesDoubleAndByte() throws Exception {
+        byte totalIndex = 0;
+        eachWithIndex(doublesOneToFive, λ(d, aByte, totalIndex += aByte));
+        assertEquals(10, totalIndex);
+    }
+
+    @LambdaParameter
+    static char aChar;
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesDoubleAndChar() throws Exception {
+        char totalIndex = 0;
+        eachWithIndex(doublesOneToFive, λ(d, aChar, totalIndex += aChar));
+        assertEquals(10, totalIndex);
+    }
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesIntAndDouble() throws Exception {
+        int total = 0;
+        eachWithIndex(doublesOneToFive, Primitives.λ(i, d, total += i));
+        assertEquals(15, total);
+    }
+
+    @Test
+    public void eachWithIndexUsingMixedPrimitivesLongAndDouble() throws Exception {
+        int total = 0;
+        eachWithIndex(doublesOneToFive, Primitives.λ(l, d, total += l));
+        assertEquals(15, total);
     }
 
     @Test
