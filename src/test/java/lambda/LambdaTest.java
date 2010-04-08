@@ -1,9 +1,5 @@
 package lambda;
 
-import static java.lang.Thread.*;
-import static lambda.Lambda.*;
-import static org.junit.Assert.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
@@ -20,7 +16,11 @@ import lambda.primitives.Fn1ItoI;
 
 import org.junit.Test;
 
+import static java.lang.Thread.*;
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
 import static lambda.primitives.LambdaPrimitives.*;
+import static org.junit.Assert.*;
 
 public class LambdaTest extends TestBase {
     @Test

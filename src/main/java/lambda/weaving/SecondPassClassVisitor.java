@@ -1,15 +1,15 @@
 package lambda.weaving;
 
-import static lambda.exception.UncheckedException.*;
-import static lambda.weaving.Debug.*;
-import static lambda.weaving.MethodInfo.*;
-import static org.objectweb.asm.Type.*;
-
 import java.util.*;
 
 import lambda.weaving.MethodInfo.LambdaInfo;
 
 import org.objectweb.asm.*;
+
+import static lambda.exception.UncheckedException.*;
+import static lambda.weaving.Debug.*;
+import static lambda.weaving.MethodInfo.*;
+import static org.objectweb.asm.Type.*;
 
 class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     String source;

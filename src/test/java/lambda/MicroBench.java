@@ -1,11 +1,13 @@
 package lambda;
 
-import static java.lang.System.*;
-import static lambda.Lambda.*;
-import static lambda.enumerable.Enumerable.*;
 import lambda.primitives.Fn1ItoI;
 import lambda.primitives.LambdaPrimitives;
 import lambda.weaving.Version;
+import static java.lang.System.*;
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
+
+import static lambda.enumerable.Enumerable.*;
 
 public class MicroBench {
     public static void main(String[] args) {

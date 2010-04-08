@@ -6,11 +6,10 @@ import java.util.Set;
 
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
-import lambda.primitives.LambdaPrimitives;
 
 import org.junit.Test;
 
-import static lambda.Lambda.*;
+import static lambda.Parameters.*;
 import static lambda.enumerable.primitives.EnumerableInts.*;
 import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
@@ -61,7 +60,7 @@ public class EnumerableIntsTest extends TestBase {
     @Test
     public void eachWithIndexUsingAllPrimitives() throws Exception {
         int totalIndex = 0;
-        eachWithIndex(intsOneToFive, LambdaPrimitives.λ(n, idx, totalIndex += idx));
+        eachWithIndex(intsOneToFive, λ(n, idx, totalIndex += idx));
         assertEquals(10, totalIndex);
     }
 
@@ -98,7 +97,7 @@ public class EnumerableIntsTest extends TestBase {
     @Test
     public void eachWithIndexIsZeroBased() throws Exception {
         List<Integer> actual = list();
-        eachWithIndex(intsOneToFive, LambdaPrimitives.λ(n, idx, actual.add(idx + 1)));
+        eachWithIndex(intsOneToFive, λ(n, idx, actual.add(idx + 1)));
         assertEquals(toList(intsOneToFive), actual);
     }
 

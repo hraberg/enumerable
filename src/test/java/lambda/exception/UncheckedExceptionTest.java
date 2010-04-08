@@ -1,11 +1,11 @@
 package lambda.exception;
 
-import static lambda.exception.UncheckedException.*;
-import static org.junit.Assert.*;
-
 import java.io.FileInputStream;
 
 import org.junit.Test;
+
+import static lambda.exception.UncheckedException.*;
+import static org.junit.Assert.*;
 
 public class UncheckedExceptionTest {
     @Test(expected = UncheckedException.class)

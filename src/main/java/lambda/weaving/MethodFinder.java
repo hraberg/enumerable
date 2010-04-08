@@ -1,10 +1,10 @@
 package lambda.weaving;
 
-import static org.objectweb.asm.Type.*;
-
 import java.util.Arrays;
 
 import org.objectweb.asm.MethodVisitor;
+
+import static org.objectweb.asm.Type.*;
 
 class MethodFinder extends EmptyVisitor {
     String name;

@@ -7,11 +7,10 @@ import java.util.Set;
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
 import lambda.enumerable.EnumerableArrays;
-import lambda.primitives.LambdaPrimitives;
 
 import org.junit.Test;
 
-import static lambda.Lambda.*;
+import static lambda.Parameters.*;
 import static lambda.enumerable.primitives.EnumerableDoubles.*;
 import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
@@ -70,14 +69,14 @@ public class EnumerableDoublesTest extends TestBase {
     @Test
     public void eachWithIndexUsingMixedPrimitivesDoubleAndInt() throws Exception {
         int totalIndex = 0;
-        eachWithIndex(doublesOneToFive, LambdaPrimitives.λ(d, idx, totalIndex += idx));
+        eachWithIndex(doublesOneToFive, λ(d, idx, totalIndex += idx));
         assertEquals(10, totalIndex);
     }
 
     @Test
     public void eachWithIndexUsingMixedPrimitivesDoubleAndLong() throws Exception {
         int totalIndex = 0;
-        eachWithIndex(doublesOneToFive, LambdaPrimitives.λ(d, l, totalIndex += l));
+        eachWithIndex(doublesOneToFive, λ(d, l, totalIndex += l));
         assertEquals(10, totalIndex);
     }
 
@@ -124,21 +123,21 @@ public class EnumerableDoublesTest extends TestBase {
     @Test
     public void eachWithIndexUsingMixedPrimitivesIntAndDouble() throws Exception {
         int total = 0;
-        eachWithIndex(doublesOneToFive, LambdaPrimitives.λ(i, d, total += i));
+        eachWithIndex(doublesOneToFive, λ(i, d, total += i));
         assertEquals(15, total);
     }
 
     @Test
     public void eachWithIndexUsingMixedPrimitivesLongAndDouble() throws Exception {
         int total = 0;
-        eachWithIndex(doublesOneToFive, LambdaPrimitives.λ(l, d, total += l));
+        eachWithIndex(doublesOneToFive, λ(l, d, total += l));
         assertEquals(15, total);
     }
 
     @Test
     public void eachWithIndexIsZeroBased() throws Exception {
         List<Integer> actual = list();
-        eachWithIndex(doublesOneToFive, LambdaPrimitives.λ(d, x, actual.add((int) x + 1)));
+        eachWithIndex(doublesOneToFive, λ(d, x, actual.add((int) x + 1)));
         assertEquals(list(1, 2, 3, 4, 5), actual);
     }
 

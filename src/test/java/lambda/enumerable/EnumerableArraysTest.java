@@ -1,15 +1,17 @@
 package lambda.enumerable;
 
-import static lambda.Lambda.*;
-import static org.junit.Assert.*;
-
 import java.util.List;
 
 import lambda.TestBase;
 
 import org.junit.Test;
 
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
+
 import static lambda.enumerable.EnumerableArrays.*;
+
+import static org.junit.Assert.*;
 
 public class EnumerableArraysTest extends TestBase {
     Integer[] oneToFive = new Integer[] { 1, 2, 3, 4, 5 };

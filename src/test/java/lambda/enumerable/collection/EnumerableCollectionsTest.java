@@ -6,9 +6,10 @@ import lambda.TestBase;
 
 import org.junit.Test;
 
+import static lambda.Parameters.*;
+
 import static lambda.enumerable.EnumerableArrays.*;
 
-import static lambda.Lambda.*;
 import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
 

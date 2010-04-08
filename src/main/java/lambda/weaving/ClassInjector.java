@@ -1,12 +1,12 @@
 package lambda.weaving;
 
-import static lambda.exception.UncheckedException.*;
-import static lambda.weaving.Debug.*;
-
 import java.io.*;
 import java.lang.reflect.Method;
 
 import org.objectweb.asm.ClassReader;
+
+import static lambda.exception.UncheckedException.*;
+import static lambda.weaving.Debug.*;
 
 class ClassInjector {
     static File classDir;

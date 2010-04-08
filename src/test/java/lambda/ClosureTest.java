@@ -1,12 +1,13 @@
 package lambda;
 
-import static java.lang.Math.*;
-import static lambda.Lambda.*;
-import static org.junit.Assert.*;
-
 import java.io.*;
 
 import org.junit.Test;
+
+import static java.lang.Math.*;
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("serial")
 public class ClosureTest extends TestBase implements Serializable {

@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import static java.util.Arrays.*;
 import static lambda.Lambda.*;
+import static lambda.Parameters.*;
 
 import static lambda.enumerable.Enumerable.*;
 

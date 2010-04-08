@@ -1,12 +1,11 @@
 package lambda.weaving;
 
-import static lambda.exception.UncheckedException.*;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import lambda.enumerable.Enumerable;
+import static lambda.exception.UncheckedException.*;
 
 public class Version {
     public static Properties buildProperties = new Properties();

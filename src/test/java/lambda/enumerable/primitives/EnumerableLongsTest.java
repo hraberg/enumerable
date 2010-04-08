@@ -7,11 +7,10 @@ import java.util.Set;
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
 import lambda.enumerable.EnumerableArrays;
-import lambda.primitives.LambdaPrimitives;
 
 import org.junit.Test;
 
-import static lambda.Lambda.*;
+import static lambda.Parameters.*;
 import static lambda.enumerable.primitives.EnumerableLongs.*;
 import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
@@ -114,7 +113,7 @@ public class EnumerableLongsTest extends TestBase {
     @Test
     public void eachWithIndexIsZeroBased() throws Exception {
         List<Long> actual = list();
-        eachWithIndex(longsOneToFive, LambdaPrimitives.λ(l, k, actual.add(k + 1)));
+        eachWithIndex(longsOneToFive, λ(l, k, actual.add(k + 1)));
         assertEquals(list(1L, 2L, 3L, 4L, 5L), actual);
     }
 

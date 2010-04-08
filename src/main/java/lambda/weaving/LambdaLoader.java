@@ -1,11 +1,5 @@
 package lambda.weaving;
 
-import static java.lang.System.*;
-import static java.util.Arrays.*;
-import static lambda.exception.UncheckedException.*;
-import static lambda.weaving.Debug.*;
-import static lambda.weaving.Version.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +11,12 @@ import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.Set;
+
+import static java.lang.System.*;
+import static java.util.Arrays.*;
+import static lambda.exception.UncheckedException.*;
+import static lambda.weaving.Debug.*;
+import static lambda.weaving.Version.*;
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     public static boolean tranformationFailed;
