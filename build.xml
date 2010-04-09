@@ -141,19 +141,19 @@
     </target>
 
     <target name="source-jar">
-        <jar jarfile="target/enumerable-sources-${enumerable.version}.jar">
+        <jar jarfile="target/enumerable-sources-${enumerable.version}.jar" encoding="UTF-8" >
             <fileset dir="src/main/java" />
         </jar>
     </target>
 
     <target name="test-source-jar">
-        <jar jarfile="target/enumerable-test-sources-${enumerable.version}.jar">
+        <jar jarfile="target/enumerable-test-sources-${enumerable.version}.jar" encoding="UTF-8" >
             <fileset dir="src/test/java" />
         </jar>
     </target>
 
     <target name="javadoc-jar" depends="javadoc">
-        <jar jarfile="target/enumerable-javadoc-${enumerable.version}.jar">
+        <jar jarfile="target/enumerable-javadoc-${enumerable.version}.jar" encoding="UTF-8" >
             <fileset dir="target/apidocs" />
         </jar>
     </target>
