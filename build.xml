@@ -160,23 +160,29 @@
 
     <target name="jars" depends="agent-jar, source-jar, test-source-jar, javadoc-jar" />
 
+    <property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}" />
     <target name="dist" depends="tests, jars">
-        <property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}" />
         <tar destfile="target/${enumerable.dist.name}.tgz" compression="gzip">
             <tarfileset dir="target" prefix="${enumerable.dist.name}">
                 <include name="enumerable-agent-${enumerable.version}.jar" />
             </tarfileset>
 
-            <tarfileset dir="target" prefix="${enumerable.dist.name}/src">
-                <include name="enumerable*-sources-${enumerable.version}.jar" />
+            <tarfileset dir="target" prefix="${enumerable.dist.name}">
+                <include name="enumerable-sources-${enumerable.version}.jar" />
             </tarfileset>
+
             <tarfileset dir="src/example/java" prefix="${enumerable.dist.name}/example/src">
                 <include name="**/*" />
             </tarfileset>
-
-            <tarfileset dir="src/example/project" prefix="${enumerable.dist.name}">
+            <tarfileset dir="src/example/project" prefix="${enumerable.dist.name}/example/">
                 <include name="**/*" />
             </tarfileset>
+            
+            <tarfileset dir="target" prefix="${enumerable.dist.name}/example">
+                <include name="enumerable-agent-${enumerable.version}.jar" />
+                <include name="enumerable-sources-${enumerable.version}.jar" />
+            </tarfileset>
+
             <tarfileset dir="lib" prefix="${enumerable.dist.name}">
                 <include name="asm-3.2.license" />
             </tarfileset>
@@ -185,6 +191,12 @@
                 <include name="epl-v10.html" />
             </tarfileset>
         </tar>
+    </target>
+    
+    <target name="dist-test" depends="dist">
+        <delete dir="target/${enumerable.dist.name}" />
+        <untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />
+        <ant dir="target/${enumerable.dist.name}/example" />
     </target>
 
     <target name="javadoc-uptodate">
