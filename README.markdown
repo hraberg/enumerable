@@ -146,3 +146,9 @@ http://www.jroller.com/ghettoJedi/entry/using_hamcrest_for_iterators
 
 A library that's quite close to what I suggested there is LambdaJ:
 http://code.google.com/p/lambdaj/
+
+## License
+
+Enumerable.java is released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
+
+ASM 3.2 is Copyright (c) 2000-2005 INRIA, France Telecom, see asm-3.2.license or [ASM License](http://asm.ow2.org/license.html).

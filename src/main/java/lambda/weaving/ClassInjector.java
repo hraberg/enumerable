@@ -1,9 +1,8 @@
 package lambda.weaving;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-
-import org.objectweb.asm.ClassReader;
 
 import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
@@ -15,6 +14,8 @@ class ClassInjector {
     static Method resolveClass;
 
     static Method verify;
+
+    private static Constructor<?> classReaderConstructor;
 
     static {
         try {
@@ -32,20 +33,19 @@ class ClassInjector {
         }
 
         try {
-            try{
-                Class<?> checkClassAdapter = Class.forName("org.objectweb.asm.util.CheckClassAdapter");
-                verify = checkClassAdapter.getMethod("verify", Class.forName("org.objectweb.asm.ClassReader"), Boolean.TYPE, PrintWriter.class);
-            } catch (ClassNotFoundException e) {                
-                Class<?> checkClassAdapter = Class.forName("lambda.asm.util.CheckClassAdapter");
-                verify = checkClassAdapter.getMethod("verify", Class.forName("lambda.asm.ClassReader"), Boolean.TYPE, PrintWriter.class);
-            }
+            String[] realAsmPackageNotToBeChangedByJarJar = { "org.objectweb." };
             
+            Class<?> checkClassAdapter = Class.forName(realAsmPackageNotToBeChangedByJarJar[0] + "asm.util.CheckClassAdapter");
+            Class<?> classReader = Class.forName(realAsmPackageNotToBeChangedByJarJar[0] + "asm.ClassReader");
+
+            verify = checkClassAdapter.getMethod("verify", classReader, Boolean.TYPE, PrintWriter.class);
+            classReaderConstructor = classReader.getConstructor(InputStream.class);
+
             debug("asm-util is avaialbe, will pre-verify generated classes");
 
         } catch (Exception ignore) {
             debug("asm-util NOT avaialbe, will not be able to pre-verify generated classes");
         }
-
     }
 
     void inject(ClassLoader loader, String className, byte[] bs) {
@@ -87,7 +87,7 @@ class ClassInjector {
             if (verify == null)
                 return;
 
-            ClassReader cr = new ClassReader(new ByteArrayInputStream(b));
+            Object cr = classReaderConstructor.newInstance(new ByteArrayInputStream(b));
             PrintWriter pw = new PrintWriter(System.out);
             verify.invoke(null, cr, false, pw);
 

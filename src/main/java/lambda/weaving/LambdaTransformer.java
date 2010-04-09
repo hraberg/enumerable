@@ -91,7 +91,7 @@ class LambdaTransformer implements Opcodes {
         if (firstPass.hasNoLambdas())
             return null;
 
-        ClassWriter cw = new ClassWriter(COMPUTE_MAXS);
+        ClassWriter cw = new ClassWriter(COMPUTE_FRAMES);
         SecondPassClassVisitor visitor = new SecondPassClassVisitor(cw, firstPass, this);
         cr.accept(visitor, 0);
 

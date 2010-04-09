@@ -25,10 +25,22 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     public static boolean isActive() {
         return isActive && !tranformationFailed;
     }
-    
+
     public static void ensureIsActive() {
         if (!isActive())
             throw new IllegalStateException(getNotActiveMessage());
+    }
+
+    public static void ensureIsActiveOrExit() {
+        if (!isActive()) {
+            System.out.println(LambdaLoader.getNotActiveMessage());
+            System.exit(1);
+        }
+    }
+
+    static String getNotActiveMessage() {
+        return "Lambda weaving is not enabled, please start the JVM with -javaagent:enumerable-"
+                + Version.getVersion() + "-agent.jar";
     }
 
     static Set<String> packagesToSkip = new HashSet<String>();
@@ -126,9 +138,5 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         Class<?> c = new LambdaLoader().loadClass(className);
         Method m = c.getMethod("main", String[].class);
         return m.invoke(null, new Object[] { args });
-    }
-
-    public static String getNotActiveMessage() {
-        return "Lambda weaving is not enabled, please start the JVM with -javaagent:enumerable-" + Version.getVersion() + "-agent.jar";
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import lambda.Fn1;
+import lambda.Lambda;
 import lambda.enumerable.collection.EList;
 import lambda.primitives.Fn1ItoI;
 import lambda.weaving.LambdaLoader;
@@ -20,12 +21,19 @@ import static lambda.enumerable.Enumerable.*;
 import static lambda.primitives.LambdaPrimitives.*;
 
 public class EnumerableExample {
+    /**
+     * If you see errors in this file, and not a real 'lambda' character, ensure
+     * that it's opened as UTF-8.
+     * <p>
+     * λ is a set of static methods in {@link Lambda}, which are used to create
+     * a new lambdas, which can take 0 to 3 arguments. There's also an alias,
+     * fn, which can be used if you prefer to not deal with any source encoding
+     * issues.
+     * <p>
+     * The λ character can be easily be inserted using a template, see
+     * {@link Lambda} for an example of this.
+     */
     public void example(PrintStream out) {
-        /*
-         * While λ looks good, it is cumbersome to insert. There are two
-         * (ignoring arity versions) static methods in Lambda that all are
-         * marked with @NewLambda and all do the same thing: λ and fn
-         */
         assert Character.isJavaIdentifierStart('λ');
 
         List<String> strings = asList("malaysia", "thailand", "india", "people's republic of china");
@@ -250,10 +258,7 @@ public class EnumerableExample {
 
     public static void main(String[] args) {
         System.out.println("[example] " + Version.getVersionString());
-        if (!LambdaLoader.isActive()) {
-            System.out.println(LambdaLoader.getNotActiveMessage());
-            System.exit(1);
-        }
-       new EnumerableExample().example(System.out);
+        LambdaLoader.ensureIsActiveOrExit();
+        new EnumerableExample().example(System.out);
     }
 }

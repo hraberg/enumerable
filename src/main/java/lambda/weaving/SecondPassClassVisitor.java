@@ -411,7 +411,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         }
 
         void createLambdaClass() {
-            lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+            lambdaWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
             lambdaWriter.visit(V1_5, ACC_FINAL | ACC_SYNTHETIC, currentLambdaClass(), null, getLambdaSuperType()
                     .getInternalName(), getLambdaInterfaces());
         }

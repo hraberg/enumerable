@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="enumerable">
-	<description>
+    <description>
 		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
 	</description>
 
-	<property name="enumerable.version" value="0.1" />
+    <property name="enumerable.version" value="0.1" />
     <property file="lambda.weaving.properties" />
     <tstamp />
 
@@ -12,10 +12,14 @@
         <pathelement location="target/classes" />
         <pathelement location="lib/asm-3.2.jar" />
     </path>
+    <path id="enumerable.example.classpath">
+        <pathelement location="target/example-classes" />
+        <path refid="enumerable.classpath" />
+    </path>
     <path id="enumerable.test.classpath">
         <pathelement location="target/test-classes" />
         <pathelement location="lib/junit-4.7.jar" />
-        <path refid="enumerable.classpath" />
+        <path refid="enumerable.example.classpath" />
     </path>
 
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-0.6.jar" />
@@ -29,6 +33,11 @@
         <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
             <src path="src/main/java" />
             <classpath refid="enumerable.classpath" />
+        </javac>
+        <mkdir dir="target/example-classes" />
+        <javac debug="true" destdir="target/example-classes" source="1.5" target="1.5" encoding="UTF-8">
+            <src path="src/example/java" />
+            <classpath refid="enumerable.example.classpath" />
         </javac>
         <mkdir dir="target/test-classes" />
         <javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8">
@@ -49,13 +58,13 @@
     </target>
 
     <target name="agent-jar-uptodate">
-        <uptodate property="jarjar.notRequired" targetfile="target/enumerable-agent.jar">
+        <uptodate property="jarjar.notRequired" targetfile="target/enumerable-agent-${enumerable.version}.jar">
             <srcfiles dir="target/classes" includes="**/*" />
         </uptodate>
     </target>
 
     <target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
-        <jarjar jarfile="target/enumerable-agent.jar">
+        <jarjar jarfile="target/enumerable-agent-${enumerable.version}.jar">
             <fileset dir="target/classes" />
             <zipfileset src="lib/asm-3.2.jar" />
             <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
@@ -70,7 +79,7 @@
     <target name="tests" depends="agent-jar">
         <mkdir dir="target/junit" />
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
-            <jvmarg value="-javaagent:target/enumerable-agent.jar" />
+            <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
@@ -90,11 +99,24 @@
 
     <target name="example-with-agent" depends="agent-jar">
         <java fork="yes" classname="lambda.enumerable.EnumerableExample">
-            <jvmarg value="-javaagent:target/enumerable-agent.jar" />
+            <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-            <classpath refid="enumerable.test.classpath" />
+            <classpath location="target/example-classes" />
+        </java>
+    </target>
+
+    <target name="example-with-verifier" depends="agent-jar">
+        <java fork="yes" classname="lambda.enumerable.EnumerableExample">
+            <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
+            <sysproperty key="lambda.weaving.debug" value="true" />
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
+            <classpath location="target/example-classes" />
+            <classpath>
+                <pathelement location="lib/asm-all-3.2.jar" />
+            </classpath>
         </java>
     </target>
 
@@ -104,58 +126,59 @@
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-            <classpath refid="enumerable.test.classpath" />
+            <classpath refid="enumerable.example.classpath" />
         </java>
     </target>
 
     <target name="microbench" depends="agent-jar">
         <java fork="yes" classname="lambda.MicroBench">
-            <jvmarg value="-javaagent:target/enumerable-agent.jar" />
+            <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-            <classpath refid="enumerable.test.classpath" />
+            <classpath refid="enumerable.example.classpath" />
         </java>
     </target>
 
     <target name="source-jar">
-        <jar jarfile="target/enumerable-${enumerable.version}-sources.jar">
+        <jar jarfile="target/enumerable-sources-${enumerable.version}.jar">
             <fileset dir="src/main/java" />
         </jar>
     </target>
 
     <target name="test-source-jar">
-        <jar jarfile="target/enumerable-${enumerable.version}-test-sources.jar">
+        <jar jarfile="target/enumerable-test-sources-${enumerable.version}.jar">
             <fileset dir="src/test/java" />
         </jar>
     </target>
 
-	<target name="javadoc-jar" depends="javadoc">
-        <jar jarfile="target/enumerable-${enumerable.version}-javadoc.jar">
+    <target name="javadoc-jar" depends="javadoc">
+        <jar jarfile="target/enumerable-javadoc-${enumerable.version}.jar">
             <fileset dir="target/apidocs" />
         </jar>
     </target>
-	
-	<target name="enumerable-asm-all-jar">
-		<jarjar jarfile="target/enumerable-asm-all-3.2.jar">
-	        <zipfileset src="lib/asm-all-3.2.jar" />
-	        <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
-	    </jarjar>
-	</target>
-    	
-    <target name="jars" depends="agent-jar, source-jar, test-source-jar, javadoc-jar, enumerable-asm-all-jar" />
+
+    <target name="jars" depends="agent-jar, source-jar, test-source-jar, javadoc-jar" />
 
     <target name="dist" depends="tests, jars">
-        <property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}"/>
+        <property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}" />
         <tar destfile="target/${enumerable.dist.name}.tgz" compression="gzip">
-            <tarfileset dir="target" fullpath="${enumerable.dist.name}/enumerable-${enumerable.version}-agent.jar">
-                <include name="enumerable-agent.jar" />
+            <tarfileset dir="target" prefix="${enumerable.dist.name}">
+                <include name="enumerable-agent-${enumerable.version}.jar" />
             </tarfileset>
+
             <tarfileset dir="target" prefix="${enumerable.dist.name}/src">
-                <include name="enumerable-*-sources.jar" />
+                <include name="enumerable*-sources-${enumerable.version}.jar" />
             </tarfileset>
-            <tarfileset dir="target" prefix="${enumerable.dist.name}/verifier">
-                <include name="enumerable-asm-all-3.2.jar" />
+            <tarfileset dir="src/example/java" prefix="${enumerable.dist.name}/example/src">
+                <include name="**/*" />
+            </tarfileset>
+
+            <tarfileset dir="src/example/project" prefix="${enumerable.dist.name}">
+                <include name="**/*" />
+            </tarfileset>
+            <tarfileset dir="lib" prefix="${enumerable.dist.name}">
+                <include name="asm-3.2.license" />
             </tarfileset>
             <tarfileset dir="." prefix="${enumerable.dist.name}">
                 <include name="README.markdown" />
@@ -165,7 +188,7 @@
     </target>
 
     <target name="javadoc-uptodate">
-        <uptodate property="javadoc.notRequired" targetfile="target/enumerable-${enumerable.version}-javadoc.jar">
+        <uptodate property="javadoc.notRequired" targetfile="target/enumerable-javadoc-${enumerable.version}.jar">
             <srcfiles dir="src/main/java" includes="**/*" />
         </uptodate>
     </target>
@@ -176,9 +199,9 @@
             <doctitle>
                 <![CDATA[<h1>Enumerable.java API ${enumerable.version}</h1>]]>
             </doctitle>
-            <bottom>
-                <![CDATA[<i>Copyright &#169; 2010 Håkan Råberg</i>]]>
+        	<bottom>
+        	    <![CDATA[<i>Copyright &#169; 2010 Håkan Råberg</i>]]>
             </bottom>
-    	</javadoc>
-    </target>
+		</javadoc>
+	</target>
 </project>
