@@ -256,8 +256,9 @@ public class EnumerableExample {
     Fn1ItoI fib;
 
     public static void main(String[] args) {
+        LambdaLoader.bootstrapMainIfNotActiveAndThenExit(args);
         System.out.println("[example] " + Version.getVersionString());
-        LambdaLoader.ensureIsActiveOrExit();
+
         new EnumerableExample().example(System.out);
     }
 }

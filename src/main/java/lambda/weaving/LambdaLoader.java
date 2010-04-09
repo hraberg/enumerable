@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static java.lang.System.*;
+import static java.lang.Thread.*;
 import static java.util.Arrays.*;
 import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
@@ -33,8 +34,27 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
     public static void ensureIsActiveOrExit() {
         if (!isActive()) {
-            System.out.println(LambdaLoader.getNotActiveMessage());
+            err.println(LambdaLoader.getNotActiveMessage());
             System.exit(1);
+        }
+    }
+
+    public static void bootstrapMainIfNotActiveAndThenExit(String[] args) {
+        if (!isActive()) {
+            StackTraceElement caller = currentThread().getStackTrace()[2];
+            if ("main".equals(caller.getMethodName())) {
+                try {
+                    String className = caller.getClassName();
+                    err.println(getNotActiveMessage());
+                    err.println("Will try to reload " + className + " in same process:");
+                    err.flush();
+                    launchApplication(className, args);
+                    System.exit(0);
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+            ensureIsActiveOrExit();
         }
     }
 
@@ -124,9 +144,6 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                 out.println("Usage: class [args...]");
                 return;
             }
-            debug("[main] " + getVersionString());
-            isActive = true;
-            addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
             launchApplication(args[0], copyOfRange(args, 1, args.length));
         } catch (InvocationTargetException e) {
             throw e.getCause();
@@ -135,6 +152,9 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
     static Object launchApplication(String className, String[] args) throws ClassNotFoundException,
             NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        debug("[main] " + getVersionString());
+        isActive = true;
+        addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
         Class<?> c = new LambdaLoader().loadClass(className);
         Method m = c.getMethod("main", String[].class);
         return m.invoke(null, new Object[] { args });

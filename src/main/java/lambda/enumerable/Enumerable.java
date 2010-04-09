@@ -86,7 +86,7 @@ public class Enumerable {
             block.call(each);
         return EIterable.from(collection);
     }
-    
+
     /**
      * Calls block once for each key in map, passing the key and value to the
      * block as parameters.
@@ -361,7 +361,7 @@ public class Enumerable {
      * Returns two lists, the first containing the elements of collection for
      * which the block evaluates to true, the second containing the rest.
      */
-    public static<E> EList<EList<E>> partition(Iterable<E> collection, Fn1<E, Boolean> block) {
+    public static <E> EList<EList<E>> partition(Iterable<E> collection, Fn1<E, Boolean> block) {
         EList<E> selected = new EList<E>();
         EList<E> rejected = new EList<E>();
         for (E each : collection)
@@ -391,9 +391,9 @@ public class Enumerable {
     public static Range range(int start, int end, boolean exclusive) {
         return new Range(start, end, exclusive);
     }
-    
+
     /**
-     * @see #times(int,  Fn1)
+     * @see #times(int, Fn1)
      */
     public static int times(int i, Fn0<?> block) {
         Iterator<Integer> range = range(0, i, true).iterator();
@@ -414,7 +414,7 @@ public class Enumerable {
      * Returns a list containing all elements of collection for which block is
      * false.
      */
-    public static<E> EList<E> reject(Iterable<E> collection, Fn1<E, Boolean> block) {
+    public static <E> EList<E> reject(Iterable<E> collection, Fn1<E, Boolean> block) {
         EList<E> result = new EList<E>();
         for (E each : collection)
             if (!block.call(each))
@@ -454,7 +454,7 @@ public class Enumerable {
         return sort(collection, (Comparator<E>) null);
     }
 
-    private static<E> EList<E> sort(Iterable<E> collection, Comparator<E> comparator) {
+    private static <E> EList<E> sort(Iterable<E> collection, Comparator<E> comparator) {
         List<E> result = asNewList(collection);
         Collections.sort(result, comparator);
         return new EList<E>(result);
@@ -465,7 +465,7 @@ public class Enumerable {
      * results of the supplied block.
      */
     @SuppressWarnings("unchecked")
-    public static<E> EList<E> sort(Iterable<E> collection, Fn2<E, E, Integer> block) {
+    public static <E> EList<E> sort(Iterable<E> collection, Fn2<E, E, Integer> block) {
         return sort(collection, block.as(Comparator.class));
     }
 
@@ -517,7 +517,7 @@ public class Enumerable {
      * effect.
      * </p>
      */
-    public static<E> EList<EList<?>> zip(Iterable<E> collection, Iterable<?>... args) {
+    public static <E> EList<EList<?>> zip(Iterable<E> collection, Iterable<?>... args) {
         EList<EList<?>> allResults = new EList<EList<?>>();
 
         List<Iterator<?>> iterators = new ArrayList<Iterator<?>>();
@@ -545,7 +545,7 @@ public class Enumerable {
         List<E> result = new ArrayList<E>();
         for (E each : collection)
             result.add(each);
-        
+
         return result;
     }
 }
