@@ -165,9 +165,6 @@
         <tar destfile="target/${enumerable.dist.name}.tgz" compression="gzip">
             <tarfileset dir="target" prefix="${enumerable.dist.name}">
                 <include name="enumerable-agent-${enumerable.version}.jar" />
-            </tarfileset>
-
-            <tarfileset dir="target" prefix="${enumerable.dist.name}">
                 <include name="enumerable-sources-${enumerable.version}.jar" />
             </tarfileset>
 
@@ -192,8 +189,10 @@
             </tarfileset>
         </tar>
     </target>
-    
+
     <target name="dist-test" depends="dist">
+        <echo message="Ensuring that example project in ${enumerable.dist.name}.tgz works" />
+
         <delete dir="target/${enumerable.dist.name}" />
         <untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />
         <ant dir="target/${enumerable.dist.name}/example" />
