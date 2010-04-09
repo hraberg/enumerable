@@ -67,10 +67,10 @@ Enumerable.java requires your classes to have local variable debugging info (-g:
 
 ### Binary Distribution
 
-`enumerable-agent-0.1.0.jar` -  is as both the actual library, and as a java agent enabling load time weaving of lambdas.
+`enumerable-agent-0.1.0.jar` is as both the actual library, and ths java agent enabling load time weaving of lambdas.
 
-The Enumerable.java binary distribution, downloaded as a .tgz archive, or built using `ant dist`, doubles as an example Eclipse project which can be directly imported as an existing project (from archive file).
-Open up *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a simple build.xml in the `example` folder.
+The binary distribution, when downloaded as a .tgz archive, or built using `ant dist`, doubles as an example Eclipse project which can be directly imported as an existing project (from archive file).
+Open up *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder.
 
 ### System Properties
 
