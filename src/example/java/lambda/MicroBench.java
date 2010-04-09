@@ -14,6 +14,7 @@ public class MicroBench {
     public static void main(String[] args) {
         System.out.println("[microbench] " + Version.getVersionString());
         LambdaLoader.ensureIsActiveOrExit();
+
         int n = args.length > 0 ? Integer.parseInt(args[0]) : 30;
         int times = args.length > 1 ? Integer.parseInt(args[1]) : 5;
 

@@ -3,5 +3,5 @@
 	<classpathentry kind="src" path="example/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="enumerable-agent-0.1.jar" sourcepath="src/enumerable-sources-0.1.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

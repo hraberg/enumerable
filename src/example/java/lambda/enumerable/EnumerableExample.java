@@ -25,13 +25,12 @@ public class EnumerableExample {
      * If you see errors in this file, and not a real 'lambda' character, ensure
      * that it's opened as UTF-8.
      * <p>
-     * λ is a set of static methods in {@link Lambda}, which are used to create
-     * a new lambdas, which can take 0 to 3 arguments. There's also an alias,
-     * fn, which can be used if you prefer to not deal with any source encoding
-     * issues.
+     * λ is a set of static methods in {@link Lambda}, used to create new
+     * lambdas, which can take 0 to 3 arguments. There's also an alias, fn, if
+     * you prefer to not deal with any encoding issues.
      * <p>
      * The λ character can be easily be inserted using a template, see
-     * {@link Lambda} for an example of this.
+     * {@link Lambda} for an example.
      */
     public void example(PrintStream out) {
         assert Character.isJavaIdentifierStart('λ');

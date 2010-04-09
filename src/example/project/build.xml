@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="example" name="enumerable-example">
+    <description>
+		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
+	</description>
+
+    <property name="enumerable.version" value="0.1" />
+
+    <target name="clean">
+        <delete dir="target" />
+    </target>
+
+    <target name="build">
+        <mkdir dir="target/classes" />
+        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
+            <src path="example/src" />
+            <classpath location="enumerable-agent-${enumerable.version}.jar" />
+        </javac>
+    </target>
+
+    <target name="example" depends="build">
+        <enumerable-java classname="lambda.enumerable.EnumerableExample" />
+    </target>
+
+    <target name="microbench" depends="build">
+        <enumerable-java classname="lambda.MicroBench" />
+    </target>
+
+    <macrodef name="enumerable-java">
+        <attribute name="classname"/>
+        <sequential>
+            <java fork="yes" classname="@{classname}">
+                <jvmarg value="-javaagent:enumerable-agent-${enumerable.version}.jar" />
+                <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
+                <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+                <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
+                <classpath location="target/classes" />
+            </java>
+        </sequential>
+    </macrodef>
+</project>
