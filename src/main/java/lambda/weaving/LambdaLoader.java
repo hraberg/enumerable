@@ -67,9 +67,8 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
             if ("main".equals(caller.getMethodName())) {
                 try {
                     String className = caller.getClassName();
-                    err.println(getNotEnabledMessage());
-                    err.println("Will try to reload " + className + " in same process:");
-                    err.flush();
+                    out.println(getNotEnabledMessage());
+                    out.println("Will try to reload " + className + " in the same process:");
                     launchApplication(className, args);
                     System.exit(0);
                 } catch (Exception e) {
