@@ -50,7 +50,7 @@ Block parameters are defined using annotated static fields. For more examples se
 
 Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (lambda.asm).
 
-    java -javaagent:enumerable-agent.jar [...]
+    java -javaagent:enumerable-agent-0.1.0.jar [...]
 
 
 Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/weaving/LambdaLoader.java) if you have different class loading needs.

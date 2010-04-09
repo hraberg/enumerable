@@ -3,6 +3,8 @@ package lambda.enumerable.primitives;
 import java.lang.reflect.Array;
 import java.util.*;
 
+import static java.lang.System.*;
+
 import lambda.enumerable.Enumerable;
 import lambda.primitives.*;
 
@@ -460,7 +462,7 @@ public class EnumerableInts {
 
     private static int[] copy(int[] array, int length) {
         int[] result = new int[length];
-        System.arraycopy(array, 0, result, 0, length);
+        arraycopy(array, 0, result, 0, length);
         return result;
     }
 }

@@ -12,40 +12,62 @@ import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.Set;
 
+import lambda.exception.LambdaWeavingNotEnabledException;
 import static java.lang.System.*;
 import static java.lang.Thread.*;
-import static java.util.Arrays.*;
 import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
 import static lambda.weaving.Version.*;
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
-    private static boolean isActive;
+    private static boolean isEnabled;
     private static boolean tranformationFailed;
 
-    public static boolean isActive() {
-        return isActive && !tranformationFailed;
+    /**
+     * Allows you to query the Lambda weaver at runtime to see if it's enabled.
+     */
+    public static boolean isEnabled() {
+        return isEnabled && !tranformationFailed;
     }
 
-    public static void ensureIsActive() {
-        if (!isActive())
-            throw new IllegalStateException(getNotActiveMessage());
+    /**
+     * This method can be used as a guard clause in your code, potentially
+     * throwing a {@link LambdaWeavingNotEnabledException}.
+     */
+    public static void ensureIsEnabled() {
+        if (!isEnabled())
+            throw new LambdaWeavingNotEnabledException();
     }
 
-    public static void ensureIsActiveOrExit() {
-        if (!isActive()) {
-            err.println(LambdaLoader.getNotActiveMessage());
+    /**
+     * This method can be used as a guard clause in your code, exiting the VM if
+     * weaving isn't enabled.
+     */
+    public static void ensureIsEnabledOrExit() {
+        if (!isEnabled()) {
+            err.println(LambdaLoader.getNotEnabledMessage());
             System.exit(1);
         }
     }
 
-    public static void bootstrapMainIfNotActiveAndThenExit(String[] args) {
-        if (!isActive()) {
+    /**
+     * This method can be used early in a main method to allow it to reload the
+     * caller in the same process with lambda weaving enabled if it is currently
+     * disabled. Control will not normally be returned to the caller as the VM
+     * will be exited after the reloaded main has finished.
+     * <p>
+     * If waving is already enabled, this method just returns.
+     * <p>
+     * This method is mainly intended to be used as a convenience in smaller
+     * applications.
+     */
+    public static void bootstrapMainIfNotEnabledAndExitUponItsReturn(String[] args) {
+        if (!isEnabled()) {
             StackTraceElement caller = currentThread().getStackTrace()[2];
             if ("main".equals(caller.getMethodName())) {
                 try {
                     String className = caller.getClassName();
-                    err.println(getNotActiveMessage());
+                    err.println(getNotEnabledMessage());
                     err.println("Will try to reload " + className + " in same process:");
                     err.flush();
                     launchApplication(className, args);
@@ -54,11 +76,25 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                     throw uncheck(e);
                 }
             }
-            ensureIsActiveOrExit();
+            throw new IllegalStateException("Must be called from a main method.");
         }
     }
 
-    static String getNotActiveMessage() {
+    /**
+     * Loads a class in a new class loader with lambda weaving enabled and
+     * invokes its main method.
+     */
+    public static Object launchApplication(String className, String[] args) throws ClassNotFoundException,
+            NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        debug("[main] " + getVersionString());
+        isEnabled = true;
+        addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
+        Class<?> c = new LambdaLoader().loadClass(className);
+        Method m = c.getMethod("main", String[].class);
+        return m.invoke(null, new Object[] { args });
+    }
+
+    public static String getNotEnabledMessage() {
         return "Lambda weaving is not enabled, please start the JVM with -javaagent:enumerable-"
                 + Version.getVersion() + "-agent.jar";
     }
@@ -133,7 +169,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
     public static void premain(String agentArgs, Instrumentation instrumentation) {
         debug("[premain] " + getVersionString());
-        isActive = true;
+        isEnabled = true;
         addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
         instrumentation.addTransformer(new LambdaLoader());
     }
@@ -144,19 +180,13 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                 out.println("Usage: class [args...]");
                 return;
             }
-            launchApplication(args[0], copyOfRange(args, 1, args.length));
+
+            String[] argsCopy = new String[args.length - 1];
+            arraycopy(args, 1, argsCopy, 0, args.length - 1);
+
+            launchApplication(args[0], argsCopy);
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
-    }
-
-    static Object launchApplication(String className, String[] args) throws ClassNotFoundException,
-            NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        debug("[main] " + getVersionString());
-        isActive = true;
-        addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
-        Class<?> c = new LambdaLoader().loadClass(className);
-        Method m = c.getMethod("main", String[].class);
-        return m.invoke(null, new Object[] { args });
     }
 }

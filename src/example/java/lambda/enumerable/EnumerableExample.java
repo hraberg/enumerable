@@ -22,8 +22,8 @@ import static lambda.primitives.LambdaPrimitives.*;
 
 public class EnumerableExample {
     /**
-     * If you see errors in this file, and not a real 'lambda' character, ensure
-     * that it's opened as UTF-8.
+     * <i>If you see errors in this file, and not a real 'lambda' character, ensure
+     * that it's opened as UTF-8.</i>
      * <p>
      * λ is a set of static methods in {@link Lambda}, used to create new
      * lambdas, which can take 0 to 3 arguments. There's also an alias, fn, if
@@ -256,7 +256,7 @@ public class EnumerableExample {
     Fn1ItoI fib;
 
     public static void main(String[] args) {
-        LambdaLoader.bootstrapMainIfNotActiveAndThenExit(args);
+        LambdaLoader.bootstrapMainIfNotEnabledAndExitUponItsReturn(args);
         System.out.println("[example] " + Version.getVersionString());
 
         new EnumerableExample().example(System.out);

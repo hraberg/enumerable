@@ -3,6 +3,8 @@ package lambda.enumerable.primitives;
 import java.lang.reflect.Array;
 import java.util.*;
 
+import static java.lang.System.*;
+
 import lambda.enumerable.Enumerable;
 import lambda.primitives.*;
 
@@ -443,7 +445,7 @@ public class EnumerableLongs {
 
     private static long[] copy(long[] array, int length) {
         long[] result = new long[length];
-        System.arraycopy(array, 0, result, 0, length);
+        arraycopy(array, 0, result, 0, length);
         return result;
     }
 }

@@ -12,7 +12,7 @@ import static lambda.enumerable.Enumerable.*;
 
 public class MicroBench {
     public static void main(String[] args) {
-        LambdaLoader.bootstrapMainIfNotActiveAndThenExit(args);
+        LambdaLoader.bootstrapMainIfNotEnabledAndExitUponItsReturn(args);
         System.out.println("[microbench] " + Version.getVersionString());
 
         int n = args.length > 0 ? Integer.parseInt(args[0]) : 30;

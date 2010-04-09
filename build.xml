@@ -4,7 +4,7 @@
 		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
 	</description>
 
-    <property name="enumerable.version" value="0.1" />
+    <property name="enumerable.version" value="0.1.0" />
     <property file="lambda.weaving.properties" />
     <tstamp />
 

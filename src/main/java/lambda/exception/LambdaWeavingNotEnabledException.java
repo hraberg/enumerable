@@ -1,6 +1,7 @@
 package lambda.exception;
 
 import lambda.annotation.NewLambda;
+import lambda.weaving.LambdaLoader;
 
 /**
  * Exception to be thrown by methods marked with {@link NewLambda} if
@@ -8,4 +9,7 @@ import lambda.annotation.NewLambda;
  */
 @SuppressWarnings("serial")
 public class LambdaWeavingNotEnabledException extends UnsupportedOperationException {
+    public LambdaWeavingNotEnabledException() {
+        super(LambdaLoader.getNotEnabledMessage());
+    }
 }
