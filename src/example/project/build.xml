@@ -14,7 +14,7 @@
         <mkdir dir="target/classes" />
         <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
             <src path="src" />
-            <classpath location="enumerable-agent-${enumerable.version}.jar" />
+            <classpath location="../enumerable-agent-${enumerable.version}.jar" />
         </javac>
     </target>
 
@@ -30,7 +30,7 @@
         <attribute name="classname"/>
         <sequential>
             <java fork="yes" classname="@{classname}">
-                <jvmarg value="-javaagent:enumerable-agent-${enumerable.version}.jar" />
+                <jvmarg value="-javaagent:../enumerable-agent-${enumerable.version}.jar" />
                 <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
                 <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
                 <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
