@@ -5,6 +5,8 @@ Copyright 2010 Håkan Råberg - Released under the [EPL license](http://www.ecli
 
 Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
 
+http://github.com/hraberg/enumerable/
+
 
 ## Introduction
 
