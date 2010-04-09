@@ -1,4 +1,4 @@
-# Enumerable.java
+# Enumerable.java 0.1.0
 
 Copyright 2010 Håkan Råberg - Released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
@@ -57,11 +57,20 @@ Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/
 
 Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/weaving/LambdaLoader.java) if you have different class loading needs.
 
+This file is also the actual Enumerable.java library itself, and is needed as a compile time dependency.
+
 The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/core/classes/Enumerable.html). You will be mainly importing static methods and fields from [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java), [Lambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Lambda.java) and [Parameters](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Parameters.java)
 
 If you're using Eclipse, you can add the agent as a default VM argument under Installed JREs. You can also add Lambda, Paramters and Enumerable as Favorites in the Java Content Assist settings. Finally, you can create a Java Editor Template to easier insert closures in your code, see *lambda.Lambda* for an example.
 
 Enumerable.java requires your classes to have local variable debugging info (-g:vars or -g in javac).
+
+### Binary Distribution
+
+`enumerable-agent-0.1.0.jar` -  is as both the actual library, and as a java agent enabling load time weaving of lambdas.
+
+The Enumerable.java binary distribution, downloaded as a .tgz archive, or built using `ant dist`, doubles as an example Eclipse project which can be directly imported as an existing project (from archive file).
+Open up *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a simple build.xml in the `example` folder.
 
 ### System Properties
 
@@ -79,7 +88,6 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
     }
 
 Accessing a static field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses are redirected.
-
 
 ## Implementation
 
@@ -153,4 +161,4 @@ http://code.google.com/p/lambdaj/
 
 Enumerable.java is released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
-ASM 3.2 is Copyright (c) 2000-2005 INRIA, France Telecom, see asm-3.2.license or [ASM License](http://asm.ow2.org/license.html).
+ASM 3.2 is Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](http://github.com/hraberg/enumerable/blob/master/lib/asm-3.2.license) or [ASM License](http://asm.ow2.org/license.html).
