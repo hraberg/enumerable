@@ -69,8 +69,12 @@ Enumerable.java requires your classes to have local variable debugging info (-g:
 
 `enumerable-agent-0.1.0.jar` is both the actual library, and the java agent enabling load time weaving of lambdas.
 
-The binary distribution, when downloaded as a .tgz archive, or built using `ant dist`, doubles as an example Eclipse project which can be directly imported as an existing project (from archive file).
-Open up *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder.
+The binary distribution, when downloaded as a .tgz archive, or built using `ant dist`, doubles as an example project which can be directly imported into Eclipse.
+Open *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder.
+
+### Verifier
+
+If you add [`asm-all-3.2.jar`](http://forge.ow2.org/project/download.php?group_id=23&file_id=12944) to your classpath, classes will be verified before loaded into the JVM and problems will be logged to the console.
 
 ### System Properties
 
