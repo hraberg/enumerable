@@ -11,6 +11,8 @@
     <path id="enumerable.classpath">
         <pathelement location="target/classes" />
         <pathelement location="lib/asm-3.2.jar" />
+        <pathelement location="lib/jsr166y.jar" />
+        <pathelement location="lib/extra166y.jar" />
     </path>
     <path id="enumerable.example.classpath">
         <pathelement location="target/example-classes" />
@@ -177,7 +179,7 @@
                 <exclude name="enumerable-test-sources-${enumerable.version}.jar" />
             </tarfileset>
 
-            <tarfileset dir="src/example/java" prefix="${enumerable.dist.name}/example/src">
+	        <tarfileset dir="src/example/java" prefix="${enumerable.dist.name}/example/src">
                 <include name="**/*" />
             </tarfileset>
             <tarfileset dir="target/example-classes" prefix="${enumerable.dist.name}">

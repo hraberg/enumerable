@@ -93,6 +93,11 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
 
 Accessing a static field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses are redirected.
 
+### Concurrencty JSR-166
+
+The class *LambdaOps* allows you to create Lambdas which implemnts the interfaces in *extra166y.Ops*, to be used with *extra166y.ParallelArray*.
+You need to have `jsr166y.jar` and `extra166y.jar` on your class path. They can be downloaded from the [Concurrency JSR-166 Interest Site](http://gee.cs.oswego.edu/dl/concurrency-interest/index.html).
+
 ## Implementation
 
 Enumerable.java uses Ant to build. Run `ant tests`, `ant example` or `ant agent-jar`.
@@ -166,3 +171,6 @@ http://code.google.com/p/lambdaj/
 Enumerable.java is released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
 ASM 3.2 is Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](http://github.com/hraberg/enumerable/blob/master/lib/asm-3.2.license) or [ASM License](http://asm.ow2.org/license.html).
+
+jsr166y and extra166y:
+Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and released to the public domain, as explained at http://creativecommons.org/licenses/publicdomain
