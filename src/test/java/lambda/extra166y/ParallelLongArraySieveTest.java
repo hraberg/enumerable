@@ -73,7 +73,7 @@ public class ParallelLongArraySieveTest {
         }
 
         // check result
-        LongPredicate notProbalePrime = op(l, !BigInteger.valueOf(l).isProbablePrime(CERTAINTY));
-        assertTrue(a.withFilter(notProbalePrime).isEmpty());
+        LongPredicate notProbablePrime = op(l, !BigInteger.valueOf(l).isProbablePrime(CERTAINTY));
+        assertTrue(a.withFilter(notProbablePrime).isEmpty());
     }
 }
