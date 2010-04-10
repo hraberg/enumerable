@@ -217,7 +217,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         public void visitVarInsn(int opcode, int operand) {
             if (!method.isLocalAccessedFromLambda(operand)) {
-                super.visitIntInsn(opcode, operand);
+                super.visitVarInsn(opcode, operand);
                 return;
             }
 
@@ -229,7 +229,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 if (inLambda())
                     loadLambdaField(operand, type);
                 else
-                    super.visitIntInsn(opcode, operand);
+                    super.visitVarInsn(opcode, operand);
             } else {
                 if (transformer.isStoreInstruction(opcode))
                     storeTopOfStackInArray(operand, type);
