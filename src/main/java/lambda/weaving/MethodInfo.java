@@ -190,7 +190,11 @@ class MethodInfo {
         }
 
         int getArity() {
-            return getParameters().size();
+            int arity = 0;
+            for (Type type : newLambdaParameterTypes)
+                if (type != Type.getType(Unused.class))
+                    arity++;
+            return arity;
         }
 
         Type getType() {
@@ -245,6 +249,15 @@ class MethodInfo {
 
         void setNewLambdaParameterTypes(Type[] newLambdaParameterTypes) {
             this.newLambdaParameterTypes = newLambdaParameterTypes;
+        }
+
+        void removeIllegalParameters() {
+            Map<String, VariableInfo> newParametersByName = new LinkedHashMap<String,VariableInfo>();
+            int i = 0;
+            for (Map.Entry<String, VariableInfo> entry : parametersByName.entrySet())
+                if (i++ < getArity() - 1)
+                    newParametersByName.put(entry.getKey(), entry.getValue());
+            parametersByName = newParametersByName;
         }
 
         Type getNewMethodParameterType(String name) {

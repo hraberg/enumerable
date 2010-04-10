@@ -95,7 +95,7 @@ Accessing a static field marked with *@LambdaParameter* outside of a block will 
 
 ### Concurrency JSR-166
 
-The class *LambdaOps* allows you to create Lambdas which implemnts the interfaces in *extra166y.Ops*, to be used with *extra166y.ParallelArray*.
+The class *LambdaOps* allows you to create Lambdas implementing interfaces from *extra166y.Ops* to be used with *extra166y.ParallelArray*.
 You need to have `jsr166y.jar` and `extra166y.jar` on your class path. They can be downloaded from the [Concurrency JSR-166 Interest Site](http://gee.cs.oswego.edu/dl/concurrency-interest/index.html).
 
 ## Implementation
