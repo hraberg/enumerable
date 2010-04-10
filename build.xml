@@ -35,7 +35,7 @@
             <arg line="rev-parse HEAD" />
         </exec>
     </target>
-
+    
     <target name="build" depends="read-git-commit">
         <mkdir dir="target/classes" />
         <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
@@ -47,6 +47,11 @@
             <src path="src/example/java" />
             <classpath refid="enumerable.example.classpath" />
         </javac>
+        <filter token="enumerable.version" value="${enumerable.version}" />
+        <copy todir="target/example-classes" filtering="true">
+            <fileset dir="src/example/project" includes="**/*" />
+        </copy>
+
         <mkdir dir="target/test-classes" />
         <javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8">
             <src path="src/test/java" />
@@ -175,11 +180,11 @@
             <tarfileset dir="src/example/java" prefix="${enumerable.dist.name}/example/src">
                 <include name="**/*" />
             </tarfileset>
-            <tarfileset dir="src/example/project" prefix="${enumerable.dist.name}">
+            <tarfileset dir="target/example-classes" prefix="${enumerable.dist.name}">
                 <include name="**/*" />
                 <exclude name="**/build.xml" />
             </tarfileset>
-            <tarfileset dir="src/example/project" prefix="${enumerable.dist.name}/example">
+            <tarfileset dir="target/example-classes" prefix="${enumerable.dist.name}/example">
                 <include name="**/build.xml" />
             </tarfileset>
             

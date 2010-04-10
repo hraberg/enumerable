@@ -1,4 +1,4 @@
-# Enumerable.java 0.1.0
+# Enumerable.java
 
 Copyright 2010 Håkan Råberg - Released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
@@ -52,7 +52,7 @@ Block parameters are defined using annotated static fields. For more examples se
 
 Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (lambda.asm).
 
-    java -javaagent:enumerable-agent-0.1.0.jar [...]
+    java -javaagent:enumerable-agent-<version>.jar [...]
 
 
 Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/weaving/LambdaLoader.java) if you have different class loading needs.
@@ -67,7 +67,7 @@ Enumerable.java requires your classes to have local variable debugging info (-g:
 
 ### Binary Distribution
 
-`enumerable-agent-0.1.0.jar` is both the actual library, and the java agent enabling load time weaving of lambdas.
+`enumerable-agent-<version>.jar` is both the actual library, and the java agent enabling load time weaving of lambdas.
 
 The binary distribution, when downloaded as a .tgz archive, or built using `ant dist`, doubles as an example project which can be directly imported into Eclipse.
 Open *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder.
