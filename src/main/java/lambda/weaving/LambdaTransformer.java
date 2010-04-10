@@ -9,9 +9,7 @@ import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
 import lambda.annotation.Unused;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
@@ -41,19 +39,63 @@ class LambdaTransformer implements Opcodes {
     }
 
     boolean isInterface(String owner) {
-        try {
-            class IsInterfaceFinder extends EmptyVisitor {
-                boolean isInterface;
+        class IsInterface extends EmptyVisitor {
+            boolean isInterface;
 
-                public void visit(int version, int access, String name, String signature, String superName,
-                        String[] interfaces) {
-                    isInterface = (access & ACC_INTERFACE) != 0;
-                }
+            public void visit(int version, int access, String name, String signature, String superName,
+                    String[] interfaces) {
+                isInterface = (access & ACC_INTERFACE) != 0;
             }
+        }
+        return visitClass(owner, new IsInterface()).isInterface;
+    }
+
+    String[] getInterfaces(String owner) {
+        class GetInterfaces extends EmptyVisitor {
+            String[] interfaces;
+
+            public void visit(int version, int access, String name, String signature, String superName,
+                    String[] interfaces) {
+                this.interfaces = interfaces;
+            }
+        }
+        return visitClass(owner, new GetInterfaces()).interfaces;
+    }
+
+    String getSuperClass(String owner) {
+        class GetSuperClass extends EmptyVisitor {
+            String superClass;
+
+            public void visit(int version, int access, String name, String signature, String superName,
+                    String[] interfaces) {
+                this.superClass = superName;
+            }
+        }
+        return visitClass(owner, new GetSuperClass()).superClass;
+    }
+
+    MethodInfo findMethodByParameterTypes(String owner, String desc) {
+        MethodInfo method = visitClass(owner, new MethodFinder(desc)).getMethod();
+        if (method != null)
+            return method;
+
+        for (String anInterface : getInterfaces(owner)) {
+            method = findMethodByParameterTypes(anInterface, desc);
+            if (method != null)
+                return method;
+        }
+        String superClass = getSuperClass(owner);
+        if (superClass != null)
+            return findMethodByParameterTypes(superClass, desc);
+        return null;
+    }
+
+    
+    <V extends ClassVisitor> V visitClass(String owner, V cv) {
+        try {
             ClassReader cr = new ClassReader(getObjectType(owner).getClassName());
-            IsInterfaceFinder finder = new IsInterfaceFinder();
-            cr.accept(finder, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
-            return finder.isInterface;
+            cr.accept(cv, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+            return cv;
         } catch (IOException e) {
             throw uncheck(e);
         }
@@ -65,17 +107,6 @@ class LambdaTransformer implements Opcodes {
 
     boolean isStoreInstruction(int opcode) {
         return opcode >= ISTORE && opcode <= ASTORE;
-    }
-
-    MethodInfo findMethodByParameterTypes(String owner, String desc) {
-        try {
-            MethodFinder finder = new MethodFinder(desc);
-            ClassReader cr = new ClassReader(getObjectType(owner).getClassName());
-            cr.accept(finder, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
-            return finder.getMethod();
-        } catch (IOException e) {
-            throw uncheck(e);
-        }
     }
 
     byte[] transform(String name, InputStream in) throws IOException {
