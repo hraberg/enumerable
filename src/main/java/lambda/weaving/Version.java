@@ -20,7 +20,8 @@ public class Version {
             throw uncheck(e);
         } finally {
             try {
-                in.close();
+                if (in != null)
+                    in.close();
             } catch (IOException slient) {
             }
         }
