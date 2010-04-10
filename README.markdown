@@ -93,7 +93,7 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
 
 Accessing a static field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses are redirected.
 
-### Concurrency JSR-166
+### Concurrency JSR-166 (for Java 6)
 
 The class *LambdaOps* allows you to create Lambdas implementing interfaces from *extra166y.Ops* to be used with *extra166y.ParallelArray*.
 You need to have `jsr166y.jar` and `extra166y.jar` on your class path. They can be downloaded from the [Concurrency JSR-166 Interest Site](http://gee.cs.oswego.edu/dl/concurrency-interest/index.html).
