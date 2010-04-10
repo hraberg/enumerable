@@ -13,7 +13,7 @@ import static lambda.extra166y.LambdaOps.*;
 import static org.junit.Assert.*;
 
 /*
- * This test is adapted from the extra166y API specs here:
+ * This test was adapted from the extra166y API specs here:
  * http://gee.cs.oswego
  * .edu/dl/jsr166/dist/extra166ydocs/extra166y/ParallelLongArray.html
  */
@@ -22,7 +22,7 @@ public class ParallelLongArraySieveTest {
     static final int N = 20;
 
     @Test
-    public void parallelLongArraySieve() {
+    public void parallelLongArraySieveUsingInnerClasses() {
         // create array of divisors
         ParallelLongArray a = create(N - 1, defaultExecutor());
         a.replaceWithMappedIndex(add2);

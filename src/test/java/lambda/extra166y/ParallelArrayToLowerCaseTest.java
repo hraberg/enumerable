@@ -10,7 +10,7 @@ import static lambda.extra166y.LambdaOps.*;
 import static org.junit.Assert.*;
 
 /*
- * This test is adapted from the 'Examples from Jacques DeFarge' on the Java
+ * This test was adapted from the 'Examples from Jacques DeFarge' on the Java
  * Concurrency Wiki at
  * http://artisans-serverintellect-com.si-eioswww6.com/default.asp?W7
  */
