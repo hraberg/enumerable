@@ -40,7 +40,7 @@ public class Lambda {
      * an example.
      */
     @NewLambda
-    static <A1, A2, A3, I> I delegate(A1 a1, A2 a2, A3 a3, Object block) {
+    public static <A1, A2, A3, I> I delegate(A1 a1, A2 a2, A3 a3, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -50,7 +50,7 @@ public class Lambda {
      * an example.
      */
     @NewLambda
-    static <A1, A2, I> I delegate(A1 a1, A2 a2, Object block) {
+    public static <A1, A2, I> I delegate(A1 a1, A2 a2, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -60,7 +60,7 @@ public class Lambda {
      * example.
      */
     @NewLambda
-    static <A1, I> I delegate(A1 a1, Object block) {
+    public static <A1, I> I delegate(A1 a1, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -81,7 +81,7 @@ public class Lambda {
      * 
      */
     @NewLambda
-    static <I> I delegate(Unused _, Object block) {
+    public static <I> I delegate(Unused _, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
