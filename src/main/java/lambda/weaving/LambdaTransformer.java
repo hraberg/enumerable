@@ -39,7 +39,7 @@ class LambdaTransformer implements Opcodes {
     }
 
     boolean isInterface(String owner) {
-       return (getClassReader(owner).getAccess() & ACC_INTERFACE) != 0;
+        return (getClassReader(owner).getAccess() & ACC_INTERFACE) != 0;
     }
 
     String[] getInterfaces(String owner) {
@@ -53,6 +53,7 @@ class LambdaTransformer implements Opcodes {
     boolean isFieldPrivate(String owner, final String field) {
         class IsFieldPrivateVisitor extends EmptyVisitor {
             int access;
+
             public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
                 if (field.equals(name))
                     IsFieldPrivateVisitor.this.access = access;
@@ -60,7 +61,21 @@ class LambdaTransformer implements Opcodes {
             }
         }
         return (visitClass(owner, new IsFieldPrivateVisitor()).access & ACC_PRIVATE) != 0;
-     }
+    }
+
+    boolean isStaticMethodPrivate(String owner, final String methodName, final String methodDesc) {
+        class IsMethodPrivateVisitor extends EmptyVisitor {
+            int access;
+
+            public MethodVisitor visitMethod(int access, String name, String desc, String signature,
+                    String[] exceptions) {
+                if ((access & ACC_STATIC) != 0 && methodName.equals(name) && methodDesc.equals(desc))
+                    IsMethodPrivateVisitor.this.access = access;
+                return null;
+            }
+        }
+        return (visitClass(owner, new IsMethodPrivateVisitor()).access & ACC_PRIVATE) != 0;
+    }
 
     MethodInfo findMethodByParameterTypes(String owner, String desc) {
         MethodInfo method = visitClass(owner, new MethodFinder(desc)).getMethod();

@@ -215,6 +215,19 @@ public class ClosureTest extends TestBase implements Serializable {
         assertEquals("hello", world);
     }
 
+    private static String staticWorld = "world";
+
+    @Test
+    public void gettingPrivateStaticFieldOnThisClass() throws Exception {
+        assertEquals(staticWorld, λ(_, staticWorld).call());
+    }
+
+    @Test
+    public void settingPrivateStaticFieldOnThisClass() throws Exception {
+        assertEquals("hello", λ(_, staticWorld = "hello").call());
+        assertEquals("hello", staticWorld);
+    }
+
     private long large = 2;
 
     @Test
@@ -258,6 +271,15 @@ public class ClosureTest extends TestBase implements Serializable {
                 return privatePrimitiveHello("", 2);
             }
         }.call(), (int) result);
+    }
+    
+    @Test
+    public void callPrivateStaticMethodOnThisClassTakingNoArguments() throws Exception {
+        assertEquals(staticPrivateHelloNoArguments(), λ(_, staticPrivateHelloNoArguments()).call());
+    }
+
+    private static String staticPrivateHelloNoArguments() {
+        return "hello";
     }
 
     private String privateHello(String string, int number) {
