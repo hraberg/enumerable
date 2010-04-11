@@ -104,8 +104,8 @@ Enumerable.java uses Ant to build. Run `ant tests`, `ant example` or `ant agent-
 
 The transformation is implemented in two passes. The first pass identifies all blocks and their arities and which local variables they access, if any. The second pass does the actual transformation, which has three main elements:
 
-* Moving the actual block expression into a new inner class implementing Fn1, Fn2 or F3.
-* Wrapping any accessed local variables in arrays which are passed into the block constructor.
+* Moving the actual block expression into a new inner class implementing the return type of the *@Newlambda* factory method, which is assumed to have one single abstract method for the lambda to override.
+* Passing any accessed local variables into the block constructor. Mutable variables are wrapped in arrays.
 * Replacing the original expression with code that constructs the new block.
 
 To understand the transformation better, a good point to start is running `ant example -Dlambda.weaving.debug=true`.
