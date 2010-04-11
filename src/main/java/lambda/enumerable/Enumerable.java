@@ -280,6 +280,8 @@ public class Enumerable {
      */
     public static <E> E inject(Iterable<E> collection, Fn2<E, E, E> block) {
         Iterator<E> i = collection.iterator();
+        if (!i.hasNext())
+            return null;
         E initial = i.next();
         while (i.hasNext())
             initial = block.call(initial, i.next());

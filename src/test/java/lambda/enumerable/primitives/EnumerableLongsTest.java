@@ -150,6 +150,16 @@ public class EnumerableLongsTest extends TestBase {
     }
 
     @Test
+    public void injectWithoutInitialValueAndOnlyOneElementReturnsElement() throws Exception {
+        assertEquals(1, inject(new long[] {1}, λ(l, k, l * k)));
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void injectWithoutInitialValueAndEmptyArrayThrowsException() throws Exception {
+        inject(new long[0], λ(l, k, l * k));
+    }
+
+    @Test
     public void anyOnEmptyArray() throws Exception {
         assertFalse(any(new long[0], λ(l, l > 0)));
     }

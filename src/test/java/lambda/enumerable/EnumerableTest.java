@@ -287,6 +287,16 @@ public class EnumerableTest extends TestBase {
         assertEquals(3628800, (int) inject(oneToTen, λ(n, m, n * m)));
     }
 
+    @Test
+    public void injectWithoutInitialValueAndOnlyOneElementReturnsElement() throws Exception {
+        assertEquals(1, (int) inject(list(1), λ(n, m, n * m)));
+    }
+
+    @Test
+    public void injectWithoutInitialValueAndEmptyListReturnsNull() throws Exception {
+        assertNull(inject(list(int.class), λ(n, m, n * m)));
+    }
+ 
     @LambdaParameter
     static List<Integer> list;
 

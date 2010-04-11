@@ -22,8 +22,8 @@ import static lambda.primitives.LambdaPrimitives.*;
 
 public class EnumerableExample {
     /**
-     * <i>If you see errors in this file, and not a real 'lambda' character, ensure
-     * that it's opened as UTF-8.</i>
+     * <i>If you see errors in this file, and not a real 'lambda' character,
+     * ensure that it's opened as UTF-8.</i>
      * <p>
      * λ is a set of static methods in {@link Lambda}, used to create new
      * lambdas, which can take 0 to 3 arguments. There's also an alias, fn, if
@@ -38,16 +38,16 @@ public class EnumerableExample {
         List<String> strings = asList("malaysia", "thailand", "india", "people's republic of china");
 
         /*
-         * each will evaluate the block for every element in the array. The
-         * block has to be an expression, printf returns a PrintStream which we
+         * each will evaluate the block for every element in the list. The block
+         * has to be an expression, printf returns a PrintStream which we
          * ignore.
          */
         each(strings, λ(s, out.printf("Country: %s\n", s)));
 
         /*
          * eachWithIndex binds the second parameter to the current index, we use
-         * the int @LambdaParameter idx here. The local variable map is wrapped
-         * in an array to enable closure.
+         * the int @LambdaParameter idx here. The local variable map is
+         * effectively final, as it's only accessed once.
          */
         Map<String, Integer> map = new HashMap<String, Integer>();
         eachWithIndex(strings, λ(s, idx, map.put(s, idx)));
@@ -62,11 +62,11 @@ public class EnumerableExample {
         /*
          * Contrived example of both collecting and modifying a local variable
          * at the same time. StringBuffer#append returns the buffer, so each
-         * element of twoStrings will contain the buffer up to that point.
+         * element of stringsSoFar will contain the buffer up to that point.
          */
         StringBuffer hello = new StringBuffer("");
-        List<String> twoStrings = collect(strings, λ(s, hello.append(s).toString()));
-        out.println(twoStrings);
+        List<String> stringsSoFar = collect(strings, λ(s, hello.append(s).toString()));
+        out.println(stringsSoFar);
         out.println(hello);
 
         List<Integer> ints = asList(5, 1, 8, 4, 6, 3, 10, 2, 7, 9);
@@ -76,8 +76,8 @@ public class EnumerableExample {
          * Squares a list of integers. The @LambdaParameter n is accessed a
          * total of 3 times during block construction. The first time is to
          * define a block argument, the two next times to access the first
-         * parameter to Fn1#call(arg) While actually executing n is not accessed
-         * at all, the arg parameter of the new Fn1 is.
+         * parameter to Fn1#call(Object). While actually executing n is not
+         * accessed at all, the arg parameter of the new Fn1 is.
          */
         List<Integer> squares = collect(ints, λ(n, n * n));
         out.println(squares);
@@ -85,7 +85,7 @@ public class EnumerableExample {
         /*
          * Special case of wrapping a block in a java interface
          * (java.util.Comparator). For a general, proxy based solution, see the
-         * Lambda.as methods.
+         * Fn0#as(Class) method.
          */
         List<Integer> sortedDescending = sort(ints, λ(n, m, m - n));
         out.println(sortedDescending);
@@ -158,8 +158,11 @@ public class EnumerableExample {
         /*
          * Partition is select and reject rolled into one, returning a list with
          * two collections, [selected, rejected].
+         * 
+         * EList<?> is a normal wrapped java.util.List which implements
+         * IEnumerable, the instance version of Enumerable.
          */
-        List<EList<Integer>> partitioned = partition(ints, λ(n, n % 2 == 0));
+        EList<EList<Integer>> partitioned = partition(ints, λ(n, n % 2 == 0));
         out.println(partitioned);
 
         /*
@@ -227,7 +230,7 @@ public class EnumerableExample {
         /*
          * You cannot nest lambda constructs as the weaver doesn't support it,
          * but you can use more than one in the same larger expression like
-         * this.
+         * this, using an EIterable.
          */
         List<Integer> oddTimesSum = collect(ints, λ(n, n * sum)).select(λ(n, n % 2 == 1));
         out.println(oddTimesSum);

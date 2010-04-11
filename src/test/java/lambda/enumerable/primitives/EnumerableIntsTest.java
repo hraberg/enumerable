@@ -134,6 +134,16 @@ public class EnumerableIntsTest extends TestBase {
     }
 
     @Test
+    public void injectWithoutInitialValueAndOnlyOneElementReturnsElement() throws Exception {
+        assertEquals(1, inject(new int[] {1}, λ(n, m, n * m)));
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void injectWithoutInitialValueAndEmptyArrayThrowsException() throws Exception {
+        inject(new int[0], λ(n, m, n * m));
+    }
+
+    @Test
     public void anyOnEmptyArray() throws Exception {
         assertFalse(any(new int[0], λ(n, n > 0)));
     }

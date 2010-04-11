@@ -174,6 +174,16 @@ public class EnumerableDoublesTest extends TestBase {
     }
 
     @Test
+    public void injectWithoutInitialValueAndOnlyOneElementReturnsElement() throws Exception {
+        assertEquals(1.0, inject(new double[] {1.0}, λ(x, y, x * y)), 0.0);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void injectWithoutInitialValueAndEmptyArrayThrowsException() throws Exception {
+        inject(new double[0], λ(x, y, x * y));
+    }
+
+    @Test
     public void anyOnEmptyArray() throws Exception {
         assertFalse(any(new double[0], λ(d, d > 0)));
     }
