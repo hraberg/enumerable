@@ -19,6 +19,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
     Map<String, MethodInfo> methodsByNameAndDesc;
 
     int currentLambdaId;
+    int accessMethods;
 
     class LambdaMethodVisitor extends MethodAdapter {
         MethodVisitor originalMethodWriter;
@@ -102,7 +103,6 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             if (isPrimitive(lambdaParameterType) && isReference(currentLambda.getNewMethodParameterType(name)))
                 lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = getBoxedType(lambdaParameterType);
 
-            
             Type[] methodParameterTypes = getArgumentTypes(currentLambda.getLambdaMethod().desc);
             Type methodParameterType = methodParameterTypes[currentLambda.getParameterIndex(name)];
 
@@ -165,13 +165,14 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void ensureAllLambdaParametersAreDefined(String name) {
             if (!currentLambda.allParametersAreDefined())
-                throw new IllegalArgumentException("Defining " + name + " more than once for " + currentLambda + " at " + sourceAndLine());
+                throw new IllegalArgumentException("Defining " + name + " more than once for " + currentLambda
+                        + " at " + sourceAndLine());
         }
 
         void ensureLambdaHasParameter(String name) {
             if (!currentLambda.hasParameter(name))
-                throw new IllegalArgumentException("Parameter " + name
-                        + " is undefined for " + currentLambda + " at " + sourceAndLine());
+                throw new IllegalArgumentException("Parameter " + name + " is undefined for " + currentLambda
+                        + " at " + sourceAndLine());
         }
 
         public void visitMethodInsn(int opcode, String owner, String name, String desc) {
@@ -187,12 +188,46 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 } else if (isValueOfCallToIgnore(opcode, owner, name)) {
                     lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = null;
 
+                } else if (isInvokeSpecialOnThisWhichNeedAcccessMethodFromLambda(opcode, owner)) {
+                    createAndCallStaticAccessMethodToReplaceInvokeSpecial(opcode, owner, name, desc);
+
                 } else {
                     super.visitMethodInsn(opcode, owner, name, desc);
+
                 }
             } catch (Exception e) {
                 throw uncheck(e);
             }
+        }
+
+        void createAndCallStaticAccessMethodToReplaceInvokeSpecial(int opcode, String owner, String name, String desc) {
+            List<Type> argumentTypes = new ArrayList<Type>();
+            argumentTypes.add(getObjectType(owner));
+            for (Type type : getArgumentTypes(desc))
+                argumentTypes.add(type);
+
+            String accessMethodDescriptor = getMethodDescriptor(getReturnType(desc), argumentTypes
+                    .toArray(new Type[0]));
+            String accessMethodName = "access$lambda$" + String.format("%03d_", accessMethods++);
+
+            mv.visitMethodInsn(INVOKESTATIC, owner, accessMethodName, accessMethodDescriptor);
+
+            MethodVisitor mv = SecondPassClassVisitor.this.cv.visitMethod(ACC_STATIC + ACC_SYNTHETIC,
+                    accessMethodName, accessMethodDescriptor, null, null);
+            mv.visitCode();
+
+            int i = 0;
+            for (Type type : argumentTypes)
+                mv.visitVarInsn(type.getOpcode(ILOAD), i++);
+
+            mv.visitMethodInsn(opcode, owner, name, desc);
+            mv.visitInsn(getReturnType(desc).getOpcode(IRETURN));
+            mv.visitMaxs(0, 0);
+            mv.visitEnd();
+        }
+
+        boolean isInvokeSpecialOnThisWhichNeedAcccessMethodFromLambda(int opcode, String owner) {
+            return inLambda() && INVOKESPECIAL == opcode && className.equals(owner);
         }
 
         boolean isValueOfCallToIgnore(int opcode, String owner, String name) {
@@ -506,11 +541,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void handleBoxingAndUnboxing(Type returnType, Type lambdaExpressionType) {
             if (isPrimitive(returnType) && isReference(lambdaExpressionType)) {
                 unbox(returnType);
-                debug("unboxed return value with type " + getSimpleClassName(lambdaExpressionType) + " as " + getSimpleClassName(returnType));
+                debug("unboxed return value with type " + getSimpleClassName(lambdaExpressionType) + " as "
+                        + getSimpleClassName(returnType));
             }
-            if (isReference(returnType) && isPrimitive(lambdaExpressionType)) {                
+            if (isReference(returnType) && isPrimitive(lambdaExpressionType)) {
                 box(lambdaExpressionType);
-                debug("boxed return value with type " + getSimpleClassName(lambdaExpressionType) + " as " + getSimpleClassName(returnType));
+                debug("boxed return value with type " + getSimpleClassName(lambdaExpressionType) + " as "
+                        + getSimpleClassName(returnType));
             }
         }
 

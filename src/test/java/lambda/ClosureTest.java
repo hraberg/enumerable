@@ -203,6 +203,50 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
+    public void callPrivateInstanceMethodOnThisTakingNoArguments() throws Exception {
+        assertEquals(privateHelloNoArguments(), λ(_, privateHelloNoArguments()).call());
+    }
+
+    @Test
+    public void callPrivateInstanceMethodOnThisTakingNoArgumentsTwice() throws Exception {
+        assertEquals(privateHelloNoArguments(), λ(_, privateHelloNoArguments()).call());
+        assertEquals(privateHelloNoArguments(), λ(_, privateHelloNoArguments()).call());
+    }
+
+    @Test
+    public void callPrivateInstanceMethodOnThisTakingArguments() throws Exception {
+        assertEquals(privateHello("world", 2), λ(_, privateHello("world", 2)).call());
+    }
+
+    @Test
+    public void callPrivateInstanceMethodOnThisReturningPrimitive() throws Exception {
+        assertEquals(privatePrimitiveHello("world", 2), (int) λ(_, privatePrimitiveHello("world", 2)).call());
+    }
+
+    @Test
+    public void callPrivateInstanceMethodOnThisWithExistingAccessMethod() throws Exception {
+        int result = λ(_, privatePrimitiveHello("world", 2)).call();
+        assertEquals(7, result);
+        assertEquals(new Fn0<Object>() {
+            public Object call() {
+                return privatePrimitiveHello("", 2);
+            }
+        }.call(), (int) result);
+    }
+
+    private String privateHello(String string, int number) {
+        return "hello" + string + number;
+    }
+
+    private String privateHelloNoArguments() {
+        return "hello";
+    }
+
+    private int privatePrimitiveHello(String string, int number) {
+        return "hello".length() + number;
+    }
+
+    @Test
     public void callStaticMethod() throws Exception {
         assertEquals(ClosureTest.world(), λ(_, ClosureTest.world()).call());
     }
