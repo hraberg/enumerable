@@ -11,6 +11,10 @@ public class EList<E> extends ECollection<E> implements List<E> {
         super(list);
     }
 
+    public EList(int length) {
+        new ArrayList<E>(length);
+    }
+
     public List<E> delegate() {
         return (List<E>) iterable;
     }

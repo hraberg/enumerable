@@ -1,12 +1,13 @@
 package lambda.enumerable.primitives;
 
 import java.lang.reflect.Array;
-import java.util.*;
-
-import static java.lang.System.*;
+import java.util.Arrays;
 
 import lambda.enumerable.Enumerable;
+import lambda.enumerable.collection.EList;
+import lambda.enumerable.collection.ESet;
 import lambda.primitives.*;
+import static java.lang.System.*;
 
 /**
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
@@ -186,7 +187,7 @@ public class EnumerableLongs {
     /**
      * @see #toList(long[])
      */
-    public static <E> List<Long> entries(long[] array) {
+    public static <E> EList<Long> entries(long[] array) {
         return toList(array);
     }
 
@@ -285,8 +286,13 @@ public class EnumerableLongs {
     public static long max(long[] array) {
         if (array.length == 0)
             return 0;
-        long[] result = sort(array);
-        return result[result.length - 1];
+        long result = array[0];
+        for (int i = 1; i < array.length; i++) {
+            long each = array[i];
+            if (each > result)
+                result = each;
+        }
+        return result;
     }
 
     // /**
@@ -313,7 +319,13 @@ public class EnumerableLongs {
     public static long min(long[] array) {
         if (array.length == 0)
             return 0;
-        return sort(array)[0];
+        long result = array[0];
+        for (int i = 1; i < array.length; i++) {
+            long each = array[i];
+            if (each < result)
+                result = each;
+        }
+        return result;
     }
 
     //
@@ -394,8 +406,8 @@ public class EnumerableLongs {
     /**
      * Returns a list containing the items in array.
      */
-    public static List<Long> toList(long[] array) {
-        List<Long> result = new ArrayList<Long>(array.length);
+    public static EList<Long> toList(long[] array) {
+        EList<Long> result = new EList<Long>(array.length);
         for (long each : array)
             result.add(each);
         return result;
@@ -404,7 +416,7 @@ public class EnumerableLongs {
     /**
      * Creates a new Set containing the elements of the given array.
      */
-    public static Set<Long> toSet(long[] array) {
+    public static ESet<Long> toSet(long[] array) {
         return Enumerable.toSet(toList(array));
     }
 
@@ -412,7 +424,7 @@ public class EnumerableLongs {
      * Creates a new Set containing the elements of the given array, the
      * elements are preprocessed by the given block.
      */
-    public static <R> Set<R> toSet(long[] array, Fn1LtoO<R> block) {
+    public static <R> ESet<R> toSet(long[] array, Fn1LtoO<R> block) {
         return Enumerable.toSet(toList(array), block);
     }
 

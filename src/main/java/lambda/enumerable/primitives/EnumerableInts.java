@@ -1,12 +1,13 @@
 package lambda.enumerable.primitives;
 
 import java.lang.reflect.Array;
-import java.util.*;
-
-import static java.lang.System.*;
+import java.util.Arrays;
 
 import lambda.enumerable.Enumerable;
+import lambda.enumerable.collection.EList;
+import lambda.enumerable.collection.ESet;
 import lambda.primitives.*;
+import static java.lang.System.*;
 
 /**
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
@@ -186,7 +187,7 @@ public class EnumerableInts {
     /**
      * @see #toList(int[])
      */
-    public static <E> List<Integer> entries(int[] array) {
+    public static <E> EList<Integer> entries(int[] array) {
         return toList(array);
     }
 
@@ -285,8 +286,13 @@ public class EnumerableInts {
     public static int max(int[] array) {
         if (array.length == 0)
             return 0;
-        int[] result = sort(array);
-        return result[result.length - 1];
+        int result = array[0];
+        for (int i = 1; i < array.length; i++) {
+            int each = array[i];
+            if (each > result)
+                result = each;
+        }
+        return result;
     }
 
     // /**
@@ -313,7 +319,13 @@ public class EnumerableInts {
     public static int min(int[] array) {
         if (array.length == 0)
             return 0;
-        return sort(array)[0];
+        int result = array[0];
+        for (int i = 1; i < array.length; i++) {
+            int each = array[i];
+            if (each < result)
+                result = each;
+        }
+        return result;
     }
 
     //
@@ -411,8 +423,8 @@ public class EnumerableInts {
     /**
      * Returns a list containing the items in array.
      */
-    public static List<Integer> toList(int[] array) {
-        List<Integer> result = new ArrayList<Integer>(array.length);
+    public static EList<Integer> toList(int[] array) {
+        EList<Integer> result = new EList<Integer>(array.length);
         for (int each : array)
             result.add(each);
         return result;
@@ -421,7 +433,7 @@ public class EnumerableInts {
     /**
      * Creates a new Set containing the elements of the given array.
      */
-    public static Set<Integer> toSet(int[] array) {
+    public static ESet<Integer> toSet(int[] array) {
         return Enumerable.toSet(toList(array));
     }
 
@@ -429,7 +441,7 @@ public class EnumerableInts {
      * Creates a new Set containing the elements of the given array, the
      * elements are preprocessed by the given block.
      */
-    public static <R> Set<R> toSet(int[] array, Fn1ItoO<R> block) {
+    public static <R> ESet<R> toSet(int[] array, Fn1ItoO<R> block) {
         return Enumerable.toSet(toList(array), block);
     }
 

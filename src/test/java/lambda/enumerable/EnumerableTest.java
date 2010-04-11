@@ -1,11 +1,14 @@
 package lambda.enumerable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
+import lambda.enumerable.EnumerableArrays.ArrayIterable;
 import lambda.enumerable.collection.EList;
 
 import org.junit.Test;
@@ -470,30 +473,5 @@ public class EnumerableTest extends TestBase {
     @Test
     public void zipEmptyCollectionReturnsEmptyCollection() throws Exception {
         assertTrue(zip(list()).isEmpty());
-    }
-
-    class ArrayIterable<T> implements Iterable<T> {
-        Object[] elements;
-
-        ArrayIterable(Object[] elements) {
-            this.elements = elements;
-        }
-
-        public Iterator<T> iterator() {
-            return new Iterator<T>() {
-                int i = 0;
-
-                public boolean hasNext() {
-                    return i < elements.length;
-                }
-
-                public T next() {
-                    return (T) elements[i++];
-                }
-
-                public void remove() {
-                }
-            };
-        }
     }
 }

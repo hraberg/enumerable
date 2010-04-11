@@ -1,12 +1,13 @@
 package lambda.enumerable.primitives;
 
 import java.lang.reflect.Array;
-import java.util.*;
-
-import static java.lang.System.*;
+import java.util.Arrays;
 
 import lambda.enumerable.Enumerable;
+import lambda.enumerable.collection.EList;
+import lambda.enumerable.collection.ESet;
 import lambda.primitives.*;
+import static java.lang.System.*;
 
 /**
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
@@ -186,7 +187,7 @@ public class EnumerableDoubles {
     /**
      * @see #toList(double[])
      */
-    public static <E> List<Double> entries(double[] array) {
+    public static <E> EList<Double> entries(double[] array) {
         return toList(array);
     }
 
@@ -285,8 +286,13 @@ public class EnumerableDoubles {
     public static double max(double[] array) {
         if (array.length == 0)
             return 0;
-        double[] result = sort(array);
-        return result[result.length - 1];
+        double result = array[0];
+        for (int i = 1; i < array.length; i++) {
+            double each = array[i];
+            if (each > result)
+                result = each;
+        }
+        return result;
     }
 
     // /**
@@ -313,7 +319,13 @@ public class EnumerableDoubles {
     public static double min(double[] array) {
         if (array.length == 0)
             return 0;
-        return sort(array)[0];
+        double result = array[0];
+        for (int i = 1; i < array.length; i++) {
+            double each = array[i];
+            if (each < result)
+                result = each;
+        }
+        return result;
     }
 
     //
@@ -394,8 +406,8 @@ public class EnumerableDoubles {
     /**
      * Returns a list containing the items in array.
      */
-    public static List<Double> toList(double[] array) {
-        List<Double> result = new ArrayList<Double>(array.length);
+    public static EList<Double> toList(double[] array) {
+        EList<Double> result = new EList<Double>(array.length);
         for (double each : array)
             result.add(each);
         return result;
@@ -404,7 +416,7 @@ public class EnumerableDoubles {
     /**
      * Creates a new Set containing the elements of the given array.
      */
-    public static Set<Double> toSet(double[] array) {
+    public static ESet<Double> toSet(double[] array) {
         return Enumerable.toSet(toList(array));
     }
 
@@ -412,7 +424,7 @@ public class EnumerableDoubles {
      * Creates a new Set containing the elements of the given array, the
      * elements are preprocessed by the given block.
      */
-    public static <R> Set<R> toSet(double[] array, Fn1DtoO<R> block) {
+    public static <R> ESet<R> toSet(double[] array, Fn1DtoO<R> block) {
         return Enumerable.toSet(toList(array), block);
     }
 

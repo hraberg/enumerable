@@ -310,21 +310,16 @@ public class Enumerable {
      * assumes all objects implement {@link Comparable}
      */
     public static <E extends Object & Comparable<? super E>> E max(Iterable<E> collection) {
-        List<E> sorted = sort(collection);
-        if (sorted.isEmpty())
-            return null;
-        return sorted.get(sorted.size() - 1);
+        return min(collection, new ReverseComparator<E>(new NaturalOrderComparator<E>()));
     }
 
     /**
      * Returns the object in collection with the maximum value. This form uses
      * the block to {@link Comparator#compare}.
      */
+    @SuppressWarnings("unchecked")
     public static <E> E max(Iterable<E> collection, Fn2<E, E, Integer> block) {
-        List<E> sorted = sort(collection, block);
-        if (sorted.isEmpty())
-            return null;
-        return sorted.get(sorted.size() - 1);
+        return min(collection, new ReverseComparator<E>(block.as(Comparator.class)));
     }
 
     /**
@@ -340,21 +335,16 @@ public class Enumerable {
      * assumes all objects implement {@link Comparable}.
      */
     public static <E extends Object & Comparable<? super E>> E min(Iterable<E> collection) {
-        List<E> sorted = sort(collection);
-        if (sorted.isEmpty())
-            return null;
-        return sorted.get(0);
+        return min(collection, new NaturalOrderComparator<E>());
     }
 
     /**
      * Returns the object in collection with the minimum value. This form uses
      * the block to {@link Comparator#compare}.
      */
+    @SuppressWarnings("unchecked")
     public static <E> E min(Iterable<E> collection, Fn2<E, E, Integer> block) {
-        List<E> sorted = sort(collection, block);
-        if (sorted.isEmpty())
-            return null;
-        return sorted.get(0);
+        return min(collection, (Comparator<E>) block.as(Comparator.class));
     }
 
     /**
@@ -547,5 +537,31 @@ public class Enumerable {
             result.add(each);
 
         return result;
+    }
+
+    private static <E> E min(Iterable<E> collection, Comparator<E> comparator) {
+        E result = null;
+        for (E each : collection)
+            if (result == null || comparator.compare(each, result) < 0)
+                result = each;
+        return result;
+    }
+
+    private static final class ReverseComparator<E> implements Comparator<E> {
+        Comparator<E> comparator;
+
+        ReverseComparator(Comparator<E> comparator) {
+            this.comparator = comparator;
+        }
+
+        public int compare(E o1, E o2) {
+            return - comparator.compare(o1, o2);
+        }
+    }
+
+    private static final class NaturalOrderComparator<E extends Object & Comparable<? super E>> implements Comparator<E> {
+        public int compare(E o1, E o2) {
+            return o1.compareTo(o2);
+        }
     }
 }

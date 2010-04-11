@@ -221,7 +221,7 @@ public class EnumerableDoublesTest extends TestBase {
     }
 
     @Test
-    public void minReturnsZeroForEmptyList() throws Exception {
+    public void minReturnsZeroForEmptyArray() throws Exception {
         assertEquals(0, min(new double[0]), 0.0);
     }
 

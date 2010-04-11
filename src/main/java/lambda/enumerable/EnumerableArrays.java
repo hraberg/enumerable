@@ -2,6 +2,7 @@ package lambda.enumerable;
 
 import java.lang.reflect.Array;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -9,7 +10,6 @@ import lambda.Fn1;
 import lambda.Fn2;
 import lambda.enumerable.collection.EList;
 import lambda.enumerable.collection.ESet;
-import static java.util.Arrays.*;
 
 /**
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
@@ -26,7 +26,7 @@ public class EnumerableArrays {
      * true if the block never returns false or null.
      */
     public static <E> boolean all(E[] array, Fn1<E, ?> block) {
-        return Enumerable.all(asList(array), block);
+        return Enumerable.all(asIterable(array), block);
     }
 
     /**
@@ -34,7 +34,7 @@ public class EnumerableArrays {
      * true if the block ever returns a value other than false or null.
      */
     public static <E> boolean any(E[] array, Fn1<E, ?> block) {
-        return Enumerable.any(asList(array), block);
+        return Enumerable.any(asIterable(array), block);
     }
 
     /**
@@ -42,7 +42,7 @@ public class EnumerableArrays {
      * element in array.
      */
     public static <E, R> Object[] collect(E[] array, Fn1<E, R> block) {
-        return Enumerable.collect(asList(array), block).toArray();
+        return Enumerable.collect(asIterable(array), block).toArray();
     }
 
     /**
@@ -51,7 +51,7 @@ public class EnumerableArrays {
      */
     @SuppressWarnings("unchecked")
     public static <E, R> R[] collect(E[] array, Fn1<E, R> block, Class<R> type) {
-        return Enumerable.collect(asList(array), block).toArray((R[]) Array.newInstance(type, 0));
+        return Enumerable.collect(asIterable(array), block).toArray((R[]) Array.newInstance(type, 0));
     }
 
     /**
@@ -59,7 +59,7 @@ public class EnumerableArrays {
      * not false. If no object matches, it returns null.
      */
     public static <E> E detect(E[] array, Fn1<E, Boolean> block) {
-        return Enumerable.detect(asList(array), block);
+        return Enumerable.detect(asIterable(array), block);
     }
 
     /**
@@ -67,28 +67,29 @@ public class EnumerableArrays {
      * not false. If no object matches, it returns ifNone.
      */
     public static <E> E detect(E[] array, E ifNone, Fn1<E, Boolean> block) {
-        return Enumerable.detect(asList(array), ifNone, block);
+        return Enumerable.detect(asIterable(array), ifNone, block);
     }
 
     /**
      * Calls block for each item in array.
      */
     public static <E, R> E[] each(E[] array, Fn1<E, R> block) {
-        return Enumerable.toList(Enumerable.each(asList(array), block)).toArray(newEmptyArray(array));
+        Enumerable.each(asIterable(array), block);
+        return array;
     }
 
     /**
      * Iterates the given block for each list of consecutive n elements.
      */
     public static <E, R> Object eachCons(E[] array, int n, Fn1<List<E>, R> block) {
-        return Enumerable.eachCons(asList(array), n, block);
+        return Enumerable.eachCons(asIterable(array), n, block);
     }
 
     /**
      * Iterates the given block for each slice of n elements.
      */
     public static <E, R> Object eachSlice(E[] array, int n, Fn1<List<E>, R> block) {
-        return Enumerable.eachSlice(asList(array), n, block);
+        return Enumerable.eachSlice(asIterable(array), n, block);
     }
 
     /**
@@ -96,42 +97,43 @@ public class EnumerableArrays {
      * array.
      */
     public static <E, R> E[] eachWithIndex(E[] array, Fn2<E, Integer, R> block) {
-        return Enumerable.toList(Enumerable.eachWithIndex(asList(array), block)).toArray(newEmptyArray(array));
+        Enumerable.eachWithIndex(asIterable(array), block);
+        return array;
     }
 
     /**
      * @see #toList(Object...)
      */
-    public static <E> E[] entries(E... array) {
-        return Enumerable.toList(asList(array)).toArray(newEmptyArray(array));
+    public static <E> EList<E> entries(E... array) {
+        return Enumerable.toList(asIterable(array));
     }
 
     /**
      * @see #detect(Object[], Fn1)
      */
     public static <E> E find(E[] array, Fn1<E, Boolean> block) {
-        return Enumerable.detect(asList(array), block);
+        return Enumerable.detect(asIterable(array), block);
     }
 
     /**
      * @see #detect(Object[], Object, Fn1)
      */
     public static <E> E find(E[] array, E ifNone, Fn1<E, Boolean> block) {
-        return Enumerable.detect(asList(array), ifNone, block);
+        return Enumerable.detect(asIterable(array), ifNone, block);
     }
 
     /**
      * @see #select(Object[], Fn1)
      */
     public static <E> E[] findAll(E[] array, Fn1<E, Boolean> block) {
-        return Enumerable.findAll(asList(array), block).toArray(newEmptyArray(array));
+        return Enumerable.findAll(asIterable(array), block).toArray(newEmptyArray(array));
     }
 
     /**
      * Returns an array of every element in array for which pattern matches.
      */
     public static <E> E[] grep(E[] array, Pattern pattern) {
-        return Enumerable.grep(asList(array), pattern).toArray(newEmptyArray(array));
+        return Enumerable.grep(asIterable(array), pattern).toArray(newEmptyArray(array));
     }
 
     /**
@@ -140,28 +142,28 @@ public class EnumerableArrays {
      * the output list.
      */
     public static <E, R> Object[] grep(E[] array, Pattern pattern, Fn1<E, R> block) {
-        return Enumerable.grep(asList(array), pattern, block).toArray();
+        return Enumerable.grep(asIterable(array), pattern, block).toArray();
     }
 
     /**
      * @see #grep(Object[], Pattern)
      */
     public static <E> E[] grep(E[] array, String pattern) {
-        return Enumerable.grep(asList(array), pattern).toArray(newEmptyArray(array));
+        return Enumerable.grep(asIterable(array), pattern).toArray(newEmptyArray(array));
     }
 
     /**
      * @see #grep(Object[], Pattern, Fn1)
      */
     public static <E, R> Object[] grep(E[] array, String pattern, Fn1<E, R> block) {
-        return Enumerable.grep(asList(array), pattern, block).toArray();
+        return Enumerable.grep(asIterable(array), pattern, block).toArray();
     }
 
     /**
      * @see #member(Object[], Object)
      */
     public static <E> boolean includes(E[] array, Object obj) {
-        return Enumerable.includes(asList(array), obj);
+        return Enumerable.includes(asIterable(array), obj);
     }
 
     /**
@@ -171,7 +173,7 @@ public class EnumerableArrays {
      * array as a the initial value (and skips that element while iterating).
      */
     public static <E> E inject(E[] array, Fn2<E, E, E> block) {
-        return Enumerable.inject(asList(array), block);
+        return Enumerable.inject(asIterable(array), block);
     }
 
     /**
@@ -181,14 +183,14 @@ public class EnumerableArrays {
      * for memo.
      */
     public static <E, R> R inject(E[] array, R initial, Fn2<R, E, R> block) {
-        return Enumerable.inject(asList(array), initial, block);
+        return Enumerable.inject(asIterable(array), initial, block);
     }
 
     /**
      * @see #collect(Object[], Fn1)
      */
     public static <E, R> Object[] map(E[] array, Fn1<E, R> block) {
-        return Enumerable.map(asList(array), block).toArray();
+        return Enumerable.map(asIterable(array), block).toArray();
     }
 
     /**
@@ -203,7 +205,7 @@ public class EnumerableArrays {
      * objects implement {@link Comparable}
      */
     public static <E extends Object & Comparable<? super E>> E max(E[] array) {
-        return Enumerable.max(asList(array));
+        return Enumerable.max(asIterable(array));
     }
 
     /**
@@ -211,7 +213,7 @@ public class EnumerableArrays {
      * block to {@link Comparator#compare}.
      */
     public static <E> E max(E[] array, Fn2<E, E, Integer> block) {
-        return Enumerable.max(asList(array), block);
+        return Enumerable.max(asIterable(array), block);
     }
 
     /**
@@ -219,7 +221,7 @@ public class EnumerableArrays {
      * {@link Object#equals(Object)}.
      */
     public static <E> boolean member(E[] array, Object obj) {
-        return Enumerable.member(asList(array), obj);
+        return Enumerable.member(asIterable(array), obj);
     }
 
     /**
@@ -227,7 +229,7 @@ public class EnumerableArrays {
      * objects implement {@link Comparable}.
      */
     public static <E extends Object & Comparable<? super E>> E min(E[] array) {
-        return Enumerable.min(asList(array));
+        return Enumerable.min(asIterable(array));
     }
 
     /**
@@ -235,7 +237,7 @@ public class EnumerableArrays {
      * block to {@link Comparator#compare}.
      */
     public static <E> E min(E[] array, Fn2<E, E, Integer> block) {
-        return Enumerable.min(asList(array), block);
+        return Enumerable.min(asIterable(array), block);
     }
 
     /**
@@ -244,7 +246,7 @@ public class EnumerableArrays {
      */
     @SuppressWarnings("unchecked")
     public static <E> E[][] partition(E[] array, Fn1<E, Boolean> block) {
-        List<EList<E>> partition = Enumerable.partition(asList(array), block);
+        List<EList<E>> partition = Enumerable.partition(asIterable(array), block);
 
         E[][] result = (E[][]) Array.newInstance(array.getClass(), 2);
 
@@ -276,7 +278,7 @@ public class EnumerableArrays {
      * false.
      */
     public static <E> E[] reject(E[] array, Fn1<E, Boolean> block) {
-        return Enumerable.reject(asList(array), block).toArray(newEmptyArray(array));
+        return Enumerable.reject(asIterable(array), block).toArray(newEmptyArray(array));
     }
 
     /**
@@ -284,7 +286,7 @@ public class EnumerableArrays {
      * false.
      */
     public static <E> E[] select(E[] array, Fn1<E, Boolean> block) {
-        return Enumerable.select(asList(array), block).toArray(newEmptyArray(array));
+        return Enumerable.select(asIterable(array), block).toArray(newEmptyArray(array));
     }
 
     /**
@@ -292,7 +294,7 @@ public class EnumerableArrays {
      * own compareTo method.
      */
     public static <E extends Object & Comparable<? super E>> E[] sort(E[] array) {
-        return Enumerable.sort(asList(array)).toArray(newEmptyArray(array));
+        return Enumerable.sort(asIterable(array)).toArray(newEmptyArray(array));
     }
 
     /**
@@ -300,7 +302,7 @@ public class EnumerableArrays {
      * results of the supplied block.
      */
     public static <E> E[] sort(E[] array, Fn2<E, E, Integer> block) {
-        return Enumerable.sort(asList(array), block).toArray(newEmptyArray(array));
+        return Enumerable.sort(asIterable(array), block).toArray(newEmptyArray(array));
     }
 
     /**
@@ -308,21 +310,21 @@ public class EnumerableArrays {
      * through the given block.
      */
     public static <E, R extends Object & Comparable<? super R>> E[] sortBy(E[] array, final Fn1<E, R> block) {
-        return Enumerable.sortBy(asList(array), block).toArray(newEmptyArray(array));
+        return Enumerable.sortBy(asIterable(array), block).toArray(newEmptyArray(array));
     }
 
     /**
      * Returns a list containing the items in array.
      */
     public static <E> EList<E> toList(E... array) {
-        return Enumerable.toList(asList(array));
+        return Enumerable.toList(asIterable(array));
     }
 
     /**
      * Creates a new Set containing the elements of the given array.
      */
     public static <E> ESet<E> toSet(E... array) {
-        return Enumerable.toSet(asList(array));
+        return Enumerable.toSet(asIterable(array));
     }
 
     /**
@@ -330,7 +332,7 @@ public class EnumerableArrays {
      * elements are preprocessed by the given block.
      */
     public static <E, R> ESet<R> toSet(E[] array, Fn1<E, R> block) {
-        return Enumerable.toSet(asList(array), block);
+        return Enumerable.toSet(asIterable(array), block);
     }
 
     /**
@@ -349,9 +351,9 @@ public class EnumerableArrays {
     public static <E> Object[][] zip(E[] array, Object[]... args) {
         Iterable<?>[] lists = new Iterable<?>[args.length];
         for (int i = 0; i < args.length; i++)
-            lists[i] = asList(args[i]);
+            lists[i] = asIterable(args[i]);
 
-        List<EList<?>> zip = Enumerable.zip(asList(array), lists);
+        List<EList<?>> zip = Enumerable.zip(asIterable(array), lists);
 
         Object[][] result = new Object[zip.size()][];
         for (int i = 0; i < zip.size(); i++)
@@ -363,4 +365,34 @@ public class EnumerableArrays {
     private static <T> T[] newEmptyArray(T[] array) {
         return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
     }
+    
+    private static <T> Iterable<T> asIterable(T[] array) {
+        return new ArrayIterable<T>(array);
+    }
+    
+    static class ArrayIterable<T> implements Iterable<T> {
+        T[] array;
+
+        ArrayIterable(T[] elements) {
+            this.array = elements;
+        }
+
+        public Iterator<T> iterator() {
+            return new Iterator<T>() {
+                int i = 0;
+
+                public boolean hasNext() {
+                    return i < array.length;
+                }
+
+                public T next() {
+                    return array[i++];
+                }
+
+                public void remove() {
+                }
+            };
+        }
+    }
+
 }
