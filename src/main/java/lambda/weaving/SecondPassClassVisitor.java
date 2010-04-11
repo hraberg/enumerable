@@ -255,7 +255,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
             mv.visitMethodInsn(INVOKESTATIC, owner, accessMethodName, accessMethodDescriptor);
 
-            MethodVisitor mv = SecondPassClassVisitor.this.cv.visitMethod(ACC_STATIC + ACC_SYNTHETIC,
+            MethodVisitor mv = cv.visitMethod(ACC_STATIC + ACC_SYNTHETIC,
                     accessMethodName, accessMethodDescriptor, null, null);
             mv.visitCode();
 
@@ -333,7 +333,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         public void visitCode() {
             super.visitCode();
-            initAccessedLocalsAndMethodParametersAsArrays();
+            initAccessedLocalsAndMethodArgumentsAsArrays();
         }
 
         public void visitLineNumber(int line, Label start) {
@@ -347,11 +347,11 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             super.visitLocalVariable(name, desc, signature, start, end, index);
         }
 
-        boolean isMethodParameter(int local) {
+        boolean isMethodArgument(int local) {
             return local <= getArgumentTypes(method.desc).length;
         }
 
-        void initAccessedLocalsAndMethodParametersAsArrays() {
+        void initAccessedLocalsAndMethodArgumentsAsArrays() {
             for (int local : method.getAccessedLocals())
                 if (!method.isLocalReadOnly(local))
                     initArray(local, method.getTypeOfLocal(local));
@@ -361,13 +361,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             mv.visitInsn(ICONST_1);
             newArray(type);
 
-            if (isMethodParameter(local))
-                initializeArrayWithCurrentValueOfLocal(local, type);
+            if (isMethodArgument(local))
+                initializeArrayOnTopOfStackWithCurrentValueOfLocal(local, type);
 
             mv.visitVarInsn(ASTORE, local);
         }
 
-        void initializeArrayWithCurrentValueOfLocal(int local, Type type) {
+        void initializeArrayOnTopOfStackWithCurrentValueOfLocal(int local, Type type) {
             // a[]
             mv.visitInsn(DUP);
             // a[] a[]
@@ -575,7 +575,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             Type returnType = getReturnType(currentLambdaMethod.desc);
             Type lambdaExpressionType = currentLambda.getExpressionType();
 
-            handleBoxingAndUnboxing(returnType, lambdaExpressionType);
+            handleBoxingAndUnboxingOfReturnFromLambda(returnType, lambdaExpressionType);
 
             mv.visitInsn(returnType.getOpcode(IRETURN));
             mv.visitMaxs(0, 0);
@@ -584,7 +584,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             currentLambdaMethod = null;
         }
 
-        void handleBoxingAndUnboxing(Type returnType, Type lambdaExpressionType) {
+        void handleBoxingAndUnboxingOfReturnFromLambda(Type returnType, Type lambdaExpressionType) {
             if (isPrimitive(returnType) && isReference(lambdaExpressionType)) {
                 unbox(returnType);
                 debug("unboxed return value with type " + getSimpleClassName(lambdaExpressionType) + " as "

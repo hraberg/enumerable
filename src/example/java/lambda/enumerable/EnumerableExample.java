@@ -174,8 +174,8 @@ public class EnumerableExample {
         out.println(sum);
 
         /*
-         * Inject without an initial value,, requires the collection to be at
-         * least two elements.
+         * Inject without an initial value, requires the collection to be at
+         * least one element or null will be returned.
          */
         int factorial = inject(ints, λ(n, m, n * m));
         out.println(factorial);
@@ -230,7 +230,7 @@ public class EnumerableExample {
         /*
          * You cannot nest lambda constructs as the weaver doesn't support it,
          * but you can use more than one in the same larger expression like
-         * this, using an EIterable.
+         * this, using the returned EIterable.
          */
         List<Integer> oddTimesSum = collect(ints, λ(n, n * sum)).select(λ(n, n % 2 == 1));
         out.println(oddTimesSum);
