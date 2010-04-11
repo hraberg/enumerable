@@ -1,9 +1,7 @@
 package lambda.enumerable;
 
 import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import lambda.Fn1;
@@ -373,7 +371,7 @@ public class EnumerableArrays {
     static class ArrayIterable<T> implements Iterable<T> {
         T[] array;
 
-        ArrayIterable(T[] elements) {
+        ArrayIterable(T... elements) {
             this.array = elements;
         }
 
@@ -386,10 +384,13 @@ public class EnumerableArrays {
                 }
 
                 public T next() {
+                    if (i == array.length)
+                        throw new NoSuchElementException();           
                     return array[i++];
                 }
 
                 public void remove() {
+                    throw new UnsupportedOperationException();
                 }
             };
         }
