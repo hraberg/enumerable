@@ -23,6 +23,9 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     private static boolean isEnabled;
     private static boolean tranformationFailed;
 
+    static String weavingNotEnabledMessage = "Please start the JVM with -javaagent:enumerable-"
+            + Version.getVersion() + "-agent.jar";;
+
     /**
      * Allows you to query the Lambda weaver at runtime to see if it's enabled.
      */
@@ -94,8 +97,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     }
 
     public static String getNotEnabledMessage() {
-        return "Lambda weaving is not enabled, please start the JVM with -javaagent:enumerable-"
-                + Version.getVersion() + "-agent.jar";
+        return weavingNotEnabledMessage;
     }
 
     static Set<String> packagesToSkip = new HashSet<String>();
@@ -143,6 +145,8 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
             return transformer.transform(name, in);
         } catch (Throwable t) {
             tranformationFailed = true;
+            weavingNotEnabledMessage = t.getMessage();
+
             err.println(getVersionString());
             err
                     .println("caught throwable while transforming " + name

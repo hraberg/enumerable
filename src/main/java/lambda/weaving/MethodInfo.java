@@ -32,7 +32,7 @@ class MethodInfo {
     List<LambdaInfo> lambdas = new ArrayList<LambdaInfo>();
 
     LambdaInfo newLambda() {
-        LambdaInfo lambda = new LambdaInfo();
+        LambdaInfo lambda = new LambdaInfo(this);
         lambdas.add(lambda);
         return lambda;
     }
@@ -134,6 +134,11 @@ class MethodInfo {
         Type type;
         MethodInfo method;
         Type[] newLambdaParameterTypes;
+        MethodInfo enclosingMethod;
+
+        public LambdaInfo(MethodInfo method) {
+            this.enclosingMethod = method;
+        }
 
         void accessLocal(int operand) {
             VariableInfo local = accessedLocalsByIndex.get(operand);
@@ -271,6 +276,15 @@ class MethodInfo {
                         i++;
             }
             return null;
+        }
+        
+        public String toString() {
+            String locals = "";
+            if (!accessedLocals.isEmpty())
+                locals = " closing over " + enclosingMethod.getAccessedParametersAndLocalsString(accessedLocals);
+
+            return "lambda #" + getSimpleClassName(getExpressionType()) + getTypedParametersString() + locals
+                    + " as " + getLambdaMethod() + " in " + getSimpleClassName(getType());
         }
     }
 }

@@ -165,14 +165,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
         void ensureAllLambdaParametersAreDefined(String name) {
             if (!currentLambda.allParametersAreDefined())
-                throw new IllegalArgumentException("All parameters " + currentLambda.getParameters()
-                        + " have to be defined before accessing " + name + " " + sourceAndLine());
+                throw new IllegalArgumentException("Defining " + name + " more than once for " + currentLambda + " at " + sourceAndLine());
         }
 
         void ensureLambdaHasParameter(String name) {
             if (!currentLambda.hasParameter(name))
-                throw new IllegalArgumentException("Tried to access a undefined parameter " + name
-                        + " valid ones are " + currentLambda.getParameters() + " " + sourceAndLine());
+                throw new IllegalArgumentException("Parameter " + name
+                        + " is undefined for " + currentLambda + " at " + sourceAndLine());
         }
 
         public void visitMethodInsn(int opcode, String owner, String name, String desc) {
