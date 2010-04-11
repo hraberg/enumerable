@@ -38,10 +38,10 @@ public class MicroBench {
 
         out.println();
         
-        bench("object collect method", times, λ(_, methodCollect()));        
+        bench("object collect for loop", times, λ(_, methodCollect()));        
         bench("object collect lambda", times, λ(_, lambdaCollect()));
 
-        bench("primitive collect method", times, λ(_, methodCollectP()));        
+        bench("primitive collect for loop", times, λ(_, methodCollectP()));        
         bench("primitive collect lambda", times, λ(_, lambdaCollectP()));
     }
 

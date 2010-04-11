@@ -81,7 +81,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                             createLambda();
                     }
 
-                } else if (isPrivateFieldOnThisWhichNeedsAcccessMethodFromLambda(opcode, owner, name)) {
+                } else if (isPrivateFieldOnOwnerWhichNeedsAcccessMethodFromLambda(opcode, owner, name)) {
                     createAndCallStaticAccessMethodToReplacePrivateFieldAccess(opcode, owner, name, desc);
 
                 } else {
@@ -192,8 +192,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 } else if (isValueOfCallToIgnore(opcode, owner, name)) {
                     lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = null;
 
-                } else if (isInvokeSpecialOnThisOrPrivateStaticOnThisClassWhichNeedsAcccessMethodFromLambda(opcode,
-                        owner, name, desc)) {
+                } else if (isPrivateMethodOnOwnerWhichNeedsAcccessMethodFromLambda(opcode, owner, name, desc)) {
                     createAndCallStaticAccessMethodToReplacePrivateMethodInvocation(opcode, owner, name, desc);
 
                 } else {
@@ -208,21 +207,22 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void createAndCallStaticAccessMethodToReplacePrivateFieldAccess(int opcode, String owner, String name,
                 String desc) {
             List<Type> argumentTypes = new ArrayList<Type>();
+            
             if (opcode == GETFIELD || opcode == PUTFIELD)
                 argumentTypes.add(getObjectType(owner));
-            Type returnType = getType(desc);
 
             if (opcode == PUTFIELD || opcode == PUTSTATIC)
                 argumentTypes.add(getType(desc));
 
+            Type returnType = getType(desc);
             MethodVisitor mv = createAndCallAccessMethodAndLoadArguments(owner, argumentTypes, returnType);
 
             mv.visitFieldInsn(opcode, owner, name, desc);
 
-            if (opcode == PUTFIELD)
-                mv.visitVarInsn(argumentTypes.get(1).getOpcode(ILOAD), 1);
-            else if (opcode == PUTSTATIC)
-                mv.visitVarInsn(argumentTypes.get(0).getOpcode(ILOAD), 0);
+            if (opcode == PUTFIELD || opcode == PUTSTATIC) {
+                int indexOfNewFieldValue = argumentTypes.size() - 1;
+                mv.visitVarInsn(argumentTypes.get(indexOfNewFieldValue).getOpcode(ILOAD), indexOfNewFieldValue);
+            }
 
             mv.visitInsn(returnType.getOpcode(IRETURN));
             mv.visitMaxs(0, 0);
@@ -232,6 +232,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void createAndCallStaticAccessMethodToReplacePrivateMethodInvocation(int opcode, String owner, String name,
                 String desc) {
             List<Type> argumentTypes = new ArrayList<Type>();
+
             if (opcode != INVOKESTATIC)
                 argumentTypes.add(getObjectType(owner));
 
@@ -264,13 +265,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
             return mv;
         }
-
-        boolean isPrivateFieldOnThisWhichNeedsAcccessMethodFromLambda(int opcode, String owner, String name) {
+        
+        boolean isPrivateFieldOnOwnerWhichNeedsAcccessMethodFromLambda(int opcode, String owner, String name) {
             return inLambda() && className.equals(owner) && transformer.isFieldPrivate(owner, name);
         }
 
-        boolean isInvokeSpecialOnThisOrPrivateStaticOnThisClassWhichNeedsAcccessMethodFromLambda(int opcode,
-                String owner, String name, String desc) {
+        boolean isPrivateMethodOnOwnerWhichNeedsAcccessMethodFromLambda(int opcode, String owner, String name,
+                String desc) {
             return inLambda() && className.equals(owner) && INVOKESPECIAL == opcode || INVOKESTATIC == opcode
                     && transformer.isStaticMethodPrivate(owner, name, desc);
         }
