@@ -50,6 +50,18 @@ class LambdaTransformer implements Opcodes {
         return getClassReader(owner).getSuperName();
     }
 
+    boolean isFieldPrivate(String owner, final String field) {
+        class IsFieldPrivateVisitor extends EmptyVisitor {
+            int access;
+            public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
+                if (field.equals(name))
+                    IsFieldPrivateVisitor.this.access = access;
+                return null;
+            }
+        }
+        return (visitClass(owner, new IsFieldPrivateVisitor()).access & ACC_PRIVATE) != 0;
+     }
+
     MethodInfo findMethodByParameterTypes(String owner, String desc) {
         MethodInfo method = visitClass(owner, new MethodFinder(desc)).getMethod();
         if (method != null)

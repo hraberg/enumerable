@@ -80,6 +80,10 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                         if (currentLambda.allParametersAreDefined())
                             createLambda();
                     }
+                    
+                } else if (isPrivateFieldOnThisWhichNeedsAcccessMethodFromLambda(owner, name)) {
+                    createAndCallStaticAccessMethodToReplacePrivateFieldAccess(opcode, owner, name, desc);
+
                 } else {
                     super.visitFieldInsn(opcode, owner, name, desc);
                 }
@@ -188,7 +192,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                 } else if (isValueOfCallToIgnore(opcode, owner, name)) {
                     lambdaParameterTypeDefinitionToIgnoreValueOfCallOn = null;
 
-                } else if (isInvokeSpecialOnThisWhichNeedAcccessMethodFromLambda(opcode, owner)) {
+                } else if (isInvokeSpecialOnThisWhichNeedsAcccessMethodFromLambda(opcode, owner)) {
                     createAndCallStaticAccessMethodToReplaceInvokeSpecial(opcode, owner, name, desc);
 
                 } else {
@@ -200,13 +204,43 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             }
         }
 
+        void createAndCallStaticAccessMethodToReplacePrivateFieldAccess(int opcode, String owner, String name, String desc) {
+            List<Type> argumentTypes = new ArrayList<Type>();
+            argumentTypes.add(getObjectType(owner));
+            Type returnType = getType(desc);
+
+            if (opcode == PUTFIELD)
+                argumentTypes.add(getType(desc));
+
+            MethodVisitor mv = createAndCallAccessMethodAndLoadArguments(owner, argumentTypes, returnType);
+
+            mv.visitFieldInsn(opcode, owner, name, desc);
+            
+            if (opcode == PUTFIELD)
+                mv.visitVarInsn(argumentTypes.get(1).getOpcode(ILOAD), 1);
+
+            mv.visitInsn(returnType.getOpcode(IRETURN));
+            mv.visitMaxs(0, 0);
+            mv.visitEnd();
+        }
+
         void createAndCallStaticAccessMethodToReplaceInvokeSpecial(int opcode, String owner, String name, String desc) {
             List<Type> argumentTypes = new ArrayList<Type>();
             argumentTypes.add(getObjectType(owner));
             for (Type type : getArgumentTypes(desc))
                 argumentTypes.add(type);
 
-            String accessMethodDescriptor = getMethodDescriptor(getReturnType(desc), argumentTypes
+            MethodVisitor mv = createAndCallAccessMethodAndLoadArguments(owner, argumentTypes, getReturnType(desc));
+
+            mv.visitMethodInsn(opcode, owner, name, desc);
+
+            mv.visitInsn(getReturnType(desc).getOpcode(IRETURN));
+            mv.visitMaxs(0, 0);
+            mv.visitEnd();
+        }
+
+        MethodVisitor createAndCallAccessMethodAndLoadArguments(String owner, List<Type> argumentTypes, Type returnType) {
+            String accessMethodDescriptor = getMethodDescriptor(returnType, argumentTypes
                     .toArray(new Type[0]));
             String accessMethodName = "access$lambda$" + String.format("%03d_", accessMethods++);
 
@@ -220,13 +254,14 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             for (Type type : argumentTypes)
                 mv.visitVarInsn(type.getOpcode(ILOAD), i++);
 
-            mv.visitMethodInsn(opcode, owner, name, desc);
-            mv.visitInsn(getReturnType(desc).getOpcode(IRETURN));
-            mv.visitMaxs(0, 0);
-            mv.visitEnd();
+            return mv;
         }
 
-        boolean isInvokeSpecialOnThisWhichNeedAcccessMethodFromLambda(int opcode, String owner) {
+        boolean isPrivateFieldOnThisWhichNeedsAcccessMethodFromLambda(String owner, String name) {
+            return inLambda() && className.equals(owner) && transformer.isFieldPrivate(owner, name);
+        }
+
+        boolean isInvokeSpecialOnThisWhichNeedsAcccessMethodFromLambda(int opcode, String owner) {
             return inLambda() && INVOKESPECIAL == opcode && className.equals(owner);
         }
 

@@ -201,6 +201,32 @@ public class ClosureTest extends TestBase implements Serializable {
     public String hello() {
         return "hello";
     }
+    
+    private String world = "world";
+
+    @Test
+    public void gettingPrivateFieldOnThis() throws Exception {
+        assertEquals(world, λ(_, world).call());
+    }
+
+    @Test
+    public void settingPrivateFieldOnThis() throws Exception {
+        assertEquals("hello", λ(_, world = "hello").call());
+        assertEquals("hello", world);
+    }
+
+    private long large = 2;
+
+    @Test
+    public void gettingPrivateLongFieldOnThis() throws Exception {
+        assertEquals(large, (long) λ(_, large).call());
+    }
+
+    @Test
+    public void settingPrivateLongFieldOnThis() throws Exception {
+        assertEquals(4, (long) λ(_, large = 4).call());
+        assertEquals(4, large);
+    }
 
     @Test
     public void callPrivateInstanceMethodOnThisTakingNoArguments() throws Exception {
