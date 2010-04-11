@@ -7,10 +7,8 @@ import org.objectweb.asm.MethodVisitor;
 import static org.objectweb.asm.Type.*;
 
 class MethodFinder extends EmptyVisitor {
-    String name;
-    String desc;
-
     String descToMatch;
+    MethodInfo method;
 
     MethodFinder(String desc) {
         this.descToMatch = desc;
@@ -19,12 +17,10 @@ class MethodFinder extends EmptyVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         if (isAbstract(access)) {
             if (Arrays.equals(getArgumentTypes(this.descToMatch), getArgumentTypes(desc))) {
-                this.name = name;
-                this.desc = desc;
+                method = new MethodInfo(name, desc);
             }
-            if (this.name == null && getArgumentTypes(this.descToMatch).length == getArgumentTypes(desc).length) {
-                this.name = name;
-                this.desc = desc;
+            if (this.method == null && getArgumentTypes(this.descToMatch).length == getArgumentTypes(desc).length) {
+                method = new MethodInfo(name, desc);
             }
         }
         return null;
@@ -35,8 +31,6 @@ class MethodFinder extends EmptyVisitor {
     }
     
     MethodInfo getMethod() {
-        if (name == null)
-            return null;
-        return new MethodInfo(name, desc);
+        return method;
     }
 }

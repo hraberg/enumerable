@@ -39,39 +39,15 @@ class LambdaTransformer implements Opcodes {
     }
 
     boolean isInterface(String owner) {
-        class IsInterface extends EmptyVisitor {
-            boolean isInterface;
-
-            public void visit(int version, int access, String name, String signature, String superName,
-                    String[] interfaces) {
-                isInterface = (access & ACC_INTERFACE) != 0;
-            }
-        }
-        return visitClass(owner, new IsInterface()).isInterface;
+       return (getClassReader(owner).getAccess() & ACC_INTERFACE) != 0;
     }
 
     String[] getInterfaces(String owner) {
-        class GetInterfaces extends EmptyVisitor {
-            String[] interfaces;
-
-            public void visit(int version, int access, String name, String signature, String superName,
-                    String[] interfaces) {
-                this.interfaces = interfaces;
-            }
-        }
-        return visitClass(owner, new GetInterfaces()).interfaces;
+        return getClassReader(owner).getInterfaces();
     }
 
     String getSuperClass(String owner) {
-        class GetSuperClass extends EmptyVisitor {
-            String superClass;
-
-            public void visit(int version, int access, String name, String signature, String superName,
-                    String[] interfaces) {
-                this.superClass = superName;
-            }
-        }
-        return visitClass(owner, new GetSuperClass()).superClass;
+        return getClassReader(owner).getSuperName();
     }
 
     MethodInfo findMethodByParameterTypes(String owner, String desc) {
@@ -90,12 +66,15 @@ class LambdaTransformer implements Opcodes {
         return null;
     }
 
-    
     <V extends ClassVisitor> V visitClass(String owner, V cv) {
+        ClassReader cr = getClassReader(owner);
+        cr.accept(cv, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+        return cv;
+    }
+
+    ClassReader getClassReader(String owner) {
         try {
-            ClassReader cr = new ClassReader(getObjectType(owner).getClassName());
-            cr.accept(cv, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
-            return cv;
+            return new ClassReader(getObjectType(owner).getClassName());
         } catch (IOException e) {
             throw uncheck(e);
         }
