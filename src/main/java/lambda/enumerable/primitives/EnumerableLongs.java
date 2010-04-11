@@ -2,6 +2,7 @@ package lambda.enumerable.primitives;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 import lambda.enumerable.Enumerable;
 import lambda.enumerable.collection.EList;
@@ -285,13 +286,11 @@ public class EnumerableLongs {
      */
     public static long max(long[] array) {
         if (array.length == 0)
-            return 0;
-        long result = array[0];
-        for (int i = 1; i < array.length; i++) {
-            long each = array[i];
+            throw new NoSuchElementException();
+        long result = Long.MIN_VALUE;
+        for (long each : array)
             if (each > result)
                 result = each;
-        }
         return result;
     }
 
@@ -318,13 +317,11 @@ public class EnumerableLongs {
      */
     public static long min(long[] array) {
         if (array.length == 0)
-            return 0;
-        long result = array[0];
-        for (int i = 1; i < array.length; i++) {
-            long each = array[i];
+            throw new NoSuchElementException();
+        long result = Long.MAX_VALUE;
+        for (long each : array)
             if (each < result)
                 result = each;
-        }
         return result;
     }
 

@@ -1,8 +1,6 @@
 package lambda.enumerable.primitives;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
@@ -205,9 +203,9 @@ public class EnumerableDoublesTest extends TestBase {
         assertTrue(all(new double[0], λ(d, d > 0)));
     }
 
-    @Test
-    public void maxReturnsZeroForEmptyArray() throws Exception {
-        assertEquals(0, max(new double[0]), 0.0);
+    @Test(expected = NoSuchElementException.class)
+    public void maxThrowsExceptionForEmptyArray() throws Exception {
+        max(new double[0]);
     }
 
     @Test
@@ -220,9 +218,9 @@ public class EnumerableDoublesTest extends TestBase {
         assertEquals(1, min(doublesOneToFive), 0.0);
     }
 
-    @Test
-    public void minReturnsZeroForEmptyArray() throws Exception {
-        assertEquals(0, min(new double[0]), 0.0);
+    @Test(expected = NoSuchElementException.class)
+    public void minThrowsExceptionForEmptyArray() throws Exception {
+        min(new double[0]);
     }
 
     @Test

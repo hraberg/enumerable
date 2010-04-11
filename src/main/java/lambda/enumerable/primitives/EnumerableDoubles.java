@@ -2,6 +2,7 @@ package lambda.enumerable.primitives;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 import lambda.enumerable.Enumerable;
 import lambda.enumerable.collection.EList;
@@ -285,13 +286,11 @@ public class EnumerableDoubles {
      */
     public static double max(double[] array) {
         if (array.length == 0)
-            return 0;
-        double result = array[0];
-        for (int i = 1; i < array.length; i++) {
-            double each = array[i];
+            throw new NoSuchElementException();
+        double result = Double.MIN_VALUE;
+        for (double each : array)
             if (each > result)
                 result = each;
-        }
         return result;
     }
 
@@ -318,13 +317,11 @@ public class EnumerableDoubles {
      */
     public static double min(double[] array) {
         if (array.length == 0)
-            return 0;
-        double result = array[0];
-        for (int i = 1; i < array.length; i++) {
-            double each = array[i];
+            throw new NoSuchElementException();
+        double result = Double.MAX_VALUE;
+        for (double each : array)
             if (each < result)
                 result = each;
-        }
         return result;
     }
 

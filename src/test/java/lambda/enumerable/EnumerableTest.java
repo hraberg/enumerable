@@ -400,19 +400,19 @@ public class EnumerableTest extends TestBase {
 
     @Test
     public void toListCreatesListFromIterable() throws Exception {
-        Iterable<String> iterable = new ArrayIterable(new String[] { "hello", "world" });
+        Iterable<String> iterable = new ArrayIterable("hello", "world");
         assertEquals(list("hello", "world"), toList(iterable));
     }
 
     @Test
     public void toSetCreatesSetFromIterable() throws Exception {
-        Iterable<String> iterable = new ArrayIterable(new String[] { "hello", "world" });
+        Iterable<String> iterable = new ArrayIterable("hello", "world");
         assertEquals(new HashSet<String>(list("hello", "world")), toSet(iterable));
     }
 
     @Test
     public void toSetCreatesSetFromIterableUsingBlock() throws Exception {
-        Iterable<String> iterable = new ArrayIterable(new String[] { "hello", "world" });
+        Iterable<String> iterable = new ArrayIterable("hello", "world");
         Set<Integer> set = toSet(iterable, λ(s, s.length()));
         assertEquals(new HashSet<Integer>(list(5)), set);
     }
