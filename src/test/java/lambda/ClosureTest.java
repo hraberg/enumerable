@@ -1,6 +1,9 @@
 package lambda;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
@@ -194,6 +197,27 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
+    public void closingOverOuterFinalInlineableVariableFromInsideAnonymousClass() throws Exception {
+        final String string = "final";
+        assertEquals(string, new Callable<String>() {
+            public String call() {
+                return λ(_, string).call();
+            }
+        }.call());
+    }
+
+    @Test
+    public void closingOverOuterFinalReferenceVariableFromInsideAnonymousClass() throws Exception {
+        final List<String> list = new ArrayList<String>();
+        new Runnable() {
+            public void run() {
+                λ(_, list.add("final")).call();
+            }
+        }.run();
+        assertEquals(list("final"), list);
+    }
+
+    @Test
     public void callInstanceMethodOnThis() throws Exception {
         assertEquals(hello(), λ(_, hello()).call());
     }
@@ -201,7 +225,7 @@ public class ClosureTest extends TestBase implements Serializable {
     public String hello() {
         return "hello";
     }
-    
+
     private String world = "world";
 
     @Test
@@ -272,7 +296,7 @@ public class ClosureTest extends TestBase implements Serializable {
             }
         }.call(), (int) result);
     }
-    
+
     @Test
     public void callPrivateStaticMethodOnThisClassTakingNoArguments() throws Exception {
         assertEquals(staticPrivateHelloNoArguments(), λ(_, staticPrivateHelloNoArguments()).call());

@@ -37,12 +37,20 @@ public class MicroBench {
         bench("primitive fib lambda", times, λ(_, fibp.call(n)));
 
         out.println();
-        
+
         bench("object collect for loop", times, λ(_, methodCollect()));        
         bench("object collect lambda", times, λ(_, lambdaCollect()));
 
         bench("primitive collect for loop", times, λ(_, methodCollectP()));        
         bench("primitive collect lambda", times, λ(_, lambdaCollectP()));
+
+        out.println();
+
+        bench("object inject for loop", times, λ(_, methodInject()));        
+        bench("object inject lambda", times, λ(_, lambdaInject()));
+
+        bench("primitive inject for loop", times, λ(_, methodInjectP()));        
+        bench("primitive inject lambda", times, λ(_, lambdaInjectP()));
     }
 
     List<String> methodCollect() {
@@ -66,6 +74,28 @@ public class MicroBench {
 
     String[] lambdaCollectP() {
         return EnumerableInts.collect(ints, LambdaPrimitives.λ(n, n + ""), String.class);
+    }
+
+    Integer methodInject() {
+        Integer result = 1;
+        for (Integer i : integers)
+            result *= i;
+        return result;
+    }
+    
+    Integer lambdaInject() {
+        return inject(integers, λ(n, m, n * m));
+    }
+
+    int methodInjectP() {
+        int result = 1;
+        for (int i : ints)
+            result *= i;
+        return result;
+    }
+
+    int lambdaInjectP() {
+        return EnumerableInts.inject(ints, LambdaPrimitives.λ(n, m, n * m));
     }
 
     long bench(String name, int times, Fn0<?> block) {
