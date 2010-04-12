@@ -1,7 +1,10 @@
 package lambda.enumerable;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 import lambda.Fn1;
@@ -270,7 +273,7 @@ public class EnumerableArrays {
     public static Integer[] range(int start, int end, boolean exclusive) {
         return Enumerable.range(start, end, exclusive).toList().toArray(new Integer[0]);
     }
-    
+
     /**
      * Returns an array containing all elements of array for which block is
      * false.
@@ -363,11 +366,11 @@ public class EnumerableArrays {
     private static <T> T[] newEmptyArray(T[] array) {
         return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
     }
-    
+
     private static <T> Iterable<T> asIterable(T[] array) {
         return new ArrayIterable<T>(array);
     }
-    
+
     static class ArrayIterable<T> implements Iterable<T> {
         T[] array;
 
@@ -385,7 +388,7 @@ public class EnumerableArrays {
 
                 public T next() {
                     if (i == array.length)
-                        throw new NoSuchElementException();           
+                        throw new NoSuchElementException();
                     return array[i++];
                 }
 

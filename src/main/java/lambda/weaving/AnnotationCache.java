@@ -1,15 +1,15 @@
 package lambda.weaving;
 
+import static lambda.exception.UncheckedException.*;
+import static org.objectweb.asm.ClassReader.*;
+import static org.objectweb.asm.Type.*;
+
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.asm.ClassReader;
-
-import static lambda.exception.UncheckedException.*;
-import static org.objectweb.asm.ClassReader.*;
-import static org.objectweb.asm.Type.*;
 
 class AnnotationCache {
     Map<String, Boolean> elementsToHasAnnotation = new HashMap<String, Boolean>();

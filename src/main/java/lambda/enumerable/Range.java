@@ -28,7 +28,7 @@ public class Range implements Iterable<Integer> {
             result.add(integer);
         return result;
     }
-    
+
     public int[] toArray() {
         int[] array = new int[(exclusive ? end : end + 1) - start];
         int i = 0;

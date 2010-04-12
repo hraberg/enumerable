@@ -1,6 +1,9 @@
 package lambda.enumerable.collection;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ListIterator;
 
 public class EList<E> extends ECollection<E> implements List<E> {
     public EList() {

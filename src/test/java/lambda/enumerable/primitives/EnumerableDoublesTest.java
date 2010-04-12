@@ -1,17 +1,20 @@
 package lambda.enumerable.primitives;
 
-import java.util.*;
+import static lambda.Parameters.*;
+import static lambda.enumerable.primitives.EnumerableDoubles.*;
+import static lambda.primitives.LambdaPrimitives.*;
+import static org.junit.Assert.*;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
 import lambda.enumerable.EnumerableArrays;
 
 import org.junit.Test;
-
-import static lambda.Parameters.*;
-import static lambda.enumerable.primitives.EnumerableDoubles.*;
-import static lambda.primitives.LambdaPrimitives.*;
-import static org.junit.Assert.*;
 
 public class EnumerableDoublesTest extends TestBase {
     double[] doublesOneToFive = new double[] { 1, 2, 3, 4, 5 };
@@ -26,7 +29,7 @@ public class EnumerableDoublesTest extends TestBase {
     @Test
     public void canUsePrimitiveLambdaWithMatchingObjectVersion() throws Exception {
         List<Double> actual = list();
-        EnumerableArrays.each(new Double[] {1.0, 2.0, 3.0, 4.0, 5.0}, λ(d, actual.add(d)));
+        EnumerableArrays.each(new Double[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, λ(d, actual.add(d)));
         assertEquals(toList(doublesOneToFive), actual);
     }
 
@@ -41,12 +44,11 @@ public class EnumerableDoublesTest extends TestBase {
     public void eachReturnsArray() throws Exception {
         assertArrayEquals(doublesOneToFive, each(doublesOneToFive, λ(d, d)), 0.0);
     }
-    
+
     @LambdaParameter
     public static int[] ints;
-    
-    @Test
 
+    @Test
     public void collectElementsToDifferentType() throws Exception {
         String[] expected = new String[] { "#1.0", "#2.0", "#3.0", "#4.0", "#5.0" };
         Object[] actual = collect(doublesOneToFive, λ(d, "#" + d));
@@ -151,10 +153,10 @@ public class EnumerableDoublesTest extends TestBase {
         double[] selected = select(doublesOneToFive, λ(d, d % 2 == 0));
         assertArrayEquals(new double[] { 2, 4 }, selected, 0.0);
     }
-    
+
     @Test
     public void rejectMatchingElements() throws Exception {
-        double[] odd = {1, 3, 5};
+        double[] odd = { 1, 3, 5 };
         assertArrayEquals(odd, reject(doublesOneToFive, λ(d, d % 2 == 0)), 0.0);
     }
 
@@ -162,7 +164,7 @@ public class EnumerableDoublesTest extends TestBase {
     public void sortUsingNaturalOrder() throws Exception {
         assertArrayEquals(doublesOneToFive, sort(new double[] { 5, 4, 3, 2, 1 }), 0.0);
     }
-    
+
     @Test
     public void injectUsingInitialValue() throws Exception {
         assertEquals(15, inject(doublesOneToFive, 0, λ(x, y, x + y)), 0.0);
@@ -175,7 +177,7 @@ public class EnumerableDoublesTest extends TestBase {
 
     @Test
     public void injectWithoutInitialValueAndOnlyOneElementReturnsElement() throws Exception {
-        assertEquals(1.0, inject(new double[] {1.0}, λ(x, y, x * y)), 0.0);
+        assertEquals(1.0, inject(new double[] { 1.0 }, λ(x, y, x * y)), 0.0);
     }
 
     @Test(expected = ArrayIndexOutOfBoundsException.class)
@@ -197,7 +199,7 @@ public class EnumerableDoublesTest extends TestBase {
     public void anyNotMatchingPredicate() throws Exception {
         assertFalse(any(doublesOneToFive, λ(d, d > 5)));
     }
-    
+
     @Test
     public void allMatchingPredicate() throws Exception {
         assertTrue(all(doublesOneToFive, λ(d, d > 0)));
@@ -251,13 +253,13 @@ public class EnumerableDoublesTest extends TestBase {
     @Test
     public void toSetCreatesIntegerSetFromDoubleArray() throws Exception {
         Set<Double> expected = new HashSet<Double>(list(1.0, 2.0, 3.0, 4.0));
-        assertEquals(expected, toSet(new double[] {1, 2, 2, 3, 4, 4}));
+        assertEquals(expected, toSet(new double[] { 1, 2, 2, 3, 4, 4 }));
     }
 
     @Test
     public void toSetCreatesIntegerSetFromIntArrayUsingBlock() throws Exception {
         Set<String> expected = new HashSet<String>(list("1.0", "2.0", "3.0", "4.0"));
-        assertEquals(expected, toSet(new double[] {1, 2, 2, 3, 4, 4}, λ(d, d + "")));
+        assertEquals(expected, toSet(new double[] { 1, 2, 2, 3, 4, 4 }, λ(d, d + "")));
     }
 
     @Test

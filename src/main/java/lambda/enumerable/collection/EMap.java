@@ -17,7 +17,7 @@ public class EMap<K, V> implements Map<K, V> {
     public EMap(Map<K, V> map) {
         this.map = map;
     }
-    
+
     public Map<K, V> delegate() {
         return map;
     }

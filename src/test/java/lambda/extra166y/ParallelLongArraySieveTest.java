@@ -1,5 +1,10 @@
 package lambda.extra166y;
 
+import static extra166y.ParallelLongArray.*;
+import static lambda.Parameters.*;
+import static lambda.extra166y.LambdaOps.*;
+import static org.junit.Assert.*;
+
 import java.math.BigInteger;
 
 import org.junit.Test;
@@ -7,10 +12,6 @@ import org.junit.Test;
 import extra166y.ParallelLongArray;
 import extra166y.Ops.IntToLong;
 import extra166y.Ops.LongPredicate;
-import static extra166y.ParallelLongArray.*;
-import static lambda.Parameters.*;
-import static lambda.extra166y.LambdaOps.*;
-import static org.junit.Assert.*;
 
 /*
  * This test was adapted from the extra166y API specs here:

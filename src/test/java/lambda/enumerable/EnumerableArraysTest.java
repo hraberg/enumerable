@@ -1,17 +1,15 @@
 package lambda.enumerable;
 
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
+import static lambda.enumerable.EnumerableArrays.*;
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 import lambda.TestBase;
 
 import org.junit.Test;
-
-import static lambda.Lambda.*;
-import static lambda.Parameters.*;
-
-import static lambda.enumerable.EnumerableArrays.*;
-
-import static org.junit.Assert.*;
 
 public class EnumerableArraysTest extends TestBase {
     Integer[] oneToFive = new Integer[] { 1, 2, 3, 4, 5 };
@@ -43,13 +41,14 @@ public class EnumerableArraysTest extends TestBase {
 
     @Test
     public void inclusiveRanges() throws Exception {
-        assertArrayEquals(oneToFive, range(1, 5));        
+        assertArrayEquals(oneToFive, range(1, 5));
     }
 
     @Test
     public void exclusiveRanges() throws Exception {
-        assertArrayEquals(list(1, 2, 3, 4).toArray(), range(1, 5, true));        
+        assertArrayEquals(list(1, 2, 3, 4).toArray(), range(1, 5, true));
     }
+
     @Test
     public void selectMatchingElements() throws Exception {
         Integer[] selected = select(oneToFive, λ(n, n % 2 == 0));

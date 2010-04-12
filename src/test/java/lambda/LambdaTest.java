@@ -1,11 +1,21 @@
 package lambda;
 
+import static java.lang.Thread.*;
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
+import static lambda.primitives.LambdaPrimitives.*;
+import static org.junit.Assert.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
 import lambda.annotation.LambdaParameter;
@@ -15,12 +25,6 @@ import lambda.exception.LambdaWeavingNotEnabledException;
 import lambda.primitives.Fn1ItoI;
 
 import org.junit.Test;
-
-import static java.lang.Thread.*;
-import static lambda.Lambda.*;
-import static lambda.Parameters.*;
-import static lambda.primitives.LambdaPrimitives.*;
-import static org.junit.Assert.*;
 
 public class LambdaTest extends TestBase {
     @Test
@@ -117,12 +121,12 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void assignLambdaParameter() throws Exception {
-        assertEquals(1, (int) λ(n, n = 1).call(5));
+        assertEquals(1, λ(n, n = 1).call(5));
     }
 
     @Test
     public void incrementLambdaParameter() throws Exception {
-        assertEquals(1, (int) λ(n, ++n).call(0));
+        assertEquals(1, λ(n, ++n).call(0));
     }
 
     @LambdaParameter
@@ -139,11 +143,11 @@ public class LambdaTest extends TestBase {
     @Test
     public void callLambdaInLambda() throws Exception {
         Fn1<Integer, Integer> timesTwo = λ(n, n * 2);
-        assertEquals(6, (int) λ(n, m, timesTwo.call(n) + m).call(2, 2));
+        assertEquals(6, λ(n, m, timesTwo.call(n) + m).call(2, 2));
     }
 
     @LambdaParameter
-    static Fn1<String,String> stringToString;
+    static Fn1<String, String> stringToString;
 
     @Test
     public void callLambdaWithLambdaArgument() throws Exception {

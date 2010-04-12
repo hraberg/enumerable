@@ -1,5 +1,8 @@
 package lambda.weaving;
 
+import static lambda.exception.UncheckedException.*;
+import static org.objectweb.asm.Type.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,9 +12,6 @@ import lambda.weaving.MethodInfo.LambdaInfo;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-
-import static lambda.exception.UncheckedException.*;
-import static org.objectweb.asm.Type.*;
 
 class FirstPassClassVisitor extends EmptyVisitor {
     Map<String, MethodInfo> methodsByNameAndDesc = new HashMap<String, MethodInfo>();
@@ -91,7 +91,7 @@ class FirstPassClassVisitor extends EmptyVisitor {
                     currentLambda.removeIllegalParameters();
 
                     Type returnType = getReturnType(desc);
-                    
+
                     if (returnType.equals(getType(Object.class))) {
                         resolvingTypeUsingCheckCast = true;
 
@@ -110,8 +110,8 @@ class FirstPassClassVisitor extends EmptyVisitor {
 
     void setLambdaMethod() {
         String descriptor = getMethodDescriptor(getType(Object.class), currentLambda.getParameterTypes());
-        MethodInfo currentLambdaMethod = transformer.findMethodByParameterTypes(currentLambda.getType().getInternalName(),
-                descriptor);
+        MethodInfo currentLambdaMethod = transformer.findMethodByParameterTypes(currentLambda.getType()
+                .getInternalName(), descriptor);
         currentLambda.setLambdaMethod(currentLambdaMethod);
     }
 

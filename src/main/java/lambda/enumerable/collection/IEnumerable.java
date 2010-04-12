@@ -219,8 +219,7 @@ public interface IEnumerable<E> extends Iterable<E> {
      * 
      * <p>
      * Due to varargs this version doesn't support taking a block like in Ruby.
-     * Feed the result into {@link #collect(Fn1)} to achieve the same
-     * effect.
+     * Feed the result into {@link #collect(Fn1)} to achieve the same effect.
      * </p>
      */
     EList<EList<?>> zip(Iterable<?>... args);

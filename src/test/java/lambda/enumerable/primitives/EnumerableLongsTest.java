@@ -1,17 +1,20 @@
 package lambda.enumerable.primitives;
 
-import java.util.*;
+import static lambda.Parameters.*;
+import static lambda.enumerable.primitives.EnumerableLongs.*;
+import static lambda.primitives.LambdaPrimitives.*;
+import static org.junit.Assert.*;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
 import lambda.enumerable.EnumerableArrays;
 
 import org.junit.Test;
-
-import static lambda.Parameters.*;
-import static lambda.enumerable.primitives.EnumerableLongs.*;
-import static lambda.primitives.LambdaPrimitives.*;
-import static org.junit.Assert.*;
 
 public class EnumerableLongsTest extends TestBase {
     long[] longsOneToFive = new long[] { 1, 2, 3, 4, 5 };
@@ -26,10 +29,10 @@ public class EnumerableLongsTest extends TestBase {
     @Test
     public void canUsePrimitiveLambdaWithMatchingObjectVersion() throws Exception {
         List<Long> actual = list();
-        EnumerableArrays.each(new Long[] {1L, 2L, 3L, 4L, 5L}, λ(l, actual.add(l)));
+        EnumerableArrays.each(new Long[] { 1L, 2L, 3L, 4L, 5L }, λ(l, actual.add(l)));
         assertEquals(toList(longsOneToFive), actual);
     }
-    
+
     @Test
     public void callsBlockOnceForEachElementWithLongReturn() throws Exception {
         long result = 1;
@@ -41,12 +44,11 @@ public class EnumerableLongsTest extends TestBase {
     public void eachReturnsArray() throws Exception {
         assertArrayEquals(longsOneToFive, each(longsOneToFive, λ(l, l)));
     }
-    
+
     @LambdaParameter
     public static int[] ints;
-    
-    @Test
 
+    @Test
     public void collectElementsToDifferentType() throws Exception {
         String[] expected = new String[] { "#1", "#2", "#3", "#4", "#5" };
         Object[] actual = collect(longsOneToFive, λ(l, "#" + l));
@@ -77,7 +79,7 @@ public class EnumerableLongsTest extends TestBase {
         eachWithIndex(longsOneToFive, λ(i, l, total += i));
         assertEquals(15, total);
     }
-    
+
     @LambdaParameter
     static short aShort;
 
@@ -127,10 +129,10 @@ public class EnumerableLongsTest extends TestBase {
         long[] selected = select(longsOneToFive, λ(l, l % 2 == 0));
         assertArrayEquals(new long[] { 2, 4 }, selected);
     }
-    
+
     @Test
     public void rejectMatchingElements() throws Exception {
-        long[] odd = {1, 3, 5};
+        long[] odd = { 1, 3, 5 };
         assertArrayEquals(odd, reject(longsOneToFive, λ(l, l % 2 == 0)));
     }
 
@@ -138,7 +140,7 @@ public class EnumerableLongsTest extends TestBase {
     public void sortUsingNaturalOrder() throws Exception {
         assertArrayEquals(longsOneToFive, sort(new long[] { 5, 4, 3, 2, 1 }));
     }
-    
+
     @Test
     public void injectUsingInitialValue() throws Exception {
         assertEquals(15, inject(longsOneToFive, 0, λ(l, k, l + k)));
@@ -151,7 +153,7 @@ public class EnumerableLongsTest extends TestBase {
 
     @Test
     public void injectWithoutInitialValueAndOnlyOneElementReturnsElement() throws Exception {
-        assertEquals(1, inject(new long[] {1}, λ(l, k, l * k)));
+        assertEquals(1, inject(new long[] { 1 }, λ(l, k, l * k)));
     }
 
     @Test(expected = ArrayIndexOutOfBoundsException.class)
@@ -173,7 +175,7 @@ public class EnumerableLongsTest extends TestBase {
     public void anyNotMatchingPredicate() throws Exception {
         assertFalse(any(longsOneToFive, λ(l, l > 5)));
     }
-    
+
     @Test
     public void allMatchingPredicate() throws Exception {
         assertTrue(all(longsOneToFive, λ(l, l > 0)));
@@ -227,13 +229,13 @@ public class EnumerableLongsTest extends TestBase {
     @Test
     public void toSetCreatesIntegerSetFromLongArray() throws Exception {
         Set<Long> expected = new HashSet<Long>(list(1L, 2L, 3L, 4L));
-        assertEquals(expected, toSet(new long[] {1, 2, 2, 3, 4, 4}));
+        assertEquals(expected, toSet(new long[] { 1, 2, 2, 3, 4, 4 }));
     }
 
     @Test
     public void toSetCreatesIntegerSetFromIntArrayUsingBlock() throws Exception {
         Set<String> expected = new HashSet<String>(list("1", "2", "3", "4"));
-        assertEquals(expected, toSet(new long[] {1, 2, 2, 3, 4, 4}, λ(l, l + "")));
+        assertEquals(expected, toSet(new long[] { 1, 2, 2, 3, 4, 4 }, λ(l, l + "")));
     }
 
     @Test

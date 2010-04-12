@@ -1,11 +1,16 @@
 package lambda.weaving;
 
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-
 import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 class ClassInjector {
     static File classDir;
@@ -34,8 +39,9 @@ class ClassInjector {
 
         try {
             String[] realAsmPackageNotToBeChangedByJarJar = { "org.objectweb." };
-            
-            Class<?> checkClassAdapter = Class.forName(realAsmPackageNotToBeChangedByJarJar[0] + "asm.util.CheckClassAdapter");
+
+            Class<?> checkClassAdapter = Class.forName(realAsmPackageNotToBeChangedByJarJar[0]
+                    + "asm.util.CheckClassAdapter");
             Class<?> classReader = Class.forName(realAsmPackageNotToBeChangedByJarJar[0] + "asm.ClassReader");
 
             verify = checkClassAdapter.getMethod("verify", classReader, Boolean.TYPE, PrintWriter.class);

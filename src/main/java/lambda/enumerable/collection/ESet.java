@@ -11,7 +11,7 @@ public class ESet<E> extends ECollection<E> implements Set<E> {
     public ESet(Set<E> set) {
         super(set);
     }
-    
+
     public Set<E> delegate() {
         return (Set<E>) iterable;
     }

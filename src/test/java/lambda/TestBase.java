@@ -1,14 +1,18 @@
 package lambda;
 
-import java.io.*;
+import static java.util.Arrays.*;
+import static lambda.enumerable.Enumerable.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import lambda.enumerable.collection.EList;
-import static java.util.Arrays.*;
-
-import static lambda.enumerable.Enumerable.*;
 
 public class TestBase {
     public EList<Integer> oneToTen = toList(list(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));

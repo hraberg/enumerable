@@ -1,13 +1,14 @@
 package lambda.extra166y;
 
-import org.junit.Test;
-
-import extra166y.ParallelArray;
-import extra166y.Ops.Op;
 import static extra166y.ParallelLongArray.*;
 import static lambda.Parameters.*;
 import static lambda.extra166y.LambdaOps.*;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import extra166y.ParallelArray;
+import extra166y.Ops.Op;
 
 /*
  * This test was adapted from the 'Examples from Jacques DeFarge' on the Java

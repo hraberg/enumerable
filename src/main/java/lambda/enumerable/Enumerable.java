@@ -1,16 +1,33 @@
 package lambda.enumerable;
 
-import java.io.*;
-import java.util.*;
+import static java.lang.Boolean.*;
+import static lambda.exception.UncheckedException.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
-import lambda.enumerable.collection.*;
-import static java.lang.Boolean.*;
-import static lambda.exception.UncheckedException.*;
+import lambda.enumerable.collection.EIterable;
+import lambda.enumerable.collection.EList;
+import lambda.enumerable.collection.EMap;
+import lambda.enumerable.collection.ESet;
 
 /**
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
@@ -557,11 +574,12 @@ public class Enumerable {
         }
 
         public int compare(E o1, E o2) {
-            return - comparator.compare(o1, o2);
+            return -comparator.compare(o1, o2);
         }
     }
 
-    private static final class NaturalOrderComparator<E extends Object & Comparable<? super E>> implements Comparator<E> {
+    private static final class NaturalOrderComparator<E extends Object & Comparable<? super E>> implements
+            Comparator<E> {
         public int compare(E o1, E o2) {
             return o1.compareTo(o2);
         }

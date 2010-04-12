@@ -1,5 +1,11 @@
 package lambda.enumerable;
 
+import static java.util.Arrays.*;
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
+import static lambda.enumerable.Enumerable.*;
+import static org.junit.Assert.*;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,14 +18,6 @@ import lambda.enumerable.EnumerableArrays.ArrayIterable;
 import lambda.enumerable.collection.EList;
 
 import org.junit.Test;
-
-import static java.util.Arrays.*;
-import static lambda.Lambda.*;
-import static lambda.Parameters.*;
-
-import static lambda.enumerable.Enumerable.*;
-
-import static org.junit.Assert.*;
 
 @SuppressWarnings("unchecked")
 public class EnumerableTest extends TestBase {
@@ -108,20 +106,20 @@ public class EnumerableTest extends TestBase {
 
     @Test
     public void inclusiveRanges() throws Exception {
-        assertEquals(oneToFive, collect(range(1, 5), λ(n, n)));        
-        assertEquals(list(), collect(range(-1, -5), λ(n, n)));        
-        assertEquals(list(-5, -4, -3, -2, -1), collect(range(-5, -1), λ(n, n)));        
-        assertEquals(list(1), collect(range(1, 1), λ(n, n)));        
-        assertEquals(list(-1), collect(range(-1, -1), λ(n, n)));        
+        assertEquals(oneToFive, collect(range(1, 5), λ(n, n)));
+        assertEquals(list(), collect(range(-1, -5), λ(n, n)));
+        assertEquals(list(-5, -4, -3, -2, -1), collect(range(-5, -1), λ(n, n)));
+        assertEquals(list(1), collect(range(1, 1), λ(n, n)));
+        assertEquals(list(-1), collect(range(-1, -1), λ(n, n)));
     }
 
     @Test
     public void exclusiveRanges() throws Exception {
-        assertEquals(list(1, 2, 3, 4), collect(range(1, 5, true), λ(n, n)));        
-        assertEquals(list(), collect(range(-1, -5, true), λ(n, n)));        
-        assertEquals(list(-5, -4, -3, -2), collect(range(-5, -1, true), λ(n, n)));        
-        assertEquals(list(), collect(range(1, 1, true), λ(n, n)));        
-        assertEquals(list(), collect(range(-1, -1, true), λ(n, n)));        
+        assertEquals(list(1, 2, 3, 4), collect(range(1, 5, true), λ(n, n)));
+        assertEquals(list(), collect(range(-1, -5, true), λ(n, n)));
+        assertEquals(list(-5, -4, -3, -2), collect(range(-5, -1, true), λ(n, n)));
+        assertEquals(list(), collect(range(1, 1, true), λ(n, n)));
+        assertEquals(list(), collect(range(-1, -1, true), λ(n, n)));
     }
 
     @Test
@@ -296,7 +294,7 @@ public class EnumerableTest extends TestBase {
     public void injectWithoutInitialValueAndEmptyListReturnsNull() throws Exception {
         assertNull(inject(list(int.class), λ(n, m, n * m)));
     }
- 
+
     @LambdaParameter
     static List<Integer> list;
 

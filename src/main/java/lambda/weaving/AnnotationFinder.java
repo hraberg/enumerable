@@ -1,12 +1,12 @@
 package lambda.weaving;
 
+import static org.objectweb.asm.Type.*;
+
 import java.lang.annotation.Annotation;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
-
-import static org.objectweb.asm.Type.*;
 
 class AnnotationFinder extends EmptyVisitor {
     String name;

@@ -1,17 +1,19 @@
 package lambda.enumerable.collection;
 
-import java.util.*;
+import static lambda.Parameters.*;
+import static lambda.enumerable.EnumerableArrays.*;
+import static lambda.primitives.LambdaPrimitives.*;
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 import lambda.TestBase;
 
 import org.junit.Test;
-
-import static lambda.Parameters.*;
-
-import static lambda.enumerable.EnumerableArrays.*;
-
-import static lambda.primitives.LambdaPrimitives.*;
-import static org.junit.Assert.*;
 
 public class EnumerableCollectionsTest extends TestBase {
     @Test
@@ -62,7 +64,7 @@ public class EnumerableCollectionsTest extends TestBase {
         ArrayList<Object> original = new ArrayList<Object>();
         ECollection<Object> collection = EIterable.from(original);
         assertTrue(original.isEmpty());
-        
+
         collection.add("hello");
         assertEquals(1, original.size());
 

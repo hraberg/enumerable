@@ -1,16 +1,19 @@
 package lambda.enumerable.primitives;
 
-import java.util.*;
+import static lambda.Parameters.*;
+import static lambda.enumerable.primitives.EnumerableInts.*;
+import static lambda.primitives.LambdaPrimitives.*;
+import static org.junit.Assert.*;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
 
 import org.junit.Test;
-
-import static lambda.Parameters.*;
-import static lambda.enumerable.primitives.EnumerableInts.*;
-import static lambda.primitives.LambdaPrimitives.*;
-import static org.junit.Assert.*;
 
 public class EnumerableIntsTest extends TestBase {
     int[] intsOneToFive = new int[] { 1, 2, 3, 4, 5 };
@@ -135,7 +138,7 @@ public class EnumerableIntsTest extends TestBase {
 
     @Test
     public void injectWithoutInitialValueAndOnlyOneElementReturnsElement() throws Exception {
-        assertEquals(1, inject(new int[] {1}, λ(n, m, n * m)));
+        assertEquals(1, inject(new int[] { 1 }, λ(n, m, n * m)));
     }
 
     @Test(expected = ArrayIndexOutOfBoundsException.class)

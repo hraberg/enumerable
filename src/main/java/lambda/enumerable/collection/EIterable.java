@@ -1,13 +1,16 @@
 package lambda.enumerable.collection;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import lambda.Fn1;
 import lambda.Fn2;
 import lambda.enumerable.Enumerable;
 
-public class EIterable<E> implements Iterable<E>, IEnumerable<E>  {
+public class EIterable<E> implements Iterable<E>, IEnumerable<E> {
     @SuppressWarnings("unchecked")
     public static <T, R extends EIterable<T>> R from(Iterable<T> iterable) {
         if (iterable instanceof EIterable<?>)
@@ -20,7 +23,7 @@ public class EIterable<E> implements Iterable<E>, IEnumerable<E>  {
             return (R) new ECollection<T>((Collection<T>) iterable);
         return (R) new EIterable<T>(iterable);
     }
-    
+
     protected final Iterable<E> iterable;
 
     public EIterable(Iterable<E> iterable) {
@@ -39,7 +42,7 @@ public class EIterable<E> implements Iterable<E>, IEnumerable<E>  {
         if (obj instanceof EIterable<?>)
             return this.iterable.equals(((EIterable<?>) obj).iterable);
         if (obj instanceof Iterable<?>)
-            return this.iterable.equals((Iterable<?>) obj);
+            return this.iterable.equals(obj);
         return false;
     }
 

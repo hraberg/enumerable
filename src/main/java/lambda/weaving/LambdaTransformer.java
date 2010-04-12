@@ -1,5 +1,11 @@
 package lambda.weaving;
 
+import static lambda.exception.UncheckedException.*;
+import static lambda.weaving.Debug.*;
+import static org.objectweb.asm.ClassReader.*;
+import static org.objectweb.asm.ClassWriter.*;
+import static org.objectweb.asm.Type.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -9,13 +15,12 @@ import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
 import lambda.annotation.Unused;
 
-import org.objectweb.asm.*;
-
-import static lambda.exception.UncheckedException.*;
-import static lambda.weaving.Debug.*;
-import static org.objectweb.asm.ClassReader.*;
-import static org.objectweb.asm.ClassWriter.*;
-import static org.objectweb.asm.Type.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 class LambdaTransformer implements Opcodes {
     Map<String, byte[]> lambdasByClassName = new HashMap<String, byte[]>();

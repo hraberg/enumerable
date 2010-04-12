@@ -1,5 +1,10 @@
 package lambda;
 
+import static java.lang.System.*;
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
+import static lambda.enumerable.Enumerable.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -9,11 +14,6 @@ import lambda.primitives.Fn1ItoI;
 import lambda.primitives.LambdaPrimitives;
 import lambda.weaving.LambdaLoader;
 import lambda.weaving.Version;
-import static java.lang.System.*;
-import static lambda.Lambda.*;
-import static lambda.Parameters.*;
-
-import static lambda.enumerable.Enumerable.*;
 
 public class MicroBench {
     public static void main(String[] args) {
@@ -38,18 +38,18 @@ public class MicroBench {
 
         out.println();
 
-        bench("object collect for loop", times, λ(_, methodCollect()));        
+        bench("object collect for loop", times, λ(_, methodCollect()));
         bench("object collect lambda", times, λ(_, lambdaCollect()));
 
-        bench("primitive collect for loop", times, λ(_, methodCollectP()));        
+        bench("primitive collect for loop", times, λ(_, methodCollectP()));
         bench("primitive collect lambda", times, λ(_, lambdaCollectP()));
 
         out.println();
 
-        bench("object inject for loop", times, λ(_, methodInject()));        
+        bench("object inject for loop", times, λ(_, methodInject()));
         bench("object inject lambda", times, λ(_, lambdaInject()));
 
-        bench("primitive inject for loop", times, λ(_, methodInjectP()));        
+        bench("primitive inject for loop", times, λ(_, methodInjectP()));
         bench("primitive inject lambda", times, λ(_, lambdaInjectP()));
     }
 
@@ -82,7 +82,7 @@ public class MicroBench {
             result *= i;
         return result;
     }
-    
+
     Integer lambdaInject() {
         return inject(integers, λ(n, m, n * m));
     }
@@ -110,7 +110,7 @@ public class MicroBench {
     Fn1ItoI fibp;
 
     int length = 100000;
-    
+
     List<Integer> integers = new ArrayList<Integer>(length);
     int[] ints = new int[length];
 

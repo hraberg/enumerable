@@ -1,16 +1,19 @@
 package lambda;
 
-import java.io.*;
+import static java.lang.Math.*;
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
+import static org.junit.Assert.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.NotSerializableException;
+import java.io.PrintStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
-
-import static java.lang.Math.*;
-import static lambda.Lambda.*;
-import static lambda.Parameters.*;
-import static org.junit.Assert.*;
 
 @SuppressWarnings("serial")
 public class ClosureTest extends TestBase implements Serializable {
@@ -199,7 +202,8 @@ public class ClosureTest extends TestBase implements Serializable {
     @Test
     public void closeOverForLoopVariableInTestAndForUpdate() throws Exception {
         int sum = 0;
-        for (int i = 0; λ(n, n < 10).call(i); sum += λ(n, i += n).call(1));
+        for (int i = 0; λ(n, n < 10).call(i); sum += λ(n, i += n).call(1))
+            ;
         assertEquals(55, sum);
     }
 
@@ -301,7 +305,7 @@ public class ClosureTest extends TestBase implements Serializable {
             public Object call() {
                 return privatePrimitiveHello("", 2);
             }
-        }.call(), (int) result);
+        }.call(), result);
     }
 
     @Test

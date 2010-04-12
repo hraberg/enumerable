@@ -1,6 +1,12 @@
 package lambda.weaving;
 
-import org.objectweb.asm.*;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 class EmptyVisitor implements ClassVisitor, FieldVisitor, MethodVisitor, Opcodes {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {

@@ -11,7 +11,7 @@ public class ECollection<E> extends EIterable<E> implements Collection<E> {
     public ECollection(Collection<E> collection) {
         super(collection);
     }
-    
+
     public Collection<E> delegate() {
         return (Collection<E>) iterable;
     }

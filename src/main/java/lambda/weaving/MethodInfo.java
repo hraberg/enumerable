@@ -1,12 +1,20 @@
 package lambda.weaving;
 
-import java.util.*;
+import static org.objectweb.asm.Type.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import lambda.annotation.Unused;
 
 import org.objectweb.asm.Type;
-
-import static org.objectweb.asm.Type.*;
 
 class MethodInfo {
     String name;
@@ -226,7 +234,7 @@ class MethodInfo {
         }
 
         Type getExpressionType() {
-            return newLambdaParameterTypes[newLambdaParameterTypes.length -1];
+            return newLambdaParameterTypes[newLambdaParameterTypes.length - 1];
         }
 
         void setLambdaMethod(MethodInfo method) {
@@ -257,7 +265,7 @@ class MethodInfo {
         }
 
         void removeIllegalParameters() {
-            Map<String, VariableInfo> newParametersByName = new LinkedHashMap<String,VariableInfo>();
+            Map<String, VariableInfo> newParametersByName = new LinkedHashMap<String, VariableInfo>();
             int i = 0;
             for (Map.Entry<String, VariableInfo> entry : parametersByName.entrySet())
                 if (i++ < getArity() - 1)
@@ -277,7 +285,7 @@ class MethodInfo {
             }
             return null;
         }
-        
+
         public String toString() {
             String locals = "";
             if (!accessedLocals.isEmpty())

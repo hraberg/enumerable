@@ -1,5 +1,12 @@
 package lambda.enumerable;
 
+import static java.lang.Math.*;
+import static java.util.Arrays.*;
+import static lambda.Lambda.*;
+import static lambda.Parameters.*;
+import static lambda.enumerable.Enumerable.*;
+import static lambda.primitives.LambdaPrimitives.*;
+
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
@@ -11,14 +18,6 @@ import lambda.enumerable.collection.EList;
 import lambda.primitives.Fn1ItoI;
 import lambda.weaving.LambdaLoader;
 import lambda.weaving.Version;
-import static java.lang.Math.*;
-import static java.util.Arrays.*;
-import static lambda.Lambda.*;
-import static lambda.Parameters.*;
-
-import static lambda.enumerable.Enumerable.*;
-
-import static lambda.primitives.LambdaPrimitives.*;
 
 public class EnumerableExample {
     /**
