@@ -10,7 +10,7 @@ http://github.com/hraberg/enumerable/
 
 ## Introduction
 
-Enumarable allows you to write blocks in valid Java like this:
+Enumerable allows you to write blocks in valid Java like this:
 
     Fn1 square = fn(n, n * n);
     List<Integer> result = collect(integers, square);
