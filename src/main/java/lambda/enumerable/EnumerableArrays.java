@@ -10,7 +10,9 @@ import java.util.regex.Pattern;
 import lambda.Fn1;
 import lambda.Fn2;
 import lambda.enumerable.collection.EList;
+import lambda.enumerable.collection.EMap;
 import lambda.enumerable.collection.ESet;
+import lambda.enumerable.collection.IEnumerable;
 
 /**
  * Ruby/Smalltalk style internal iterators for Java 5 using bytecode
@@ -53,6 +55,37 @@ public class EnumerableArrays {
     @SuppressWarnings("unchecked")
     public static <E, R> R[] collect(E[] array, Fn1<E, R> block, Class<R> type) {
         return Enumerable.collect(asIterable(array), block).toArray((R[]) Array.newInstance(type, 0));
+    }
+
+    /**
+     * Returns the count of all elements in array.
+     */
+    public static <E> int count(E[] array) {
+        return array.length;
+    }
+
+    /**
+     * Returns the count of objects in arry that equal obj.
+     */
+    public static <E> int count(E[] array, E obj) {
+        return Enumerable.count(asIterable(array), obj);
+    }
+
+    /**
+     * Returns the count of objects in array for which the block returns a true
+     * value.
+     */
+    public static <E> int count(E[] array, Fn1<E, Boolean> block) {
+        return Enumerable.count(asIterable(array), block);
+    }
+
+    /**
+     * Returns null if array has no elements; otherwise, passes the elements,
+     * one at a time to the block. When it reaches the end, it repeats. The
+     * number of times it repeats is set by the parameter.
+     */
+    public static <E, R> Object cycle(E[] array, int times, Fn1<E, R> block) {
+        return Enumerable.cycle(asIterable(array), times, block);
     }
 
     /**
@@ -113,14 +146,14 @@ public class EnumerableArrays {
      * @see #detect(Object[], Fn1)
      */
     public static <E> E find(E[] array, Fn1<E, Boolean> block) {
-        return Enumerable.detect(asIterable(array), block);
+        return Enumerable.find(asIterable(array), block);
     }
 
     /**
      * @see #detect(Object[], Object, Fn1)
      */
     public static <E> E find(E[] array, E ifNone, Fn1<E, Boolean> block) {
-        return Enumerable.detect(asIterable(array), ifNone, block);
+        return Enumerable.find(asIterable(array), ifNone, block);
     }
 
     /**
@@ -158,6 +191,16 @@ public class EnumerableArrays {
      */
     public static <E, R> Object[] grep(E[] array, String pattern, Fn1<E, R> block) {
         return Enumerable.grep(asIterable(array), pattern, block).toArray();
+    }
+
+    /**
+     * Partitions array by calling the block for each item and using the result
+     * returned by the block to group the items into buckets. Returns a map
+     * where the keys are the objects returned by the block, and the values for
+     * a key are those items for which the block returned that object.
+     */
+    public static <E, R> EMap<R, EList<E>> groupBy(E[] array, Fn1<E, R> block) {
+        return Enumerable.groupBy(asIterable(array), block);
     }
 
     /**
@@ -218,6 +261,14 @@ public class EnumerableArrays {
     }
 
     /**
+     * Passes each item in the array to the block. Returns the item
+     * corresponding to the largest value returned by the block.
+     */
+    public static <E, R extends Object & Comparable<? super R>> E maxBy(E[] array, Fn1<E, R> block) {
+        return Enumerable.maxBy(asIterable(array), block);
+    }
+
+    /**
      * Returns true if any member of array equals obj. Equality is tested using
      * {@link Object#equals(Object)}.
      */
@@ -239,6 +290,54 @@ public class EnumerableArrays {
      */
     public static <E> E min(E[] array, Fn2<E, E, Integer> block) {
         return Enumerable.min(asIterable(array), block);
+    }
+
+    /**
+     * Passes each item in the array to the block. Returns the item
+     * corresponding to the smallest value returned by the block.
+     */
+    public static <E, R extends Object & Comparable<? super R>> E minBy(E[] array, Fn1<E, R> block) {
+        return Enumerable.minBy(asIterable(array), block);
+    }
+
+    /**
+     * Compares the elements of array using {@link Comparable}, returning the
+     * minimum and maximum value.
+     */
+    public static <E> E[] minMax(E[] array) {
+        return Enumerable.minMax(asIterable(array)).toArray(newEmptyArray(array));
+    }
+
+    /**
+     * Compares the elements of array using the given block, returning the
+     * minimum and maximum value.
+     */
+    public static <E> E[] minMax(E[] array, Fn2<E, E, Integer> block) {
+        return Enumerable.minMax(asIterable(array), block).toArray(newEmptyArray(array));
+    }
+
+    /**
+     * Passes each item in the array to the block. Returns the items
+     * corresponding to the smallest and largest values returned by the block.
+     */
+    public static <E, R extends Object & Comparable<? super R>> E[] minMaxBy(E[] array, Fn1<E, R> block) {
+        return Enumerable.minMaxBy(asIterable(array), block).toArray(newEmptyArray(array));
+    }
+
+    /**
+     * Passes each element of the array to the given block. The method returns
+     * true if the block never returns a value other than false or null.
+     */
+    public static <E> boolean none(E[] array, Fn1<E, ?> block) {
+        return Enumerable.none(asIterable(array), block);
+    }
+
+    /**
+     * Passes each element of the array to the given block. The method returns
+     * true if the block returns true exactly one time.
+     */
+    public static <E> boolean one(E[] array, Fn1<E, ?> block) {
+        return Enumerable.one(asIterable(array), block);
     }
 
     /**
@@ -275,11 +374,33 @@ public class EnumerableArrays {
     }
 
     /**
+     * @see #inject(Object[], Fn2)
+     */
+    public static <E> E reduce(E[] array, Fn2<E, E, E> block) {
+        return Enumerable.inject(asIterable(array), block);
+    }
+
+    /**
+     * @see #inject(Object[], Object, Fn2)
+     */
+    public static <E, R> R reduce(E[] array, R initial, Fn2<R, E, R> block) {
+        return Enumerable.inject(asIterable(array), initial, block);
+    }
+
+    /**
      * Returns an array containing all elements of array for which block is
      * false.
      */
     public static <E> E[] reject(E[] array, Fn1<E, Boolean> block) {
         return Enumerable.reject(asIterable(array), block).toArray(newEmptyArray(array));
+    }
+
+    /**
+     * Invokes the block with the elements of array in reverse order. Creates an
+     * intermediate list internally, so this might be expensive on large arrays.
+     */
+    public static <E, R> IEnumerable<E> reverseEach(E[] array, Fn1<E, R> block) {
+        return Enumerable.reverseEach(asIterable(array), block);
     }
 
     /**
@@ -312,6 +433,21 @@ public class EnumerableArrays {
      */
     public static <E, R extends Object & Comparable<? super R>> E[] sortBy(E[] array, final Fn1<E, R> block) {
         return Enumerable.sortBy(asIterable(array), block).toArray(newEmptyArray(array));
+    }
+
+    /**
+     * Returns an array containing the first n items from array.
+     */
+    public static <E> E[] take(E[] array, int n) {
+        return Enumerable.take(asIterable(array), n).toArray(newEmptyArray(array));
+    }
+
+    /**
+     * Passes successive items to the block, adding them to the result array
+     * until the block returns false or null.
+     */
+    public static <E> E[] takeWhile(E[] array, Fn1<E, Boolean> block) {
+        return Enumerable.takeWhile(asIterable(array), block).toArray(newEmptyArray(array));
     }
 
     /**

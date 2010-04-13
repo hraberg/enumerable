@@ -27,6 +27,41 @@ public interface IEnumerable<E> extends Iterable<E> {
     <R> EList<R> collect(Fn1<E, R> block);
 
     /**
+     * Returns the count of all elements in collection.
+     */
+    int count();
+
+    /**
+     * Returns the count of objects in collection that equal obj.
+     */
+    int count(E obj);
+
+    /**
+     * Returns the count of objects in collection for which the block returns a
+     * true value.
+     */
+    int count(Fn1<E, Boolean> block);
+
+    /**
+     * Returns null if collection has no elements; otherwise, passes the
+     * elements, one at a time to the block. When it reaches the end, it
+     * repeats. The number of times it repeats is set by the parameter.
+     */
+    <R> Object cycle(int times, Fn1<E, R> block);
+
+    /**
+     * Returns a list containing all but the first n elements of collection.
+     */
+    EList<E> drop(int n);
+
+    /**
+     * Passes elements in turn to the block until the block does not return a
+     * true value. Starting with that element, copies the remainder to a list
+     * and returns it.
+     */
+    EList<E> dropWhile(Fn1<E, Boolean> block);
+
+    /**
      * Passes each entry in collection to block. Returns the first for which
      * block is not false. If no object matches, it returns null.
      */
@@ -60,6 +95,12 @@ public interface IEnumerable<E> extends Iterable<E> {
     <R> IEnumerable<E> eachWithIndex(Fn2<E, Integer, R> block);
 
     /**
+     * Calls block with two arguments, the item and the memo object, for each
+     * item in collection.
+     */
+    <M, R> M eachWithObject(M memo, Fn2<E, M, R> block);
+
+    /**
      * @see #toList()
      */
     EList<E> entries();
@@ -78,6 +119,22 @@ public interface IEnumerable<E> extends Iterable<E> {
      * @see #select(Fn1)
      */
     EList<E> findAll(Fn1<E, Boolean> block);
+
+    /**
+     * Returns the index of the first item for which the given block returns a
+     * true value or returns nil if the block only ever returns false.
+     */
+    int findIndex(Fn1<E, Boolean> block);
+
+    /**
+     * Returns the first item of collection or null.
+     */
+    E first();
+
+    /**
+     * Returns the first n items of collection.
+     */
+    EList<E> first(int n);
 
     /**
      * Returns a list of every element in collection for which pattern matches.
@@ -100,6 +157,14 @@ public interface IEnumerable<E> extends Iterable<E> {
      * @see #grep(Pattern, Fn1)
      */
     <R> EList<R> grep(String pattern, Fn1<E, R> block);
+
+    /**
+     * Partitions collection by calling the block for each item and using the
+     * result returned by the block to group the items into buckets. Returns a
+     * map where the keys are the objects returned by the block, and the values
+     * for a key are those items for which the block returned that object.
+     */
+    <R> EMap<R, EList<E>> groupBy(Fn1<E, R> block);
 
     /**
      * @see #member(Object)
@@ -141,6 +206,12 @@ public interface IEnumerable<E> extends Iterable<E> {
     E max(Fn2<E, E, Integer> block);
 
     /**
+     * Passes each item in the collection to the block. Returns the item
+     * corresponding to the largest value returned by the block.
+     */
+    <R extends Object & Comparable<? super R>> E maxBy(Fn1<E, R> block);
+
+    /**
      * Returns true if any member of collection equals obj. Equality is tested
      * using {@link Object#equals(Object)}.
      */
@@ -159,16 +230,69 @@ public interface IEnumerable<E> extends Iterable<E> {
     E min(Fn2<E, E, Integer> block);
 
     /**
+     * Passes each item in the collection to the block. Returns the item
+     * corresponding to the smallest value returned by the block.
+     */
+    <R extends Object & Comparable<? super R>> E minBy(Fn1<E, R> block);
+
+    /**
+     * Compares the elements of self using {@link Comparable}, returning the
+     * minimum and maximum value.
+     */
+    EList<E> minMax();
+
+    /**
+     * Compares the elements of self using the given block, returning the
+     * minimum and maximum value.
+     */
+    EList<E> minMax(Fn2<E, E, Integer> block);
+
+    /**
+     * Passes each item in the collection to the block. Returns the items
+     * corresponding to the smallest and largest values returned by the block.
+     */
+    <R extends Object & Comparable<? super R>> EList<E> minMaxBy(Fn1<E, R> block);
+
+    /**
+     * Passes each element of the collection to the given block. The method
+     * returns true if the block never returns a value other than false or null.
+     */
+    boolean none(Fn1<E, ?> block);
+
+    /**
+     * Passes each element of the collection to the given block. The method
+     * returns true if the block returns true exactly one time.
+     */
+    boolean one(Fn1<E, ?> block);
+
+    /**
      * Returns two lists, the first containing the elements of collection for
      * which the block evaluates to true, the second containing the rest.
      */
     EList<EList<E>> partition(Fn1<E, Boolean> block);
 
     /**
+     * @see #inject(Fn2)
+     */
+    E reduce(Fn2<E, E, E> block);
+
+    /**
+     * @see #inject(Object, Fn2)
+     */
+    <R> R reduce(R initial, Fn2<R, E, R> block);
+
+    /**
      * Returns a list containing all elements of collection for which block is
      * false.
      */
     EList<E> reject(Fn1<E, Boolean> block);
+
+    /**
+     * Invokes the block with the elements of collection in reverse order.
+     * Creates an intermediate list internally, so this might be expensive on
+     * large collections.
+     */
+    <R> IEnumerable<E> reverseEach(Fn1<E, R> block);
 
     /**
      * Returns a list containing all elements of collection for which block is
@@ -193,6 +317,17 @@ public interface IEnumerable<E> extends Iterable<E> {
      * collection through the given block.
      */
     <R extends Object & Comparable<? super R>> EList<E> sortBy(Fn1<E, R> block);
+
+    /**
+     * Returns a list containing the first n items from collection.
+     */
+    EList<E> take(int n);
+
+    /**
+     * Passes successive items to the block, adding them to the result list
+     * until the block returns false or null.
+     */
+    EList<E> takeWhile(Fn1<E, Boolean> block);
 
     /**
      * Returns a list containing the items in collection.
