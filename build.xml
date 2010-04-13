@@ -114,7 +114,7 @@
     </target>
 
     <target name="aot-compile-tests" depends="test-jar">
-        <java fork="yes" classname="lambda.weaving.LambdaCompiler">
+        <java fork="yes" classname="lambda.weaving.LambdaCompiler" failonerror="yes">
             <arg value="target/enumerable-test-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
@@ -129,7 +129,7 @@
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-            <classpath refid="enumerable.example.classpath" />
+            <classpath refid="enumerable.classpath" />
             <classpath location="target/enumerable-test-${enumerable.version}.jar" />
             <classpath location="lib/junit-4.7.jar" />
             <batchtest todir="target/junit-aot">
