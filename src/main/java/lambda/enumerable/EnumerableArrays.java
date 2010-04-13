@@ -304,7 +304,7 @@ public class EnumerableArrays {
      * Compares the elements of array using {@link Comparable}, returning the
      * minimum and maximum value.
      */
-    public static <E> E[] minMax(E[] array) {
+    public static <E extends Object & Comparable<? super E>> E[] minMax(E[] array) {
         return Enumerable.minMax(asIterable(array)).toArray(newEmptyArray(array));
     }
 

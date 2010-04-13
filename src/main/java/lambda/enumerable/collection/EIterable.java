@@ -196,8 +196,9 @@ public class EIterable<E> implements Iterable<E>, IEnumerable<E> {
         return Enumerable.minBy(iterable, block);
     }
 
+    @SuppressWarnings("unchecked")
     public EList<E> minMax() {
-        return Enumerable.minMax(iterable);
+        return Enumerable.minMax((EIterable<? extends Comparable>) iterable);
     }
 
     public EList<E> minMax(Fn2<E, E, Integer> block) {

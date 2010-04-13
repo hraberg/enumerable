@@ -122,7 +122,7 @@ public interface IEnumerable<E> extends Iterable<E> {
 
     /**
      * Returns the index of the first item for which the given block returns a
-     * true value or returns nil if the block only ever returns false.
+     * true value or returns -1 if the block only ever returns false.
      */
     int findIndex(Fn1<E, Boolean> block);
 

@@ -9,17 +9,24 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import lambda.enumerable.collection.EList;
 
 public class TestBase {
+    public EList<Integer> oneToFiveTwice = toList(list(Integer.class));
     public EList<Integer> oneToTen = toList(list(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
     public EList<Integer> oneToFive = oneToTen.subList(0, 5);
+    public EList<String> animals = toList(list("albatross", "dog", "horse", "fox"));
+
     public HashMap<String, Integer> stringsToInts = new HashMap<String, Integer>();
 
     {
+        oneToFiveTwice.addAll(oneToFive);
+        oneToFiveTwice.addAll(oneToFive);
+
         stringsToInts.put("hello", 1);
         stringsToInts.put("world", 2);
     }
@@ -30,6 +37,10 @@ public class TestBase {
 
     public <E> List<E> list(Class<E> type) {
         return new ArrayList<E>();
+    }
+
+    public <E> List<E> list(Collection<E> collection) {
+        return new ArrayList<E>(collection);
     }
 
     @SuppressWarnings("unchecked")

@@ -20,7 +20,7 @@ import lambda.enumerable.collection.EList;
 import org.junit.Test;
 
 @SuppressWarnings("unchecked")
-public class EnumerableTest extends TestBase {
+public class EnumerableOneEightTest extends TestBase {
     @Test
     public void callsBlockOnceForEachElement() throws Exception {
         List<Integer> actual = list();
@@ -381,14 +381,12 @@ public class EnumerableTest extends TestBase {
 
     @Test
     public void minReturnsFirstValueUsingNaturalOrder() throws Exception {
-        List<String> strings = list("albatross", "dog", "horse");
-        assertEquals("albatross", min(strings));
+        assertEquals("albatross", min(animals));
     }
 
     @Test
     public void minReturnsFistValueUsingBlockAsComparator() throws Exception {
-        List<String> strings = list("albatross", "dog", "horse");
-        assertEquals("dog", min(strings, λ(s, t, s.length() - t.length())));
+        assertEquals("dog", min(animals, λ(s, t, s.length() - t.length())));
     }
 
     @Test

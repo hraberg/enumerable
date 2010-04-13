@@ -81,14 +81,23 @@ public class Enumerable {
      * Returns the count of all elements in collection.
      */
     public static <E> int count(Iterable<E> collection) {
-        throw new UnsupportedOperationException();
+        if (collection instanceof Collection<?>)
+            return ((Collection<E>) collection).size();
+        int count = 0;
+        for (Iterator<E> iterator = collection.iterator(); iterator.hasNext(); iterator.next())
+            count++;
+        return count;
     }
 
     /**
      * Returns the count of objects in collection that equal obj.
      */
     public static <E> int count(Iterable<E> collection, E obj) {
-        throw new UnsupportedOperationException();
+        int count = 0;
+        for (E each : collection)
+            if (obj.equals(each))
+                count++;
+        return count;
     }
 
     /**
@@ -96,7 +105,7 @@ public class Enumerable {
      * true value.
      */
     public static <E> int count(Iterable<E> collection, Fn1<E, Boolean> block) {
-        throw new UnsupportedOperationException();
+        return select(collection, block).size();
     }
 
     /**
@@ -104,8 +113,15 @@ public class Enumerable {
      * elements, one at a time to the block. When it reaches the end, it
      * repeats. The number of times it repeats is set by the parameter.
      */
-    public static <E, R> Object cycle(Iterable<E> collection, int times, Fn1<E, R> block) {
-        throw new UnsupportedOperationException();
+    public static <E, R> EList<E> cycle(Iterable<E> collection, int times, Fn1<E, R> block) {
+        EList<E> result = new EList<E>();
+        while (times-- > 0) {
+            for (E each : collection) {
+                block.call(each);
+                result.add(each);
+            }
+        }
+        return result;
     }
 
     /**
@@ -131,7 +147,11 @@ public class Enumerable {
      * Returns a list containing all but the first n elements of collection.
      */
     public static <E> EList<E> drop(Iterable<E> collection, int n) {
-        throw new UnsupportedOperationException();
+        EList<E> result = new EList<E>();
+        for (E each : collection)
+            if (n-- <= 0)
+                result.add(each);
+        return result;
     }
 
     /**
@@ -140,7 +160,11 @@ public class Enumerable {
      * and returns it.
      */
     public static <E> EList<E> dropWhile(Iterable<E> collection, Fn1<E, Boolean> block) {
-        throw new UnsupportedOperationException();
+        EList<E> result = new EList<E>();
+        for (E next : collection)
+            if (!result.isEmpty() || !block.call(next))
+                result.add(next);
+        return result;
     }
 
     /**
@@ -258,7 +282,9 @@ public class Enumerable {
      * item in collection.
      */
     public static <E, M, R> M eachWithObject(Iterable<E> collection, M memo, Fn2<E, M, R> block) {
-        throw new UnsupportedOperationException();
+        for (E each : collection)
+            block.call(each, memo);
+        return memo;
     }
 
     /**
@@ -291,24 +317,38 @@ public class Enumerable {
 
     /**
      * Returns the index of the first item for which the given block returns a
-     * true value or returns nil if the block only ever returns false.
+     * true value or returns -1 if the block only ever returns false.
      */
     public static <E> int findIndex(Iterable<E> collection, Fn1<E, Boolean> block) {
-        throw new UnsupportedOperationException();
+        int index = 0;
+        for (E each : collection)
+            if (block.call(each))
+                return index;
+            else
+                index++;
+        return -1;
     }
 
     /**
      * Returns the first item of collection or null.
      */
     public static <E> E first(Iterable<E> collection) {
-        throw new UnsupportedOperationException();
+        for (E each : collection)
+            return each;
+        return null;
     }
 
     /**
      * Returns the first n items of collection.
      */
     public static <E> EList<E> first(Iterable<E> collection, int n) {
-        throw new UnsupportedOperationException();
+        EList<E> result = new EList<E>();
+        for (E each : collection)
+            if (n-- > 0)
+                result.add(each);
+            else
+                return result;
+        return result;
     }
 
     /**
@@ -356,7 +396,14 @@ public class Enumerable {
      * for a key are those items for which the block returned that object.
      */
     public static <E, R> EMap<R, EList<E>> groupBy(Iterable<E> collection, Fn1<E, R> block) {
-        throw new UnsupportedOperationException();
+        EMap<R, EList<E>> result = new EMap<R, EList<E>>();
+        for (E each : collection) {
+            R key = block.call(each);
+            if (!result.containsKey(key))
+                result.put(key, new EList<E>());
+            result.get(key).add(each);
+        }
+        return result;
     }
 
     /**
@@ -434,7 +481,7 @@ public class Enumerable {
      * corresponding to the largest value returned by the block.
      */
     public static <E, R extends Object & Comparable<? super R>> E maxBy(Iterable<E> collection, Fn1<E, R> block) {
-        throw new UnsupportedOperationException();
+        return min(collection, new ReverseComparator<E>(new BlockResultComparator<E, R>(block)));
     }
 
     /**
@@ -467,15 +514,18 @@ public class Enumerable {
      * corresponding to the smallest value returned by the block.
      */
     public static <E, R extends Object & Comparable<? super R>> E minBy(Iterable<E> collection, Fn1<E, R> block) {
-        throw new UnsupportedOperationException();
+        return min(collection, new BlockResultComparator<E, R>(block));
     }
 
     /**
      * Compares the elements of collection using {@link Comparable}, returning
      * the minimum and maximum value.
      */
-    public static <E> EList<E> minMax(Iterable<E> collection) {
-        throw new UnsupportedOperationException();
+    public static <E extends Object & Comparable<? super E>> EList<E> minMax(Iterable<E> collection) {
+        EList<E> result = new EList<E>();
+        result.add(min(collection));
+        result.add(max(collection));
+        return result;
     }
 
     /**
@@ -483,7 +533,10 @@ public class Enumerable {
      * minimum and maximum value.
      */
     public static <E> EList<E> minMax(Iterable<E> collection, Fn2<E, E, Integer> block) {
-        throw new UnsupportedOperationException();
+        EList<E> result = new EList<E>();
+        result.add(min(collection, block));
+        result.add(max(collection, block));
+        return result;
     }
 
     /**
@@ -492,7 +545,10 @@ public class Enumerable {
      */
     public static <E, R extends Object & Comparable<? super R>> EList<E> minMaxBy(Iterable<E> collection,
             Fn1<E, R> block) {
-        throw new UnsupportedOperationException();
+        EList<E> result = new EList<E>();
+        result.add(minBy(collection, block));
+        result.add(maxBy(collection, block));
+        return result;
     }
 
     /**
@@ -500,7 +556,7 @@ public class Enumerable {
      * returns true if the block never returns a value other than false or null.
      */
     public static <E> boolean none(Iterable<E> collection, Fn1<E, ?> block) {
-        throw new UnsupportedOperationException();
+        return !any(collection, block);
     }
 
     /**
@@ -508,7 +564,16 @@ public class Enumerable {
      * returns true if the block returns true exactly one time.
      */
     public static <E> boolean one(Iterable<E> collection, Fn1<E, ?> block) {
-        throw new UnsupportedOperationException();
+        Object match = null;
+        for (E each : collection) {
+            Object result = block.call(each);
+            if (result != FALSE && result != null)
+                if (match != null)
+                    return false;
+                else
+                    match = result;
+        }
+        return match != null;
     }
 
     /**
@@ -578,7 +643,9 @@ public class Enumerable {
      * large collections.
      */
     public static <E, R> IEnumerable<E> reverseEach(Iterable<E> collection, Fn1<E, R> block) {
-        throw new UnsupportedOperationException();
+        EList<E> result = new EList<E>(asNewList(collection));
+        Collections.reverse(result);
+        return each(result, block);
     }
 
     /**
@@ -634,18 +701,20 @@ public class Enumerable {
      */
     public static <E, R extends Object & Comparable<? super R>> EList<E> sortBy(Iterable<E> collection,
             final Fn1<E, R> block) {
-        return sort(collection, new Comparator<E>() {
-            public int compare(E o1, E o2) {
-                return block.call(o1).compareTo(block.call(o2));
-            }
-        });
+        return sort(collection, new BlockResultComparator<E, R>(block));
     }
 
     /**
      * Returns a list containing the first n items from collection.
      */
     public static <E> EList<E> take(Iterable<E> collection, int n) {
-        throw new UnsupportedOperationException();
+        EList<E> result = new EList<E>();
+        for (E each : collection)
+            if (n-- > 0)
+                result.add(each);
+            else
+                return result;
+        return result;
     }
 
     /**
@@ -653,7 +722,13 @@ public class Enumerable {
      * until the block returns false or null.
      */
     public static <E> EList<E> takeWhile(Iterable<E> collection, Fn1<E, Boolean> block) {
-        throw new UnsupportedOperationException();
+        EList<E> result = new EList<E>();
+        for (E next : collection)
+            if (block.call(next))
+                result.add(next);
+            else
+                return result;
+        return result;
     }
 
     /**
@@ -747,6 +822,19 @@ public class Enumerable {
             if (result == null || comparator.compare(each, result) < 0)
                 result = each;
         return result;
+    }
+
+    private static final class BlockResultComparator<E, R extends Object & Comparable<? super R>> implements
+            Comparator<E> {
+        private final Fn1<E, R> block;
+
+        private BlockResultComparator(Fn1<E, R> block) {
+            this.block = block;
+        }
+
+        public int compare(E o1, E o2) {
+            return block.call(o1).compareTo(block.call(o2));
+        }
     }
 
     private static final class ReverseComparator<E> implements Comparator<E> {
