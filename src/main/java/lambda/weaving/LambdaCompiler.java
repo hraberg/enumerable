@@ -112,9 +112,17 @@ public class LambdaCompiler {
             jar.delete();
             newJar.renameTo(new File(jar.getAbsolutePath()));
 
+            delete(tempDir);
         } catch (Exception e) {
             throw uncheck(e);
         }
+    }
+
+    void delete(File file) {
+        if (file.isDirectory())
+            for (File child : file.listFiles())
+                delete(child);
+        file.delete();
     }
 
     void writeGeneratedLambdas(File tempDir) throws FileNotFoundException, IOException {
@@ -188,7 +196,6 @@ public class LambdaCompiler {
         File tempDir = File.createTempFile("lambda.compiler.jar", "");
         tempDir.delete();
         tempDir.mkdir();
-        tempDir.deleteOnExit();
 
         try {
             Enumeration<JarEntry> entries = jarFile.entries();
@@ -197,7 +204,6 @@ public class LambdaCompiler {
                 JarEntry jarEntry = entries.nextElement();
 
                 File file = new File(tempDir, jarEntry.getName());
-                file.deleteOnExit();
                 if (jarEntry.isDirectory()) {
                     file.mkdir();
                 } else {
