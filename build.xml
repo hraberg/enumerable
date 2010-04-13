@@ -109,7 +109,9 @@
     <target name="test-jar" depends="build">
         <jar jarfile="target/enumerable-test-${enumerable.version}.jar" encoding="UTF-8" >
             <fileset dir="target/test-classes" />
-            <fileset dir="target/example-classes" />
+            <fileset dir="target/example-classes">
+                <include name="**/EnumerableExample.class" />
+            </fileset>
         </jar>
     </target>
 

@@ -50,19 +50,32 @@ public class LambdaCompiler {
 
     LambdaTransformer transformer = new LambdaTransformer();
     byte[] buffer = new byte[8 * 1024];
+    String aotCompiledMarkerFileName = "META-INF/lambda.aot.compiled";
 
     void compile(String[] args) throws Exception {
         for (String name : args) {
             File file = new File(name);
             debug("compiling " + file.getPath());
             if (file.isDirectory()) {
-                compileDirectory(file);
-                debug("writing generated lambdas in " + file);
-                writeGeneratedLambdas(file);
+                compileClassesDirectory(file);
 
             } else if (file.getName().endsWith(".jar"))
                 compilieJar(file);
         }
+    }
+
+    private void compileClassesDirectory(File file) throws IOException, Exception, FileNotFoundException {
+        File aotCompiledMarker = new File(file, aotCompiledMarkerFileName);
+        if (aotCompiledMarker.exists()) {
+            out.println(file + " is already compiled, skipping.");
+            return;
+        }
+        aotCompiledMarker.getParentFile().mkdir();
+        aotCompiledMarker.createNewFile();
+
+        compileDirectory(file);
+        debug("writing generated lambdas in " + file);
+        writeGeneratedLambdas(file);
     }
 
     void compileDirectory(File dir) throws Exception {
@@ -100,7 +113,18 @@ public class LambdaCompiler {
 
     void compilieJar(File jar) throws Exception {
         try {
-            File tempDir = unjar(jar);
+            JarFile jarFile = new JarFile(jar);
+
+            if (jarFile.getEntry(aotCompiledMarkerFileName) != null) {
+                out.println(jar + " is already compiled, skipping.");
+                return;
+            }
+
+            File tempDir = unjar(jarFile);
+
+            File aotCompiledMarker = new File(tempDir, aotCompiledMarkerFileName);
+            aotCompiledMarker.getParentFile().mkdir();
+            aotCompiledMarker.createNewFile();
 
             compileDirectory(tempDir);
             debug("writing generated lambdas in " + jar);
@@ -109,7 +133,7 @@ public class LambdaCompiler {
             File newJar = jar(tempDir);
 
             jar.delete();
-            newJar.renameTo(new File(jar.getAbsolutePath()));
+            newJar.renameTo(jar);
 
             delete(tempDir);
         } catch (Exception e) {
@@ -186,10 +210,9 @@ public class LambdaCompiler {
         }
     }
 
-    File unjar(File jar) throws IOException, FileNotFoundException {
+    File unjar(JarFile jarFile) throws IOException, FileNotFoundException {
         InputStream in = null;
         OutputStream out = null;
-        JarFile jarFile = new JarFile(jar);
 
         File tempDir = File.createTempFile("lambda.compiler.jar", "");
         tempDir.delete();
