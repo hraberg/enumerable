@@ -120,13 +120,14 @@ class LambdaTransformer implements Opcodes {
         return opcode >= ISTORE && opcode <= ASTORE;
     }
 
-    byte[] transform(String name, InputStream in) throws IOException {
+    byte[] transform(InputStream in) throws IOException {
+        ClassReader cr = new ClassReader(in);
+        String name = cr.getClassName();
+
         if (lambdasByClassName.containsKey(name)) {
             debug("generated lambda requested by the class loader " + name);
             return lambdasByClassName.get(name);
         }
-
-        ClassReader cr = new ClassReader(in);
 
         FirstPassClassVisitor firstPass = new FirstPassClassVisitor(this);
         cr.accept(firstPass, 0);

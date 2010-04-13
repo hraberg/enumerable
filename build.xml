@@ -86,7 +86,7 @@
             </manifest>
         </jarjar>
     </target>
-
+    
     <target name="tests" depends="agent-jar">
         <mkdir dir="target/junit" />
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
@@ -104,6 +104,43 @@
             <formatter type="plain" />
         </junit>
         <fail if="tests.failed" message="unit tests failed" />
+    </target>
+
+    <target name="test-jar" depends="build">
+        <jar jarfile="target/enumerable-test-${enumerable.version}.jar" encoding="UTF-8" >
+            <fileset dir="target/test-classes" />
+            <fileset dir="target/example-classes" />
+        </jar>
+    </target>
+
+    <target name="aot-compile-tests" depends="test-jar">
+        <java fork="yes" classname="lambda.weaving.LambdaCompiler">
+            <arg value="target/enumerable-test-${enumerable.version}.jar" />
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
+            <classpath refid="enumerable.test.classpath" />
+        </java>        
+    </target>
+
+    <target name="aot-tests" depends="agent-jar, aot-compile-tests">
+        <mkdir dir="target/junit-aot" />
+        <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
+            <classpath refid="enumerable.example.classpath" />
+            <classpath location="target/enumerable-test-${enumerable.version}.jar" />
+            <classpath location="lib/junit-4.7.jar" />
+            <batchtest todir="target/junit-aot">
+                <fileset dir="src/test/java">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+            <formatter type="xml" />
+            <formatter type="plain" />
+        </junit>
+        <fail if="tests.failed" message="AOT unit tests failed" />
     </target>
 
     <target name="example" depends="example-with-agent" />
@@ -200,7 +237,7 @@
         </tar>
     </target>
 
-    <target name="dist" depends="dist-no-test">
+    <target name="dist" depends="dist-no-test, aot-tests">
         <echo message="Ensuring that the example project in ${enumerable.dist.name}.tgz works" />
         <delete dir="target/${enumerable.dist.name}" />
         <untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />

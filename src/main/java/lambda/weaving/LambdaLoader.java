@@ -74,7 +74,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
                     out.println(getNotEnabledMessage());
                     out.println("Will try to reload " + className + " in the same process:");
                     launchApplication(className, args);
-                    System.exit(0);
+                    exit(0);
                 } catch (Exception e) {
                     throw uncheck(e);
                 }
@@ -143,7 +143,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         try {
             if (isNotToBeInstrumented(name) || tranformationFailed)
                 return null;
-            return transformer.transform(name, in);
+            return transformer.transform(in);
         } catch (Throwable t) {
             tranformationFailed = true;
             weavingNotEnabledMessage = t.getMessage();
