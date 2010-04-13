@@ -3,6 +3,7 @@ package lambda;
 import static java.lang.Math.*;
 import static lambda.Lambda.*;
 import static lambda.Parameters.*;
+import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
@@ -428,6 +429,41 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
+    public void defaultValueCapturedFromLocalVariableForSecondArgument() throws Exception {
+        int two = 2;
+        Fn2<Integer, Integer, Integer> nTimesM = λ(n, m = two, n * m);
+        assertEquals(2, (int) nTimesM.call(2, 1));
+        assertEquals(4, (int) nTimesM.call(2));
+    }
+
+    int two = 2;
+
+    @Test
+    public void defaultValueCapturedFromInstanceFieldForSecondArgument() throws Exception {
+        Fn2<Integer, Integer, Integer> nTimesM = λ(n, m = two, n * m);
+        assertEquals(2, (int) nTimesM.call(2, 1));
+        assertEquals(4, (int) nTimesM.call(2));
+    }
+
+    @Test
+    public void defaultValueFromInstanceMethodForSecondArgument() throws Exception {
+        Fn2<Integer, Integer, Integer> nTimesM = λ(n, m = two(), n * m);
+        assertEquals(2, (int) nTimesM.call(2, 1));
+        assertEquals(4, (int) nTimesM.call(2));
+    }
+
+    private int two() {
+        return 2;
+    }
+
+    @Test
+    public void defaultValueFromStaticFieldForSecondArgument() throws Exception {
+        Fn2<Double, Double, Double> nTimesM = λ(x, y = PI, x * y);
+        assertEquals(2, nTimesM.call(2.0, 1.0), 0.0);
+        assertEquals(2 * PI, nTimesM.call(2.0), 0.0);
+    }
+
+    @Test
     public void serializingOfClosure() throws Exception {
         int x = 5;
 
@@ -448,27 +484,27 @@ public class ClosureTest extends TestBase implements Serializable {
         assertEquals(20, (int) deserializedInc.call(5));
     }
 
-    int x = 5;
+    int fieldOnThis = 5;
 
     @Test
     public void serializingWhenClosingOverThis() throws Exception {
-        Fn1<Integer, Integer> inc = λ(n, this.x = n + x);
+        Fn1<Integer, Integer> inc = λ(n, this.fieldOnThis = n + this.fieldOnThis);
         assertEquals(10, (int) inc.call(5));
-        assertEquals(10, x);
+        assertEquals(10, this.fieldOnThis);
 
         byte[] bytes = serialze(inc);
         Fn1<Integer, Integer> deserializedInc = deserialize(bytes);
         assertNotSame(inc, deserializedInc);
 
         assertEquals(15, (int) deserializedInc.call(5));
-        assertEquals(10, x);
+        assertEquals(10, this.fieldOnThis);
     }
 
     @Test(expected = NotSerializableException.class)
     public void lambdaMustBeExplicitlySerializable() throws Exception {
-        Runnable runnable = delegate(_, x = 1);
+        Runnable runnable = delegate(_, fieldOnThis = 1);
         runnable.run();
-        assertEquals(1, x);
+        assertEquals(1, fieldOnThis);
         serialze(runnable);
     }
 }

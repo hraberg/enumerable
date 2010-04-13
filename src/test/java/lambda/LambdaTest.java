@@ -120,6 +120,42 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    public void defaultValueForSecondArgument() throws Exception {
+        Fn2<Integer, Integer, Integer> nTimesM = λ(n, m = 3, n * m);
+        assertEquals(4, (int) nTimesM.call(2, 2));
+        assertEquals(6, (int) nTimesM.call(2));
+    }
+
+    @Test
+    public void defaultComputatedValueForSecondArgument() throws Exception {
+        Fn2<Integer, Integer, Integer> nTimesM = λ(n, m = 3 * 2, n * m);
+        assertEquals(4, (int) nTimesM.call(2, 2));
+        assertEquals(12, (int) nTimesM.call(2));
+    }
+
+    @Test
+    public void defaultReferenceValueForSecondArgument() throws Exception {
+        Fn2<Integer, String, String> nWithPrefix = λ(n, s = "", s + n);
+        assertEquals("prefix 2", nWithPrefix.call(2, "prefix "));
+        assertEquals("2", nWithPrefix.call(2));
+    }
+
+    @Test
+    public void defaultValueForThirdArgument() throws Exception {
+        Fn3<String, Integer, Integer, String> addWithPrefixString = λ(s, n, m = 4, s + (n + m));
+        assertEquals("total: 4", addWithPrefixString.call("total: ", 2, 2));
+        assertEquals("total: 6", addWithPrefixString.call("total: ", 2));
+    }
+
+    @Test
+    public void defaultValueForSecondAndThirdArgument() throws Exception {
+        Fn3<String, Integer, Integer, String> addWithPrefixString = λ(s, n = 8, m = 4, s + (n + m));
+        assertEquals("total: 4", addWithPrefixString.call("total: ", 2, 2));
+        assertEquals("total: 6", addWithPrefixString.call("total: ", 2));
+        assertEquals("total: 12", addWithPrefixString.call("total: "));
+    }
+
+    @Test
     public void assignLambdaParameter() throws Exception {
         assertEquals(1, λ(n, n = 1).call(5));
     }

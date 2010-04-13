@@ -8,7 +8,11 @@ public abstract class Fn3<A1, A2, A3, R> extends Fn2<A1, A2, R> {
     public abstract R call(A1 a1, A2 a2, A3 a3);
 
     public R call(A1 a1, A2 a2) {
-        return call(a1, a2, null);
+        return call(a1, a2, default$3());
+    }
+
+    protected A3 default$3() {
+        return null;
     }
 
     @SuppressWarnings("unchecked")

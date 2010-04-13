@@ -43,6 +43,8 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         MethodInfo currentLambdaMethod;
         boolean inLambdaDefinition;
 
+        Type defaultParameterValueType;
+
         Type lambdaParameterTypeDefinitionToIgnoreValueOfCallOn;
         int lambdaParameterDefinitionPrimitiveConversionToIgnore = -1;
 
@@ -66,6 +68,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     nextLambdaId();
                     inLambdaDefinition = true;
                     debugLambdaStart();
+                    createLambdaClass();
                 }
 
                 if (transformer.isLambdaParameterField(owner, name)) {
@@ -85,6 +88,13 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
                     } else {
                         currentLambda.defineParameter(name);
 
+                        if (defaultParameterValueType != null)
+                            endDefaultParameterValueCapture();
+
+                        int nextParameterIndex = currentLambda.getParameterIndex(name) + 1;
+                        if (currentLambda.parametersWithDefaultValue.contains(nextParameterIndex))
+                            captureDefaultParameterValue(nextParameterIndex);
+
                         skipValidImplictCastBetweenTypeOfMethodArgumentAndLambdaParameterAtDefinition(name);
 
                         if (currentLambda.allParametersAreDefined())
@@ -102,10 +112,37 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
             }
         }
 
+        void endDefaultParameterValueCapture() {
+            Type returnType = isReference(defaultParameterValueType) ? defaultParameterValueType
+                    : getBoxedType(defaultParameterValueType);
+
+            if (isPrimitive(defaultParameterValueType))
+                box(defaultParameterValueType);
+
+            mv.visitInsn(returnType.getOpcode(IRETURN));
+            mv.visitMaxs(0, 0);
+            mv.visitEnd();
+            mv.visitEnd();
+
+            mv = originalMethodWriter;
+            defaultParameterValueType = null;
+        }
+
+        void captureDefaultParameterValue(int nextParameterIndex) {
+            String nextParameterName = currentLambda.getParameterByIndex(nextParameterIndex);
+            defaultParameterValueType = currentLambda.getParameterType(nextParameterName);
+
+            debug("parameter " + nextParameterName + " " + getSimpleClassName(defaultParameterValueType)
+                    + " has default value");
+
+            mv = lambdaWriter.visitMethod(ACC_PROTECTED | ACC_SYNTHETIC, "default$" + (nextParameterIndex + 1),
+                    getMethodDescriptor(getType(Object.class), new Type[0]), null, null);
+            mv.visitCode();
+        }
+
         void createLambda() {
             inLambdaDefinition = false;
 
-            createLambdaClass();
             createLambdaConstructor();
 
             createLambdaMethodAndRedirectMethodVisitorToIt();
@@ -533,7 +570,7 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
 
                 if (!methodParameterType.equals(lambdaParameterType)
                         && !(isReference(methodParameterType) && isReference(lambdaParameterType)))
-                    convertMethodArgumentIntoLambdaParameterType(i + 1, methodParameterType, lambdaParameterType);
+                    convertMethodArgumentIntoLambdaParameterType(i, methodParameterType, lambdaParameterType);
             }
         }
 

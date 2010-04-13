@@ -138,6 +138,7 @@ class MethodInfo {
     class LambdaInfo {
         Set<Integer> accessedLocals = new HashSet<Integer>();
         Map<String, VariableInfo> parametersByName = new LinkedHashMap<String, VariableInfo>();
+        Set<Integer> parametersWithDefaultValue = new HashSet<Integer>();
         Set<String> definedParameters = new HashSet<String>();
         Type type;
         MethodInfo method;
@@ -161,7 +162,7 @@ class MethodInfo {
             this.type = type;
         }
 
-        void setParameterInfo(String name, Type type) {
+        void setParameterInfo(String name, Type type, boolean hasDefaultValue) {
             if (parametersByName.containsKey(name))
                 return;
             VariableInfo value = new VariableInfo();
@@ -169,6 +170,8 @@ class MethodInfo {
             value.type = type;
             value.mutable = true;
             parametersByName.put(name, value);
+            if (hasDefaultValue)
+                parametersWithDefaultValue.add(getParameterIndex(name));
         }
 
         String getParametersString() {
@@ -257,7 +260,7 @@ class MethodInfo {
         }
 
         String getParameterByIndex(int index) {
-            return new ArrayList<String>(getParameters()).get(index - 1);
+            return new ArrayList<String>(getParameters()).get(index);
         }
 
         void setNewLambdaParameterTypes(Type[] newLambdaParameterTypes) {
