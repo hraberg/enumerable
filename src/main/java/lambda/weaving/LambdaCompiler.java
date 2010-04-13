@@ -5,8 +5,6 @@ import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
 import static lambda.weaving.Version.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,6 +49,7 @@ public class LambdaCompiler {
     }
 
     LambdaTransformer transformer = new LambdaTransformer();
+    byte[] buffer = new byte[8 * 1024];
 
     void compile(String[] args) throws Exception {
         for (String name : args) {
@@ -174,11 +173,10 @@ public class LambdaCompiler {
 
                 InputStream in = null;
                 try {
-                    in = new BufferedInputStream(new FileInputStream(file));
-                    byte[] bs = new byte[8192];
+                    in = new FileInputStream(file);
                     int read = -1;
-                    while ((read = in.read(bs)) != -1)
-                        out.write(bs, 0, read);
+                    while ((read = in.read(buffer)) != -1)
+                        out.write(buffer, 0, read);
                     out.closeEntry();
                 } finally {
                     if (in != null)
@@ -209,12 +207,11 @@ public class LambdaCompiler {
                 } else {
                     file.getParentFile().mkdirs();
 
-                    in = new BufferedInputStream(jarFile.getInputStream(jarEntry));
-                    out = new BufferedOutputStream(new FileOutputStream(file));
-                    byte[] bs = new byte[8192];
+                    in = jarFile.getInputStream(jarEntry);
+                    out = new FileOutputStream(file);
                     int read = -1;
-                    while ((read = in.read(bs)) != -1)
-                        out.write(bs, 0, read);
+                    while ((read = in.read(buffer)) != -1)
+                        out.write(buffer, 0, read);
                     out.flush();
                 }
             }
