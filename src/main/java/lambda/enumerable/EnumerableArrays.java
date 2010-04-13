@@ -396,11 +396,10 @@ public class EnumerableArrays {
     }
 
     /**
-     * Invokes the block with the elements of array in reverse order. Creates an
-     * intermediate list internally, so this might be expensive on large arrays.
+     * Invokes the block with the elements of array in reverse order.
      */
     public static <E, R> IEnumerable<E> reverseEach(E[] array, Fn1<E, R> block) {
-        return Enumerable.reverseEach(asIterable(array), block);
+        return Enumerable.each(new ReverseArrayIterable<E>(array), block);
     }
 
     /**
@@ -535,4 +534,31 @@ public class EnumerableArrays {
         }
     }
 
+    static class ReverseArrayIterable<T> implements Iterable<T> {
+        T[] array;
+
+        ReverseArrayIterable(T... elements) {
+            this.array = elements;
+        }
+
+        public Iterator<T> iterator() {
+            return new Iterator<T>() {
+                int i = array.length - 1;
+
+                public boolean hasNext() {
+                    return i >= 0;
+                }
+
+                public T next() {
+                    if (i == array.length)
+                        throw new NoSuchElementException();
+                    return array[i--];
+                }
+
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+    }
 }

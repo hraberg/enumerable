@@ -82,6 +82,13 @@ public class EnumerableArraysTest extends TestBase {
     }
 
     @Test
+    public void reverseEachEvaluatesBlockForEachElementInReverseOrder() throws Exception {
+        List<Integer> actual = list();
+        reverseEach(oneToFive, λ(n, actual.add(n)));
+        assertEquals(list(5, 4, 3, 2, 1), actual);
+    }
+
+    @Test
     public void zipMoreThanOneCollection() throws Exception {
         Integer[] array = new Integer[] { 1, 2, 3 };
         Integer[] a = new Integer[] { 4, 5, 6 };
