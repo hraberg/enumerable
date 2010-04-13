@@ -142,6 +142,11 @@ public class EnumerableOneNineTest extends TestBase {
     }
 
     @Test
+    public void noneReturnsTrueForEmptyList() throws Exception {
+        assertTrue(none(list(), λ(obj, obj)));
+    }
+
+    @Test
     public void noneReturnsFalseIfBlockIsEverNonNull() throws Exception {
         assertFalse(none(list((Object) null, ""), λ(obj, obj)));
     }
@@ -174,6 +179,16 @@ public class EnumerableOneNineTest extends TestBase {
     @Test
     public void oneReturnsFalseForBlockReturningTrueTwice() throws Exception {
         assertFalse(one(oneToFive, λ(n, n > 3)));
+    }
+
+    @Test
+    public void oneReturnsFalseForBlockReturningTrueMoreThanOnce() throws Exception {
+        assertFalse(one(oneToFive, λ(n, n % 2 == 0)));
+    }
+
+    @Test
+    public void oneReturnsFalseForEmptyList() throws Exception {
+        assertFalse(one(list(), λ(obj, true)));
     }
 
     @Test
