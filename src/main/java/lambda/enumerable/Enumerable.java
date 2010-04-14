@@ -52,7 +52,7 @@ public class Enumerable {
     public static <E> boolean all(Iterable<E> collection, Fn1<E, ?> block) {
         for (E each : collection) {
             Object result = block.call(each);
-            if (result == FALSE || result == null)
+            if (isFalseOrNull(result))
                 return false;
         }
         return true;
@@ -65,7 +65,7 @@ public class Enumerable {
     public static <E> boolean any(Iterable<E> collection, Fn1<E, ?> block) {
         for (E each : collection) {
             Object result = block.call(each);
-            if (result != FALSE && result != null)
+            if (isNotFalseOrNull(result))
                 return true;
         }
         return false;
@@ -573,7 +573,7 @@ public class Enumerable {
         Object match = null;
         for (E each : collection) {
             Object result = block.call(each);
-            if (result != FALSE && result != null)
+            if (isNotFalseOrNull(result))
                 if (match != null)
                     return false;
                 else
@@ -809,6 +809,14 @@ public class Enumerable {
         }
 
         return allResults;
+    }
+
+    static boolean isNotFalseOrNull(Object obj) {
+        return obj != FALSE && obj != null;
+    }
+
+    static boolean isFalseOrNull(Object result) {
+        return !isNotFalseOrNull(result);
     }
 
     static <E> List<E> asNewList(Iterable<E> collection) {
