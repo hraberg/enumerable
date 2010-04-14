@@ -8,15 +8,21 @@ import static org.junit.Assert.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventObject;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
+
+import javax.swing.JButton;
 
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
@@ -356,6 +362,57 @@ public class LambdaTest extends TestBase {
         thread.start();
         thread.join();
         assertEquals("hello", string);
+    }
+
+    @LambdaParameter
+    static KeyEvent ke;
+
+    @Test
+    public void lambdaAsKeyListener() throws Exception {
+        List<KeyEvent> events = new ArrayList<KeyEvent>();
+        KeyListener keyListener = λ(ke, events.add(ke)).as(KeyListener.class);
+        KeyEvent event = new KeyEvent(new JButton(), 0, 0, 0, 0, (char) 0);
+
+        keyListener.keyPressed(event);
+        assertEquals(1, events.size());
+    }
+
+    @Test
+    public void lambdaAsKeyListenerWithRegex() throws Exception {
+        List<KeyEvent> events = new ArrayList<KeyEvent>();
+        KeyListener keyListener = λ(ke, events.add(ke)).as(KeyListener.class, ".*Typed");
+        KeyEvent event = new KeyEvent(new JButton(), 0, 0, 0, 0, (char) 0);
+
+        keyListener.keyPressed(event);
+        assertTrue(events.isEmpty());
+        keyListener.keyReleased(event);
+        assertTrue(events.isEmpty());
+        keyListener.keyTyped(event);
+        assertEquals(1, events.size());
+    }
+
+    @Test
+    public void lambdaAsKeyListenerWithExactMatchAndMatchingParameterType() throws Exception {
+        List<KeyEvent> events = new ArrayList<KeyEvent>();
+        KeyListener keyListener = λ(ke, events.add(ke)).as(KeyListener.class, "keyPressed", EventObject.class);
+        KeyEvent event = new KeyEvent(new JButton(), 0, 0, 0, 0, (char) 0);
+
+        keyListener.keyPressed(event);
+        assertEquals(1, events.size());
+        keyListener.keyReleased(event);
+        assertEquals(1, events.size());
+        keyListener.keyPressed(null);
+        assertEquals(2, events.size());
+    }
+
+    @Test
+    public void lambdaAsKeyListenerWithExactMatchAndNonMatchingParameterType() throws Exception {
+        List<KeyEvent> events = new ArrayList<KeyEvent>();
+        KeyListener keyListener = λ(ke, events.add(ke)).as(KeyListener.class, "keyPressed", ActionEvent.class);
+        KeyEvent event = new KeyEvent(new JButton(), 0, 0, 0, 0, (char) 0);
+
+        keyListener.keyPressed(event);
+        assertTrue(events.isEmpty());
     }
 
     @Test

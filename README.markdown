@@ -131,6 +131,23 @@ Alternatively, you can create an instance of any single abstract method interfac
 
 This approach works best for functions which always take the same non generic type, like `ActionEvent` here.
 
+### Proxies
+
+Once created, a lambda can be turned into an invocation handler for a proxy like this:
+
+    @LambdaParameter
+    static KeyEvent event;
+
+    // ...
+
+    KeyListener listener = fn(event, out.printf(event + "\n")).as(KeyListener.class);
+
+The version above forwards all calls to the lambda. You can also limit the calls to be forwarded like this:
+
+    KeyListener keyTyped = fn(event, out.printf(event + "\n")).as(KeyListener.class, ".*Typed", EventObject.class);
+
+Now only calls matching the regular expression and the specidifed argument types will be forwarded.
+
 ### Unused
 
 Note that the first parameter in the example above is marked as [Unused](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/Unused.java), this is required for functions that take no arguments to identify the start of the lambda.
