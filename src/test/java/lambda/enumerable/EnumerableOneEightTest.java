@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
-import lambda.enumerable.EnumerableArrays.ArrayIterable;
+import lambda.enumerable.EnumerableArrays.ReverseArrayIterable;
 import lambda.enumerable.collection.EList;
 
 import org.junit.Test;
@@ -406,19 +406,19 @@ public class EnumerableOneEightTest extends TestBase {
 
     @Test
     public void toListCreatesListFromIterable() throws Exception {
-        Iterable<String> iterable = new ArrayIterable("hello", "world");
-        assertEquals(list("hello", "world"), toList(iterable));
+        Iterable<String> iterable = new ReverseArrayIterable("hello", "world");
+        assertEquals(list("world", "hello"), toList(iterable));
     }
 
     @Test
     public void toSetCreatesSetFromIterable() throws Exception {
-        Iterable<String> iterable = new ArrayIterable("hello", "world");
-        assertEquals(new HashSet<String>(list("hello", "world")), toSet(iterable));
+        Iterable<String> iterable = new ReverseArrayIterable("hello", "world");
+        assertEquals(new HashSet<String>(list("world", "hello")), toSet(iterable));
     }
 
     @Test
     public void toSetCreatesSetFromIterableUsingBlock() throws Exception {
-        Iterable<String> iterable = new ArrayIterable("hello", "world");
+        Iterable<String> iterable = new ReverseArrayIterable("hello", "world");
         Set<Integer> set = toSet(iterable, λ(s, s.length()));
         assertEquals(new HashSet<Integer>(list(5)), set);
     }
