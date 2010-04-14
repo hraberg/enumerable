@@ -142,7 +142,7 @@ The second or third parameter to a Fn2 or Fn3 can have a default value:
     Fn2<Double, Double, Double> nTimesMorPI = fn(n, m = Math.PI, n * m);
     assert 2.0 * Math.PI == nTimesMorPI.call(2.0);
 
-The default value expression is captured as the expression assigned to the static field marked with *@LambdaParameter@*, and can be more complex than just accessing a constant value like in this example.
+The default value expression is captured as the expression assigned to the static field marked with *@LambdaParameter*, and can be more complex than just accessing a constant value like in this example.
 
 ### Concurrency JSR-166 (for Java 6)
 
