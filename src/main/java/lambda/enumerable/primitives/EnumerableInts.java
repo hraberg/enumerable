@@ -23,7 +23,7 @@ import lambda.primitives.Fn2IItoO;
  * 
  * <p>
  * <a href="http://ruby-doc.org/core/classes/Enumerable.html"/>Ruby's Enumerable
- * module</a>
+ * module in 1.8.6</a>
  * </p>
  */
 public class EnumerableInts {

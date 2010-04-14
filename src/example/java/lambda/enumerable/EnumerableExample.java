@@ -16,6 +16,7 @@ import lambda.Fn1;
 import lambda.Lambda;
 import lambda.enumerable.collection.EList;
 import lambda.primitives.Fn1ItoI;
+import lambda.primitives.Fn2DDtoD;
 import lambda.weaving.LambdaLoader;
 import lambda.weaving.Version;
 
@@ -233,6 +234,12 @@ public class EnumerableExample {
          */
         List<Integer> oddTimesSum = collect(ints, λ(n, n * sum)).select(λ(n, n % 2 == 1));
         out.println(oddTimesSum);
+
+        /*
+         * Parameters (except for the first) can have default values.
+         */
+        Fn2DDtoD times = λ(x, y = PI, x * y);
+        out.println(times.call(2.0));
 
         /*
          * Another example of closure, the Fn1 instance can still read and write

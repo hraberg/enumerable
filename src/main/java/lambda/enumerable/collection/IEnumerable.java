@@ -7,6 +7,16 @@ import java.util.regex.Pattern;
 import lambda.Fn1;
 import lambda.Fn2;
 
+/**
+ * <p>
+ * <a href="http://ruby-doc.org/core/classes/Enumerable.html"/>Ruby's Enumerable
+ * module in 1.8.6</a>
+ * </p>
+ * <p>
+ * <a href="http://ruby-doc.org/ruby-1.9/classes/Enumerable.html"/>Ruby's
+ * Enumerable module in 1.9</a>
+ * </p>
+ */
 public interface IEnumerable<E> extends Iterable<E> {
     /**
      * Passes each element of the collection to the given block. The method

@@ -20,7 +20,11 @@ import lambda.enumerable.collection.IEnumerable;
  * 
  * <p>
  * <a href="http://ruby-doc.org/core/classes/Enumerable.html"/>Ruby's Enumerable
- * module</a>
+ * module in 1.8.6</a>
+ * </p>
+ * <p>
+ * <a href="http://ruby-doc.org/ruby-1.9/classes/Enumerable.html"/>Ruby's
+ * Enumerable module in 1.9</a>
  * </p>
  */
 public class EnumerableArrays {
