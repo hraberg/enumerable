@@ -21,12 +21,14 @@ import java.util.Set;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
-    private static boolean isEnabled = LambdaLoader.class.getClassLoader().getResource(
-            LambdaCompiler.AOT_COMPILED_MARKER) != null;
+    private static boolean isEnabled;
     private static boolean tranformationFailed;
-
     static String weavingNotEnabledMessage = "Please start the JVM with -javaagent:enumerable-"
             + Version.getVersion() + "-agent.jar";;
+
+    static {
+        isEnabled = LambdaLoader.class.getClassLoader().getResource(LambdaCompiler.AOT_COMPILED_MARKER) != null;
+    }
 
     /**
      * Allows you to query the Lambda weaver at runtime to see if it's enabled.

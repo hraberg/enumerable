@@ -105,7 +105,7 @@ Accessing a static field marked with *@LambdaParameter* outside of a block will 
 
 ### NewLambda
 
-Enumerable.java is not tied to the *Fn0* hierarchy or function classes. Any Single Abstract Method class or interface can be implemented as a Lambda using *@NewLambda*:
+Enumerable.java is not tied to the *Fn0* hierarchy or function classes. Any single abstract method interface or class can be implemented as a Lambda using *@NewLambda*:
 
     public class MyDomainLambdas {
         @NewLambda
@@ -120,9 +120,20 @@ This allows you to create a new anonymous instance of a *Callable* like this:
 
 The call to the method marked with [@NewLambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/NewLambda.java) will be replaced with the creation of a new anonymous instance at runtime, as seen in the beginning of this document.
 
+Alternatively, you can create an instance of any single abstract method interface or class like this:
+
+    @LambdaParameter
+    static ActionEvent event;
+
+    // ...
+
+    ActionListener a = delegate(event, out.printf(event + "\n"));
+
+This approach works best for functions which always take the same non generic type, like `ActionEvent` here.
+
 ### Unused
 
-Note that the first parameter in the example above is marked as [Unused](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/Unused.java), this is required for functions that take no arguments to identifiy the start of the lambda.
+Note that the first parameter in the example above is marked as [Unused](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/Unused.java), this is required for functions that take no arguments to identify the start of the lambda.
 
 ### Default Parameter Values
 
