@@ -105,7 +105,7 @@ Accessing a static field marked with *@LambdaParameter* outside of a block will 
 
 ### NewLambda
 
-Enumerable.java is not tied to the *Fn0* hierarchy or function classes. Any single abstract method interface or class can be implemented as a Lambda using *@NewLambda*:
+Enumerable.java is not tied to the [Fn0](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Fn0.java) hierarchy or function classes. Any single abstract method interface or class can be implemented as a Lambda using *@NewLambda*:
 
     public class MyDomainLambdas {
         @NewLambda
@@ -129,7 +129,7 @@ Alternatively, you can create an instance of any single abstract method interfac
 
     ActionListener a = delegate(event, out.printf(event + "\n"));
 
-This approach works best for functions which always take the same non generic type, like `ActionEvent` here.
+This approach works best for functions which always take the same non generic type, like *ActionEvent* here.
 
 ### Unused
 
