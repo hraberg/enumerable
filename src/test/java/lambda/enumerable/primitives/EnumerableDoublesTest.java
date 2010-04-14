@@ -282,7 +282,7 @@ public class EnumerableDoublesTest extends TestBase {
     }
 
     @Test
-    public void partitionArrayIntoTwoBasedOnPreducate() throws Exception {
+    public void partitionArrayIntoTwoBasedOnPredicate() throws Exception {
         double[] even = { 2, 4 };
         double[] odd = { 1, 3, 5 };
 

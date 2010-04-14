@@ -27,6 +27,7 @@ import lambda.primitives.Fn2DDtoO;
  * </p>
  */
 public class EnumerableDoubles {
+    // If changing this file, remember to run PrimitiveEnumerableGenerator.
     /**
      * Passes each element of the array to the given block. The method returns
      * true if the block never returns false.
@@ -110,7 +111,7 @@ public class EnumerableDoubles {
     // /**
     // * Passes each entry in array to block. Returns the first for which block
     // is
-    // * not false. If no object matches, it returns null.
+    // * not false. If no value matches, it returns null.
     // */
     // public static <E> E detect(double[] array, Fn1DtoB block) {
     // return Enumerable.detect(asList(array), block);
@@ -118,7 +119,7 @@ public class EnumerableDoubles {
 
     /**
      * Passes each entry in array to block. Returns the first for which block is
-     * not false. If no object matches, it returns ifNone.
+     * not false. If no value matches, it returns ifNone.
      */
     public static double detect(double[] array, double ifNone, Fn1DtoB block) {
         for (double each : array)
@@ -300,15 +301,15 @@ public class EnumerableDoubles {
     }
 
     /**
-     * Returns the double in array with the maximum value.
+     * Returns the maximum value in array.
      */
     public static double max(double[] array) {
         return min(array, new ReverseNaturalOrderDoubleComparator(new NaturalOrderPrimitiveComparator()));
     }
 
     /**
-     * Returns the double in collection with the maximum value. This form uses
-     * the block to {@link Comparator#compare}.
+     * Returns the maximum value in array. This form uses the block to
+     * {@link Comparator#compare}.
      */
     public static double max(double[] array, Fn2DDtoD block) {
         return min(array, new ReverseNaturalOrderDoubleComparator(new BlockDoubleComparator(block)));
@@ -323,15 +324,15 @@ public class EnumerableDoubles {
     }
 
     /**
-     * Returns the double in array with the minimum value.
+     * Returns the minimum value in array.
      */
     public static double min(double[] array) {
         return min(array, new NaturalOrderPrimitiveComparator());
     }
 
     /**
-     * Returns the double in collection with the minimum value. This form uses
-     * the block to {@link Comparator#compare}.
+     * Returns the minimum value in array. This form uses the block to
+     * {@link Comparator#compare}.
      */
     public static double min(double[] array, Fn2DDtoD block) {
         return min(array, new BlockDoubleComparator(block));

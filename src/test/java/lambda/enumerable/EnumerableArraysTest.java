@@ -71,7 +71,7 @@ public class EnumerableArraysTest extends TestBase {
     }
 
     @Test
-    public void partitionArrayIntoTwoBasedOnPreducate() throws Exception {
+    public void partitionArrayIntoTwoBasedOnPredicate() throws Exception {
         Integer[] even = { 2, 4 };
         Integer[] odd = { 1, 3, 5 };
 

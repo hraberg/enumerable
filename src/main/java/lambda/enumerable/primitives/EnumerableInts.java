@@ -111,7 +111,7 @@ public class EnumerableInts {
 
     /**
      * Passes each entry in array to block. Returns the first for which block is
-     * not false. If no object matches, it returns ifNone.
+     * not false. If no value matches, it returns ifNone.
      */
     public static int detect(int[] array, int ifNone, Fn1ItoB block) {
         for (int each : array)
@@ -285,15 +285,15 @@ public class EnumerableInts {
     }
 
     /**
-     * Returns the int in array with the maximum value.
+     * Returns the maximum value in array.
      */
     public static int max(int[] array) {
         return min(array, new ReverseNaturalOrderIntegerComparator(new NaturalOrderPrimitiveComparator()));
     }
 
     /**
-     * Returns the int in collection with the maximum value. This form uses
-     * the block to {@link Comparator#compare}.
+     * Returns the maximum value in array. This form uses the block to
+     * {@link Comparator#compare}.
      */
     public static int max(int[] array, Fn2IItoI block) {
         return min(array, new ReverseNaturalOrderIntegerComparator(new BlockIntegerComparator(block)));
@@ -308,15 +308,15 @@ public class EnumerableInts {
     }
 
     /**
-     * Returns the int in array with the minimum value.
+     * Returns the minimum value in array.
      */
     public static int min(int[] array) {
         return min(array, new NaturalOrderPrimitiveComparator());
     }
 
     /**
-     * Returns the int in collection with the minimum value. This form uses
-     * the block to {@link Comparator#compare}.
+     * Returns the minimum value in array. This form uses the block to
+     * {@link Comparator#compare}.
      */
     public static int min(int[] array, Fn2IItoI block) {
         return min(array, new BlockIntegerComparator(block));

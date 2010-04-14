@@ -111,7 +111,7 @@ public class EnumerableLongs {
 
     /**
      * Passes each entry in array to block. Returns the first for which block is
-     * not false. If no object matches, it returns ifNone.
+     * not false. If no value matches, it returns ifNone.
      */
     public static long detect(long[] array, long ifNone, Fn1LtoB block) {
         for (long each : array)
@@ -285,15 +285,15 @@ public class EnumerableLongs {
     }
 
     /**
-     * Returns the long in array with the maximum value.
+     * Returns the maximum value in array.
      */
     public static long max(long[] array) {
         return min(array, new ReverseNaturalOrderLongComparator(new NaturalOrderPrimitiveComparator()));
     }
 
     /**
-     * Returns the long in collection with the maximum value. This form uses
-     * the block to {@link Comparator#compare}.
+     * Returns the maximum value in array. This form uses the block to
+     * {@link Comparator#compare}.
      */
     public static long max(long[] array, Fn2LLtoL block) {
         return min(array, new ReverseNaturalOrderLongComparator(new BlockLongComparator(block)));
@@ -308,15 +308,15 @@ public class EnumerableLongs {
     }
 
     /**
-     * Returns the long in array with the minimum value.
+     * Returns the minimum value in array.
      */
     public static long min(long[] array) {
         return min(array, new NaturalOrderPrimitiveComparator());
     }
 
     /**
-     * Returns the long in collection with the minimum value. This form uses
-     * the block to {@link Comparator#compare}.
+     * Returns the minimum value in array. This form uses the block to
+     * {@link Comparator#compare}.
      */
     public static long min(long[] array, Fn2LLtoL block) {
         return min(array, new BlockLongComparator(block));

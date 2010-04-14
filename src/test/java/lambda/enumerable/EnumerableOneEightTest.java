@@ -139,7 +139,7 @@ public class EnumerableOneEightTest extends TestBase {
     }
 
     @Test
-    public void partitionListIntoTwoBasedOnPreducate() throws Exception {
+    public void partitionListIntoTwoBasedOnPredicate() throws Exception {
         List<Integer> even = list(2, 4, 6, 8, 10);
         List<Integer> odd = list(1, 3, 5, 7, 9);
 

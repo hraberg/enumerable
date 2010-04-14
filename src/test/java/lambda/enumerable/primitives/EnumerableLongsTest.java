@@ -258,7 +258,7 @@ public class EnumerableLongsTest extends TestBase {
     }
 
     @Test
-    public void partitionArrayIntoTwoBasedOnPreducate() throws Exception {
+    public void partitionArrayIntoTwoBasedOnPredicate() throws Exception {
         long[] even = { 2, 4 };
         long[] odd = { 1, 3, 5 };
 
