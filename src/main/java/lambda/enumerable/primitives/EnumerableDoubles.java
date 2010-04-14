@@ -64,8 +64,8 @@ public class EnumerableDoubles {
     /**
      * @see #collect(double[], Fn1DtoO)
      */
-    public static double[] collect(double[] array, Fn1DtoD block) {
-        double[] result = new double[array.length];
+    public static/* don't change */double[] collect(double[] array, Fn1DtoD block) {
+        /* don't change */double[] result = new /* don't change */double[array.length];
         int i = 0;
         for (double each : array)
             result[i++] = block.call(each);
@@ -215,6 +215,7 @@ public class EnumerableDoubles {
     // return Enumerable.detect(asList(array), block);
     // }
     //
+
     /**
      * @see #select(double[], Fn1DtoB)
      */
@@ -225,8 +226,8 @@ public class EnumerableDoubles {
     /**
      * @see #member(double[], double)
      */
-    public static boolean includes(double[] array, double d) {
-        return member(array, d);
+    public static boolean includes(double[] array, double value) {
+        return member(array, value);
     }
 
     /**
@@ -264,7 +265,7 @@ public class EnumerableDoubles {
     /**
      * @see #collect(double[], Fn1DtoO)
      */
-    public static double[] map(double[] array, Fn1DtoD block) {
+    public static/* don't change */double[] map(double[] array, Fn1DtoD block) {
         return collect(array, block);
     }
 
@@ -313,11 +314,11 @@ public class EnumerableDoubles {
     //
 
     /**
-     * Returns true if any member of array equals obj. Equality is tested using
-     * {@link Object#equals(Object)}.
+     * Returns true if any member of array equals value. Equality is tested
+     * using {@link Object#equals(Object)}.
      */
-    public static boolean member(double[] array, double d) {
-        return Arrays.binarySearch(sort(array), d) >= 0;
+    public static boolean member(double[] array, double value) {
+        return Arrays.binarySearch(sort(array), value) >= 0;
     }
 
     /**
@@ -343,6 +344,7 @@ public class EnumerableDoubles {
     // return Enumerable.min(asList(array), block);
     // }
     //
+
     /**
      * Returns two lists, the first containing the elements of array for which
      * the block evaluates to true, the second containing the rest.
@@ -409,6 +411,7 @@ public class EnumerableDoubles {
     // block).toArray(newEmptyArray(array));
     // }
     //
+
     /**
      * Returns a list containing the items in array.
      */
