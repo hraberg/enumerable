@@ -17,6 +17,14 @@ public class LambdaPrimitives {
     }
 
     /**
+     * @see lambda.Lambda#fn(Object, Object, Object)
+     */
+    @NewLambda
+    public static Fn2BBtoB fn(boolean a1, boolean a2, boolean block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
      * @see lambda.Lambda#fn(Object, Object)
      */
     @NewLambda
@@ -191,6 +199,14 @@ public class LambdaPrimitives {
     public static Fn1BtoB λ(boolean a1, boolean block) {
         throw new LambdaWeavingNotEnabledException();
 
+    }
+
+    /**
+     * @see lambda.Lambda#fn(Object, Object, Object)
+     */
+    @NewLambda
+    public static Fn2BBtoB λ(boolean a1, boolean a2, boolean block) {
+        throw new LambdaWeavingNotEnabledException();
     }
 
     /**
