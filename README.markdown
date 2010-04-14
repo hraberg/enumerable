@@ -99,9 +99,9 @@ Enumerable.java is not tied to the *Fn0* hierarchy or function classes. Any Sing
 
     public class MyDomainLambdas {
         @NewLambda
-	public static <R> Callable<R> callable(Unused_ unused, R block) {
-	    throw new LambdaWeavingNotEnabledException();
-	}
+        public static <R> Callable<R> callable(Unused_ unused, R block) {
+            throw new LambdaWeavingNotEnabledException();
+        }
     }
 
 This allows you to create a new anonymous instance of a *Callable* like this:
@@ -121,14 +121,14 @@ The second or third parameter to a Fn2 or Fn3 can have a default value:
     Fn2<Double, Double, Double> nTimesMorPI = fn(n, m = Math.PI, n * m);
     assert 2.0 * Math.PI == nTimesMorPI.call(2.0);
 
-The default value expression is captured as the expression assigned to the static field marked with *@LambdaParameter@, and can be more complex than just accessing a constant value like in this example.
+The default value expression is captured as the expression assigned to the static field marked with *@LambdaParameter@*, and can be more complex than just accessing a constant value like in this example.
 
 ### Concurrency JSR-166 (for Java 6)
 
 The class [LamdaOps](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/extra166y/LambdaOps.java) allows you to create lambdas implementing interfaces from [extra166y.Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html) to be used with [extra166y.ParallelArray](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/ParallelArray.html).
 You need to have `jsr166y.jar` and `extra166y.jar` on your class path. They can be downloaded from the [Concurrency JSR-166 Interest Site](http://gee.cs.oswego.edu/dl/concurrency-interest/index.html). They can also be found in this repository in [`lib`](http://github.com/hraberg/enumerable/tree/master/lib/).
 
-The *LambdaOps* class is an example of a collection of static factory methods marked with *@NewLambda* as mentioned above. You can create your own factory classes in a similar way, Enumerable.java has no special support for the interfaces in *Ops*, it just provides this generated factory class as a convenience.
+The *LambdaOps* class is an example of a collection of static factory methods marked with *@NewLambda* as mentioned above. You can create your own factory classes in a similar way, Enumerable.java has no special support for the interfaces in *Ops*.
 
 ## Implementation
 
