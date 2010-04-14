@@ -1,6 +1,7 @@
 package lambda.enumerable;
 
 import static java.lang.Boolean.*;
+import static java.util.Collections.*;
 import static lambda.exception.UncheckedException.*;
 
 import java.io.BufferedReader;
@@ -464,7 +465,8 @@ public class Enumerable {
      * assumes all objects implement {@link Comparable}
      */
     public static <E extends Object & Comparable<? super E>> E max(Iterable<E> collection) {
-        return min(collection, new ReverseComparator<E>(new NaturalOrderComparator<E>()));
+        Comparator<E> reverseOrder = reverseOrder();
+        return min(collection, reverseOrder);
     }
 
     /**
@@ -473,7 +475,7 @@ public class Enumerable {
      */
     @SuppressWarnings("unchecked")
     public static <E> E max(Iterable<E> collection, Fn2<E, E, Integer> block) {
-        return min(collection, new ReverseComparator<E>(block.as(Comparator.class)));
+        return min(collection, reverseOrder((Comparator<E>) block.as(Comparator.class)));
     }
 
     /**
@@ -481,7 +483,7 @@ public class Enumerable {
      * corresponding to the largest value returned by the block.
      */
     public static <E, R extends Object & Comparable<? super R>> E maxBy(Iterable<E> collection, Fn1<E, R> block) {
-        return min(collection, new ReverseComparator<E>(new BlockResultComparator<E, R>(block)));
+        return min(collection, reverseOrder(new BlockResultComparator<E, R>(block)));
     }
 
     /**
@@ -643,7 +645,7 @@ public class Enumerable {
      * large collections.
      */
     public static <E, R> IEnumerable<E> reverseEach(Iterable<E> collection, Fn1<E, R> block) {
-        EList<E> result = new EList<E>(asNewList(collection));
+        List<E> result = asNewList(collection);
         Collections.reverse(result);
         return each(result, block);
     }
@@ -805,7 +807,7 @@ public class Enumerable {
         return allResults;
     }
 
-    private static <E> List<E> asNewList(Iterable<E> collection) {
+    static <E> List<E> asNewList(Iterable<E> collection) {
         if (collection instanceof Collection<?>)
             return new ArrayList<E>((Collection<E>) collection);
 
@@ -816,7 +818,7 @@ public class Enumerable {
         return result;
     }
 
-    private static <E> E min(Iterable<E> collection, Comparator<E> comparator) {
+    static <E> E min(Iterable<E> collection, Comparator<E> comparator) {
         E result = null;
         for (E each : collection)
             if (result == null || comparator.compare(each, result) < 0)
@@ -824,11 +826,10 @@ public class Enumerable {
         return result;
     }
 
-    private static final class BlockResultComparator<E, R extends Object & Comparable<? super R>> implements
-            Comparator<E> {
-        private final Fn1<E, R> block;
+    static class BlockResultComparator<E, R extends Object & Comparable<? super R>> implements Comparator<E> {
+        Fn1<E, R> block;
 
-        private BlockResultComparator(Fn1<E, R> block) {
+        BlockResultComparator(Fn1<E, R> block) {
             this.block = block;
         }
 
@@ -837,20 +838,7 @@ public class Enumerable {
         }
     }
 
-    private static final class ReverseComparator<E> implements Comparator<E> {
-        Comparator<E> comparator;
-
-        ReverseComparator(Comparator<E> comparator) {
-            this.comparator = comparator;
-        }
-
-        public int compare(E o1, E o2) {
-            return -comparator.compare(o1, o2);
-        }
-    }
-
-    private static final class NaturalOrderComparator<E extends Object & Comparable<? super E>> implements
-            Comparator<E> {
+    static class NaturalOrderComparator<E extends Object & Comparable<? super E>> implements Comparator<E> {
         public int compare(E o1, E o2) {
             return o1.compareTo(o2);
         }

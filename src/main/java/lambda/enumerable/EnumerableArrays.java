@@ -550,7 +550,7 @@ public class EnumerableArrays {
                 }
 
                 public T next() {
-                    if (i == array.length)
+                    if (i < 0)
                         throw new NoSuchElementException();
                     return array[i--];
                 }

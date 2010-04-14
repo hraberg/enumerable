@@ -80,11 +80,11 @@ If you add [`asm-all-3.2.jar`](http://forge.ow2.org/project/download.php?group_i
 
 * `lambda.weaving.debug` - will log to System.out and write all generated classes to disk if set to true.
 * `lambda.weaving.debug.classes.dir` - where to write the classes. Defaults to `target/generated-classes`.
-* `lambda.weaving.skipped.packages` - is a comma separeted list of package prefixes to skip.
+* `lambda.weaving.skipped.packages` - is a comma separated list of package prefixes to skip.
 
 ### LambdaParameter
 
-You probably want to use the *@LambdaParameter* annotation to mark fields of your own types to be used in blocks via static imports:
+You probably want to use the [@LambdaParameter](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/LambdaParameter.java) annotation to mark fields of your own types to be used in blocks via static imports:
 
     public class MyDomainLambdaParameters {
         @LambdaParameter
@@ -93,10 +93,42 @@ You probably want to use the *@LambdaParameter* annotation to mark fields of you
 
 Accessing a static field marked with *@LambdaParameter* outside of a block will either start a new block or throw an exception depending on the situation. The fields are never really used, as all accesses are redirected.
 
+### NewLambda
+
+Enumerable.java is not tied to the *Fn0* hierarchy or function classes. Any Single Abstract Method class or interface can be implemented as a Lambda using *@NewLambda*:
+
+    public class MyDomainLambdas {
+        @NewLambda
+	public static <R> Callable<R> callable(Unused_ unused, R block) {
+	    throw new LambdaWeavingNotEnabledException();
+	}
+    }
+
+This allows you to create a new anonymous instance of a *Callable* like this:
+
+    Callable<String> c = callable(_, "you called?");
+
+The call to the method marked with [@NewLambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/NewLambda.java) will be replaced with the creation of a new anonymous instance at runtime, as seen in the beginning of this document.
+
+### Unused
+
+Note that the first parameter in the example above is marked as [Unused](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/Unused.java), this is required for functions that take no arguments to identifiy the start of the lambda.
+
+### Default Parameter Values
+
+The second or third parameter to a Fn2 or Fn3 can have a default value:
+
+    Fn2<Double, Double, Double> nTimesMorPI = fn(n, m = Math.PI, n * m);
+    assert 2.0 * Math.PI == nTimesMorPI.call(2.0);
+
+The default value expression is captured as the expression assigned to the static field marked with *@LambdaParameter@, and can be more complex than just accessing a constant value like in this example.
+
 ### Concurrency JSR-166 (for Java 6)
 
-The class *LambdaOps* allows you to create Lambdas implementing interfaces from *extra166y.Ops* to be used with *extra166y.ParallelArray*.
-You need to have `jsr166y.jar` and `extra166y.jar` on your class path. They can be downloaded from the [Concurrency JSR-166 Interest Site](http://gee.cs.oswego.edu/dl/concurrency-interest/index.html).
+The class [LamdaOps](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/extra166y/LambdaOps.java) allows you to create lambdas implementing interfaces from [extra166y.Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html) to be used with [extra166y.ParallelArray](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/ParallelArray.html).
+You need to have `jsr166y.jar` and `extra166y.jar` on your class path. They can be downloaded from the [Concurrency JSR-166 Interest Site](http://gee.cs.oswego.edu/dl/concurrency-interest/index.html). They can also be found in this repository in [`lib`](http://github.com/hraberg/enumerable/tree/master/lib/).
+
+The *LambdaOps* class is an example of a collection of static factory methods marked with *@NewLambda* as mentioned above. You can create your own factory classes in a similar way, Enumerable.java has no special support for the interfaces in *Ops*, it just provides this generated factory class as a convenience.
 
 ## Implementation
 
@@ -123,7 +155,7 @@ Take this block:
     
 The first pass starts by looking for any static fields marked with the *@LambdaParameter* annotation. Once it sees access to one, *s* in this case, it will start moving the code into a new *Fn1* (or *Fn2*) implementation. A block ends with a call to a static method marked with *@NewLambda*: *fn*. (Remember when reading the code that all arguments are (obviously) evaluated before the method call, so *s* is accessed first, and *fn* called last.)
 
-The first pass also keeps track of any local varible that is accessed from within a block, so that it can be wrapped in an array when initialized. This allows the block to properly close over local variables.
+The first pass also keeps track of any local variable that is accessed from within a block, so that it can be wrapped in an array when initialized. This allows the block to properly close over local variables.
 
 The Enumerable methods themselves are implemented using plain old Java. You can call them using normal anonymous inner classes (as seen in the beginning of this document).
 
@@ -155,7 +187,7 @@ Closures for JDK7, a Straw-Man Proposal:
 http://cr.openjdk.java.net/~mr/lambda/straw-man/
 
 
-BlocksInJava, old c2 wiki article about everyones favorite missing feature:
+BlocksInJava, old c2 wiki article about everyone's favorite missing feature:
 http://c2.com/cgi/wiki?BlocksInJavaIntro
 
 
