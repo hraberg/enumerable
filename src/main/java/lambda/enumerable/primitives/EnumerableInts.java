@@ -110,6 +110,17 @@ public class EnumerableInts {
     }
 
     /**
+     * Passes each entry in array to block. Returns the first for which block is
+     * not false. If no object matches, it returns ifNone.
+     */
+    public static int detect(int[] array, int ifNone, Fn1ItoB block) {
+        for (int each : array)
+            if (block.call(each))
+                return each;
+        return ifNone;
+    }
+
+    /**
      * Calls block for each item in array.
      */
     public static <R> int[] each(int[] array, Fn1ItoO<R> block) {
@@ -183,10 +194,27 @@ public class EnumerableInts {
     }
 
     /**
+     * @see #detect(int[], int, Fn1ItoB)
+     */
+    public static int find(int[] array, int ifNone, Fn1ItoB block) {
+        return detect(array, ifNone, block);
+    }
+
+    /**
      * @see #select(int[], Fn1ItoB)
      */
     public static int[] findAll(int[] array, Fn1ItoB block) {
         return select(array, block);
+    }
+
+    /**
+     * Named parameter for detect.
+     * 
+     * @see #detect(int[], int, Fn1ItoB)
+     * @see #find(int[], int, Fn1ItoB)
+     */
+    public static int ifNone(int defaultValue) {
+        return defaultValue;
     }
 
     /**
@@ -260,7 +288,7 @@ public class EnumerableInts {
      * Returns the int in array with the maximum value.
      */
     public static int max(int[] array) {
-        return min(array, new ReverseNaturalOrderIntegerComparator(new NaturalOrderComparator()));
+        return min(array, new ReverseNaturalOrderIntegerComparator(new NaturalOrderPrimitiveComparator()));
     }
 
     /**
@@ -283,7 +311,7 @@ public class EnumerableInts {
      * Returns the int in array with the minimum value.
      */
     public static int min(int[] array) {
-        return min(array, new NaturalOrderComparator());
+        return min(array, new NaturalOrderPrimitiveComparator());
     }
 
     /**
@@ -381,7 +409,7 @@ public class EnumerableInts {
         int compare(int a, int b);
     }
 
-    static class NaturalOrderComparator implements IntegerComparator {
+    static class NaturalOrderPrimitiveComparator implements IntegerComparator {
         public int compare(/* don't change */double a, /* don't change */double b) {
             return /* don't change */Double.compare(a, b);
         }

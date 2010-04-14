@@ -66,6 +66,16 @@ public class EnumerableDoublesTest extends TestBase {
     }
 
     @Test
+    public void detectFirstMatchingElement() throws Exception {
+        assertEquals(2.0, detect(doublesOneToFive, ifNone(-1), λ(d, d % 2 == 0)), 0.0);
+    }
+
+    @Test
+    public void detectReturnsIfNoneValueIfNoMatch() throws Exception {
+        assertEquals(-1.0, detect(doublesOneToFive, ifNone(-1), λ(d, d > 5)), 0.0);
+    }
+
+    @Test
     public void eachWithIndexUsingMixedPrimitivesDoubleAndInt() throws Exception {
         int totalIndex = 0;
         eachWithIndex(doublesOneToFive, λ(d, idx, totalIndex += idx));

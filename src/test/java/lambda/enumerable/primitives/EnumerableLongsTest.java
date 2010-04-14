@@ -66,6 +66,16 @@ public class EnumerableLongsTest extends TestBase {
     }
 
     @Test
+    public void detectFirstMatchingElement() throws Exception {
+        assertEquals(2, detect(longsOneToFive, ifNone(-1), λ(l, l % 2 == 0)));
+    }
+
+    @Test
+    public void detectReturnsIfNoneValueIfNoMatch() throws Exception {
+        assertEquals(-1, detect(longsOneToFive, ifNone(-1), λ(l, l > 5)));
+    }
+
+    @Test
     public void eachWithIndexUsingMixedPrimitivesLongAndInt() throws Exception {
         int totalIndex = 0;
         eachWithIndex(longsOneToFive, λ(l, idx, totalIndex += idx));

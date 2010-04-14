@@ -110,6 +110,17 @@ public class EnumerableLongs {
     }
 
     /**
+     * Passes each entry in array to block. Returns the first for which block is
+     * not false. If no object matches, it returns ifNone.
+     */
+    public static long detect(long[] array, long ifNone, Fn1LtoB block) {
+        for (long each : array)
+            if (block.call(each))
+                return each;
+        return ifNone;
+    }
+
+    /**
      * Calls block for each item in array.
      */
     public static <R> long[] each(long[] array, Fn1LtoO<R> block) {
@@ -183,10 +194,27 @@ public class EnumerableLongs {
     }
 
     /**
+     * @see #detect(long[], long, Fn1LtoB)
+     */
+    public static long find(long[] array, long ifNone, Fn1LtoB block) {
+        return detect(array, ifNone, block);
+    }
+
+    /**
      * @see #select(long[], Fn1LtoB)
      */
     public static long[] findAll(long[] array, Fn1LtoB block) {
         return select(array, block);
+    }
+
+    /**
+     * Named parameter for detect.
+     * 
+     * @see #detect(long[], long, Fn1LtoB)
+     * @see #find(long[], long, Fn1LtoB)
+     */
+    public static long ifNone(long defaultValue) {
+        return defaultValue;
     }
 
     /**
@@ -260,7 +288,7 @@ public class EnumerableLongs {
      * Returns the long in array with the maximum value.
      */
     public static long max(long[] array) {
-        return min(array, new ReverseNaturalOrderLongComparator(new NaturalOrderComparator()));
+        return min(array, new ReverseNaturalOrderLongComparator(new NaturalOrderPrimitiveComparator()));
     }
 
     /**
@@ -283,7 +311,7 @@ public class EnumerableLongs {
      * Returns the long in array with the minimum value.
      */
     public static long min(long[] array) {
-        return min(array, new NaturalOrderComparator());
+        return min(array, new NaturalOrderPrimitiveComparator());
     }
 
     /**
@@ -381,7 +409,7 @@ public class EnumerableLongs {
         int compare(long a, long b);
     }
 
-    static class NaturalOrderComparator implements LongComparator {
+    static class NaturalOrderPrimitiveComparator implements LongComparator {
         public int compare(/* don't change */double a, /* don't change */double b) {
             return /* don't change */Double.compare(a, b);
         }

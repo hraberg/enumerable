@@ -58,6 +58,16 @@ public class EnumerableIntsTest extends TestBase {
     }
 
     @Test
+    public void detectFirstMatchingElement() throws Exception {
+        assertEquals(2, detect(intsOneToFive, ifNone(-1), λ(n, n % 2 == 0)));
+    }
+
+    @Test
+    public void detectReturnsIfNoneValueIfNoMatch() throws Exception {
+        assertEquals(-1, detect(intsOneToFive, ifNone(-1), λ(n, n > 5)));
+    }
+
+    @Test
     public void eachWithIndexUsingAllPrimitives() throws Exception {
         int totalIndex = 0;
         eachWithIndex(intsOneToFive, λ(n, idx, totalIndex += idx));

@@ -115,17 +115,17 @@ public class EnumerableDoubles {
     // public static <E> E detect(double[] array, Fn1DtoB block) {
     // return Enumerable.detect(asList(array), block);
     // }
-    //
-    // /**
-    // * Passes each entry in array to block. Returns the first for which block
-    // is
-    // * not false. If no object matches, it returns ifNone.
-    // */
-    // public static <E> E detect(double[] array, Fn1DtoB block, E
-    // ifNone)
-    // {
-    // return Enumerable.detect(asList(array), block);
-    // }
+
+    /**
+     * Passes each entry in array to block. Returns the first for which block is
+     * not false. If no object matches, it returns ifNone.
+     */
+    public static double detect(double[] array, double ifNone, Fn1DtoB block) {
+        for (double each : array)
+            if (block.call(each))
+                return each;
+        return ifNone;
+    }
 
     /**
      * Calls block for each item in array.
@@ -207,20 +207,29 @@ public class EnumerableDoubles {
     // return Enumerable.detect(asList(array), block);
     // }
     //
-    // /**
-    // * @see #detect(double[], Fn1, Object)
-    // */
-    // public static <E> E find(double[] array, Fn1DtoB block, E ifNone)
-    // {
-    // return Enumerable.detect(asList(array), block);
-    // }
-    //
+
+    /**
+     * @see #detect(double[], double, Fn1DtoB)
+     */
+    public static double find(double[] array, double ifNone, Fn1DtoB block) {
+        return detect(array, ifNone, block);
+    }
 
     /**
      * @see #select(double[], Fn1DtoB)
      */
     public static double[] findAll(double[] array, Fn1DtoB block) {
         return select(array, block);
+    }
+
+    /**
+     * Named parameter for detect.
+     * 
+     * @see #detect(double[], double, Fn1DtoB)
+     * @see #find(double[], double, Fn1DtoB)
+     */
+    public static double ifNone(double defaultValue) {
+        return defaultValue;
     }
 
     /**
