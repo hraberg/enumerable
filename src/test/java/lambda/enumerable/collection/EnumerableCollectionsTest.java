@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import lambda.TestBase;
 
@@ -43,6 +44,23 @@ public class EnumerableCollectionsTest extends TestBase {
         EList<Integer> list = oneToFive.toList();
         assertEquals(oneToFive, list);
         assertNotSame(oneToFive, list);
+    }
+
+    @Test
+    public void mapIsEnumerableAsEntrySet() throws Exception {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("hello", "world");
+
+        EMap<String, String> eMap = new EMap<String, String>(map);
+        Entry<String, String> first = eMap.first();
+        assertEquals("hello", first.getKey());
+        assertEquals("world", first.getValue());
+
+        map.remove("hello");
+        assertNull(eMap.first());
+
+        eMap.put("hello", "world");
+        assertNotNull(eMap.first());
     }
 
     @Test

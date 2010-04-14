@@ -170,6 +170,8 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ## Implementation
 
+[Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java) and [EnumerableArrays](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/EnumerableArrays.java) act as a facades for the implementation of the Enumerable module in [EIterable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/collection/EIterable.java) and [EMap](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/collection/EMap.java).
+
 Enumerable.java uses Ant to build. Run `ant tests`, `ant example` or `ant agent-jar`.
 
 The transformation is implemented in two passes. The first pass identifies all blocks and their arities and which local variables they access, if any. The second pass does the actual transformation, which has three main elements:

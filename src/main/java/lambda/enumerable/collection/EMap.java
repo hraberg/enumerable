@@ -5,9 +5,12 @@ import java.util.Map;
 
 import lambda.Fn1;
 import lambda.Fn2;
-import lambda.enumerable.Enumerable;
 
-public class EMap<K, V> implements Map<K, V> {
+/**
+ * A decorator for Map and the actual implementation of the Enumerable module
+ * for Maps.
+ */
+public class EMap<K, V> extends EIterable<Map.Entry<K, V>> implements Map<K, V> {
     private final Map<K, V> map;
 
     public EMap() {
@@ -15,11 +18,8 @@ public class EMap<K, V> implements Map<K, V> {
     }
 
     public EMap(Map<K, V> map) {
+        super(map.entrySet());
         this.map = map;
-    }
-
-    public Map<K, V> delegate() {
-        return map;
     }
 
     public ESet<Map.Entry<K, V>> entrySet() {
@@ -35,19 +35,29 @@ public class EMap<K, V> implements Map<K, V> {
     }
 
     public <R> EMap<K, V> each(Fn2<K, V, R> block) {
-        return Enumerable.each(this, block);
+        for (Entry<K, V> each : this)
+            block.call(each.getKey(), each.getValue());
+        return this;
     }
 
     public <R> EMap<K, V> eachKey(Fn1<K, R> block) {
-        return Enumerable.eachKey(this, block);
+        for (K each : map.keySet())
+            block.call(each);
+        return this;
     }
 
     public <R> EMap<K, V> eachValue(Fn1<V, R> block) {
-        return Enumerable.eachValue(this, block);
+        for (V each : map.values())
+            block.call(each);
+        return this;
     }
 
     public EList<java.util.Map.Entry<K, V>> select(Fn2<K, V, Boolean> block) {
-        return Enumerable.select(this, block);
+        EList<Map.Entry<K, V>> result = new EList<Map.Entry<K, V>>();
+        for (Map.Entry<K, V> each : this)
+            if (block.call(each.getKey(), each.getValue()))
+                result.add(each);
+        return result;
     }
 
     public void clear() {

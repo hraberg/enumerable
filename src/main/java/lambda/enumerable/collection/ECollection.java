@@ -3,6 +3,10 @@ package lambda.enumerable.collection;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * A decorator for {@link Collection} which includes the Enumerable module via
+ * {@link EIterable}.
+ */
 public class ECollection<E> extends EIterable<E> implements Collection<E> {
     public ECollection() {
         this(new ArrayList<E>());

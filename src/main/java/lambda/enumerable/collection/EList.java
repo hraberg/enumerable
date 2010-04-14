@@ -5,6 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * A decorator for {@link List} which includes the Enumerable module via
+ * {@link EIterable}.
+ */
 public class EList<E> extends ECollection<E> implements List<E> {
     public EList() {
         this(new ArrayList<E>());
