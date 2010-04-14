@@ -65,12 +65,22 @@ If you're using Eclipse, you can add the agent as a default VM argument under In
 
 Enumerable.java requires your classes to have local variable debugging info (-g:vars or -g in javac).
 
+### AOT Compilation
+
+To avoid the use of the agent, or any other non standard class loading, you can compile your lambdas ahead of time like this:
+
+    java -cp <project class path> lambda.weaving.LambdaCompiler project.jar
+
+The jar will be compiled and rebuilt in place. The runtime dependency on `enumerable-agent-<version>.jar` as a library remains after AOT compilation.
+
+See the targets `aot-compile-tests` and `aot-tests` in [build.xml](http://github.com/hraberg/enumerable/blob/master/build.xml) for an example.
+
 ### Binary Distribution
 
 `enumerable-agent-<version>.jar` is both the actual library, and the java agent enabling load time weaving of lambdas.
 
 The binary distribution, when downloaded as a .tgz archive, or built using `ant dist`, doubles as an example project which can be directly imported into Eclipse.
-Open *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder.
+Open *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder, which includes targets for AOT compilation.
 
 ### Verifier
 

@@ -21,7 +21,8 @@ import java.util.Set;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
-    private static boolean isEnabled;
+    private static boolean isEnabled = LambdaLoader.class.getClassLoader().getResource(
+            LambdaCompiler.AOT_COMPILED_MARKER) != null;
     private static boolean tranformationFailed;
 
     static String weavingNotEnabledMessage = "Please start the JVM with -javaagent:enumerable-"

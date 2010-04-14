@@ -30,6 +30,8 @@ import java.util.jar.JarOutputStream;
  * dependency after compilation.
  */
 public class LambdaCompiler {
+    static final String AOT_COMPILED_MARKER = "META-INF/lambda.aot.compiled";
+
     public static void main(String[] args) throws Exception {
         out.println("[compiler] " + getVersionString());
         if (args.length == 0) {
@@ -50,7 +52,6 @@ public class LambdaCompiler {
 
     LambdaTransformer transformer = new LambdaTransformer();
     byte[] buffer = new byte[8 * 1024];
-    String aotCompiledMarkerFileName = "META-INF/lambda.aot.compiled";
 
     void compile(String[] args) throws Exception {
         for (String name : args) {
@@ -65,7 +66,7 @@ public class LambdaCompiler {
     }
 
     private void compileClassesDirectory(File file) throws IOException, Exception, FileNotFoundException {
-        File aotCompiledMarker = new File(file, aotCompiledMarkerFileName);
+        File aotCompiledMarker = new File(file, AOT_COMPILED_MARKER);
         if (aotCompiledMarker.exists()) {
             out.println(file + " is already compiled, skipping.");
             return;
@@ -115,14 +116,14 @@ public class LambdaCompiler {
         try {
             JarFile jarFile = new JarFile(jar);
 
-            if (jarFile.getEntry(aotCompiledMarkerFileName) != null) {
+            if (jarFile.getEntry(AOT_COMPILED_MARKER) != null) {
                 out.println(jar + " is already compiled, skipping.");
                 return;
             }
 
             File tempDir = unjar(jarFile);
 
-            File aotCompiledMarker = new File(tempDir, aotCompiledMarkerFileName);
+            File aotCompiledMarker = new File(tempDir, AOT_COMPILED_MARKER);
             aotCompiledMarker.getParentFile().mkdir();
             aotCompiledMarker.createNewFile();
 

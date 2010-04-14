@@ -244,8 +244,9 @@
         <delete dir="target/${enumerable.dist.name}" />
         <untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />
         <ant dir="target/${enumerable.dist.name}/example" inheritall="false" />
+        <ant dir="target/${enumerable.dist.name}/example" target="aot-example" inheritall="false" />
     </target>
-
+    
     <target name="javadoc-uptodate">
         <uptodate property="javadoc.notRequired" targetfile="target/enumerable-javadoc-${enumerable.version}.jar">
             <srcfiles dir="src/main/java" includes="**/*" />
