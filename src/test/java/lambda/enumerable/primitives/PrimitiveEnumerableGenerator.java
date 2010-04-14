@@ -21,13 +21,17 @@ public class PrimitiveEnumerableGenerator {
 
     static String readSourceForDouble() throws FileNotFoundException, IOException {
         Reader in = new BufferedReader(new FileReader(DIR + SOURCE));
-        StringWriter out = new StringWriter();
+        try {
+            StringWriter out = new StringWriter();
 
-        int c = -1;
-        while ((c = in.read()) != -1)
-            out.write(c);
+            int c = -1;
+            while ((c = in.read()) != -1)
+                out.write(c);
 
-        return out.toString();
+            return out.toString();
+        } finally {
+            in.close();
+        }
     }
 
     static void generateSource(String s, String primitiveType, String name, String boxedType, String letterForType)
@@ -36,6 +40,7 @@ public class PrimitiveEnumerableGenerator {
         s = s.replaceAll("Doubles", name);
         s = s.replaceAll("Double", boxedType);
         s = s.replaceAll("/\\* don't change \\*/" + primitiveType, "/\\* don't change \\*/double");
+        s = s.replaceAll("/\\* don't change \\*/" + boxedType, "/\\* don't change \\*/Double");
 
         s = s.replaceAll("Fn1D", "Fn1" + letterForType);
         s = s.replaceAll("Fn2DDtoO", "Fn2" + letterForType + letterForType + "toO");
@@ -50,8 +55,11 @@ public class PrimitiveEnumerableGenerator {
         s = s.replaceAll("(\\w*?\n){2,}", "\n\n");
 
         FileWriter writer = new FileWriter(DIR + "Enumerable" + name + ".java");
-        writer.write(s.toString());
-        writer.close();
+        try {
+            writer.write(s.toString());
+        } finally {
+            writer.close();
+        }
 
         System.out.println(s);
     }

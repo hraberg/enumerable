@@ -4,7 +4,7 @@ import static java.lang.System.*;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
+import java.util.Comparator;
 
 import lambda.enumerable.Enumerable;
 import lambda.enumerable.collection.EList;
@@ -112,7 +112,7 @@ public class EnumerableDoubles {
     // is
     // * not false. If no object matches, it returns null.
     // */
-    // public static <E> E detect(double[] array, Fn1<E, Boolean> block) {
+    // public static <E> E detect(double[] array, Fn1DtoB block) {
     // return Enumerable.detect(asList(array), block);
     // }
     //
@@ -121,7 +121,7 @@ public class EnumerableDoubles {
     // is
     // * not false. If no object matches, it returns ifNone.
     // */
-    // public static <E> E detect(double[] array, Fn1<E, Boolean> block, E
+    // public static <E> E detect(double[] array, Fn1DtoB block, E
     // ifNone)
     // {
     // return Enumerable.detect(asList(array), block);
@@ -203,14 +203,14 @@ public class EnumerableDoubles {
     // /**
     // * @see #detect(double[], Fn1)
     // */
-    // public static <E> E find(double[] array, Fn1<E, Boolean> block) {
+    // public static <E> E find(double[] array, Fn1DtoB block) {
     // return Enumerable.detect(asList(array), block);
     // }
     //
     // /**
     // * @see #detect(double[], Fn1, Object)
     // */
-    // public static <E> E find(double[] array, Fn1<E, Boolean> block, E ifNone)
+    // public static <E> E find(double[] array, Fn1DtoB block, E ifNone)
     // {
     // return Enumerable.detect(asList(array), block);
     // }
@@ -291,27 +291,19 @@ public class EnumerableDoubles {
     }
 
     /**
-     * Returns the object in array with the maximum value. This form assumes all
-     * objects implement {@link Comparable}
+     * Returns the double in array with the maximum value.
      */
     public static double max(double[] array) {
-        if (array.length == 0)
-            throw new NoSuchElementException();
-        double result = Double.MIN_VALUE;
-        for (double each : array)
-            if (each > result)
-                result = each;
-        return result;
+        return min(array, new ReverseNaturalOrderDoubleComparator(new NaturalOrderPrimitiveComparator()));
     }
 
-    // /**
-    // * Returns the object in array with the maximum value. This form uses the
-    // * block to {@link Comparator#compare}.
-    // */
-    // public static <E> E max(double[] array, Fn2<E, E, doubleeger> block) {
-    // return Enumerable.max(asList(array), block);
-    // }
-    //
+    /**
+     * Returns the double in collection with the maximum value. This form uses
+     * the block to {@link Comparator#compare}.
+     */
+    public static double max(double[] array, Fn2DDtoD block) {
+        return min(array, new ReverseNaturalOrderDoubleComparator(new BlockDoubleComparator(block)));
+    }
 
     /**
      * Returns true if any member of array equals value. Equality is tested
@@ -322,28 +314,19 @@ public class EnumerableDoubles {
     }
 
     /**
-     * Returns the object in array with the minimum value. This form assumes all
-     * objects implement {@link Comparable}.
+     * Returns the double in array with the minimum value.
      */
     public static double min(double[] array) {
-        if (array.length == 0)
-            throw new NoSuchElementException();
-        double result = Double.MAX_VALUE;
-        for (double each : array)
-            if (each < result)
-                result = each;
-        return result;
+        return min(array, new NaturalOrderPrimitiveComparator());
     }
 
-    //
-    // /**
-    // * Returns the object in array with the minimum value. This form uses the
-    // * block to {@link Comparator#compare}.
-    // */
-    // public static <E> E min(double[] array, Fn2<E, E, doubleeger> block) {
-    // return Enumerable.min(asList(array), block);
-    // }
-    //
+    /**
+     * Returns the double in collection with the minimum value. This form uses
+     * the block to {@link Comparator#compare}.
+     */
+    public static double min(double[] array, Fn2DDtoD block) {
+        return min(array, new BlockDoubleComparator(block));
+    }
 
     /**
      * Returns two lists, the first containing the elements of array for which
@@ -397,7 +380,7 @@ public class EnumerableDoubles {
     // * Returns an array containing the items in array sorted by using the
     // * results of the supplied block.
     // */
-    // public static double[] sort(double[] array, Fn2IItoI block) {
+    // public static double[] sort(double[] array, Fn2DDtoD block) {
     // }
     //
     // /**
@@ -464,7 +447,59 @@ public class EnumerableDoubles {
     // return result;
     // }
 
-    private static double[] copy(double[] array, int length) {
+    static double min(double[] array, DoubleComparator comparator) {
+        double result = array[0];
+        for (int i = 1; i < array.length; i++) {
+            double each = array[i];
+            if (comparator.compare(each, result) < 0)
+                result = each;
+        }
+        return result;
+    }
+
+    static interface DoubleComparator {
+        int compare(double a, double b);
+    }
+
+    static class NaturalOrderPrimitiveComparator implements DoubleComparator {
+        public int compare(/* don't change */double a, /* don't change */double b) {
+            return /* don't change */Double.compare(a, b);
+        }
+
+        public int compare(long a, long b) {
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        }
+
+        public int compare(int a, int b) {
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        }
+    }
+
+    static class BlockDoubleComparator implements DoubleComparator {
+        Fn2DDtoD block;
+
+        BlockDoubleComparator(Fn2DDtoD block) {
+            this.block = block;
+        }
+
+        public int compare(double a, double b) {
+            return (int) block.call(a, b);
+        }
+    }
+
+    static class ReverseNaturalOrderDoubleComparator implements DoubleComparator {
+        DoubleComparator comparator;
+
+        ReverseNaturalOrderDoubleComparator(DoubleComparator comparator) {
+            this.comparator = comparator;
+        }
+
+        public int compare(double a, double b) {
+            return -comparator.compare(a, b);
+        }
+    }
+
+    static double[] copy(double[] array, int length) {
         double[] result = new double[length];
         arraycopy(array, 0, result, 0, length);
         return result;

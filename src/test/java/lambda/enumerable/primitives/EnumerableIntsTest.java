@@ -7,7 +7,6 @@ import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import lambda.TestBase;
@@ -176,7 +175,7 @@ public class EnumerableIntsTest extends TestBase {
         assertTrue(all(new int[0], λ(n, n > 0)));
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void maxThrowsExceptionForEmptyArray() throws Exception {
         max(new int[0]);
     }
@@ -187,11 +186,21 @@ public class EnumerableIntsTest extends TestBase {
     }
 
     @Test
+    public void maxReturnsFirstValueUsingReverseNaturalOrder() throws Exception {
+        assertEquals(1, max(intsOneToFive, λ(n, m, m - n)));
+    }
+
+    @Test
     public void minReturnsFirstValueUsingNaturalOrder() throws Exception {
         assertEquals(1, min(intsOneToFive));
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
+    public void minReturnsLastValueUsingReverseNaturalOrder() throws Exception {
+        assertEquals(5, min(intsOneToFive, λ(n, m, m - n)));
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void minThrowsExceptionForEmptyArray() throws Exception {
         min(new int[0]);
     }

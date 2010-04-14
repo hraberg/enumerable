@@ -4,7 +4,7 @@ import static java.lang.System.*;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
+import java.util.Comparator;
 
 import lambda.enumerable.Enumerable;
 import lambda.enumerable.collection.EList;
@@ -257,17 +257,18 @@ public class EnumerableLongs {
     }
 
     /**
-     * Returns the object in array with the maximum value. This form assumes all
-     * objects implement {@link Comparable}
+     * Returns the long in array with the maximum value.
      */
     public static long max(long[] array) {
-        if (array.length == 0)
-            throw new NoSuchElementException();
-        long result = Long.MIN_VALUE;
-        for (long each : array)
-            if (each > result)
-                result = each;
-        return result;
+        return min(array, new ReverseNaturalOrderLongComparator(new NaturalOrderComparator()));
+    }
+
+    /**
+     * Returns the long in collection with the maximum value. This form uses
+     * the block to {@link Comparator#compare}.
+     */
+    public static long max(long[] array, Fn2LLtoL block) {
+        return min(array, new ReverseNaturalOrderLongComparator(new BlockLongComparator(block)));
     }
 
     /**
@@ -279,17 +280,18 @@ public class EnumerableLongs {
     }
 
     /**
-     * Returns the object in array with the minimum value. This form assumes all
-     * objects implement {@link Comparable}.
+     * Returns the long in array with the minimum value.
      */
     public static long min(long[] array) {
-        if (array.length == 0)
-            throw new NoSuchElementException();
-        long result = Long.MAX_VALUE;
-        for (long each : array)
-            if (each < result)
-                result = each;
-        return result;
+        return min(array, new NaturalOrderComparator());
+    }
+
+    /**
+     * Returns the long in collection with the minimum value. This form uses
+     * the block to {@link Comparator#compare}.
+     */
+    public static long min(long[] array, Fn2LLtoL block) {
+        return min(array, new BlockLongComparator(block));
     }
 
     /**
@@ -365,7 +367,59 @@ public class EnumerableLongs {
         return Enumerable.toSet(toList(array), block);
     }
 
-    private static long[] copy(long[] array, int length) {
+    static long min(long[] array, LongComparator comparator) {
+        long result = array[0];
+        for (int i = 1; i < array.length; i++) {
+            long each = array[i];
+            if (comparator.compare(each, result) < 0)
+                result = each;
+        }
+        return result;
+    }
+
+    static interface LongComparator {
+        int compare(long a, long b);
+    }
+
+    static class NaturalOrderComparator implements LongComparator {
+        public int compare(/* don't change */double a, /* don't change */double b) {
+            return /* don't change */Double.compare(a, b);
+        }
+
+        public int compare(long a, long b) {
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        }
+
+        public int compare(int a, int b) {
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        }
+    }
+
+    static class BlockLongComparator implements LongComparator {
+        Fn2LLtoL block;
+
+        BlockLongComparator(Fn2LLtoL block) {
+            this.block = block;
+        }
+
+        public int compare(long a, long b) {
+            return (int) block.call(a, b);
+        }
+    }
+
+    static class ReverseNaturalOrderLongComparator implements LongComparator {
+        LongComparator comparator;
+
+        ReverseNaturalOrderLongComparator(LongComparator comparator) {
+            this.comparator = comparator;
+        }
+
+        public int compare(long a, long b) {
+            return -comparator.compare(a, b);
+        }
+    }
+
+    static long[] copy(long[] array, int length) {
         long[] result = new long[length];
         arraycopy(array, 0, result, 0, length);
         return result;

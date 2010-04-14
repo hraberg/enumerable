@@ -4,7 +4,7 @@ import static java.lang.System.*;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
+import java.util.Comparator;
 
 import lambda.enumerable.Enumerable;
 import lambda.enumerable.collection.EList;
@@ -257,17 +257,18 @@ public class EnumerableInts {
     }
 
     /**
-     * Returns the object in array with the maximum value. This form assumes all
-     * objects implement {@link Comparable}
+     * Returns the int in array with the maximum value.
      */
     public static int max(int[] array) {
-        if (array.length == 0)
-            throw new NoSuchElementException();
-        int result = Integer.MIN_VALUE;
-        for (int each : array)
-            if (each > result)
-                result = each;
-        return result;
+        return min(array, new ReverseNaturalOrderIntegerComparator(new NaturalOrderComparator()));
+    }
+
+    /**
+     * Returns the int in collection with the maximum value. This form uses
+     * the block to {@link Comparator#compare}.
+     */
+    public static int max(int[] array, Fn2IItoI block) {
+        return min(array, new ReverseNaturalOrderIntegerComparator(new BlockIntegerComparator(block)));
     }
 
     /**
@@ -279,17 +280,18 @@ public class EnumerableInts {
     }
 
     /**
-     * Returns the object in array with the minimum value. This form assumes all
-     * objects implement {@link Comparable}.
+     * Returns the int in array with the minimum value.
      */
     public static int min(int[] array) {
-        if (array.length == 0)
-            throw new NoSuchElementException();
-        int result = Integer.MAX_VALUE;
-        for (int each : array)
-            if (each < result)
-                result = each;
-        return result;
+        return min(array, new NaturalOrderComparator());
+    }
+
+    /**
+     * Returns the int in collection with the minimum value. This form uses
+     * the block to {@link Comparator#compare}.
+     */
+    public static int min(int[] array, Fn2IItoI block) {
+        return min(array, new BlockIntegerComparator(block));
     }
 
     /**
@@ -365,7 +367,59 @@ public class EnumerableInts {
         return Enumerable.toSet(toList(array), block);
     }
 
-    private static int[] copy(int[] array, int length) {
+    static int min(int[] array, IntegerComparator comparator) {
+        int result = array[0];
+        for (int i = 1; i < array.length; i++) {
+            int each = array[i];
+            if (comparator.compare(each, result) < 0)
+                result = each;
+        }
+        return result;
+    }
+
+    static interface IntegerComparator {
+        int compare(int a, int b);
+    }
+
+    static class NaturalOrderComparator implements IntegerComparator {
+        public int compare(/* don't change */double a, /* don't change */double b) {
+            return /* don't change */Double.compare(a, b);
+        }
+
+        public int compare(long a, long b) {
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        }
+
+        public int compare(int a, int b) {
+            return (a < b) ? -1 : ((a > b) ? 1 : 0);
+        }
+    }
+
+    static class BlockIntegerComparator implements IntegerComparator {
+        Fn2IItoI block;
+
+        BlockIntegerComparator(Fn2IItoI block) {
+            this.block = block;
+        }
+
+        public int compare(int a, int b) {
+            return (int) block.call(a, b);
+        }
+    }
+
+    static class ReverseNaturalOrderIntegerComparator implements IntegerComparator {
+        IntegerComparator comparator;
+
+        ReverseNaturalOrderIntegerComparator(IntegerComparator comparator) {
+            this.comparator = comparator;
+        }
+
+        public int compare(int a, int b) {
+            return -comparator.compare(a, b);
+        }
+    }
+
+    static int[] copy(int[] array, int length) {
         int[] result = new int[length];
         arraycopy(array, 0, result, 0, length);
         return result;

@@ -7,7 +7,6 @@ import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import lambda.TestBase;
@@ -191,9 +190,14 @@ public class EnumerableLongsTest extends TestBase {
         assertTrue(all(new long[0], λ(l, l > 0)));
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void maxThrowsExceptionForEmptyArray() throws Exception {
         max(new long[0]);
+    }
+
+    @Test
+    public void maxReturnsFirstValueUsingReverseNaturalOrder() throws Exception {
+        assertEquals(1, max(longsOneToFive, λ(l, k, k - l)));
     }
 
     @Test
@@ -206,7 +210,12 @@ public class EnumerableLongsTest extends TestBase {
         assertEquals(1, min(longsOneToFive));
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
+    public void minReturnsFirstValueUsingReverseNaturalOrder() throws Exception {
+        assertEquals(5, min(longsOneToFive, λ(l, k, k - l)));
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void minThrowsExceptionForEmptyArray() throws Exception {
         assertEquals(0, min(new long[0]));
     }

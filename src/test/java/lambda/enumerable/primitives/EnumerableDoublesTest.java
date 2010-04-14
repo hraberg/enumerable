@@ -7,7 +7,6 @@ import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import lambda.TestBase;
@@ -215,7 +214,7 @@ public class EnumerableDoublesTest extends TestBase {
         assertTrue(all(new double[0], λ(d, d > 0)));
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void maxThrowsExceptionForEmptyArray() throws Exception {
         max(new double[0]);
     }
@@ -226,11 +225,21 @@ public class EnumerableDoublesTest extends TestBase {
     }
 
     @Test
+    public void maxReturnsFirstValueUsingReverseNaturalOrder() throws Exception {
+        assertEquals(1, max(doublesOneToFive, λ(x, y, y - x)), 0.0);
+    }
+
+    @Test
     public void minReturnsFirstValueUsingNaturalOrder() throws Exception {
         assertEquals(1, min(doublesOneToFive), 0.0);
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
+    public void minReturnsLastValueUsingReverseNaturalOrder() throws Exception {
+        assertEquals(5, min(doublesOneToFive, λ(x, y, y - x)), 0.0);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void minThrowsExceptionForEmptyArray() throws Exception {
         min(new double[0]);
     }

@@ -222,7 +222,7 @@
                 <include name="**/*" />
             </tarfileset>
             <tarfileset dir="target/example-classes" prefix="${enumerable.dist.name}">
-                <include name="**/*" />
+                <include name="*" />
                 <exclude name="**/build.xml" />
             </tarfileset>
             <tarfileset dir="target/example-classes" prefix="${enumerable.dist.name}/example">
