@@ -400,6 +400,11 @@ public class EnumerableOneEightTest extends TestBase {
     }
 
     @Test
+    public void memberReturnsTrueForExistingElementAndHandlesNullElements() throws Exception {
+        assertTrue(member(list((String) null, "hello"), "hello"));
+    }
+
+    @Test
     public void memberReturnsFalseForNonExistingElement() throws Exception {
         assertFalse(member(list("hello"), "world"));
     }
@@ -407,6 +412,11 @@ public class EnumerableOneEightTest extends TestBase {
     @Test
     public void memberReturnsTrueForNullIfNullIsMember() throws Exception {
         assertTrue(member(list((Object) null), null));
+    }
+
+    @Test
+    public void memberReturnsFalseForNullIfNullIsNotMember() throws Exception {
+        assertFalse(member(list("hello"), null));
     }
 
     @Test
