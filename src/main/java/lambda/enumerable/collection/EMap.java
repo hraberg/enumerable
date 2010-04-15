@@ -1,6 +1,7 @@
 package lambda.enumerable.collection;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import lambda.Fn1;
@@ -10,15 +11,14 @@ import lambda.Fn2;
  * A decorator for Map and the actual implementation of the Enumerable module
  * for Maps.
  */
-public class EMap<K, V> extends EIterable<Map.Entry<K, V>> implements Map<K, V> {
-    private final Map<K, V> map;
+public class EMap<K, V> extends EnumerableModule<Map.Entry<K, V>> implements Map<K, V> {
+    protected final Map<K, V> map;
 
     public EMap() {
         this(new HashMap<K, V>());
     }
 
     public EMap(Map<K, V> map) {
-        super(map.entrySet());
         this.map = map;
     }
 
@@ -94,5 +94,25 @@ public class EMap<K, V> extends EIterable<Map.Entry<K, V>> implements Map<K, V> 
 
     public int size() {
         return map.size();
+    }
+
+    public Iterator<java.util.Map.Entry<K, V>> iterator() {
+        return map.entrySet().iterator();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof EMap<?, ?>)
+            return this.map.equals(((EMap<?, ?>) obj).map);
+        if (obj instanceof Map<?, ?>)
+            return this.map.equals(obj);
+        return false;
+    }
+
+    public int hashCode() {
+        return map.hashCode();
+    }
+
+    public String toString() {
+        return map.toString();
     }
 }

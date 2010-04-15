@@ -1,5 +1,6 @@
 package lambda.enumerable.collection;
 
+import static lambda.Lambda.*;
 import static lambda.Parameters.*;
 import static lambda.enumerable.EnumerableArrays.*;
 import static lambda.primitives.LambdaPrimitives.*;
@@ -27,6 +28,12 @@ public class EnumerableCollectionsTest extends TestBase {
     public void canChainEnumerableCollectionsThatSwitchType() throws Exception {
         List<String> actual = oneToTen.select(λ(n, n > 5)).collect(λ(n, String.format("%03d", n)));
         assertEquals(list("006", "007", "008", "009", "010"), actual);
+    }
+
+    @Test
+    public void eachReturnsSameEnumerable() throws Exception {
+        EList<Object> list = new EList<Object>();
+        assertSame(list, list.each(λ(obj, obj)));
     }
 
     @Test
@@ -65,22 +72,22 @@ public class EnumerableCollectionsTest extends TestBase {
 
     @Test
     public void wrappingIterablesUsingEIterableFrom() throws Exception {
-        assertEquals(ESet.class, EIterable.from(new HashSet<Object>()).getClass());
-        assertEquals(ECollection.class, EIterable.from(new HashMap<Object, Object>().values()).getClass());
+        assertEquals(ESet.class, EnumerableModule.extend(new HashSet<Object>()).getClass());
+        assertEquals(ECollection.class, EnumerableModule.extend(new HashMap<Object, Object>().values()).getClass());
 
-        EList<Object> list = EIterable.from(new ArrayList<Object>());
+        EList<Object> list = EnumerableModule.extend(new ArrayList<Object>());
         assertEquals(EList.class, list.getClass());
 
         AnIterable anIterable = new AnIterable();
-        EIterable<Object> eIterable = EIterable.from(anIterable);
-        assertSame(eIterable, EIterable.from(eIterable));
+        EIterable<Object> eIterable = EnumerableModule.extend(anIterable);
+        assertSame(eIterable, EnumerableModule.extend(eIterable));
         assertSame(anIterable, eIterable.delegate());
     }
 
     @Test
     public void enumerableCollectionForwardsAllCallsToBackingCollection() throws Exception {
         ArrayList<Object> original = new ArrayList<Object>();
-        ECollection<Object> collection = EIterable.from(original);
+        ECollection<Object> collection = EnumerableModule.extend(original);
         assertTrue(original.isEmpty());
 
         collection.add("hello");

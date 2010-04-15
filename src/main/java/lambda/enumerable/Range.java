@@ -7,8 +7,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import lambda.enumerable.collection.EList;
+import lambda.enumerable.collection.EnumerableModule;
 
-public class Range implements Iterable<Integer> {
+public class Range extends EnumerableModule<Integer> {
     public final int start, end;
     public final boolean exclusive;
 
