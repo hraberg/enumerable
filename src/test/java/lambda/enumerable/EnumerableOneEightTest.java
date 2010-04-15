@@ -106,20 +106,20 @@ public class EnumerableOneEightTest extends TestBase {
 
     @Test
     public void inclusiveRanges() throws Exception {
-        assertEquals(oneToFive, collect(range(1, 5), λ(n, n)));
-        assertEquals(list(), collect(range(-1, -5), λ(n, n)));
-        assertEquals(list(-5, -4, -3, -2, -1), collect(range(-5, -1), λ(n, n)));
-        assertEquals(list(1), collect(range(1, 1), λ(n, n)));
-        assertEquals(list(-1), collect(range(-1, -1), λ(n, n)));
+        assertEquals(oneToFive, range(1, 5).collect(λ(n, n)));
+        assertEquals(list(), range(-1, -5).collect(λ(n, n)));
+        assertEquals(list(-5, -4, -3, -2, -1), range(-5, -1).collect(λ(n, n)));
+        assertEquals(list(1), range(1, 1).collect(λ(n, n)));
+        assertEquals(list(-1), range(-1, -1).collect(λ(n, n)));
     }
 
     @Test
     public void exclusiveRanges() throws Exception {
-        assertEquals(list(1, 2, 3, 4), collect(range(1, 5, true), λ(n, n)));
-        assertEquals(list(), collect(range(-1, -5, true), λ(n, n)));
-        assertEquals(list(-5, -4, -3, -2), collect(range(-5, -1, true), λ(n, n)));
-        assertEquals(list(), collect(range(1, 1, true), λ(n, n)));
-        assertEquals(list(), collect(range(-1, -1, true), λ(n, n)));
+        assertEquals(list(1, 2, 3, 4), range(1, 5, true).collect(λ(n, n)));
+        assertEquals(list(), range(-1, -5, true).collect(λ(n, n)));
+        assertEquals(list(-5, -4, -3, -2), range(-5, -1, true).collect(λ(n, n)));
+        assertEquals(list(), range(1, 1, true).collect(λ(n, n)));
+        assertEquals(list(), range(-1, -1, true).collect(λ(n, n)));
     }
 
     @Test

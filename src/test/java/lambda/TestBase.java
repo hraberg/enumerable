@@ -10,10 +10,10 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import lambda.enumerable.collection.EList;
+import lambda.enumerable.collection.EMap;
 
 public class TestBase {
     public EList<Integer> oneToFiveTwice = toList(list(Integer.class));
@@ -21,7 +21,7 @@ public class TestBase {
     public EList<Integer> oneToFive = oneToTen.subList(0, 5);
     public EList<String> animals = toList(list("albatross", "dog", "horse", "fox"));
 
-    public HashMap<String, Integer> stringsToInts = new HashMap<String, Integer>();
+    public EMap<String, Integer> stringsToInts = new EMap<String, Integer>();
 
     {
         oneToFiveTwice.addAll(oneToFive);

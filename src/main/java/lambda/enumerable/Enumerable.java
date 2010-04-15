@@ -141,7 +141,7 @@ public class Enumerable {
      * block as parameters.
      */
     public static <K, V, R> EMap<K, V> each(Map<K, V> map, Fn2<K, V, R> block) {
-        return new EMap<K, V>(map).each(block);
+        return EnumerableModule.extend(map).each(block);
     }
 
     /**
@@ -155,7 +155,7 @@ public class Enumerable {
      * Calls block once for each key in map, passing the key as parameter.
      */
     public static <K, V, R> EMap<K, V> eachKey(Map<K, V> map, Fn1<K, R> block) {
-        return new EMap<K, V>(map).eachKey(block);
+        return EnumerableModule.extend(map).eachKey(block);
     }
 
     /**
@@ -209,7 +209,7 @@ public class Enumerable {
      * Calls block once for each value in map, passing the key as parameter.
      */
     public static <K, V, R> EMap<K, V> eachValue(Map<K, V> map, Fn1<V, R> block) {
-        return new EMap<K, V>(map).eachValue(block);
+        return EnumerableModule.extend(map).eachValue(block);
     }
 
     /**
@@ -529,7 +529,7 @@ public class Enumerable {
      * true.
      */
     public static <K, V> EList<Map.Entry<K, V>> select(Map<K, V> map, Fn2<K, V, Boolean> block) {
-        return new EMap<K, V>(map).select(block);
+        return EnumerableModule.extend(map).select(block);
     }
 
     /**

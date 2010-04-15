@@ -21,7 +21,8 @@ import lambda.enumerable.EnumerableArrays;
 
 /**
  * The actual implementation of the Enumerable module used by {@link Enumerable}
- * and {@link EnumerableArrays} and extended by {@link EIterable}.
+ * and {@link EnumerableArrays} and extended by {@link EIterable} and
+ * {@link EMap}.
  */
 public abstract class EnumerableModule<E> implements IEnumerable<E> {
     @SuppressWarnings("unchecked")
@@ -35,6 +36,12 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         if (iterable instanceof Collection<?>)
             return (R) new ECollection<T>((Collection<T>) iterable);
         return (R) new EIterable<T>(iterable);
+    }
+
+    public static <K, V> EMap<K, V> extend(Map<K, V> map) {
+        if (map instanceof EMap<?, ?>)
+            return (EMap<K, V>) map;
+        return new EMap<K, V>(map);
     }
 
     public boolean all(Fn1<E, ?> block) {

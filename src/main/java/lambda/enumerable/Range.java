@@ -6,7 +6,6 @@ package lambda.enumerable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import lambda.enumerable.collection.EList;
 import lambda.enumerable.collection.EnumerableModule;
 
 public class Range extends EnumerableModule<Integer> {
@@ -21,13 +20,6 @@ public class Range extends EnumerableModule<Integer> {
         this.start = start;
         this.end = end;
         this.exclusive = exclusive;
-    }
-
-    public EList<Integer> toList() {
-        EList<Integer> result = new EList<Integer>();
-        for (Integer integer : this)
-            result.add(integer);
-        return result;
     }
 
     public int[] toArray() {
