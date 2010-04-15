@@ -1,13 +1,16 @@
-/**
- * 
- */
 package lambda.enumerable;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import lambda.Fn1;
+import lambda.Fn2;
 import lambda.enumerable.collection.EnumerableModule;
 
+/**
+ * An {@link Iterable} that represents a ascending range of integers. Includes
+ * the {@link EnumerableModule} by extension.
+ */
 public class Range extends EnumerableModule<Integer> {
     public final int start, end;
     public final boolean exclusive;
@@ -20,6 +23,18 @@ public class Range extends EnumerableModule<Integer> {
         this.start = start;
         this.end = end;
         this.exclusive = exclusive;
+    }
+
+    public <R> Range each(Fn1<Integer, R> block) {
+        return (Range) super.each(block);
+    }
+
+    public <R> Range eachWithIndex(Fn2<Integer, Integer, R> block) {
+        return (Range) super.eachWithIndex(block);
+    }
+
+    public <R> Range reverseEach(Fn1<Integer, R> block) {
+        return (Range) super.reverseEach(block);
     }
 
     public int[] toArray() {

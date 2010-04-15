@@ -5,8 +5,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
+import lambda.Fn1;
+import lambda.Fn2;
+
 /**
- * A decorator for {@link List} which includes the Enumerable module via
+ * A decorator for {@link List} which includes the {@link EnumerableModule} via
  * {@link EIterable}.
  */
 public class EList<E> extends ECollection<E> implements List<E> {
@@ -20,6 +23,18 @@ public class EList<E> extends ECollection<E> implements List<E> {
 
     public EList(int length) {
         new ArrayList<E>(length);
+    }
+
+    public <R> EList<E> each(Fn1<E, R> block) {
+        return (EList<E>) super.each(block);
+    }
+
+    public <R> EList<E> eachWithIndex(Fn2<E, Integer, R> block) {
+        return (EList<E>) super.eachWithIndex(block);
+    }
+
+    public <R> EList<E> reverseEach(Fn1<E, R> block) {
+        return (EList<E>) super.reverseEach(block);
     }
 
     public List<E> delegate() {

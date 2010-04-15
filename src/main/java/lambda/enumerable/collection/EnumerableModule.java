@@ -20,9 +20,20 @@ import lambda.enumerable.Enumerable;
 import lambda.enumerable.EnumerableArrays;
 
 /**
- * The actual implementation of the Enumerable module used by {@link Enumerable}
- * and {@link EnumerableArrays} and extended by {@link EIterable} and
- * {@link EMap}.
+ * The Enumerable mixin provides collection classes with several traversal and
+ * searching methods, and with the ability to sort. The class must provide a
+ * method {@link Iterable#iterator()}, which yields successive members of the
+ * collection. If {@link #max}, {@link #min}, or {@link #sort} is used, the
+ * objects in the collection must also implement a meaningful
+ * {@link Comparable#compareTo(Object)} operator, as these methods rely on an
+ * ordering between members of the collection.
+ * <p>
+ * It can be mixed in either by using the decorators ({@link EIterable},
+ * {@link ECollection}, {@link EList}, {@link ESet} and {@link EMap}) or by
+ * subclassing and provide {@link Iterable#iterator()}.
+ * <p>
+ * The static methods in the facades {@link Enumerable} and
+ * {@link EnumerableArrays} use this implementation via the decorators.
  */
 public abstract class EnumerableModule<E> implements IEnumerable<E> {
     @SuppressWarnings("unchecked")

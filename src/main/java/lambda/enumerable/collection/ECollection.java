@@ -3,9 +3,12 @@ package lambda.enumerable.collection;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import lambda.Fn1;
+import lambda.Fn2;
+
 /**
- * A decorator for {@link Collection} which includes the Enumerable module via
- * {@link EIterable}.
+ * A decorator for {@link Collection} which includes the
+ * {@link EnumerableModule} via {@link EIterable}.
  */
 public class ECollection<E> extends EIterable<E> implements Collection<E> {
     public ECollection() {
@@ -14,6 +17,18 @@ public class ECollection<E> extends EIterable<E> implements Collection<E> {
 
     public ECollection(Collection<E> collection) {
         super(collection);
+    }
+
+    public <R> ECollection<E> each(Fn1<E, R> block) {
+        return (ECollection<E>) super.each(block);
+    }
+
+    public <R> ECollection<E> eachWithIndex(Fn2<E, Integer, R> block) {
+        return (ECollection<E>) super.eachWithIndex(block);
+    }
+
+    public <R> ECollection<E> reverseEach(Fn1<E, R> block) {
+        return (ECollection<E>) super.reverseEach(block);
     }
 
     public Collection<E> delegate() {

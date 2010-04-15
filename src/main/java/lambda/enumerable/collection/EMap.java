@@ -8,8 +8,10 @@ import lambda.Fn1;
 import lambda.Fn2;
 
 /**
- * A decorator for Map and the actual implementation of the Enumerable module
- * for Maps.
+ * A decorator for {@link Map} which includes the {@link EnumerableModule} by
+ * extension and adds methods specific to Maps.
+ * <p>
+ * Acts as an {@link Iterable} on its {@link #keySet()}.
  */
 public class EMap<K, V> extends EnumerableModule<Map.Entry<K, V>> implements Map<K, V> {
     protected final Map<K, V> map;
@@ -20,6 +22,21 @@ public class EMap<K, V> extends EnumerableModule<Map.Entry<K, V>> implements Map
 
     public EMap(Map<K, V> map) {
         this.map = map;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <R> EMap<K, V> each(Fn1<Map.Entry<K, V>, R> block) {
+        return (EMap<K, V>) super.each(block);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <R> EMap<K, V> eachWithIndex(Fn2<Map.Entry<K, V>, Integer, R> block) {
+        return (EMap<K, V>) super.eachWithIndex(block);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <R> EMap<K, V> reverseEach(Fn1<Map.Entry<K, V>, R> block) {
+        return (EMap<K, V>) super.reverseEach(block);
     }
 
     public ESet<Map.Entry<K, V>> entrySet() {
