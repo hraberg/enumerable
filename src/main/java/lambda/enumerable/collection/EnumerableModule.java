@@ -286,7 +286,8 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public E min() {
-        return min(new NaturalOrderComparator<E>());
+        Comparator<E> naturalOrder = naturalOrder();
+        return min(naturalOrder);
     }
 
     @SuppressWarnings("unchecked")
@@ -501,10 +502,16 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         }
     }
 
-    static class NaturalOrderComparator<E> implements Comparator<E> {
-        @SuppressWarnings("unchecked")
-        public int compare(E o1, E o2) {
-            return ((Comparable<E>) o1).compareTo(o2);
+    static final NaturalOrderComparator NATURAL_ORDER = new NaturalOrderComparator();
+
+    static class NaturalOrderComparator implements Comparator<Comparable<Object>> {
+        public int compare(Comparable<Object> o1, Comparable<Object> o2) {
+            return o1.compareTo(o2);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    Comparator<E> naturalOrder() {
+        return (Comparator<E>) NATURAL_ORDER;
     }
 }
