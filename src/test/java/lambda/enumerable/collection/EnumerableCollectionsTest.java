@@ -1,11 +1,13 @@
 package lambda.enumerable.collection;
 
+import static java.lang.System.*;
 import static lambda.Lambda.*;
 import static lambda.Parameters.*;
 import static lambda.enumerable.EnumerableArrays.*;
 import static lambda.primitives.LambdaPrimitives.*;
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import lambda.Fn1;
 import lambda.TestBase;
 
 import org.junit.Test;
@@ -95,6 +98,53 @@ public class EnumerableCollectionsTest extends TestBase {
 
         original.add("hello");
         assertEquals(2, collection.size());
+    }
+
+    @Test
+    public void sortByExpensiveBlock() throws Exception {
+        File windows = new File("C:\\Windows");
+        if (!windows.isDirectory())
+            return;
+
+        EList<String> files = toList(windows.list());
+        Fn1<String, Long> lastModifiedBlock = λ(s, new File(s).lastModified());
+
+        List<String> actual = null;
+        int times = 5;
+        long now;
+
+        long timeSchwartzianTransform = 0;
+        long timeWithCache = 0;
+        long timeNoCache = 0;
+        for (int i = 0; i < times; i++) {
+            now = nanoTime();
+            actual = files.sortBy(lastModifiedBlock);
+            timeSchwartzianTransform += nanoTime() - now;
+
+            now = nanoTime();
+            actual = files.sort(new EnumerableModule.CachedBlockResultComparator<String, Long>(lastModifiedBlock));
+            timeWithCache += nanoTime() - now;
+
+            now = nanoTime();
+            actual = files.sort(new EnumerableModule.BlockResultComparator<String, Long>(lastModifiedBlock));
+            timeNoCache += nanoTime() - now;
+        }
+
+        // out.println("schwartzian: " + timeSchwartzianTransform);
+        // out.println("identity hash map: " + timeWithCache);
+        // out.println("no cache: " + timeNoCache);
+
+        assertTrue("Schwarzian transform was slower than no cache: " + timeSchwartzianTransform + " > "
+                + timeNoCache, timeSchwartzianTransform <= timeNoCache);
+        assertTrue("Schwarzian transform was slower than identity hash map: " + timeSchwartzianTransform + " > "
+                + timeWithCache, timeSchwartzianTransform <= timeWithCache);
+
+        long lastModified = -1;
+        for (String f : actual) {
+            long fileLastModified = new File(f).lastModified();
+            assertTrue(fileLastModified >= lastModified);
+            lastModified = fileLastModified;
+        }
     }
 
     class AnIterable implements Iterable<Object> {

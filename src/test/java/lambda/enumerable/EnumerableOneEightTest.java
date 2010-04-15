@@ -271,8 +271,8 @@ public class EnumerableOneEightTest extends TestBase {
 
     @Test
     public void sortByUsingBlock() throws Exception {
-        List<String> actual = sortBy(list("10", "100", "1"), λ(s, s.length()));
-        assertEquals(list("1", "10", "100"), actual);
+        List<String> actual = sortBy(animals, λ(s, s.length()));
+        assertEquals(list("dog", "fox", "horse", "albatross"), actual);
     }
 
     @Test
