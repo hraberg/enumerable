@@ -405,6 +405,11 @@ public class EnumerableOneEightTest extends TestBase {
     }
 
     @Test
+    public void memberReturnsTrueForNullIfNullIsMember() throws Exception {
+        assertTrue(member(list((Object) null), null));
+    }
+
+    @Test
     public void toListCreatesListFromIterable() throws Exception {
         Iterable<String> iterable = new ReverseArrayIterable("hello", "world");
         assertEquals(list("world", "hello"), toList(iterable));

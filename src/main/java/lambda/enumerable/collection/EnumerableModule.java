@@ -255,9 +255,15 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public boolean includes(Object obj) {
-        for (E each : this)
-            if (each.equals(obj))
-                return true;
+        if (obj == null) {
+            for (E each : this)
+                if (each == null)
+                    return true;
+        } else {
+            for (E each : this)
+                if (each.equals(obj))
+                    return true;
+        }
         return false;
     }
 
