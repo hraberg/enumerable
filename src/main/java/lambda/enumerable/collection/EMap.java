@@ -11,7 +11,7 @@ import lambda.Fn2;
  * A decorator for {@link Map} which includes the {@link EnumerableModule} by
  * extension and adds methods specific to Maps.
  * <p>
- * Acts as an {@link Iterable} on its {@link #keySet()}.
+ * Acts as an {@link Iterable} on its {@link #entrySet()}.
  */
 public class EMap<K, V> extends EnumerableModule<Map.Entry<K, V>> implements Map<K, V> {
     protected final Map<K, V> map;
