@@ -170,8 +170,6 @@ public class LambdaCompiler {
         try {
             out = new JarOutputStream(new FileOutputStream(newJar));
             addDirToJar(tempDir, tempDir, out);
-        } catch (Exception e) {
-            throw uncheck(e);
         } finally {
             if (out != null)
                 out.close();

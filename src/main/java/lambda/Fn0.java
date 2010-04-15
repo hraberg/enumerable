@@ -52,14 +52,15 @@ public abstract class Fn0<R> implements Serializable {
         }
 
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (pattern.matcher(method.getName()).matches()) {
-                int i = 0;
-                for (Class<?> type : parameterTypes)
-                    if (args[i] != null && !type.isAssignableFrom(args[i++].getClass()))
-                        return null;
-                return apply(args != null ? args : new Object[0]);
+            if (!pattern.matcher(method.getName()).matches())
+                return null;
+
+            for (int i = 0; i < parameterTypes.length; i++) {
+                Class<?> type = parameterTypes[i];
+                if (args[i] != null && !type.isAssignableFrom(args[i].getClass()))
+                    return null;
             }
-            return null;
+            return apply(args != null ? args : new Object[0]);
         }
     }
 }
