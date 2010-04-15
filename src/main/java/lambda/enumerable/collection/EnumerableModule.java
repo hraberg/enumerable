@@ -261,7 +261,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
                     return true;
         } else {
             for (E each : this)
-                if (each.equals(obj))
+                if (obj.equals(each))
                     return true;
         }
         return false;
