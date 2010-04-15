@@ -27,6 +27,8 @@ import lambda.enumerable.collection.ESet;
  * <a href="http://ruby-doc.org/ruby-1.9/classes/Enumerable.html"/>Ruby's
  * Enumerable module in 1.9</a>
  * </p>
+ * <p>
+ * This class adapts the methods in {@link Enumerable} to work on arrays.
  */
 public class EnumerableArrays {
     /**

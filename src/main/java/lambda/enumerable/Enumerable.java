@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
-import lambda.enumerable.collection.EIterable;
 import lambda.enumerable.collection.EList;
 import lambda.enumerable.collection.EMap;
 import lambda.enumerable.collection.ESet;
@@ -38,8 +37,8 @@ import lambda.enumerable.collection.IEnumerable;
  * Enumerable module in 1.9</a>
  * </p>
  * 
- * This class is as a facade for the implementation of the Enumerable module in
- * {@link EIterable} and {@link EMap}.
+ * This class is as a facade for the implementation of the in
+ * {@link EnumerableModule} and {@link EMap}.
  */
 public class Enumerable {
     /**

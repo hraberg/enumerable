@@ -255,7 +255,10 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public boolean includes(Object obj) {
-        return asNewList().contains(obj);
+        for (E each : this)
+            if (each.equals(obj))
+                return true;
+        return false;
     }
 
     public E inject(Fn2<E, E, E> block) {
