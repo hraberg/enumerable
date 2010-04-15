@@ -428,6 +428,16 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void lambdaAsInterfaceWithExactMatchAndNullArgumentPassesFilter() throws Exception {
+        List<String> list = new ArrayList<String>();
+        list.add("world");
+        List<String> proxy = λ(idx, s, list.set(idx, s)).as(List.class, "set", Integer.class, String.class);
+        proxy.set(0, null);
+        assertNull(list.get(0));
+    }
+
+    @Test
     public void lambdaInConstructor() throws Exception {
         class ConstructorClass {
             public String fromConstructor;
