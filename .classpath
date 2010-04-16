@@ -5,8 +5,8 @@
 	<classpathentry kind="src" output="target/example-classes" path="src/example/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/junit-4.7.jar" sourcepath="lib/src/junit-4.7-sources.jar"/>
-	<classpathentry kind="lib" path="lib/asm-all-3.2.jar" sourcepath="lib/src/asm-all-3.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/extra166y.jar" sourcepath="lib/src/extra166y.zip"/>
 	<classpathentry kind="lib" path="lib/jsr166y.jar" sourcepath="lib/src/jsr166y.zip"/>
+	<classpathentry kind="lib" path="lib/asm-debug-all-3.2.jar" sourcepath="lib/src/asm-all-3.2-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
