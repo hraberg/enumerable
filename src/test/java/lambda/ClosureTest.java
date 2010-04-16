@@ -12,7 +12,6 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
@@ -465,9 +464,9 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void bindingsAsUnmodifiableMap() throws Exception {
+    public void readingBindings() throws Exception {
         Fn0<String> closure = getClosureWithBindings("world");
-        Map<String, Object> binding = closure.binding();
+        Fn0<?>.Binding binding = closure.binding();
         assertEquals(this, binding.get("this"));
         assertEquals(2, binding.get("two"));
         assertEquals("world", binding.get("arg"));
@@ -482,11 +481,32 @@ public class ClosureTest extends TestBase implements Serializable {
         return λ(_, (two = 4) + hello() + arg);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void bindingsAsUnmodifiableMapThrowsExceptionIfChanged() throws Exception {
+    public void readerVariableNotInBindingReturnsNull() throws Exception {
         Fn0<String> closure = λ(_, hello());
-        Map<String, Object> binding = closure.binding();
+        Fn0<?>.Binding binding = closure.binding();
+        assertNull(binding.get("x"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void changingFinalVariableInBindingThrowsException() throws Exception {
+        Fn0<String> closure = λ(_, hello());
+        Fn0<?>.Binding binding = closure.binding();
         binding.put("this", this);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void changingVariableNotInBindingThrowsException() throws Exception {
+        Fn0<String> closure = λ(_, hello());
+        Fn0<?>.Binding binding = closure.binding();
+        binding.put("x", 2);
+    }
+
+    @Test
+    public void changingMutableVariableInBinditngReflectsOnCapturedContext() throws Exception {
+        int two = 2;
+        Fn0<?>.Binding binding = λ(_, two = 2).binding();
+        binding.put("two", 4);
+        assertEquals(4, two);
     }
 
     @Test

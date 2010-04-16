@@ -1,6 +1,5 @@
 package lambda;
 
-import static java.util.Collections.*;
 import static lambda.exception.UncheckedException.*;
 
 import java.io.Serializable;
@@ -9,8 +8,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import lambda.annotation.LambdaLocal;
@@ -75,27 +72,62 @@ public abstract class Fn0<R> implements Serializable {
         }
     }
 
-    /**
-     * Returns this functions execution context as an unmodifiable map. Contains
-     * captured local variables (including the outer this) and parameters.
-     */
-    public Map<String, Object> binding() {
-        try {
-            Map<String, Object> binding = new HashMap<String, Object>();
-            for (Field field : getClass().getDeclaredFields()) {
-                field.setAccessible(true);
+    public class Binding {
+        public Object get(String name) {
+            try {
+                Field field = findField(name);
+                if (field == null)
+                    return null;
+                Object value = field.get(Fn0.this);
+                if (!field.getAnnotation(LambdaLocal.class).isReadOnly())
+                    value = Array.get(value, 0);
+                return value;
+            } catch (Exception e) {
+                throw uncheck(e);
+            }
+        }
+
+        public Object put(String name, Object value) {
+            try {
+                Field field = findField(name);
+                if (field == null)
+                    throw new IllegalArgumentException("No such variable " + name + " in " + Fn0.this);
+
+                if (field.getAnnotation(LambdaLocal.class).isReadOnly())
+                    throw new IllegalArgumentException("Variable " + name + " " + field.getType().getName()
+                            + " is not modifiable from " + Fn0.this);
+                Object array = field.get(Fn0.this);
+                Object previousValue = Array.get(array, 0);
+                Array.set(array, 0, value);
+                return previousValue;
+            } catch (Exception e) {
+                throw uncheck(e);
+            }
+        }
+
+        Field findField(String name) {
+            for (Field field : Fn0.this.getClass().getDeclaredFields()) {
                 if (field.isAnnotationPresent(LambdaLocal.class)) {
                     LambdaLocal lambdaLocal = field.getAnnotation(LambdaLocal.class);
-
-                    Object value = field.get(this);
-                    if (!lambdaLocal.isReadOnly())
-                        value = Array.get(value, 0);
-                    binding.put(lambdaLocal.name(), value);
+                    if (name.equals(lambdaLocal.name())) {
+                        field.setAccessible(true);
+                        return field;
+                    }
                 }
             }
-            return unmodifiableMap(binding);
-        } catch (Exception e) {
-            throw uncheck(e);
+            return null;
         }
+    }
+
+    /**
+     * Returns a limited execution context of this function. It contains local
+     * variables (including the outer this) and parameters that as captured.
+     */
+    public Binding binding() {
+        return new Binding();
+    }
+
+    public String toString() {
+        return getClass().getName();
     }
 }

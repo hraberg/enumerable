@@ -136,8 +136,6 @@ public class EnumerableCollectionsTest extends TestBase {
 
         assertTrue("Schwarzian transform was slower than no cache: " + timeSchwartzianTransform + " > "
                 + timeNoCache, timeSchwartzianTransform <= timeNoCache);
-        assertTrue("Schwarzian transform was slower than identity hash map: " + timeSchwartzianTransform + " > "
-                + timeWithCache, timeSchwartzianTransform <= timeWithCache);
 
         long lastModified = -1;
         for (String f : actual) {
