@@ -491,22 +491,31 @@ public class ClosureTest extends TestBase implements Serializable {
     public void changingFinalVariableInBindingThrowsException() throws Exception {
         Fn0<String> closure = λ(_, hello());
         Fn0<?>.Binding binding = closure.binding();
-        binding.put("this", this);
+        binding.set("this", this);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void changingVariableNotInBindingThrowsException() throws Exception {
         Fn0<String> closure = λ(_, hello());
         Fn0<?>.Binding binding = closure.binding();
-        binding.put("x", 2);
+        binding.set("x", 2);
     }
 
     @Test
-    public void changingMutableVariableInBinditngReflectsOnCapturedContext() throws Exception {
+    public void changingMutableVariableInBindingReflectsOnCapturedContext() throws Exception {
         int two = 2;
         Fn0<?>.Binding binding = λ(_, two = 2).binding();
-        binding.put("two", 4);
+        binding.set("two", 4);
         assertEquals(4, two);
+    }
+
+    @Test
+    public void changingMutableVariableInCapturedContextReflectsOnBinding() throws Exception {
+        int two = 2;
+        Fn0<?>.Binding binding = λ(_, two = 2).binding();
+        two = 4;
+        assertEquals(two, binding.get("two"));
+        assertEquals(4, binding.get("two"));
     }
 
     @Test

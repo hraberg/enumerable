@@ -73,6 +73,10 @@ public abstract class Fn0<R> implements Serializable {
     }
 
     public class Binding {
+        /**
+         * Gets the current value of a variable that was captured when creating
+         * this lambda.
+         */
         public Object get(String name) {
             try {
                 Field field = findField(name);
@@ -87,7 +91,12 @@ public abstract class Fn0<R> implements Serializable {
             }
         }
 
-        public Object put(String name, Object value) {
+        /**
+         * Sets the value of a variable that was captured and when creating this
+         * lambda. Only works if the variable is changed somewhere in the
+         * original method body or inside the lambda expression.
+         */
+        public Object set(String name, Object value) {
             try {
                 Field field = findField(name);
                 if (field == null)
@@ -121,7 +130,7 @@ public abstract class Fn0<R> implements Serializable {
 
     /**
      * Returns a limited execution context of this function. It contains local
-     * variables (including the outer this) and parameters that as captured.
+     * variables (including the outer this) and parameters that are captured.
      */
     public Binding binding() {
         return new Binding();
