@@ -69,12 +69,16 @@ public class ParallelLongArraySieveTest {
         int i = 0;
         long p = 2;
         while (p * p < N) { // repeatedly filter
-            a = a.withFilter(op(l, l <= p || (l % p) != 0)).all();
+            a = a.withFilter(notDivisibleByLambda(p)).all();
             p = a.get(++i);
         }
 
         // check result
         LongPredicate notProbablePrime = op(l, !BigInteger.valueOf(l).isProbablePrime(CERTAINTY));
         assertTrue(a.withFilter(notProbablePrime).isEmpty());
+    }
+
+    LongPredicate notDivisibleByLambda(long p) {
+        return op(l, l <= p || (l % p) != 0);
     }
 }
