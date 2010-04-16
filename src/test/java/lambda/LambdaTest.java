@@ -162,6 +162,14 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    public void arities() throws Exception {
+        assertEquals(0, λ(_, null).arity);
+        assertEquals(1, λ(n, null).arity);
+        assertEquals(2, λ(n, m, null).arity);
+        assertEquals(3, λ(n, m, s, null).arity);
+    }
+
+    @Test
     public void assignLambdaParameter() throws Exception {
         assertEquals(1, λ(n, n = 1).call(5));
     }

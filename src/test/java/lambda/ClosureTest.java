@@ -12,6 +12,7 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
@@ -461,6 +462,31 @@ public class ClosureTest extends TestBase implements Serializable {
         Fn2<Double, Double, Double> nTimesM = λ(x, y = PI, x * y);
         assertEquals(2, nTimesM.call(2.0, 1.0), 0.0);
         assertEquals(2 * PI, nTimesM.call(2.0), 0.0);
+    }
+
+    @Test
+    public void bindingsAsUnmodifiableMap() throws Exception {
+        Fn0<String> closure = getClosureWithBindings("world");
+        Map<String, Object> binding = closure.binding();
+        assertEquals(this, binding.get("this"));
+        assertEquals(2, binding.get("two"));
+        assertEquals("world", binding.get("arg"));
+        closure.call();
+        binding = closure.binding();
+        assertEquals(4, binding.get("two"));
+    }
+
+    public Fn0<String> getClosureWithBindings(String arg) {
+        @SuppressWarnings("unused")
+        int two = 2;
+        return λ(_, (two = 4) + hello() + arg);
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void bindingsAsUnmodifiableMapThrowsExceptionIfChanged() throws Exception {
+        Fn0<String> closure = λ(_, hello());
+        Map<String, Object> binding = closure.binding();
+        binding.put("this", this);
     }
 
     @Test

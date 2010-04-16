@@ -10,11 +10,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import lambda.annotation.LambdaLocal;
 import lambda.weaving.MethodInfo.LambdaInfo;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
@@ -736,16 +739,27 @@ class SecondPassClassVisitor extends ClassAdapter implements Opcodes {
         void createAndInitializeFieldsWithAccessedLocals(MethodVisitor mv, Type[] parameters) {
             Iterator<Integer> locals = currentLambda.accessedLocals.iterator();
             for (int i = 0; locals.hasNext(); i++) {
-                String field = currentLambda.getFieldNameForLocal(locals.next());
+                int local = locals.next();
+                String field = currentLambda.getFieldNameForLocal(local);
                 Type type = parameters[i];
 
-                lambdaWriter.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, field, type.getDescriptor(), null,
-                        null).visitEnd();
+                FieldVisitor fieldVisitor = lambdaWriter.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, field,
+                        type.getDescriptor(), null, null);
+                addLambdaLocalAnnotation(local, fieldVisitor);
+                fieldVisitor.visitEnd();
 
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitVarInsn(type.getOpcode(ILOAD), i + 1);
                 mv.visitFieldInsn(PUTFIELD, currentLambdaClass(), field, type.getDescriptor());
             }
+        }
+
+        void addLambdaLocalAnnotation(int local, FieldVisitor fieldVisitor) {
+            AnnotationVisitor annotationVisitor = fieldVisitor.visitAnnotation(getDescriptor(LambdaLocal.class),
+                    true);
+            annotationVisitor.visit("isReadOnly", method.isLocalReadOnly(local));
+            annotationVisitor.visit("name", method.getNameOfLocal(local));
+            annotationVisitor.visitEnd();
         }
 
         void invokeSuperConstructor(MethodVisitor mv) {

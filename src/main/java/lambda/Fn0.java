@@ -1,16 +1,27 @@
 package lambda;
 
+import static java.util.Collections.*;
+import static lambda.exception.UncheckedException.*;
+
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import lambda.annotation.LambdaLocal;
 
 /**
  * A function that takes no arguments.
  */
 @SuppressWarnings("serial")
 public abstract class Fn0<R> implements Serializable {
+    public final int arity = 0;
+
     public abstract R call();
 
     /**
@@ -61,6 +72,30 @@ public abstract class Fn0<R> implements Serializable {
                     return null;
             }
             return apply(args != null ? args : new Object[0]);
+        }
+    }
+
+    /**
+     * Returns this functions execution context as an unmodifiable map. Contains
+     * captured local variables (including the outer this) and parameters.
+     */
+    public Map<String, Object> binding() {
+        try {
+            Map<String, Object> binding = new HashMap<String, Object>();
+            for (Field field : getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                if (field.isAnnotationPresent(LambdaLocal.class)) {
+                    LambdaLocal lambdaLocal = field.getAnnotation(LambdaLocal.class);
+
+                    Object value = field.get(this);
+                    if (!lambdaLocal.isReadOnly())
+                        value = Array.get(value, 0);
+                    binding.put(lambdaLocal.name(), value);
+                }
+            }
+            return unmodifiableMap(binding);
+        } catch (Exception e) {
+            throw uncheck(e);
         }
     }
 }

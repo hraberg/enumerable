@@ -5,6 +5,8 @@ package lambda;
  */
 @SuppressWarnings("serial")
 public abstract class Fn1<A1, R> extends Fn0<R> {
+    public final int arity = 1;
+
     public abstract R call(A1 a1);
 
     public R call() {
