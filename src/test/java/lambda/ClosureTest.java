@@ -481,7 +481,7 @@ public class ClosureTest extends TestBase implements Serializable {
         return λ(_, (two = 4) + hello() + arg);
     }
 
-    public void readerVariableNotInBindingReturnsNull() throws Exception {
+    public void readingVariableNotInBindingReturnsNull() throws Exception {
         Fn0<String> closure = λ(_, hello());
         Fn0<?>.Binding binding = closure.binding();
         assertNull(binding.get("x"));
