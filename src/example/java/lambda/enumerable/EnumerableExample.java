@@ -242,6 +242,12 @@ public class EnumerableExample {
         out.println(times.call(2.0));
 
         /*
+         * Lambda acting as proxy.
+         */
+        Runnable runnable = λ(_, out.printf("running...\n")).as(Runnable.class);
+        runnable.run();
+
+        /*
          * Another example of closure, the Fn1 instance can still read and write
          * the local variable x if we would to pass it along to another scope.
          */
