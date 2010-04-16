@@ -146,7 +146,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         try {
             if (isNotToBeInstrumented(name) || tranformationFailed)
                 return null;
-            return transformer.transform(in);
+            return transformer.transform(name, in);
         } catch (Throwable t) {
             tranformationFailed = true;
             weavingNotEnabledMessage = t.getMessage();

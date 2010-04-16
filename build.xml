@@ -239,7 +239,7 @@
         </tar>
     </target>
 
-    <target name="dist" depends="dist-no-test, aot-tests">
+    <target name="dist" depends="dist-no-test, example-with-loader, aot-tests">
         <echo message="Ensuring that the example project in ${enumerable.dist.name}.tgz works" />
         <delete dir="target/${enumerable.dist.name}" />
         <untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />

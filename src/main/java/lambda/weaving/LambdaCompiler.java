@@ -92,7 +92,7 @@ public class LambdaCompiler {
         FileOutputStream out = null;
         try {
             in = new FileInputStream(file);
-            byte[] bs = transformer.transform(in);
+            byte[] bs = transformer.transform(null, in);
             in.close();
             if (bs != null) {
                 out = new FileOutputStream(file);
