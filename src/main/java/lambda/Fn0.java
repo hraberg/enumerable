@@ -45,7 +45,7 @@ public abstract class Fn0<R> implements Serializable {
      * the parameter types to {@link #apply(Object...)}.
      */
     @SuppressWarnings("unchecked")
-    public <I> I as(Class<I> anInterface, String regex, Class... parameterTypes) {
+    public <I> I as(Class<I> anInterface, String regex, Class<?>... parameterTypes) {
         return (I) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { anInterface },
                 new ApplyMethodInvocationHandler(regex, parameterTypes));
     }

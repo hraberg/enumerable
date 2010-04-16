@@ -529,7 +529,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     <R extends Object & Comparable<? super R>> EList<E> sortBySchwartzianTransform(Fn1<E, R> block) {
         EList<Pair<R>> pairs = new EList<Pair<R>>();
         for (E each : this)
-            pairs.add(new Pair(block.call(each), each));
+            pairs.add(new Pair<R>(block.call(each), each));
         Collections.sort(pairs);
 
         EList<E> result = (EList<E>) pairs;

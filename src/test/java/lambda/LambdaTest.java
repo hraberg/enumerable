@@ -522,12 +522,12 @@ public class LambdaTest extends TestBase {
         assertEquals("12", toStringTimes.call(3, 4));
     }
 
+    @SuppressWarnings("rawtypes")
     @LambdaParameter
-    @SuppressWarnings("unchecked")
     static List l;
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
-    @SuppressWarnings("unchecked")
     public void toyScheme() throws Exception {
         Fn1<List, Object> car = λ(l, l.get(0));
         Fn1<List, List> cdr = λ(l, l.subList(1, l.size()));
