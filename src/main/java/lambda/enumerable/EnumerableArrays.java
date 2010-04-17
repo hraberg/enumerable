@@ -158,7 +158,7 @@ public class EnumerableArrays {
     }
 
     /**
-     * @see #detect(Object[], Object, Fn1)
+     * @see #detect(Object[], Fn0, Fn1)
      */
     public static <E> E find(E[] array, Fn0<E> ifNone, Fn1<E, Boolean> block) {
         return Enumerable.find(asList(array), ifNone, block);
@@ -214,8 +214,8 @@ public class EnumerableArrays {
     /**
      * Named parameter for detect.
      * 
-     * @see #detect(Object[], Object, Fn1)
-     * @see #find(Object[], Object, Fn1)
+     * @see #detect(Object[], Fn0, Fn1)
+     * @see #find(Object[], Fn0, Fn1)
      */
     public static <R> Fn0<R> ifNone(R defaultValue) {
         return Enumerable.ifNone(defaultValue);

@@ -243,7 +243,7 @@ public class Enumerable {
     }
 
     /**
-     * @see #detect(Iterable, Object, Fn1)
+     * @see #detect(Iterable, Fn0, Fn1)
      */
     public static <E> E find(Iterable<E> collection, Fn0<E> ifNone, Fn1<E, Boolean> block) {
         return extend(collection).find(ifNone, block);
@@ -321,8 +321,8 @@ public class Enumerable {
     /**
      * Named parameter for detect.
      * 
-     * @see #detect(Iterable, Object, Fn1)
-     * @see #find(Iterable, Object, Fn1)
+     * @see #detect(Iterable, Fn0, Fn1)
+     * @see #find(Iterable, Fn0, Fn1)
      */
     public static <R> Fn0<R> ifNone(final R defaultValue) {
         return Fn0.constant(defaultValue);

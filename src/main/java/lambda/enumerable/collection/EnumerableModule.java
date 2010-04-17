@@ -116,7 +116,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public E detect(Fn1<E, Boolean> block) {
-        return detect((Fn0<E>) null, block);
+        return detect(null, block);
     }
 
     public E detect(Fn0<E> ifNone, Fn1<E, Boolean> block) {

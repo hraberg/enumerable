@@ -122,7 +122,7 @@ public interface IEnumerable<E> extends Iterable<E> {
     E find(Fn1<E, Boolean> block);
 
     /**
-     * @see #detect(Object, Fn1)
+     * @see #detect(Fn0, Fn1)
      */
     E find(Fn0<E> ifNone, Fn1<E, Boolean> block);
 
