@@ -43,6 +43,21 @@ public class EnumerableOneNineTest extends TestBase {
     }
 
     @Test
+    public void dropNGreaterThanSizeElements() throws Exception {
+        assertEquals(list(), drop(oneToFive, 6));
+    }
+
+    @Test
+    public void dropZeroElements() throws Exception {
+        assertEquals(oneToFive, drop(oneToFive, 0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void dropNegativeNOfElementsThrowsException() throws Exception {
+        drop(oneToFive, -1);
+    }
+
+    @Test
     public void dropWhileBlockIsTrue() throws Exception {
         assertEquals(list(4, 5), dropWhile(oneToFive, λ(n, n < 4)));
     }
@@ -201,6 +216,21 @@ public class EnumerableOneNineTest extends TestBase {
     @Test
     public void takeNElements() throws Exception {
         assertEquals(list(1, 2, 3), take(oneToFive, 3));
+    }
+
+    @Test
+    public void takeNGreaterThanSizeElements() throws Exception {
+        assertEquals(oneToFive, take(oneToFive, 6));
+    }
+
+    @Test
+    public void takeZeroElements() throws Exception {
+        assertEquals(list(), take(oneToFive, 0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void takeNegativeNOfElementsThrowsException() throws Exception {
+        take(oneToFive, -1);
     }
 
     @Test

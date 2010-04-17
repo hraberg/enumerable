@@ -58,20 +58,16 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public boolean all(Fn1<E, ?> block) {
-        for (E each : this) {
-            Object result = block.call(each);
-            if (isFalseOrNull(result))
+        for (E each : this)
+            if (isFalseOrNull(block.call(each)))
                 return false;
-        }
         return true;
     }
 
     public boolean any(Fn1<E, ?> block) {
-        for (E each : this) {
-            Object result = block.call(each);
-            if (isNotFalseOrNull(result))
+        for (E each : this)
+            if (isNotFalseOrNull(block.call(each)))
                 return true;
-        }
         return false;
     }
 
@@ -82,12 +78,12 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "unused" })
     public int count() {
         if (this instanceof Collection<?>)
             return ((Collection<E>) this).size();
         int count = 0;
-        for (Iterator<E> iterator = this.iterator(); iterator.hasNext(); iterator.next())
+        for (E each : this)
             count++;
         return count;
     }
@@ -106,13 +102,10 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     public <R> EList<E> cycle(int times, Fn1<E, R> block) {
         EList<E> result = new EList<E>();
-        while (times-- > 0) {
-            for (E each : this) {
-                block.call(each);
+        while (times-- > 0)
+            for (E each : this)
                 result.add(each);
-            }
-        }
-        return result;
+        return result.each(block);
     }
 
     public E detect(Fn1<E, Boolean> block) {
@@ -127,6 +120,8 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public EList<E> drop(int n) {
+        if (n < 0)
+            throw new IllegalArgumentException("Attempt to drop negative size");
         EList<E> result = new EList<E>();
         for (E each : this)
             if (n-- <= 0)
@@ -222,11 +217,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public EList<E> grep(Pattern pattern) {
-        EList<E> result = new EList<E>();
-        for (E each : this)
-            if (pattern.matcher(each.toString()).matches())
-                result.add(each);
-        return result;
+        return grep(pattern, Fn1.<E> identity());
     }
 
     public <R> EList<R> grep(Pattern pattern, Fn1<E, R> block) {
@@ -426,6 +417,8 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public EList<E> take(int n) {
+        if (n < 0)
+            throw new IllegalArgumentException("Attempt to take negative size");
         EList<E> result = new EList<E>();
         for (E each : this)
             if (n-- > 0)

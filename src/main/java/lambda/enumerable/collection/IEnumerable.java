@@ -154,7 +154,7 @@ public interface IEnumerable<E> extends Iterable<E> {
 
     /**
      * Returns a list of every element in collection for which pattern matches.
-     * Each matching element is passed to tje block, and its result is stored in
+     * Each matching element is passed to the block, and its result is stored in
      * the output list.
      */
     <R> EList<R> grep(Pattern pattern, Fn1<E, R> block);
