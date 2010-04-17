@@ -41,6 +41,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
 
 public class LambdaTreeWeaver implements Opcodes {
+    int currentLambdaId;
+
     @SuppressWarnings("unchecked")
     public ClassNode transform(ClassReader cr) throws Exception {
         ClassNode cn = new ClassNode();
@@ -49,6 +51,7 @@ public class LambdaTreeWeaver implements Opcodes {
         out.println(cn.name);
         out.println();
 
+        currentLambdaId = 1;
         for (MethodNode m : (List<MethodNode>) cn.methods)
             method(cn, m);
         return cn;
@@ -76,7 +79,7 @@ public class LambdaTreeWeaver implements Opcodes {
                     int end = i;
                     int start = findInstructionAtStartOfLambda(stackDepth, end);
 
-                    new LambdaDef(1, c, m, mi).lambda(stackDepth, end, start);
+                    new LambdaDef(currentLambdaId++, c, m, mi).lambda(stackDepth, end, start);
                 }
             }
         }
@@ -188,10 +191,10 @@ public class LambdaTreeWeaver implements Opcodes {
             List<MethodNode> sams = findPotentialSAMs();
 
             if (sams.size() == 1)
-                out.println("    SAM is: " + sams.get(0).name + sams.get(0).desc);
+                out.println("    SAM is: " + toString(sams).get(0));
             else
-                for (MethodNode mn : sams)
-                    out.println(" -- potential SAM is: " + mn.name + mn.desc);
+                for (String mn : toString(sams))
+                    out.println(" -- potential SAM is: " + mn);
 
             out.println("    parameters: " + parameters.keySet());
             out.println("    method parameter types: " + methodParameterTypes);
@@ -200,10 +203,19 @@ public class LambdaTreeWeaver implements Opcodes {
             out.println("    mutable locals: " + mutableLocals);
             out.println("    final locals: " + locals);
 
-            if (sams.size() > 1)
-                throw new IllegalStateException("Found more than one potential abstract method to override");
+            if (sams.size() > 1) {
+                throw new IllegalStateException("Found more than one potential abstract method to override: "
+                        + toString(sams));
+            }
             if (sams.isEmpty())
                 throw new IllegalStateException("Found no potential abstract method to override");
+        }
+
+        List<String> toString(List<MethodNode> ms) {
+            List<String> result = new ArrayList<String>();
+            for (MethodNode m : ms)
+                result.add(m.name + m.desc);
+            return result;
         }
 
         @SuppressWarnings("unchecked")
