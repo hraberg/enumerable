@@ -32,6 +32,7 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MemberNode;
@@ -67,6 +68,8 @@ public class LambdaTreeWeaver implements Opcodes {
         List<Integer> stackDepth;
         int line;
         List<LambdaAnalyzer> lambdas = new ArrayList<LambdaAnalyzer>();
+        Map<String, LocalVariableNode> methodLocals = new LinkedHashMap<String, LocalVariableNode>();
+        Map<String, LocalVariableNode> methodMutableLocals = new LinkedHashMap<String, LocalVariableNode>();
 
         MethodAnalyzer(MethodNode m) {
             this.m = m;
@@ -82,27 +85,29 @@ public class LambdaTreeWeaver implements Opcodes {
                     new EmptyVisitor());
 
             for (int i = 0; i < m.instructions.size(); i++) {
-                AbstractInsnNode node = m.instructions.get(i);
-                node.accept(analyzerAdapter);
+                AbstractInsnNode n = m.instructions.get(i);
+                n.accept(analyzerAdapter);
                 stackDepth.add(analyzerAdapter.stack == null ? 0 : analyzerAdapter.stack.size());
 
-                AbstractInsnNode n = m.instructions.get(i);
-
-                if (n.getType() == AbstractInsnNode.METHOD_INSN) {
-                    MethodInsnNode mi = (MethodInsnNode) node;
+                int type = n.getType();
+                if (type == AbstractInsnNode.METHOD_INSN) {
+                    MethodInsnNode mi = (MethodInsnNode) n;
 
                     if (isNewLambdaMethod(mi)) {
                         int end = i;
                         int start = findInstructionAtStartOfLambda(end);
 
                         LambdaAnalyzer lambda = new LambdaAnalyzer(currentLambdaId++, mi, start, end);
-                        lambdas.add(lambda);
                         lambda.analyze();
+                        lambdas.add(lambda);
                     }
                 }
-                if (n.getType() == LINE)
+                if (type == VAR_INSN)
+                    accessLocal((VarInsnNode) n);
+                if (type == IINC_INSN)
+                    accessLocal((IincInsnNode) n);
+                if (type == LINE)
                     line = ((LineNumberNode) n).line;
-
             }
 
             if (!lambdas.isEmpty()) {
@@ -122,6 +127,28 @@ public class LambdaTreeWeaver implements Opcodes {
             throw new IllegalStateException("Could not find previous stack depth of " + depth);
         }
 
+        LocalVariableNode accessLocal(VarInsnNode vin) {
+            if (vin.var >= m.localVariables.size())
+                return null;
+            LocalVariableNode local = (LocalVariableNode) m.localVariables.get(vin.var);
+
+            if (vin.getOpcode() == getType(local.desc).getOpcode(ISTORE) && methodLocals.containsKey(local.name))
+                methodMutableLocals.put(local.name, local);
+
+            methodLocals.put(local.name, local);
+            return local;
+        }
+
+        LocalVariableNode accessLocal(IincInsnNode iin) {
+            if (iin.var >= m.localVariables.size())
+                return null;
+            LocalVariableNode local = (LocalVariableNode) m.localVariables.get(iin.var);
+            methodMutableLocals.put(local.name, local);
+            methodLocals.put(local.name, local);
+
+            return local;
+        }
+
         class LambdaAnalyzer {
             int id;
             Method nlm;
@@ -132,7 +159,7 @@ public class LambdaTreeWeaver implements Opcodes {
 
             Map<String, FieldNode> parameters = new LinkedHashMap<String, FieldNode>();
             Map<String, LocalVariableNode> locals = new LinkedHashMap<String, LocalVariableNode>();
-            Map<String, LocalVariableNode> mutableLocals = new LinkedHashMap<String, LocalVariableNode>();
+            Map<String, LocalVariableNode> mutableLocals = MethodAnalyzer.this.methodMutableLocals;
 
             int start;
             int end;
@@ -266,16 +293,11 @@ public class LambdaTreeWeaver implements Opcodes {
             }
 
             void localVariable(VarInsnNode vin) {
-                LocalVariableNode local = (LocalVariableNode) m.localVariables.get(vin.var);
-
-                if (vin.getOpcode() == getType(local.desc).getOpcode(ISTORE))
-                    mutableLocals.put(local.name, local);
-                else
-                    locals.put(local.name, local);
+                LocalVariableNode local = accessLocal(vin);
+                locals.put(local.name, local);
 
                 out.println("  --  accessed var " + local.index + " " + local.name + " "
-                        + getType(local.desc).getClassName() + " write: "
-                        + (vin.getOpcode() == getType(local.desc).getOpcode(ISTORE)));
+                        + getType(local.desc).getClassName() + " write: " + (1));
             }
 
             String lambdaClass() {
@@ -285,18 +307,24 @@ public class LambdaTreeWeaver implements Opcodes {
             }
 
             List<Type> getParameterTypes() {
-                ArrayList<Type> result = new ArrayList<Type>();
+                List<Type> result = new ArrayList<Type>();
                 for (FieldNode f : parameters.values())
                     result.add(getType(f.desc));
                 return result;
             }
 
-            List<String> getParameterNames() {
-                return new ArrayList<String>(parameters.keySet());
+            Type getLocalVariableType(String local) {
+                return getType(locals.get(local).desc);
             }
 
-            public List<Type> getSamArgumentTypes() {
+            List<Type> getSamArgumentTypes() {
                 return asList(sam.getArgumentTypes());
+            }
+
+            void printInstruction(int index, int depth, ASMifierMethodVisitor asm) {
+                out.print(index + "\t");
+                out.print(depth + "\t\t");
+                out.print(asm.getText().get(index - start));
             }
         }
     }
@@ -357,11 +385,5 @@ public class LambdaTreeWeaver implements Opcodes {
         PrintWriter pw = new PrintWriter(w);
         asm.print(pw);
         pw.flush();
-    }
-
-    void printInstruction(int index, int depth, ASMifierMethodVisitor asm) {
-        out.print(index + "\t");
-        out.print(depth + "\t\t");
-        out.print(asm.getText().get(index - 1));
     }
 }

@@ -23,25 +23,25 @@ import org.objectweb.asm.Type;
 public class LambdaTreeWeaverTest extends TestBase {
     @Test
     public void analyzingZeroArgumentLambda() throws Exception {
-        class ZeroArgumentLambda {
-            void test() {
+        class C {
+            void m() {
                 λ(null);
             }
         }
 
-        LambdaTreeWeaver weaver = transform(ZeroArgumentLambda.class);
-        assertEquals(getType(ZeroArgumentLambda.class).getInternalName(), weaver.c.name);
+        LambdaTreeWeaver weaver = transform(C.class);
+        assertEquals(getType(C.class).getInternalName(), weaver.c.name);
         assertEquals(2, weaver.methods.size());
 
         MethodAnalyzer constructor = weaver.methods.get(0);
         assertEquals("<init>", constructor.m.name);
         assertTrue(constructor.lambdas.isEmpty());
 
-        MethodAnalyzer test = weaver.methods.get(1);
-        assertEquals("test", test.m.name);
+        MethodAnalyzer method = weaver.methods.get(1);
+        assertEquals("m", method.m.name);
 
-        assertEquals(1, test.lambdas.size());
-        LambdaAnalyzer lambda = test.lambdas.get(0);
+        assertEquals(1, method.lambdas.size());
+        LambdaAnalyzer lambda = method.lambdas.get(0);
 
         assertTrue(lambda.locals.isEmpty());
         assertTrue(lambda.mutableLocals.isEmpty());
@@ -59,18 +59,18 @@ public class LambdaTreeWeaverTest extends TestBase {
 
     @Test
     public void analyzingOneArgumentLambda() throws Exception {
-        class OneArgumentLambda {
-            void test() {
+        class C {
+            void m() {
                 λ(n, null);
             }
         }
 
-        LambdaAnalyzer lambda = lambdaFor(OneArgumentLambda.class);
+        LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertTrue(lambda.locals.isEmpty());
         assertTrue(lambda.mutableLocals.isEmpty());
 
-        assertEquals(list("n"), lambda.getParameterNames());
+        assertEquals(list("n"), list(lambda.parameters.keySet()));
         assertEquals(list(INT_TYPE), lambda.getParameterTypes());
 
         assertEquals(list(object), lambda.methodParameterTypes);
@@ -85,18 +85,18 @@ public class LambdaTreeWeaverTest extends TestBase {
 
     @Test
     public void analyzingTwoArgumentsLambda() throws Exception {
-        class TwoArgumentsLambda {
-            void test() {
+        class C {
+            void m() {
                 λ(s, n, null);
             }
         }
 
-        LambdaAnalyzer lambda = lambdaFor(TwoArgumentsLambda.class);
+        LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertTrue(lambda.locals.isEmpty());
         assertTrue(lambda.mutableLocals.isEmpty());
 
-        assertEquals(list("s", "n"), lambda.getParameterNames());
+        assertEquals(list("s", "n"), list(lambda.parameters.keySet()));
         assertEquals(list(getType(String.class), INT_TYPE), lambda.getParameterTypes());
 
         assertEquals(list(object, object), lambda.methodParameterTypes);
@@ -111,18 +111,18 @@ public class LambdaTreeWeaverTest extends TestBase {
 
     @Test
     public void analyzingThreeArgumentLambda() throws Exception {
-        class ThreeArgumentsLambda {
-            void test() {
+        class C {
+            void m() {
                 λ(s, n, b, null);
             }
         }
 
-        LambdaAnalyzer lambda = lambdaFor(ThreeArgumentsLambda.class);
+        LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertTrue(lambda.locals.isEmpty());
         assertTrue(lambda.mutableLocals.isEmpty());
 
-        assertEquals(list("s", "n", "b"), lambda.getParameterNames());
+        assertEquals(list("s", "n", "b"), list(lambda.parameters.keySet()));
         assertEquals(list(getType(String.class), INT_TYPE, BOOLEAN_TYPE), lambda.getParameterTypes());
 
         assertEquals(list(object, object, object), lambda.methodParameterTypes);
@@ -135,9 +135,172 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals(object, lambda.sam.getReturnType());
     }
 
-    LambdaAnalyzer lambdaFor(Class<?> aClass) throws Exception {
-        MethodAnalyzer test = transform(aClass).methods.get(1);
-        return test.lambdas.get(0);
+    @Test
+    public void analyzingLambdaClosingOverEffectivelyFinalVariable() throws Exception {
+        class C {
+            void m() {
+                int i = 1;
+                λ(i);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(1, lambda.locals.size());
+        assertTrue(lambda.mutableLocals.isEmpty());
+
+        assertEquals(list("i"), list(lambda.locals.keySet()));
+        assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
+    }
+
+    @Test
+    public void analyzingLambdaClosingOverMutableVariableMutatedOutsideLambda() throws Exception {
+        class C {
+            void m() {
+                int i = 1;
+                i = 2;
+                λ(i);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(1, lambda.locals.size());
+        assertEquals(1, lambda.mutableLocals.size());
+
+        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+    }
+
+    @Test
+    public void analyzingLambdaClosingOverMutableVariable() throws Exception {
+        class C {
+            void m() {
+                int i = 1;
+                λ(i = 2);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(1, lambda.locals.size());
+        assertEquals(1, lambda.mutableLocals.size());
+
+        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
+    }
+
+    @Test
+    public void analyzingLambdaClosingOverMutableVariableChangedAfterLambda() throws Exception {
+        class C {
+            void m() {
+                int i = 1;
+                λ(i);
+                i = 2;
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(1, lambda.locals.size());
+        assertEquals(1, lambda.mutableLocals.size());
+
+        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
+    }
+
+    @Test
+    public void analyzingLambdaClosingOverIncreasedVariable() throws Exception {
+        class C {
+            void m() {
+                int i = 1;
+                λ(i++);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(1, lambda.locals.size());
+        assertEquals(1, lambda.mutableLocals.size());
+
+        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
+    }
+
+    @Test
+    public void analyzingLambdaClosingOverIncreasedVariableOutsideLambda() throws Exception {
+        class C {
+            void m() {
+                int i = 1;
+                λ(i++);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(1, lambda.locals.size());
+        assertEquals(1, lambda.mutableLocals.size());
+
+        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
+    }
+
+    @Test
+    public void analyzingLambdaClosingOverVariableInitialziedInLambda() throws Exception {
+        class C {
+            void m() {
+                int i;
+                λ(i = 2);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(1, lambda.locals.size());
+        assertEquals(1, lambda.mutableLocals.size());
+
+        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
+    }
+
+    @Test
+    public void analyzingLambdaClosingOverEffectivelyFinalArgument() throws Exception {
+        class C {
+            void m(int i) {
+                λ(i);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(1, lambda.locals.size());
+        assertTrue(lambda.mutableLocals.isEmpty());
+
+        assertEquals(list("i"), list(lambda.locals.keySet()));
+        assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
+    }
+
+    @Test
+    public void analyzingLambdaClosingOverMutableArgument() throws Exception {
+        class C {
+            void m(int i) {
+                i = 2;
+                i = 4;
+                λ(i);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(1, lambda.locals.size());
+        assertEquals(1, lambda.mutableLocals.size());
+
+        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
+    }
+
+    LambdaAnalyzer lambdaIn(Class<?> aClass) throws Exception {
+        MethodAnalyzer ma = transform(aClass).methods.get(1);
+        return ma.lambdas.get(0);
     }
 
     Type object = getType(Object.class);
