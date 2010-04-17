@@ -31,7 +31,7 @@ public class LambdaTreeWeaverTest extends TestBase {
             }
         }
 
-        LambdaTreeWeaver weaver = transform(C.class);
+        LambdaTreeWeaver weaver = analyze(C.class);
         assertEquals(getType(C.class).getInternalName(), weaver.c.name);
         assertEquals(2, weaver.methods.size());
 
@@ -348,17 +348,116 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals(INT_TYPE, lambda.sam.getReturnType());
     }
 
+    @Test
+    public void analyzingOneArgumentLambdaWithDefaultValue() throws Exception {
+        class C {
+            void m() {
+                λ(n = 2, null);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertTrue(lambda.locals.isEmpty());
+        assertTrue(lambda.mutableLocals.isEmpty());
+
+        assertEquals(list("n"), list(lambda.parameters.keySet()));
+        assertEquals(list(INT_TYPE), lambda.getParameterTypes());
+
+        assertTrue(lambda.parametersWithDefaultValue.contains("n"));
+    }
+
+    @Test
+    public void analyzingTwoArgumentLambdaWithDefaultValue() throws Exception {
+        class C {
+            void m() {
+                λ(n, m = 2, null);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(list("n", "m"), list(lambda.parameters.keySet()));
+        assertEquals(list(INT_TYPE, INT_TYPE), lambda.getParameterTypes());
+
+        assertFalse(lambda.parametersWithDefaultValue.contains("n"));
+        assertTrue(lambda.parametersWithDefaultValue.contains("m"));
+    }
+
+    @Test
+    public void analyzingLambdaAccessingPrivateField() throws Exception {
+        class C {
+            private int p;
+
+            void m() {
+                λ(p);
+            }
+        }
+
+        LambdaTreeWeaver weaver = analyze(C.class);
+        assertTrue(weaver.fieldsThatNeedStaticAccessMethod.containsKey("p"));
+    }
+
+    @Test
+    public void analyzingLambdaAccessingPrivateMethod() throws Exception {
+        class C {
+            void m() {
+                λ(p());
+            }
+
+            private Object p() {
+                return null;
+            }
+        }
+
+        LambdaTreeWeaver weaver = analyze(C.class);
+        assertTrue(weaver.methodsThatNeedStaticAccessMethod.containsKey("p"));
+    }
+
+    static class PrivateStaticField {
+        private static int p;
+
+        void m() {
+            λ(p);
+        }
+    }
+
+    @Test
+    public void analyzingLambdaAccessingPrivateStaticField() throws Exception {
+        LambdaTreeWeaver weaver = analyze(PrivateStaticField.class);
+        assertTrue(weaver.fieldsThatNeedStaticAccessMethod.containsKey("p"));
+    }
+
+    static class PrivateStaticMethod {
+        void m() {
+            λ(p());
+        }
+
+        private static Object p() {
+            return null;
+        }
+    }
+
+    @Test
+    public void analyzingLambdaAccessingPrivateStaticMethod() throws Exception {
+        LambdaTreeWeaver weaver = analyze(PrivateStaticMethod.class);
+        assertTrue(weaver.methodsThatNeedStaticAccessMethod.containsKey("p"));
+    }
+
     LambdaAnalyzer lambdaIn(Class<?> aClass) throws Exception {
-        MethodAnalyzer ma = transform(aClass).methods.get(1);
-        return ma.lambdas.get(0);
+        return methodIn(aClass).lambdas.get(0);
+    }
+
+    MethodAnalyzer methodIn(Class<?> aClass) throws IOException, Exception {
+        return analyze(aClass).methods.get(1);
     }
 
     Type object = getType(Object.class);
 
-    LambdaTreeWeaver transform(Class<?> aClass) throws IOException, Exception {
+    LambdaTreeWeaver analyze(Class<?> aClass) throws IOException, Exception {
         ClassReader cr = new ClassReader(aClass.getName());
-        LambdaTreeWeaver weaver = new LambdaTreeWeaver();
-        weaver.transform(cr);
+        LambdaTreeWeaver weaver = new LambdaTreeWeaver(cr);
+        weaver.analyze();
         return weaver;
     }
 }

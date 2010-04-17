@@ -13,10 +13,13 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
@@ -42,26 +45,35 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
 
-public class LambdaTreeWeaver implements Opcodes {
+class LambdaTreeWeaver implements Opcodes {
     ClassNode c;
-    int currentLambdaId;
+    int currentLambdaId = 1;
     List<MethodAnalyzer> methods = new ArrayList<MethodAnalyzer>();
 
+    Map<String, FieldNode> fieldsThatNeedStaticAccessMethod = new HashMap<String, FieldNode>();
+    Map<String, MethodNode> methodsThatNeedStaticAccessMethod = new HashMap<String, MethodNode>();
+    ClassReader cr;
+
+    LambdaTreeWeaver(ClassReader cr) {
+        this.cr = cr;
+    }
+
     @SuppressWarnings("unchecked")
-    public ClassNode transform(ClassReader cr) throws Exception {
+    void analyze() throws Exception {
+        if (c != null)
+            return;
+
         c = new ClassNode();
         cr.accept(c, EXPAND_FRAMES);
 
         out.println(c.name);
         out.println();
 
-        currentLambdaId = 1;
         for (MethodNode m : (List<MethodNode>) c.methods) {
             MethodAnalyzer ma = new MethodAnalyzer(m);
             ma.analyze();
             methods.add(ma);
         }
-        return c;
     }
 
     class MethodAnalyzer {
@@ -105,8 +117,10 @@ public class LambdaTreeWeaver implements Opcodes {
                 }
                 if (type == VAR_INSN)
                     accessLocal((VarInsnNode) n);
+
                 if (type == IINC_INSN)
                     accessLocal((IincInsnNode) n);
+
                 if (type == LINE)
                     line = ((LineNumberNode) n).line;
             }
@@ -133,7 +147,7 @@ public class LambdaTreeWeaver implements Opcodes {
                 return null;
             LocalVariableNode local = (LocalVariableNode) m.localVariables.get(vin.var);
 
-            if (vin.getOpcode() == getType(local.desc).getOpcode(ISTORE) && methodLocals.containsKey(local.name))
+            if (isStoreInstruction(vin, local) && methodLocals.containsKey(local.name))
                 methodMutableLocals.put(local.name, local);
 
             methodLocals.put(local.name, local);
@@ -150,6 +164,10 @@ public class LambdaTreeWeaver implements Opcodes {
             return local;
         }
 
+        boolean isStoreInstruction(VarInsnNode vin, LocalVariableNode local) {
+            return vin.getOpcode() == getType(local.desc).getOpcode(ISTORE);
+        }
+
         class LambdaAnalyzer {
             int id;
             Method newLambdaMethod;
@@ -158,10 +176,12 @@ public class LambdaTreeWeaver implements Opcodes {
             Type lambdaType;
             Type expressionType;
 
+            Set<String> parametersWithDefaultValue = new HashSet<String>();
             Map<String, FieldNode> parameters = new LinkedHashMap<String, FieldNode>();
             Map<String, LocalVariableNode> locals = new LinkedHashMap<String, LocalVariableNode>();
             Map<String, LocalVariableNode> mutableLocals = MethodAnalyzer.this.methodMutableLocals;
 
+            int bodyStart;
             int start;
             int end;
             Method sam;
@@ -209,15 +229,34 @@ public class LambdaTreeWeaver implements Opcodes {
                     int type = n.getType();
                     if (type == VAR_INSN)
                         localVariable((VarInsnNode) n);
+                    if (type == METHOD_INSN) {
+                        MethodInsnNode min = (MethodInsnNode) n;
 
+                        if (min.owner.equals(c.name)) {
+                            MethodNode m = findMethod(min);
+                            if (hasAccess(m, ACC_PRIVATE))
+                                methodsThatNeedStaticAccessMethod.put(m.name, m);
+                        }
+
+                    }
                     if (type == FIELD_INSN) {
-                        lambdaParameter(lastParameterStart, (FieldInsnNode) n);
-                        lastParameterStart = i;
+                        FieldInsnNode fin = (FieldInsnNode) n;
+
+                        if (isLambdaParameterField(fin)) {
+                            lambdaParameter(lastParameterStart, fin);
+                            lastParameterStart = i;
+
+                        } else if (fin.owner.equals(c.name)) {
+                            FieldNode f = findField(fin);
+                            if (hasAccess(f, ACC_PRIVATE))
+                                fieldsThatNeedStaticAccessMethod.put(f.name, f);
+                        }
                     }
                 }
+                bodyStart = lastParameterStart + 1;
 
                 out.println("end =================== " + start + " -> " + end);
-                out.println("    body starts at: " + lastParameterStart);
+                out.println("    body starts at: " + bodyStart);
                 out.println("    type: " + lambdaType);
                 out.println("    class: " + lambdaClass());
 
@@ -266,32 +305,32 @@ public class LambdaTreeWeaver implements Opcodes {
             }
 
             void lambdaParameter(int lastParameterStart, FieldInsnNode fin) throws IOException {
-                if (isLambdaParameterField(fin)) {
-                    FieldNode f = findField(fin);
+                FieldNode f = findField(fin);
 
-                    if (!parameters.containsKey(f.name)) {
-                        if (parameters.size() == methodParameterTypes.size())
-                            throw new IllegalStateException("Tried to define extra parameter, " + f.name
-                                    + ", arity is " + methodParameterTypes.size() + ", defined parameters are "
-                                    + parameters.keySet());
+                if (!parameters.containsKey(f.name)) {
+                    if (parameters.size() == methodParameterTypes.size())
+                        throw new IllegalStateException("Tried to define extra parameter, " + f.name
+                                + ", arity is " + methodParameterTypes.size() + ", defined parameters are "
+                                + parameters.keySet());
 
-                        Type argumentType = getType(fin.desc);
-                        parameters.put(f.name, f);
+                    Type argumentType = getType(fin.desc);
+                    parameters.put(f.name, f);
+                    boolean hasDefaultValue = fin.getOpcode() == PUTSTATIC;
+                    if (hasDefaultValue)
+                        parametersWithDefaultValue.add(f.name);
 
-                        out.println("  --  defined parameter "
-                                + fin.name
-                                + " "
-                                + argumentType.getClassName()
-                                + " as "
-                                + parameters.size()
-                                + " out of "
-                                + methodParameterTypes.size()
-                                + (fin.getOpcode() == PUTSTATIC ? " (has default value starting at "
-                                        + lastParameterStart + ")" : ""));
-                    } else
-                        out.println("  --  accessed parameter " + fin.name + " " + getType(f.desc).getClassName()
-                                + " (" + (fin.getOpcode() == PUTSTATIC ? "write" : "read") + ")");
-                }
+                    out.println("  --  defined parameter "
+                            + fin.name
+                            + " "
+                            + argumentType.getClassName()
+                            + " as "
+                            + parameters.size()
+                            + " out of "
+                            + methodParameterTypes.size()
+                            + (hasDefaultValue ? " (has default value starting at " + lastParameterStart + ")" : ""));
+                } else
+                    out.println("  --  accessed parameter " + fin.name + " " + getType(f.desc).getClassName()
+                            + " (" + (fin.getOpcode() == PUTSTATIC ? "write" : "read") + ")");
             }
 
             void localVariable(VarInsnNode vin) {
@@ -299,7 +338,7 @@ public class LambdaTreeWeaver implements Opcodes {
                 locals.put(local.name, local);
 
                 out.println("  --  accessed var " + local.index + " " + local.name + " "
-                        + getType(local.desc).getClassName() + " write: " + (1));
+                        + getType(local.desc).getClassName() + " write: " + (isStoreInstruction(vin, local)));
             }
 
             String lambdaClass() {
@@ -341,8 +380,8 @@ public class LambdaTreeWeaver implements Opcodes {
         return (m.access & acc) != 0;
     }
 
-    boolean hasAccess(FieldNode m, int acc) {
-        return (m.access & acc) != 0;
+    boolean hasAccess(FieldNode f, int acc) {
+        return (f.access & acc) != 0;
     }
 
     @SuppressWarnings("unchecked")
@@ -362,9 +401,11 @@ public class LambdaTreeWeaver implements Opcodes {
     }
 
     ClassNode readClassNoCode(String in) throws IOException {
-        ClassNode classNode = new ClassNode();
-        new ClassReader(getObjectType(in).getClassName()).accept(classNode, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
-        return classNode;
+        if (in.equals(c.name))
+            return c;
+        ClassNode cn = new ClassNode();
+        new ClassReader(getObjectType(in).getClassName()).accept(cn, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+        return cn;
     }
 
     @SuppressWarnings("unchecked")
