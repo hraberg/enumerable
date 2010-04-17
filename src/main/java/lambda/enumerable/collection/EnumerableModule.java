@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
 import lambda.enumerable.Enumerable;
@@ -115,14 +116,14 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public E detect(Fn1<E, Boolean> block) {
-        return detect(null, block);
+        return detect((Fn0<E>) null, block);
     }
 
-    public E detect(E ifNone, Fn1<E, Boolean> block) {
+    public E detect(Fn0<E> ifNone, Fn1<E, Boolean> block) {
         for (E each : this)
             if (block.call(each))
                 return each;
-        return ifNone;
+        return ifNone == null ? null : ifNone.call();
     }
 
     public EList<E> drop(int n) {
@@ -186,7 +187,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return detect(block);
     }
 
-    public E find(E ifNone, Fn1<E, Boolean> block) {
+    public E find(Fn0<E> ifNone, Fn1<E, Boolean> block) {
         return detect(ifNone, block);
     }
 

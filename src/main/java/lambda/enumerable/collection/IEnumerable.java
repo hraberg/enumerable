@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
 
@@ -81,7 +82,7 @@ public interface IEnumerable<E> extends Iterable<E> {
      * Passes each entry in collection to block. Returns the first for which
      * block is not false. If no object matches, it returns ifNone.
      */
-    E detect(E ifNone, Fn1<E, Boolean> block);
+    E detect(Fn0<E> ifNone, Fn1<E, Boolean> block);
 
     /**
      * Calls block for each item in collection.
@@ -123,7 +124,7 @@ public interface IEnumerable<E> extends Iterable<E> {
     /**
      * @see #detect(Object, Fn1)
      */
-    E find(E ifNone, Fn1<E, Boolean> block);
+    E find(Fn0<E> ifNone, Fn1<E, Boolean> block);
 
     /**
      * @see #select(Fn1)

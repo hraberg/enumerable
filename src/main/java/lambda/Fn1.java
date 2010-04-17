@@ -13,7 +13,7 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
         return call(default$1());
     }
 
-    final protected A1 default$1() {
+    protected A1 default$1() {
         return null;
     }
 

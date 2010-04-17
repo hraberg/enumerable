@@ -17,6 +17,14 @@ import lambda.annotation.LambdaLocal;
  */
 @SuppressWarnings("serial")
 public abstract class Fn0<R> implements Serializable {
+    public static <R> Fn0<R> constant(final R value) {
+        return new Fn0<R>() {
+            public R call() {
+                return value;
+            }
+        };
+    }
+
     public final int arity = 0;
 
     public abstract R call();

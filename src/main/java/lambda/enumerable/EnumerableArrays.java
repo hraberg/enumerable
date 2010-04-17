@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
+import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
 import lambda.enumerable.collection.EList;
@@ -107,7 +108,7 @@ public class EnumerableArrays {
      * Passes each entry in array to block. Returns the first for which block is
      * not false. If no object matches, it returns ifNone.
      */
-    public static <E> E detect(E[] array, E ifNone, Fn1<E, Boolean> block) {
+    public static <E> E detect(E[] array, Fn0<E> ifNone, Fn1<E, Boolean> block) {
         return Enumerable.detect(asList(array), ifNone, block);
     }
 
@@ -159,7 +160,7 @@ public class EnumerableArrays {
     /**
      * @see #detect(Object[], Object, Fn1)
      */
-    public static <E> E find(E[] array, E ifNone, Fn1<E, Boolean> block) {
+    public static <E> E find(E[] array, Fn0<E> ifNone, Fn1<E, Boolean> block) {
         return Enumerable.find(asList(array), ifNone, block);
     }
 
@@ -208,6 +209,16 @@ public class EnumerableArrays {
      */
     public static <E, R> EMap<R, EList<E>> groupBy(E[] array, Fn1<E, R> block) {
         return Enumerable.groupBy(asList(array), block);
+    }
+
+    /**
+     * Named parameter for detect.
+     * 
+     * @see #detect(Object[], Object, Fn1)
+     * @see #find(Object[], Object, Fn1)
+     */
+    public static <R> Fn0<R> ifNone(R defaultValue) {
+        return Enumerable.ifNone(defaultValue);
     }
 
     /**

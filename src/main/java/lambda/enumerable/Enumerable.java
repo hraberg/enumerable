@@ -1,5 +1,6 @@
 package lambda.enumerable;
 
+import static lambda.enumerable.collection.EnumerableModule.*;
 import static lambda.exception.UncheckedException.*;
 
 import java.io.BufferedReader;
@@ -46,7 +47,7 @@ public class Enumerable {
      * returns true if the block never returns false or null.
      */
     public static <E> boolean all(Iterable<E> collection, Fn1<E, ?> block) {
-        return EnumerableModule.extend(collection).all(block);
+        return extend(collection).all(block);
     }
 
     /**
@@ -54,7 +55,7 @@ public class Enumerable {
      * returns true if the block ever returns a value other than false or null.
      */
     public static <E> boolean any(Iterable<E> collection, Fn1<E, ?> block) {
-        return EnumerableModule.extend(collection).any(block);
+        return extend(collection).any(block);
     }
 
     /**
@@ -62,21 +63,21 @@ public class Enumerable {
      * element in collection.
      */
     public static <E, R> EList<R> collect(Iterable<E> collection, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).collect(block);
+        return extend(collection).collect(block);
     }
 
     /**
      * Returns the count of all elements in collection.
      */
     public static <E> int count(Iterable<E> collection) {
-        return EnumerableModule.extend(collection).count();
+        return extend(collection).count();
     }
 
     /**
      * Returns the count of objects in collection that equal obj.
      */
     public static <E> int count(Iterable<E> collection, E obj) {
-        return EnumerableModule.extend(collection).count(obj);
+        return extend(collection).count(obj);
     }
 
     /**
@@ -84,7 +85,7 @@ public class Enumerable {
      * true value.
      */
     public static <E> int count(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).count(block);
+        return extend(collection).count(block);
     }
 
     /**
@@ -93,7 +94,7 @@ public class Enumerable {
      * repeats. The number of times it repeats is set by the parameter.
      */
     public static <E, R> EList<E> cycle(Iterable<E> collection, int times, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).cycle(times, block);
+        return extend(collection).cycle(times, block);
     }
 
     /**
@@ -101,22 +102,22 @@ public class Enumerable {
      * block is not false. If no object matches, it returns null.
      */
     public static <E> E detect(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).detect(block);
+        return extend(collection).detect(block);
     }
 
     /**
      * Passes each entry in collection to block. Returns the first for which
      * block is not false. If no object matches, it returns ifNone.
      */
-    public static <E> E detect(Iterable<E> collection, E ifNone, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).detect(ifNone, block);
+    public static <E> E detect(Iterable<E> collection, Fn0<E> ifNone, Fn1<E, Boolean> block) {
+        return extend(collection).detect(ifNone, block);
     }
 
     /**
      * Returns a list containing all but the first n elements of collection.
      */
     public static <E> EList<E> drop(Iterable<E> collection, int n) {
-        return EnumerableModule.extend(collection).drop(n);
+        return extend(collection).drop(n);
     }
 
     /**
@@ -125,14 +126,14 @@ public class Enumerable {
      * and returns it.
      */
     public static <E> EList<E> dropWhile(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).dropWhile(block);
+        return extend(collection).dropWhile(block);
     }
 
     /**
      * Calls block for each item in collection.
      */
     public static <E, R> IEnumerable<E> each(Iterable<E> collection, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).each(block);
+        return extend(collection).each(block);
     }
 
     /**
@@ -140,21 +141,21 @@ public class Enumerable {
      * block as parameters.
      */
     public static <K, V, R> EMap<K, V> each(Map<K, V> map, Fn2<K, V, R> block) {
-        return EnumerableModule.extend(map).each(block);
+        return extend(map).each(block);
     }
 
     /**
      * Iterates the given block for each list of consecutive n elements.
      */
     public static <E, R> Object eachCons(Iterable<E> collection, int n, Fn1<List<E>, R> block) {
-        return EnumerableModule.extend(collection).eachCons(n, block);
+        return extend(collection).eachCons(n, block);
     }
 
     /**
      * Calls block once for each key in map, passing the key as parameter.
      */
     public static <K, V, R> EMap<K, V> eachKey(Map<K, V> map, Fn1<K, R> block) {
-        return EnumerableModule.extend(map).eachKey(block);
+        return extend(map).eachKey(block);
     }
 
     /**
@@ -201,14 +202,14 @@ public class Enumerable {
      * Iterates the given block for each slice of n elements.
      */
     public static <E, R> Object eachSlice(Iterable<E> collection, int n, Fn1<List<E>, R> block) {
-        return EnumerableModule.extend(collection).eachSlice(n, block);
+        return extend(collection).eachSlice(n, block);
     }
 
     /**
      * Calls block once for each value in map, passing the key as parameter.
      */
     public static <K, V, R> EMap<K, V> eachValue(Map<K, V> map, Fn1<V, R> block) {
-        return EnumerableModule.extend(map).eachValue(block);
+        return extend(map).eachValue(block);
     }
 
     /**
@@ -216,7 +217,7 @@ public class Enumerable {
      * collection.
      */
     public static <E, R> IEnumerable<E> eachWithIndex(Iterable<E> collection, Fn2<E, Integer, R> block) {
-        return EnumerableModule.extend(collection).eachWithIndex(block);
+        return extend(collection).eachWithIndex(block);
     }
 
     /**
@@ -224,35 +225,35 @@ public class Enumerable {
      * item in collection.
      */
     public static <E, M, R> M eachWithObject(Iterable<E> collection, M memo, Fn2<E, M, R> block) {
-        return EnumerableModule.extend(collection).eachWithObject(memo, block);
+        return extend(collection).eachWithObject(memo, block);
     }
 
     /**
      * @see #toList(Iterable)
      */
     public static <E> EList<E> entries(Iterable<E> collection) {
-        return EnumerableModule.extend(collection).toList();
+        return extend(collection).toList();
     }
 
     /**
      * @see #detect(Iterable, Fn1)
      */
     public static <E> E find(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).find(block);
+        return extend(collection).find(block);
     }
 
     /**
      * @see #detect(Iterable, Object, Fn1)
      */
-    public static <E> E find(Iterable<E> collection, E ifNone, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).find(ifNone, block);
+    public static <E> E find(Iterable<E> collection, Fn0<E> ifNone, Fn1<E, Boolean> block) {
+        return extend(collection).find(ifNone, block);
     }
 
     /**
      * @see #select(Iterable, Fn1)
      */
     public static <E> EList<E> findAll(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).findAll(block);
+        return extend(collection).findAll(block);
     }
 
     /**
@@ -260,28 +261,28 @@ public class Enumerable {
      * true value or returns -1 if the block only ever returns false.
      */
     public static <E> int findIndex(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).findIndex(block);
+        return extend(collection).findIndex(block);
     }
 
     /**
      * Returns the first item of collection or null.
      */
     public static <E> E first(Iterable<E> collection) {
-        return EnumerableModule.extend(collection).first();
+        return extend(collection).first();
     }
 
     /**
      * Returns the first n items of collection.
      */
     public static <E> EList<E> first(Iterable<E> collection, int n) {
-        return EnumerableModule.extend(collection).first(n);
+        return extend(collection).first(n);
     }
 
     /**
      * Returns a list of every element in collection for which pattern matches.
      */
     public static <E> EList<E> grep(Iterable<E> collection, Pattern pattern) {
-        return EnumerableModule.extend(collection).grep(pattern);
+        return extend(collection).grep(pattern);
     }
 
     /**
@@ -290,21 +291,21 @@ public class Enumerable {
      * the output list.
      */
     public static <E, R> EList<R> grep(Iterable<E> collection, Pattern pattern, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).grep(pattern, block);
+        return extend(collection).grep(pattern, block);
     }
 
     /**
      * @see #grep(Iterable, Pattern)
      */
     public static <E> EList<E> grep(Iterable<E> collection, String pattern) {
-        return EnumerableModule.extend(collection).grep(pattern);
+        return extend(collection).grep(pattern);
     }
 
     /**
      * @see #grep(Iterable, Pattern, Fn1)
      */
     public static <E, R> EList<R> grep(Iterable<E> collection, String pattern, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).grep(pattern, block);
+        return extend(collection).grep(pattern, block);
     }
 
     /**
@@ -314,7 +315,7 @@ public class Enumerable {
      * for a key are those items for which the block returned that object.
      */
     public static <E, R> EMap<R, EList<E>> groupBy(Iterable<E> collection, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).groupBy(block);
+        return extend(collection).groupBy(block);
     }
 
     /**
@@ -323,15 +324,15 @@ public class Enumerable {
      * @see #detect(Iterable, Object, Fn1)
      * @see #find(Iterable, Object, Fn1)
      */
-    public static <R> R ifNone(R defaultValue) {
-        return defaultValue;
+    public static <R> Fn0<R> ifNone(final R defaultValue) {
+        return Fn0.constant(defaultValue);
     }
 
     /**
      * @see #member(Iterable, Object)
      */
     public static <E> boolean includes(Iterable<E> collection, Object obj) {
-        return EnumerableModule.extend(collection).includes(obj);
+        return extend(collection).includes(obj);
     }
 
     /**
@@ -342,7 +343,7 @@ public class Enumerable {
      * iterating).
      */
     public static <E> E inject(Iterable<E> collection, Fn2<E, E, E> block) {
-        return EnumerableModule.extend(collection).inject(block);
+        return extend(collection).inject(block);
     }
 
     /**
@@ -352,14 +353,14 @@ public class Enumerable {
      * initial value for memo.
      */
     public static <E, R> R inject(Iterable<E> collection, R initial, Fn2<R, E, R> block) {
-        return EnumerableModule.extend(collection).inject(initial, block);
+        return extend(collection).inject(initial, block);
     }
 
     /**
      * @see #collect(Iterable, Fn1)
      */
     public static <E, R> EList<R> map(Iterable<E> collection, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).map(block);
+        return extend(collection).map(block);
     }
 
     /**
@@ -367,7 +368,7 @@ public class Enumerable {
      * assumes all objects implement {@link Comparable}
      */
     public static <E extends Object & Comparable<? super E>> E max(Iterable<E> collection) {
-        return EnumerableModule.extend(collection).max();
+        return extend(collection).max();
     }
 
     /**
@@ -375,7 +376,7 @@ public class Enumerable {
      * the block to {@link Comparator#compare}.
      */
     public static <E> E max(Iterable<E> collection, Fn2<E, E, Integer> block) {
-        return EnumerableModule.extend(collection).max(block);
+        return extend(collection).max(block);
     }
 
     /**
@@ -383,7 +384,7 @@ public class Enumerable {
      * corresponding to the largest value returned by the block.
      */
     public static <E, R extends Object & Comparable<? super R>> E maxBy(Iterable<E> collection, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).maxBy(block);
+        return extend(collection).maxBy(block);
     }
 
     /**
@@ -391,7 +392,7 @@ public class Enumerable {
      * using {@link Object#equals(Object)}.
      */
     public static <E> boolean member(Iterable<E> collection, Object obj) {
-        return EnumerableModule.extend(collection).includes(obj);
+        return extend(collection).includes(obj);
     }
 
     /**
@@ -399,7 +400,7 @@ public class Enumerable {
      * assumes all objects implement {@link Comparable}.
      */
     public static <E extends Object & Comparable<? super E>> E min(Iterable<E> collection) {
-        return EnumerableModule.extend(collection).min();
+        return extend(collection).min();
     }
 
     /**
@@ -407,7 +408,7 @@ public class Enumerable {
      * the block to {@link Comparator#compare}.
      */
     public static <E> E min(Iterable<E> collection, Fn2<E, E, Integer> block) {
-        return EnumerableModule.extend(collection).min(block);
+        return extend(collection).min(block);
     }
 
     /**
@@ -415,7 +416,7 @@ public class Enumerable {
      * corresponding to the smallest value returned by the block.
      */
     public static <E, R extends Object & Comparable<? super R>> E minBy(Iterable<E> collection, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).minBy(block);
+        return extend(collection).minBy(block);
     }
 
     /**
@@ -423,7 +424,7 @@ public class Enumerable {
      * the minimum and maximum value.
      */
     public static <E extends Object & Comparable<? super E>> EList<E> minMax(Iterable<E> collection) {
-        return EnumerableModule.extend(collection).minMax();
+        return extend(collection).minMax();
     }
 
     /**
@@ -431,7 +432,7 @@ public class Enumerable {
      * minimum and maximum value.
      */
     public static <E> EList<E> minMax(Iterable<E> collection, Fn2<E, E, Integer> block) {
-        return EnumerableModule.extend(collection).minMax(block);
+        return extend(collection).minMax(block);
     }
 
     /**
@@ -440,7 +441,7 @@ public class Enumerable {
      */
     public static <E, R extends Object & Comparable<? super R>> EList<E> minMaxBy(Iterable<E> collection,
             Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).minMaxBy(block);
+        return extend(collection).minMaxBy(block);
     }
 
     /**
@@ -448,7 +449,7 @@ public class Enumerable {
      * returns true if the block never returns a value other than false or null.
      */
     public static <E> boolean none(Iterable<E> collection, Fn1<E, ?> block) {
-        return EnumerableModule.extend(collection).none(block);
+        return extend(collection).none(block);
     }
 
     /**
@@ -456,7 +457,7 @@ public class Enumerable {
      * returns true if the block returns true exactly one time.
      */
     public static <E> boolean one(Iterable<E> collection, Fn1<E, ?> block) {
-        return EnumerableModule.extend(collection).one(block);
+        return extend(collection).one(block);
     }
 
     /**
@@ -464,7 +465,7 @@ public class Enumerable {
      * which the block evaluates to true, the second containing the rest.
      */
     public static <E> EList<EList<E>> partition(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).partition(block);
+        return extend(collection).partition(block);
     }
 
     /**
@@ -488,14 +489,14 @@ public class Enumerable {
      * @see #inject(Iterable, Fn2)
      */
     public static <E> E reduce(Iterable<E> collection, Fn2<E, E, E> block) {
-        return EnumerableModule.extend(collection).reduce(block);
+        return extend(collection).reduce(block);
     }
 
     /**
      * @see #inject(Iterable, Object, Fn2)
      */
     public static <E, R> R reduce(Iterable<E> collection, R initial, Fn2<R, E, R> block) {
-        return EnumerableModule.extend(collection).reduce(initial, block);
+        return extend(collection).reduce(initial, block);
     }
 
     /**
@@ -503,7 +504,7 @@ public class Enumerable {
      * false.
      */
     public static <E> EList<E> reject(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).reject(block);
+        return extend(collection).reject(block);
     }
 
     /**
@@ -512,7 +513,7 @@ public class Enumerable {
      * large collections.
      */
     public static <E, R> IEnumerable<E> reverseEach(Iterable<E> collection, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).reverseEach(block);
+        return extend(collection).reverseEach(block);
     }
 
     /**
@@ -520,7 +521,7 @@ public class Enumerable {
      * not false.
      */
     public static <E> EList<E> select(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).select(block);
+        return extend(collection).select(block);
     }
 
     /**
@@ -528,7 +529,7 @@ public class Enumerable {
      * true.
      */
     public static <K, V> EList<Map.Entry<K, V>> select(Map<K, V> map, Fn2<K, V, Boolean> block) {
-        return EnumerableModule.extend(map).select(block);
+        return extend(map).select(block);
     }
 
     /**
@@ -536,7 +537,7 @@ public class Enumerable {
      * their own compareTo method.
      */
     public static <E extends Object & Comparable<? super E>> EList<E> sort(Iterable<E> collection) {
-        return EnumerableModule.extend(collection).sort();
+        return extend(collection).sort();
     }
 
     /**
@@ -544,7 +545,7 @@ public class Enumerable {
      * results of the supplied block.
      */
     public static <E> EList<E> sort(Iterable<E> collection, Fn2<E, E, Integer> block) {
-        return EnumerableModule.extend(collection).sort(block);
+        return extend(collection).sort(block);
     }
 
     /**
@@ -569,14 +570,14 @@ public class Enumerable {
      */
     public static <E, R extends Object & Comparable<? super R>> EList<E> sortBy(Iterable<E> collection,
             final Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).sortBy(block);
+        return extend(collection).sortBy(block);
     }
 
     /**
      * Returns a list containing the first n items from collection.
      */
     public static <E> EList<E> take(Iterable<E> collection, int n) {
-        return EnumerableModule.extend(collection).take(n);
+        return extend(collection).take(n);
     }
 
     /**
@@ -584,7 +585,7 @@ public class Enumerable {
      * until the block returns false or null.
      */
     public static <E> EList<E> takeWhile(Iterable<E> collection, Fn1<E, Boolean> block) {
-        return EnumerableModule.extend(collection).takeWhile(block);
+        return extend(collection).takeWhile(block);
     }
 
     /**
@@ -609,14 +610,14 @@ public class Enumerable {
      * Returns a list containing the items in collection.
      */
     public static <E> EList<E> toList(Iterable<E> collection) {
-        return EnumerableModule.extend(collection).toList();
+        return extend(collection).toList();
     }
 
     /**
      * Creates a new Set containing the elements of the given collection.
      */
     public static <E> ESet<E> toSet(Iterable<E> collection) {
-        return EnumerableModule.extend(collection).toSet();
+        return extend(collection).toSet();
     }
 
     /**
@@ -624,7 +625,7 @@ public class Enumerable {
      * elements are preprocessed by the given block.
      */
     public static <E, R> ESet<R> toSet(Iterable<E> collection, Fn1<E, R> block) {
-        return EnumerableModule.extend(collection).toSet(block);
+        return extend(collection).toSet(block);
     }
 
     /**
@@ -641,6 +642,6 @@ public class Enumerable {
      * </p>
      */
     public static <E> EList<EList<?>> zip(Iterable<E> collection, Iterable<?>... args) {
-        return EnumerableModule.extend(collection).zip(args);
+        return extend(collection).zip(args);
     }
 }
