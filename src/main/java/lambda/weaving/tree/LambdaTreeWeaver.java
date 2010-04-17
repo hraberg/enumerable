@@ -38,6 +38,7 @@ import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MemberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
 
@@ -151,7 +152,7 @@ public class LambdaTreeWeaver implements Opcodes {
 
         class LambdaAnalyzer {
             int id;
-            Method nlm;
+            Method newLambdaMethod;
 
             List<Type> methodParameterTypes;
             Type lambdaType;
@@ -169,15 +170,25 @@ public class LambdaTreeWeaver implements Opcodes {
                 this.id = id;
                 this.start = start;
                 this.end = end;
-                nlm = new Method(mi.name, mi.desc);
+                newLambdaMethod = new Method(mi.name, mi.desc);
 
-                methodParameterTypes = asList(nlm.getArgumentTypes());
+                methodParameterTypes = asList(newLambdaMethod.getArgumentTypes());
                 methodParameterTypes = methodParameterTypes.subList(0, methodParameterTypes.size() - 1);
-
-                lambdaType = nlm.getReturnType();
 
                 expressionType = methodParameterTypes.isEmpty() ? getType(Object.class) : methodParameterTypes
                         .get(methodParameterTypes.size() - 1);
+
+                lambdaType = resolveLambdaType();
+            }
+
+            Type resolveLambdaType() {
+                Type lambdaType = newLambdaMethod.getReturnType();
+                if (getType(Object.class).equals(lambdaType) && m.instructions.size() > end) {
+                    AbstractInsnNode n = m.instructions.get(end + 1);
+                    if (n.getOpcode() == CHECKCAST)
+                        lambdaType = getObjectType(((TypeInsnNode) n).desc);
+                }
+                return lambdaType;
             }
 
             void analyze() throws IOException {
@@ -210,27 +221,18 @@ public class LambdaTreeWeaver implements Opcodes {
                 out.println("    type: " + lambdaType);
                 out.println("    class: " + lambdaClass());
 
-                List<MethodNode> sams = findPotentialSAMs();
+                sam = findSAM(lambdaType);
 
-                if (sams.size() == 1) {
-                    sam = new Method(sams.get(0).name, sams.get(0).desc);
-                    out.println("    SAM is: " + toString(sams).get(0));
-                } else
-                    for (String mn : toString(sams))
-                        out.println(" -- potential SAM is: " + mn);
+                if (sam != null)
+                    out.println("    SAM is: " + sam);
+                else
+                    throw new IllegalStateException("Found no potential abstract method to override");
 
                 out.println("    parameters: " + parameters.keySet());
                 out.println("    method parameter types: " + methodParameterTypes);
                 out.println("    expression type: " + expressionType);
                 out.println("    mutable locals: " + mutableLocals);
                 out.println("    final locals: " + locals);
-
-                if (sams.size() > 1) {
-                    throw new IllegalStateException("Found more than one potential abstract method to override: "
-                            + toString(sams));
-                }
-                if (sams.isEmpty())
-                    throw new IllegalStateException("Found no potential abstract method to override");
 
                 if (methodParameterTypes.size() != parameters.size())
                     throw new IllegalStateException("Got " + parameters.keySet() + " as parameters need exactly "
@@ -246,21 +248,21 @@ public class LambdaTreeWeaver implements Opcodes {
                 }
             }
 
-            List<String> toString(List<MethodNode> ms) {
-                List<String> result = new ArrayList<String>();
-                for (MethodNode m : ms)
-                    result.add(m.name + m.desc);
-                return result;
-            }
-
             @SuppressWarnings("unchecked")
-            List<MethodNode> findPotentialSAMs() throws IOException {
-                List<MethodNode> sams = new ArrayList<MethodNode>();
-                for (MethodNode mn : (List<MethodNode>) readClassNoCode(lambdaType.getInternalName()).methods)
+            Method findSAM(Type type) throws IOException {
+                ClassNode cn = readClassNoCode(type.getInternalName());
+                for (MethodNode mn : (List<MethodNode>) cn.methods)
                     if (hasAccess(mn, ACC_ABSTRACT)
                             && getArgumentTypes(mn.desc).length == methodParameterTypes.size())
-                        sams.add(mn);
-                return sams;
+                        return new Method(mn.name, mn.desc);
+
+                for (String anInterface : (List<String>) cn.interfaces)
+                    return findSAM(getObjectType(anInterface));
+
+                if (cn.superName != null)
+                    return findSAM(getObjectType(cn.superName));
+
+                return null;
             }
 
             void lambdaParameter(int lastParameterStart, FieldInsnNode fin) throws IOException {
@@ -315,10 +317,6 @@ public class LambdaTreeWeaver implements Opcodes {
 
             Type getLocalVariableType(String local) {
                 return getType(locals.get(local).desc);
-            }
-
-            List<Type> getSamArgumentTypes() {
-                return asList(sam.getArgumentTypes());
             }
 
             void printInstruction(int index, int depth, ASMifierMethodVisitor asm) {

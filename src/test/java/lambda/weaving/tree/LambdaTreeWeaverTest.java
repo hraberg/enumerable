@@ -6,12 +6,14 @@ import static org.junit.Assert.*;
 import static org.objectweb.asm.Type.*;
 
 import java.io.IOException;
+import java.util.Comparator;
 
 import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
 import lambda.Fn3;
 import lambda.TestBase;
+import lambda.annotation.LambdaParameter;
 import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer;
 import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 
@@ -79,7 +81,7 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals(getType(Fn1.class), lambda.lambdaType);
 
         assertEquals("call", lambda.sam.getName());
-        assertEquals(list(object), lambda.getSamArgumentTypes());
+        assertEquals(list(object), list(lambda.sam.getArgumentTypes()));
         assertEquals(object, lambda.sam.getReturnType());
     }
 
@@ -105,7 +107,7 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals(getType(Fn2.class), lambda.lambdaType);
 
         assertEquals("call", lambda.sam.getName());
-        assertEquals(list(object, object), lambda.getSamArgumentTypes());
+        assertEquals(list(object, object), list(lambda.sam.getArgumentTypes()));
         assertEquals(object, lambda.sam.getReturnType());
     }
 
@@ -131,7 +133,7 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals(getType(Fn3.class), lambda.lambdaType);
 
         assertEquals("call", lambda.sam.getName());
-        assertEquals(list(object, object, object), lambda.getSamArgumentTypes());
+        assertEquals(list(object, object, object), list(lambda.sam.getArgumentTypes()));
         assertEquals(object, lambda.sam.getReturnType());
     }
 
@@ -296,6 +298,54 @@ public class LambdaTreeWeaverTest extends TestBase {
 
         assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
         assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
+    }
+
+    @Test
+    public void analyzingLambdaCreatedFromGenericCast() throws Exception {
+        class C {
+            void m() {
+                Runnable r = delegate(null);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertTrue(lambda.parameters.isEmpty());
+        assertTrue(lambda.methodParameterTypes.isEmpty());
+
+        assertEquals(object, lambda.expressionType);
+        assertEquals(getType(Runnable.class), lambda.lambdaType);
+
+        assertEquals("run", lambda.sam.getName());
+        assertEquals(0, lambda.sam.getArgumentTypes().length);
+        assertEquals(VOID_TYPE, lambda.sam.getReturnType());
+    }
+
+    @LambdaParameter
+    static Object o1;
+
+    @LambdaParameter
+    static Object o2;
+
+    @Test
+    public void analyzingLambdaCreatedFromGenericCastWhichAlsoDefinesMethodFromObject() throws Exception {
+        class C {
+            void m() {
+                Comparator<?> c = delegate(o1, o2, 0);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(list("o1", "o2"), list(lambda.parameters.keySet()));
+        assertEquals(list(object, object), lambda.methodParameterTypes);
+        assertEquals(object, lambda.expressionType);
+
+        assertEquals(getType(Comparator.class), lambda.lambdaType);
+
+        assertEquals("compare", lambda.sam.getName());
+        assertEquals(list(object, object), list(lambda.sam.getArgumentTypes()));
+        assertEquals(INT_TYPE, lambda.sam.getReturnType());
     }
 
     LambdaAnalyzer lambdaIn(Class<?> aClass) throws Exception {
