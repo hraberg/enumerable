@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -552,7 +552,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     static class CachedBlockResultComparator<E, R extends Object & Comparable<? super R>> implements Comparator<E> {
-        Map<E, R> cache = new IdentityHashMap<E, R>();
+        Map<E, R> cache = new HashMap<E, R>();
         Fn1<E, R> block;
 
         CachedBlockResultComparator(Fn1<E, R> block) {

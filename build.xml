@@ -41,7 +41,8 @@
     <target name="build" depends="read-git-commit">
         <mkdir dir="target/classes" />
         <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
-            <src path="src/main/java" />
+            <src path="src/main/java"/>
+            <exclude name="lambda/weaving/tree/**/*" />
             <classpath refid="enumerable.classpath" />
         </javac>
         <mkdir dir="target/example-classes" />
@@ -254,8 +255,8 @@
     </target>
 
     <target name="javadoc" unless="javadoc.notRequired" depends="javadoc-uptodate">
-        <javadoc destdir="target/apidocs" charset="UTF-8" Encoding="UTF-8" classpathref="enumerable.classpath" source="1.5" windowtitle="Enumerable.java API ${enumerable.version}">
-            <packageset dir="src/main/java" defaultexcludes="yes" />
+        <javadoc sourcepath="src/main/java" destdir="target/apidocs" charset="UTF-8" Encoding="UTF-8" classpathref="enumerable.classpath" source="1.5" windowtitle="Enumerable.java API ${enumerable.version}">
+            <excludepackage name="lambda.weaving.tree"/>
             <doctitle>
                 <![CDATA[<h1>Enumerable.java API ${enumerable.version}</h1>]]>
             </doctitle>

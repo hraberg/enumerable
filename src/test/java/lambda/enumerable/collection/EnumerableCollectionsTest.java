@@ -131,7 +131,7 @@ public class EnumerableCollectionsTest extends TestBase {
         }
 
         // out.println("schwartzian: " + timeSchwartzianTransform);
-        // out.println("identity hash map: " + timeWithCache);
+        // out.println("map: " + timeWithCache);
         // out.println("no cache: " + timeNoCache);
 
         assertTrue("Schwarzian transform was slower than no cache: " + timeSchwartzianTransform + " > "
