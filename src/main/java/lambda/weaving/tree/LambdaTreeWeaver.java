@@ -41,235 +41,264 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
 
 public class LambdaTreeWeaver implements Opcodes {
+    ClassNode c;
     int currentLambdaId;
+    List<MethodAnalyzer> methods = new ArrayList<MethodAnalyzer>();
 
     @SuppressWarnings("unchecked")
     public ClassNode transform(ClassReader cr) throws Exception {
-        ClassNode cn = new ClassNode();
-        cr.accept(cn, EXPAND_FRAMES);
+        c = new ClassNode();
+        cr.accept(c, EXPAND_FRAMES);
 
-        out.println(cn.name);
+        out.println(c.name);
         out.println();
 
         currentLambdaId = 1;
-        for (MethodNode m : (List<MethodNode>) cn.methods)
-            method(cn, m);
-        return cn;
-    }
-
-    void method(ClassNode c, MethodNode m) throws IOException {
-        out.println(m.name + m.desc);
-        StringWriter before = new StringWriter();
-        print(m, before);
-
-        AnalyzerAdapter analyzerAdapter = new AnalyzerAdapter(c.name, m.access, m.name, m.desc, new EmptyVisitor());
-
-        List<Integer> stackDepth = new ArrayList<Integer>();
-        boolean hasLambdas = false;
-        for (int i = 0; i < m.instructions.size(); i++) {
-            AbstractInsnNode node = m.instructions.get(i);
-            node.accept(analyzerAdapter);
-            stackDepth.add(analyzerAdapter.stack == null ? 0 : analyzerAdapter.stack.size());
-
-            if (m.instructions.get(i).getType() == AbstractInsnNode.METHOD_INSN) {
-                MethodInsnNode mi = (MethodInsnNode) node;
-
-                if (isNewLambdaMethod(mi)) {
-                    hasLambdas = true;
-                    int end = i;
-                    int start = findInstructionAtStartOfLambda(stackDepth, end);
-
-                    new LambdaDef(currentLambdaId++, c, m, mi).lambda(stackDepth, end, start);
-                }
-            }
+        for (MethodNode m : (List<MethodNode>) c.methods) {
+            MethodAnalyzer ma = new MethodAnalyzer(m);
+            ma.analyze();
+            methods.add(ma);
         }
-        if (hasLambdas) {
-            out.println();
-            out.println("before ================ ");
-            out.println(before);
-            out.println("after ================= ");
-            print(m, new OutputStreamWriter(out));
-        }
+        return c;
     }
 
-    void print(MethodNode m, Writer w) {
-        ASMifierMethodVisitor asm = new ASMifierMethodVisitor();
-        m.instructions.accept(asm);
-        PrintWriter pw = new PrintWriter(w);
-        asm.print(pw);
-        pw.flush();
-    }
-
-    class LambdaDef {
-        int id;
+    class MethodAnalyzer {
         MethodNode m;
-        Method nlm;
-
-        List<Type> methodParameterTypes;
-        Type lambdaType;
-        Type expressionType;
-        List<Type> argumentTypes;
-
-        Map<String, FieldNode> parameters;
-        Map<String, LocalVariableNode> locals;
-        Map<String, LocalVariableNode> mutableLocals;
-        ClassNode c;
+        List<Integer> stackDepth;
         int line;
+        List<LambdaAnalyzer> lambdas = new ArrayList<LambdaAnalyzer>();
 
-        LambdaDef(int id, ClassNode c, MethodNode m, MethodInsnNode mi) {
-            this.id = id;
-            this.c = c;
+        MethodAnalyzer(MethodNode m) {
             this.m = m;
-            nlm = new Method(mi.name, mi.desc);
-
-            methodParameterTypes = asList(nlm.getArgumentTypes());
-
-            if (methodParameterTypes.size() > 1)
-                methodParameterTypes = methodParameterTypes.subList(0, methodParameterTypes.size() - 1);
-            else
-                methodParameterTypes = new ArrayList<Type>();
-
-            lambdaType = nlm.getReturnType();
-
-            expressionType = methodParameterTypes.isEmpty() ? getType(Object.class) : methodParameterTypes
-                    .get(methodParameterTypes.size() - 1);
-
-            argumentTypes = new ArrayList<Type>();
-            parameters = new LinkedHashMap<String, FieldNode>();
-
-            locals = new LinkedHashMap<String, LocalVariableNode>();
-            mutableLocals = new LinkedHashMap<String, LocalVariableNode>();
-
         }
 
-        String lambdaClass() {
-            String lambdaClass = lambdaType.getInternalName();
-            lambdaClass = lambdaClass.substring(lambdaClass.lastIndexOf("/") + 1, lambdaClass.length());
-            return c.name + "$" + (line > 0 ? String.format("%04d_", line) : "") + lambdaClass + "_" + id;
-        }
+        void analyze() throws IOException {
+            out.println(m.name + m.desc);
+            StringWriter before = new StringWriter();
+            print(m, before);
+            stackDepth = new ArrayList<Integer>();
 
-        @SuppressWarnings("unchecked")
-        void lambda(List<Integer> stackDepth, int end, int start) throws IOException {
-            out.println("lambda ================ " + start + " -> " + end);
-            out.print("index" + "\t");
-            out.print("stack depth");
-            out.println();
+            AnalyzerAdapter analyzerAdapter = new AnalyzerAdapter(c.name, m.access, m.name, m.desc,
+                    new EmptyVisitor());
 
-            ASMifierMethodVisitor asMifierMethodVisitor = new ASMifierMethodVisitor();
-            List<String> text = asMifierMethodVisitor.getText();
+            for (int i = 0; i < m.instructions.size(); i++) {
+                AbstractInsnNode node = m.instructions.get(i);
+                node.accept(analyzerAdapter);
+                stackDepth.add(analyzerAdapter.stack == null ? 0 : analyzerAdapter.stack.size());
 
-            int lastParameterStart = start;
-            for (int i = start; i <= end; i++) {
                 AbstractInsnNode n = m.instructions.get(i);
 
-                n.accept(asMifierMethodVisitor);
-                printInstruction(i, stackDepth.get(i), text.get(text.size() - 1));
+                if (n.getType() == AbstractInsnNode.METHOD_INSN) {
+                    MethodInsnNode mi = (MethodInsnNode) node;
 
+                    if (isNewLambdaMethod(mi)) {
+                        int end = i;
+                        int start = findInstructionAtStartOfLambda(end);
+
+                        LambdaAnalyzer lambda = new LambdaAnalyzer(currentLambdaId++, mi, start, end);
+                        lambdas.add(lambda);
+                        lambda.analyze();
+                    }
+                }
                 if (n.getType() == LINE)
                     line = ((LineNumberNode) n).line;
 
-                if (n.getType() == VAR_INSN)
-                    localVariable((VarInsnNode) n);
+            }
 
-                if (n.getType() == FIELD_INSN) {
-                    lambdaParameter(lastParameterStart, (FieldInsnNode) n);
-                    lastParameterStart = i;
+            if (!lambdas.isEmpty()) {
+                out.println();
+                out.println("before ================ ");
+                out.println(before);
+                out.println("after ================= ");
+                print(m, new OutputStreamWriter(out));
+            }
+        }
+
+        int findInstructionAtStartOfLambda(int end) {
+            int depth = stackDepth.get(end);
+            for (int i = end - 1; i >= 0; i--)
+                if (stackDepth.get(i) == depth - 1)
+                    return i;
+            throw new IllegalStateException("Could not find previous stack depth of " + depth);
+        }
+
+        class LambdaAnalyzer {
+            int id;
+            Method nlm;
+
+            List<Type> methodParameterTypes;
+            Type lambdaType;
+            Type expressionType;
+
+            Map<String, FieldNode> parameters = new LinkedHashMap<String, FieldNode>();
+            Map<String, LocalVariableNode> locals = new LinkedHashMap<String, LocalVariableNode>();
+            Map<String, LocalVariableNode> mutableLocals = new LinkedHashMap<String, LocalVariableNode>();
+
+            int start;
+            int end;
+            Method sam;
+
+            LambdaAnalyzer(int id, MethodInsnNode mi, int start, int end) {
+                this.id = id;
+                this.start = start;
+                this.end = end;
+                nlm = new Method(mi.name, mi.desc);
+
+                methodParameterTypes = asList(nlm.getArgumentTypes());
+                methodParameterTypes = methodParameterTypes.subList(0, methodParameterTypes.size() - 1);
+
+                lambdaType = nlm.getReturnType();
+
+                expressionType = methodParameterTypes.isEmpty() ? getType(Object.class) : methodParameterTypes
+                        .get(methodParameterTypes.size() - 1);
+            }
+
+            void analyze() throws IOException {
+                out.println("lambda ================ " + start + " -> " + end);
+                out.print("index" + "\t");
+                out.print("stack depth");
+                out.println();
+
+                ASMifierMethodVisitor asm = new ASMifierMethodVisitor();
+
+                int lastParameterStart = start;
+                for (int i = start; i <= end; i++) {
+                    AbstractInsnNode n = m.instructions.get(i);
+
+                    n.accept(asm);
+                    printInstruction(i, stackDepth.get(i), asm);
+
+                    int type = n.getType();
+                    if (type == VAR_INSN)
+                        localVariable((VarInsnNode) n);
+
+                    if (type == FIELD_INSN) {
+                        lambdaParameter(lastParameterStart, (FieldInsnNode) n);
+                        lastParameterStart = i;
+                    }
+                }
+
+                out.println("end =================== " + start + " -> " + end);
+                out.println("    body starts at: " + lastParameterStart);
+                out.println("    type: " + lambdaType);
+                out.println("    class: " + lambdaClass());
+
+                List<MethodNode> sams = findPotentialSAMs();
+
+                if (sams.size() == 1) {
+                    sam = new Method(sams.get(0).name, sams.get(0).desc);
+                    out.println("    SAM is: " + toString(sams).get(0));
+                } else
+                    for (String mn : toString(sams))
+                        out.println(" -- potential SAM is: " + mn);
+
+                out.println("    parameters: " + parameters.keySet());
+                out.println("    method parameter types: " + methodParameterTypes);
+                out.println("    expression type: " + expressionType);
+                out.println("    mutable locals: " + mutableLocals);
+                out.println("    final locals: " + locals);
+
+                if (sams.size() > 1) {
+                    throw new IllegalStateException("Found more than one potential abstract method to override: "
+                            + toString(sams));
+                }
+                if (sams.isEmpty())
+                    throw new IllegalStateException("Found no potential abstract method to override");
+
+                if (methodParameterTypes.size() != parameters.size())
+                    throw new IllegalStateException("Got " + parameters.keySet() + " as parameters need exactly "
+                            + methodParameterTypes.size());
+            }
+
+            @SuppressWarnings("unchecked")
+            void apply() {
+                ListIterator<AbstractInsnNode> li = m.instructions.iterator(start);
+                for (int i = start; i <= end; i++) {
+                    li.next();
+                    li.remove();
                 }
             }
 
-            ListIterator<AbstractInsnNode> li = m.instructions.iterator(start);
-            for (int i = start; i <= end; i++) {
-                li.next();
-                li.remove();
+            List<String> toString(List<MethodNode> ms) {
+                List<String> result = new ArrayList<String>();
+                for (MethodNode m : ms)
+                    result.add(m.name + m.desc);
+                return result;
             }
 
-            out.println("end =================== " + start + " -> " + end);
-            out.println("    body starts at: " + lastParameterStart);
-            out.println("    type: " + lambdaType);
-            out.println("    class: " + lambdaClass());
-
-            List<MethodNode> sams = findPotentialSAMs();
-
-            if (sams.size() == 1)
-                out.println("    SAM is: " + toString(sams).get(0));
-            else
-                for (String mn : toString(sams))
-                    out.println(" -- potential SAM is: " + mn);
-
-            out.println("    parameters: " + parameters.keySet());
-            out.println("    method parameter types: " + methodParameterTypes);
-            out.println("    argument types: " + argumentTypes);
-            out.println("    expression type: " + expressionType);
-            out.println("    mutable locals: " + mutableLocals);
-            out.println("    final locals: " + locals);
-
-            if (sams.size() > 1) {
-                throw new IllegalStateException("Found more than one potential abstract method to override: "
-                        + toString(sams));
+            @SuppressWarnings("unchecked")
+            List<MethodNode> findPotentialSAMs() throws IOException {
+                List<MethodNode> sams = new ArrayList<MethodNode>();
+                for (MethodNode mn : (List<MethodNode>) readClassNoCode(lambdaType.getInternalName()).methods)
+                    if (hasAccess(mn, ACC_ABSTRACT)
+                            && getArgumentTypes(mn.desc).length == methodParameterTypes.size())
+                        sams.add(mn);
+                return sams;
             }
-            if (sams.isEmpty())
-                throw new IllegalStateException("Found no potential abstract method to override");
-        }
 
-        List<String> toString(List<MethodNode> ms) {
-            List<String> result = new ArrayList<String>();
-            for (MethodNode m : ms)
-                result.add(m.name + m.desc);
-            return result;
-        }
+            void lambdaParameter(int lastParameterStart, FieldInsnNode fin) throws IOException {
+                if (isLambdaParameterField(fin)) {
+                    FieldNode f = findField(fin);
 
-        @SuppressWarnings("unchecked")
-        List<MethodNode> findPotentialSAMs() throws IOException {
-            List<MethodNode> sams = new ArrayList<MethodNode>();
-            for (MethodNode mn : (List<MethodNode>) readClassNoCode(lambdaType.getInternalName()).methods)
-                if (hasAccess(mn, ACC_ABSTRACT) && getArgumentTypes(mn.desc).length == argumentTypes.size())
-                    sams.add(mn);
-            return sams;
-        }
+                    if (!parameters.containsKey(f.name)) {
+                        if (parameters.size() == methodParameterTypes.size())
+                            throw new IllegalStateException("Tried to define extra parameter, " + f.name
+                                    + ", arity is " + methodParameterTypes.size() + ", defined parameters are "
+                                    + parameters.keySet());
 
-        void lambdaParameter(int lastParameterStart, FieldInsnNode fin) throws IOException {
-            if (isLambdaParameterField(fin)) {
-                FieldNode f = findField(fin);
+                        Type argumentType = getType(fin.desc);
+                        parameters.put(f.name, f);
 
-                if (!parameters.containsKey(f.name)) {
-                    if (parameters.size() == methodParameterTypes.size())
-                        throw new IllegalStateException("Tried to define extra parameter, " + f.name
-                                + ", arity is " + methodParameterTypes.size() + ", defined parameters are "
-                                + parameters.keySet());
+                        out.println("  --  defined parameter "
+                                + fin.name
+                                + " "
+                                + argumentType.getClassName()
+                                + " as "
+                                + parameters.size()
+                                + " out of "
+                                + methodParameterTypes.size()
+                                + (fin.getOpcode() == PUTSTATIC ? " (has default value starting at "
+                                        + lastParameterStart + ")" : ""));
+                    } else
+                        out.println("  --  accessed parameter " + fin.name + " " + getType(f.desc).getClassName()
+                                + " (" + (fin.getOpcode() == PUTSTATIC ? "write" : "read") + ")");
+                }
+            }
 
-                    parameters.put(f.name, f);
-                    Type argumentType = getType(fin.desc);
-                    argumentTypes.add(argumentType);
+            void localVariable(VarInsnNode vin) {
+                LocalVariableNode local = (LocalVariableNode) m.localVariables.get(vin.var);
 
-                    out.println("  --  defined parameter "
-                            + fin.name
-                            + " "
-                            + argumentType.getClassName()
-                            + " as "
-                            + parameters.size()
-                            + " out of "
-                            + methodParameterTypes.size()
-                            + (fin.getOpcode() == PUTSTATIC ? " (has default value starting at "
-                                    + lastParameterStart + ")" : ""));
-                } else
-                    out.println("  --  accessed parameter " + fin.name + " " + getType(f.desc).getClassName()
-                            + " (" + (fin.getOpcode() == PUTSTATIC ? "write" : "read") + ")");
+                if (vin.getOpcode() == getType(local.desc).getOpcode(ISTORE))
+                    mutableLocals.put(local.name, local);
+                else
+                    locals.put(local.name, local);
+
+                out.println("  --  accessed var " + local.index + " " + local.name + " "
+                        + getType(local.desc).getClassName() + " write: "
+                        + (vin.getOpcode() == getType(local.desc).getOpcode(ISTORE)));
+            }
+
+            String lambdaClass() {
+                String lambdaClass = lambdaType.getInternalName();
+                lambdaClass = lambdaClass.substring(lambdaClass.lastIndexOf("/") + 1, lambdaClass.length());
+                return c.name + "$" + (line > 0 ? String.format("%04d_", line) : "") + lambdaClass + "_" + id;
+            }
+
+            List<Type> getParameterTypes() {
+                ArrayList<Type> result = new ArrayList<Type>();
+                for (FieldNode f : parameters.values())
+                    result.add(getType(f.desc));
+                return result;
+            }
+
+            List<String> getParameterNames() {
+                return new ArrayList<String>(parameters.keySet());
+            }
+
+            public List<Type> getSamArgumentTypes() {
+                return asList(sam.getArgumentTypes());
             }
         }
-
-        void localVariable(VarInsnNode vin) {
-            LocalVariableNode local = (LocalVariableNode) m.localVariables.get(vin.var);
-
-            if (vin.getOpcode() == getType(local.desc).getOpcode(ISTORE))
-                mutableLocals.put(local.name, local);
-            else
-                locals.put(local.name, local);
-
-            out.println("  --  accessed var " + local.index + " " + local.name + " "
-                    + getType(local.desc).getClassName() + " write: "
-                    + (vin.getOpcode() == getType(local.desc).getOpcode(ISTORE)));
-        }
-
     }
 
     boolean isNewLambdaMethod(MethodInsnNode mi) throws IOException {
@@ -322,17 +351,17 @@ public class LambdaTreeWeaver implements Opcodes {
         return false;
     }
 
-    int findInstructionAtStartOfLambda(List<Integer> stackDepth, int end) {
-        int depth = stackDepth.get(end);
-        for (int i = end - 1; i >= 0; i--)
-            if (stackDepth.get(i) == depth - 1)
-                return i;
-        throw new IllegalStateException("Could not find previous stack depth of " + depth);
+    void print(MethodNode m, Writer w) {
+        ASMifierMethodVisitor asm = new ASMifierMethodVisitor();
+        m.instructions.accept(asm);
+        PrintWriter pw = new PrintWriter(w);
+        asm.print(pw);
+        pw.flush();
     }
 
-    void printInstruction(int index, int depth, String asm) {
+    void printInstruction(int index, int depth, ASMifierMethodVisitor asm) {
         out.print(index + "\t");
         out.print(depth + "\t\t");
-        out.print(asm);
+        out.print(asm.getText().get(index - 1));
     }
 }
