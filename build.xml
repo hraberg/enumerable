@@ -10,7 +10,7 @@
 
     <path id="enumerable.classpath">
         <pathelement location="target/classes" />
-        <pathelement location="lib/asm-3.2.jar" />
+        <pathelement location="lib/asm-all-3.2.jar" />
         <pathelement location="lib/jsr166y.jar" />
         <pathelement location="lib/extra166y.jar" />
     </path>
@@ -42,7 +42,6 @@
         <mkdir dir="target/classes" />
         <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
             <src path="src/main/java"/>
-            <exclude name="lambda/weaving/tree/**/*" />
             <classpath refid="enumerable.classpath" />
         </javac>
         <mkdir dir="target/example-classes" />
@@ -78,7 +77,7 @@
     <target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
         <jarjar jarfile="target/enumerable-agent-${enumerable.version}.jar">
             <fileset dir="target/classes" />
-            <zipfileset src="lib/asm-3.2.jar" />
+            <zipfileset src="lib/asm-all-3.2.jar" />
             <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
             <manifest>
                 <attribute name="Main-Class" value="lambda.weaving.LambdaLoader" />
@@ -256,7 +255,6 @@
 
     <target name="javadoc" unless="javadoc.notRequired" depends="javadoc-uptodate">
         <javadoc sourcepath="src/main/java" destdir="target/apidocs" charset="UTF-8" Encoding="UTF-8" classpathref="enumerable.classpath" source="1.5" windowtitle="Enumerable.java API ${enumerable.version}">
-            <excludepackage name="lambda.weaving.tree"/>
             <doctitle>
                 <![CDATA[<h1>Enumerable.java API ${enumerable.version}</h1>]]>
             </doctitle>

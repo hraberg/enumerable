@@ -23,7 +23,6 @@ import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
-import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -45,7 +44,6 @@ import org.objectweb.asm.util.ASMifierMethodVisitor;
 
 public class LambdaTreeWeaver implements Opcodes {
     public static class TreeWeaverTest {
-        @Test
         public void simpleLambda() throws Exception {
             λ("hello");
         }
@@ -308,8 +306,7 @@ public class LambdaTreeWeaver implements Opcodes {
 
     ClassNode readClassNoCode(String in) throws IOException {
         ClassNode classNode = new ClassNode();
-        new ClassReader(getObjectType(in).getClassName()).accept(classNode, SKIP_CODE | SKIP_DEBUG
-                | SKIP_FRAMES);
+        new ClassReader(getObjectType(in).getClassName()).accept(classNode, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
         return classNode;
     }
 
