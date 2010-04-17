@@ -86,6 +86,14 @@ public class Lambda {
     }
 
     /**
+     * @see #delegate(Unused, Object)
+     */
+    @NewLambda
+    public static <I> I delegate(Object block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
      * Creates a new lambda with three arguments.
      */
     @NewLambda
@@ -118,6 +126,14 @@ public class Lambda {
     }
 
     /**
+     * @see #fn(Unused, Object)
+     */
+    @NewLambda
+    public static <R> Fn0<R> fn(R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
      * @see #fn(Object, Object, Object, Object)
      */
     @NewLambda
@@ -146,6 +162,14 @@ public class Lambda {
      */
     @NewLambda
     public static <R> Fn0<R> λ(Unused _, R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * @see #fn(Unused, Object)
+     */
+    @NewLambda
+    public static <R> Fn0<R> λ(R block) {
         throw new LambdaWeavingNotEnabledException();
     }
 }
