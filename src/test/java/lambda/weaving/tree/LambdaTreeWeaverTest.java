@@ -198,7 +198,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
     }
 
     @Test
-    public void analyzingLambdaClosingOverMutableVariable() throws Exception {
+    public void analyzingtLambdaClosingOverMutableVariable() throws Exception {
         class C {
             void m() {
                 int i = 1;
@@ -540,7 +540,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(list("n"), list(lambda.parameters.keySet()));
         assertEquals(list(INT_TYPE), lambda.getParameterTypes());
 
-        assertTrue(lambda.parametersWithDefaultValue.contains("n"));
+        assertTrue(lambda.parametersWithDefaultValue.containsKey("n"));
         assertTrue(lambda.parameterDefaultValueNeedsBoxing("n"));
     }
 
@@ -557,8 +557,8 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(list("n", "s"), list(lambda.parameters.keySet()));
         assertEquals(list(INT_TYPE, getType(String.class)), lambda.getParameterTypes());
 
-        assertFalse(lambda.parametersWithDefaultValue.contains("n"));
-        assertTrue(lambda.parametersWithDefaultValue.contains("s"));
+        assertFalse(lambda.parametersWithDefaultValue.containsKey("n"));
+        assertTrue(lambda.parametersWithDefaultValue.containsKey("s"));
 
         assertTrue(lambda.parameterDefaultValueNeedsBoxing("n"));
         assertFalse(lambda.parameterDefaultValueNeedsBoxing("s"));
@@ -578,7 +578,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(list(DOUBLE_TYPE), list(lambda.sam.getArgumentTypes()));
         assertEquals(list(DOUBLE_TYPE), lambda.getParameterTypes());
 
-        assertTrue(lambda.parametersWithDefaultValue.contains("d"));
+        assertTrue(lambda.parametersWithDefaultValue.containsKey("d"));
         assertTrue(lambda.parameterDefaultValueNeedsBoxing("d"));
     }
 
