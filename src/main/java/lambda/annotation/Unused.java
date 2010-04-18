@@ -1,11 +1,8 @@
 package lambda.annotation;
 
-import lambda.Lambda;
-
 /**
- * This class is used to mark an unused parameter, see
- * {@link Lambda#fn(Unused, Object)} and {@link Lambda#_} for the default way to
- * do this.
+ * This class used to be used to mark an unused parameter. The need for it will
+ * be deprecated by the ASM Tree API weaver.
  * 
  * The {@link NewLambda} marked method definition must explicitly use this type.
  */

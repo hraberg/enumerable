@@ -30,27 +30,27 @@ public class MicroBench {
         assert fibo.getClass().isAssignableFrom(fibp.getClass());
         assert !fibp.getClass().isAssignableFrom(fibo.getClass());
 
-        bench("object fib method", times, λ(_, fibo(n)));
-        bench("object fib lambda", times, λ(_, fibo.call(n)));
+        bench("object fib method", times, λ(fibo(n)));
+        bench("object fib lambda", times, λ(fibo.call(n)));
 
-        bench("primitive fib method", times, λ(_, fibp(n)));
-        bench("primitive fib lambda", times, λ(_, fibp.call(n)));
-
-        out.println();
-
-        bench("object collect for loop", times, λ(_, methodCollect()));
-        bench("object collect lambda", times, λ(_, lambdaCollect()));
-
-        bench("primitive collect for loop", times, λ(_, methodCollectP()));
-        bench("primitive collect lambda", times, λ(_, lambdaCollectP()));
+        bench("primitive fib method", times, λ(fibp(n)));
+        bench("primitive fib lambda", times, λ(fibp.call(n)));
 
         out.println();
 
-        bench("object inject for loop", times, λ(_, methodInject()));
-        bench("object inject lambda", times, λ(_, lambdaInject()));
+        bench("object collect for loop", times, λ(methodCollect()));
+        bench("object collect lambda", times, λ(lambdaCollect()));
 
-        bench("primitive inject for loop", times, λ(_, methodInjectP()));
-        bench("primitive inject lambda", times, λ(_, lambdaInjectP()));
+        bench("primitive collect for loop", times, λ(methodCollectP()));
+        bench("primitive collect lambda", times, λ(lambdaCollectP()));
+
+        out.println();
+
+        bench("object inject for loop", times, λ(methodInject()));
+        bench("object inject lambda", times, λ(lambdaInject()));
+
+        bench("primitive inject for loop", times, λ(methodInjectP()));
+        bench("primitive inject lambda", times, λ(lambdaInjectP()));
     }
 
     List<String> methodCollect() {

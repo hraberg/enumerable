@@ -110,6 +110,10 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         packagesToSkip.add("javax.");
         packagesToSkip.add("sun.");
         packagesToSkip.add("$Proxy");
+        packagesToSkip.add("org.eclipse.jdt.internal.");
+        packagesToSkip.add("org.junit.");
+        packagesToSkip.add("junit.");
+        packagesToSkip.add("com.sun.");
     }
 
     ILambdaTransformer transformer = ILambdaTransformer.Factory.create();

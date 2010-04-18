@@ -3,7 +3,6 @@ package lambda.weaving;
 import static lambda.exception.UncheckedException.*;
 import static lambda.weaving.Debug.*;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,7 +19,7 @@ public class ClassInjector {
 
     static Method verify;
 
-    private static Constructor<?> classReaderConstructor;
+    static Constructor<?> classReaderConstructor;
 
     static {
         try {
@@ -88,14 +87,16 @@ public class ClassInjector {
         }
     }
 
+    // Disabled for now, printing loads of stuff anyway
     public void verifyIfAsmUtilIsAvailable(byte[] b) {
         try {
-            if (verify == null)
-                return;
-
-            Object cr = classReaderConstructor.newInstance(new ByteArrayInputStream(b));
-            PrintWriter pw = new PrintWriter(System.out);
-            verify.invoke(null, cr, false, pw);
+            // if (verify == null || !debug)
+            // return;
+            //
+            // Object cr = classReaderConstructor.newInstance(new
+            // ByteArrayInputStream(b));
+            // PrintWriter pw = new PrintWriter(System.out);
+            // verify.invoke(null, cr, false, pw);
 
         } catch (Exception e) {
             throw uncheck(e);

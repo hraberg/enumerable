@@ -1,8 +1,6 @@
 package lambda;
 
-import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
-import lambda.annotation.Unused;
 import lambda.exception.LambdaWeavingNotEnabledException;
 
 /**
@@ -20,24 +18,9 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  */
 public class Lambda {
     /**
-     * This LambdaParameter is a used to to create a lambda
-     * {@link #fn(Unused, Object)} that takes no parameters.
-     * <p>
-     * For example, this function will always return 1, ignoring the argument:
-     * </p>
-     * 
-     * <pre>
-     * fn(_, 1);
-     * </pre>
-     * 
-     */
-    @LambdaParameter
-    public static Unused _;
-
-    /**
      * Creates a new lambda implementing single abstract method interface or
-     * class I taking three arguments. See {@link #delegate(Unused, Object)} for
-     * an example.
+     * class I taking three arguments. See {@link #delegate(Object)} for an
+     * example.
      */
     @NewLambda
     public static <A1, A2, A3, I> I delegate(A1 a1, A2 a2, A3 a3, Object block) {
@@ -46,8 +29,8 @@ public class Lambda {
 
     /**
      * Creates a new lambda implementing single abstract method interface or
-     * class I taking two arguments. See {@link #delegate(Unused, Object)} for
-     * an example.
+     * class I taking two arguments. See {@link #delegate(Object)} for an
+     * example.
      */
     @NewLambda
     public static <A1, A2, I> I delegate(A1 a1, A2 a2, Object block) {
@@ -56,7 +39,7 @@ public class Lambda {
 
     /**
      * Creates a new lambda implementing single abstract method interface or
-     * class I taking one argument. See {@link #delegate(Unused, Object)} for an
+     * class I taking one argument. See {@link #delegate(Object)} for an
      * example.
      */
     @NewLambda
@@ -73,20 +56,12 @@ public class Lambda {
      * </p>
      * 
      * <pre>
-     * Runnable r = delegate(_, out.printf(&quot;hello\n&quot;));
+     * Runnable r = delegate(out.printf(&quot;hello\n&quot;));
      * </pre>
      * 
      * The real type of I is resolved during the transformation by inspecting
      * the bytecode.
      * 
-     */
-    @NewLambda
-    public static <I> I delegate(Unused _, Object block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
-     * @see #delegate(Unused, Object)
      */
     @NewLambda
     public static <I> I delegate(Object block) {
@@ -118,15 +93,7 @@ public class Lambda {
     }
 
     /**
-     * Creates a new lambda with no arguments.
-     */
-    @NewLambda
-    public static <R> Fn0<R> fn(Unused _, R block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
-     * @see #fn(Unused, Object)
+     * @see #fn(Object)
      */
     @NewLambda
     public static <R> Fn0<R> fn(R block) {
@@ -158,15 +125,7 @@ public class Lambda {
     }
 
     /**
-     * @see #fn(Unused, Object)
-     */
-    @NewLambda
-    public static <R> Fn0<R> λ(Unused _, R block) {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    /**
-     * @see #fn(Unused, Object)
+     * @see #fn(Object)
      */
     @NewLambda
     public static <R> Fn0<R> λ(R block) {

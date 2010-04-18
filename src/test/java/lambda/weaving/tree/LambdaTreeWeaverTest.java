@@ -344,7 +344,6 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(0, lambda.sam.getArgumentTypes().length);
 
         assertEquals(VOID_TYPE, lambda.sam.getReturnType());
-        assertFalse(lambda.returnNeedsUnboxing());
         assertFalse(lambda.returnNeedsBoxing());
     }
 

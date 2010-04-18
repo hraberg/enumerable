@@ -9,9 +9,9 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
-import extra166y.ParallelLongArray;
 import extra166y.Ops.IntToLong;
 import extra166y.Ops.LongPredicate;
+import extra166y.ParallelLongArray;
 
 /*
  * This test was adapted from the extra166y API specs here:

@@ -8,7 +8,7 @@ import java.util.Map;
 import lambda.weaving.tree.LambdaTreeTransformer;
 
 public interface ILambdaTransformer {
-    static boolean tree = Boolean.valueOf(getProperty("lambda.weaving.tree"));
+    static boolean tree = Boolean.valueOf(getProperty("lambda.weaving.tree")) || true;
 
     static class Factory {
         public static ILambdaTransformer create() {

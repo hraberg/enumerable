@@ -26,7 +26,6 @@ import javax.swing.JButton;
 
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
-import lambda.annotation.Unused;
 import lambda.exception.LambdaWeavingNotEnabledException;
 import lambda.primitives.Fn1ItoI;
 
@@ -42,7 +41,7 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void creatingLambdaWithNoArgumentsUsingUnusedParameterMarker() throws Exception {
-        Fn0<String> hello = λ(_, "hello");
+        Fn0<String> hello = λ("hello");
         assertEquals("hello", hello.call());
     }
 
@@ -105,7 +104,7 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void applyWithNoArgumentWhenArgumentIsNotUsed() throws Exception {
-        Fn0<Integer> firstArgument = λ(_, 2);
+        Fn0<Integer> firstArgument = λ(2);
         assertEquals(2, (int) firstArgument.apply());
     }
 
@@ -163,7 +162,7 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void arities() throws Exception {
-        assertEquals(0, λ(_, null).arity);
+        assertEquals(0, λ(null).arity);
         assertEquals(1, λ(n, null).arity);
         assertEquals(2, λ(n, m, null).arity);
         assertEquals(3, λ(n, m, s, null).arity);
@@ -217,13 +216,13 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void returningThisOfLambda() throws Exception {
-        self = λ(_, self);
+        self = λ(self);
         assertSame(self, self.call());
     }
 
     @Test
     public <R> void returnAnonymousInnerClassFromLambda() throws Exception {
-        Fn0<? extends Callable<String>> returnsCallable = λ(_, new Callable<String>() {
+        Fn0<? extends Callable<String>> returnsCallable = λ(new Callable<String>() {
             public String call() throws Exception {
                 return "hello";
             }
@@ -234,14 +233,14 @@ public class LambdaTest extends TestBase {
     }
 
     @NewLambda
-    static Runnable runnable(Unused _, Object block) {
+    static Runnable runnable(Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
     @Test
     public void createSingleMethodInterfaceUsingNewLambda() throws Exception {
         String hello = "";
-        Runnable runnable = runnable(_, hello = "hello");
+        Runnable runnable = runnable(hello = "hello");
         runnable.run();
         assertEquals("hello", hello);
         assertFalse(runnable instanceof Fn0<?>);
@@ -263,7 +262,7 @@ public class LambdaTest extends TestBase {
     @Test
     public void createSingleMethodInterfaceUsingGenereicDelegate() throws Exception {
         String hello = "";
-        Runnable runnable = delegate(_, hello = "hello");
+        Runnable runnable = delegate(hello = "hello");
         runnable.run();
         assertEquals("hello", hello);
         assertFalse(runnable instanceof Fn0<?>);
@@ -303,7 +302,7 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void createSingleMethodWithNoArgumentsClassUsingGenericDelagate() throws Exception {
-        SingleAbstractMethodNoArgumentsClass m = delegate(_, "hello");
+        SingleAbstractMethodNoArgumentsClass m = delegate("hello");
         assertEquals("hello", m.getMessage());
     }
 
@@ -325,7 +324,7 @@ public class LambdaTest extends TestBase {
         Timer timer = new Timer();
         int x = 0;
 
-        TimerTask t = delegate(_, x = 1);
+        TimerTask t = delegate(x = 1);
         timer.schedule(t, 50);
         assertEquals(0, x);
 
@@ -357,7 +356,7 @@ public class LambdaTest extends TestBase {
     @Test
     public void oneArgumentLambdaAsInterfaceWithZeroArgumentMethod() throws Exception {
         String string = "";
-        Callable<?> callable = λ(_, string = "hello").as(Callable.class);
+        Callable<?> callable = λ(string = "hello").as(Callable.class);
         assertEquals("hello", callable.call());
         assertEquals("hello", string);
     }
@@ -365,7 +364,7 @@ public class LambdaTest extends TestBase {
     @Test
     public void lambdaAsRunnable() throws Exception {
         String string = "";
-        Thread thread = new Thread(λ(_, string = "hello").as(Runnable.class));
+        Thread thread = new Thread(λ(string = "hello").as(Runnable.class));
         assertEquals("", string);
         thread.start();
         thread.join();
@@ -450,7 +449,7 @@ public class LambdaTest extends TestBase {
         class ConstructorClass {
             public String fromConstructor;
             {
-                λ(_, fromConstructor = "hello").call();
+                λ(fromConstructor = "hello").call();
             }
         }
         assertEquals("hello", new ConstructorClass().fromConstructor);

@@ -244,7 +244,7 @@ public class EnumerableExample {
         /*
          * Lambda acting as proxy.
          */
-        Runnable runnable = λ(_, out.printf("running...\n")).as(Runnable.class);
+        Runnable runnable = λ(out.printf("running...\n")).as(Runnable.class);
         runnable.run();
 
         /*
