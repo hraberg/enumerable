@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-class ClassInjector {
+public class ClassInjector {
     static File classDir;
 
     static Method defineClass;
@@ -54,7 +54,7 @@ class ClassInjector {
         }
     }
 
-    void inject(ClassLoader loader, String className, byte[] bs) {
+    public void inject(ClassLoader loader, String className, byte[] bs) {
         try {
             debug("defining class " + className);
             Class<?> c = (Class<?>) defineClass.invoke(loader, className, bs, 0, bs.length);
@@ -64,7 +64,7 @@ class ClassInjector {
         }
     }
 
-    void dump(String name, byte[] b) {
+    public void dump(String name, byte[] b) {
         if (!debug)
             return;
 
@@ -88,7 +88,7 @@ class ClassInjector {
         }
     }
 
-    void verifyIfAsmUtilIsAvailable(byte[] b) {
+    public void verifyIfAsmUtilIsAvailable(byte[] b) {
         try {
             if (verify == null)
                 return;

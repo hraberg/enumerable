@@ -52,7 +52,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = method.lambdas.get(0);
 
         assertTrue(lambda.locals.isEmpty());
-        assertTrue(lambda.mutableLocals.isEmpty());
+        assertTrue(lambda.getMutableLocals().isEmpty());
 
         assertTrue(lambda.parameters.isEmpty());
         assertTrue(lambda.newLambdaParameterTypes.isEmpty());
@@ -79,7 +79,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertTrue(lambda.locals.isEmpty());
-        assertTrue(lambda.mutableLocals.isEmpty());
+        assertTrue(lambda.getMutableLocals().isEmpty());
 
         assertEquals(list("n"), list(lambda.parameters.keySet()));
 
@@ -108,7 +108,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertTrue(lambda.locals.isEmpty());
-        assertTrue(lambda.mutableLocals.isEmpty());
+        assertTrue(lambda.getMutableLocals().isEmpty());
 
         assertEquals(list("s", "n"), list(lambda.parameters.keySet()));
         assertEquals(list(getType(String.class), INT_TYPE), lambda.getParameterTypes());
@@ -139,7 +139,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertTrue(lambda.locals.isEmpty());
-        assertTrue(lambda.mutableLocals.isEmpty());
+        assertTrue(lambda.getMutableLocals().isEmpty());
 
         assertEquals(list("s", "n", "b"), list(lambda.parameters.keySet()));
         assertEquals(list(getType(String.class), INT_TYPE, BOOLEAN_TYPE), lambda.getParameterTypes());
@@ -173,7 +173,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(1, lambda.locals.size());
-        assertTrue(lambda.mutableLocals.isEmpty());
+        assertTrue(lambda.getMutableLocals().isEmpty());
 
         assertEquals(list("i"), list(lambda.locals.keySet()));
         assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
@@ -192,9 +192,9 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(1, lambda.locals.size());
-        assertEquals(1, lambda.mutableLocals.size());
+        assertEquals(1, lambda.getMutableLocals().size());
 
-        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(list("i"), list(lambda.getMutableLocals().keySet()));
     }
 
     @Test
@@ -209,9 +209,9 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(1, lambda.locals.size());
-        assertEquals(1, lambda.mutableLocals.size());
+        assertEquals(1, lambda.getMutableLocals().size());
 
-        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(list("i"), list(lambda.getMutableLocals().keySet()));
         assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
     }
 
@@ -228,9 +228,9 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(1, lambda.locals.size());
-        assertEquals(1, lambda.mutableLocals.size());
+        assertEquals(1, lambda.getMutableLocals().size());
 
-        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(list("i"), list(lambda.getMutableLocals().keySet()));
         assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
     }
 
@@ -246,9 +246,9 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(1, lambda.locals.size());
-        assertEquals(1, lambda.mutableLocals.size());
+        assertEquals(1, lambda.getMutableLocals().size());
 
-        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(list("i"), list(lambda.getMutableLocals().keySet()));
         assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
     }
 
@@ -264,9 +264,9 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(1, lambda.locals.size());
-        assertEquals(1, lambda.mutableLocals.size());
+        assertEquals(1, lambda.getMutableLocals().size());
 
-        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(list("i"), list(lambda.getMutableLocals().keySet()));
         assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
     }
 
@@ -282,9 +282,9 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(1, lambda.locals.size());
-        assertEquals(1, lambda.mutableLocals.size());
+        assertEquals(1, lambda.getMutableLocals().size());
 
-        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(list("i"), list(lambda.getMutableLocals().keySet()));
         assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
     }
 
@@ -299,7 +299,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(1, lambda.locals.size());
-        assertTrue(lambda.mutableLocals.isEmpty());
+        assertTrue(lambda.getMutableLocals().isEmpty());
 
         assertEquals(list("i"), list(lambda.locals.keySet()));
         assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
@@ -318,9 +318,9 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(1, lambda.locals.size());
-        assertEquals(1, lambda.mutableLocals.size());
+        assertEquals(1, lambda.getMutableLocals().size());
 
-        assertEquals(list("i"), list(lambda.mutableLocals.keySet()));
+        assertEquals(list("i"), list(lambda.getMutableLocals().keySet()));
         assertEquals(INT_TYPE, lambda.getLocalVariableType("i"));
     }
 
@@ -535,7 +535,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertTrue(lambda.locals.isEmpty());
-        assertTrue(lambda.mutableLocals.isEmpty());
+        assertTrue(lambda.getMutableLocals().isEmpty());
 
         assertEquals(list("n"), list(lambda.parameters.keySet()));
         assertEquals(list(INT_TYPE), lambda.getParameterTypes());

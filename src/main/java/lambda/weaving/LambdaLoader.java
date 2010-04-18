@@ -112,7 +112,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         packagesToSkip.add("$Proxy");
     }
 
-    LambdaTransformer transformer = new LambdaTransformer();
+    ILambdaTransformer transformer = ILambdaTransformer.Factory.create();
 
     protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         InputStream in = getResourceAsStream(name.replace('.', '/') + ".class");
@@ -152,9 +152,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
             weavingNotEnabledMessage = t.getMessage();
 
             err.println(getVersionString());
-            err
-                    .println("caught throwable while transforming " + name
-                            + ", transformation is disabled from here on");
+            err.println("caught throwable while transforming " + name + ", transformation is disabled from here on");
             throw uncheck(t);
         }
     }

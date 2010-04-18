@@ -24,6 +24,7 @@ import java.util.Set;
 import lambda.annotation.LambdaLocal;
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
+import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
@@ -65,9 +66,9 @@ class LambdaTreeWeaver implements Opcodes {
     }
 
     @SuppressWarnings("unchecked")
-    void analyze() throws Exception {
+    LambdaTreeWeaver analyze() throws Exception {
         if (c != null)
-            return;
+            return this;
 
         c = new ClassNode();
         cr.accept(c, EXPAND_FRAMES);
@@ -80,6 +81,7 @@ class LambdaTreeWeaver implements Opcodes {
             ma.analyze();
             methods.add(ma);
         }
+        return this;
     }
 
     ClassNode transform() throws Exception {
@@ -90,6 +92,20 @@ class LambdaTreeWeaver implements Opcodes {
             ma.transform();
 
         return c;
+    }
+
+    boolean hasLambdas() {
+        for (MethodAnalyzer ma : (methods))
+            if (!ma.lambdas.isEmpty())
+                return true;
+        return false;
+    }
+
+    List<LambdaAnalyzer> getLambdas() {
+        List<LambdaAnalyzer> result = new ArrayList<LambdaAnalyzer>();
+        for (MethodAnalyzer ma : (methods))
+            result.addAll(ma.lambdas);
+        return result;
     }
 
     class MethodAnalyzer {
@@ -120,7 +136,7 @@ class LambdaTreeWeaver implements Opcodes {
                     InsnList insns = new InsnList();
                     for (LocalVariableNode local : lambda.locals.values()) {
                         Type type = getType(local.desc);
-                        if (lambda.mutableLocals.containsKey(local.name))
+                        if (methodMutableLocals.containsKey(local.name))
                             type = toArrayType(type);
                         insns.add(new VarInsnNode(type.getOpcode(ILOAD), local.index));
                     }
@@ -239,7 +255,8 @@ class LambdaTreeWeaver implements Opcodes {
             Map<String, FieldNode> parameters = new LinkedHashMap<String, FieldNode>();
 
             Map<String, LocalVariableNode> locals = new LinkedHashMap<String, LocalVariableNode>();
-            Map<String, LocalVariableNode> mutableLocals = MethodAnalyzer.this.methodMutableLocals;
+            // Map<String, LocalVariableNode> mutableLocals =
+            // MethodAnalyzer.this.methodMutableLocals;
 
             int bodyStart;
             int start;
@@ -334,7 +351,7 @@ class LambdaTreeWeaver implements Opcodes {
             void addLambdaLocalAnnotation(String local, FieldVisitor fieldVisitor) {
                 AnnotationVisitor annotationVisitor = fieldVisitor.visitAnnotation(
                         getDescriptor(LambdaLocal.class), true);
-                annotationVisitor.visit("isReadOnly", !mutableLocals.containsKey(local));
+                annotationVisitor.visit("isReadOnly", !methodMutableLocals.containsKey(local));
                 annotationVisitor.visit("name", local);
                 annotationVisitor.visitEnd();
             }
@@ -357,7 +374,7 @@ class LambdaTreeWeaver implements Opcodes {
                 List<Type> result = new ArrayList<Type>();
                 for (String local : locals.keySet()) {
                     Type type = getLocalVariableType(local);
-                    result.add(mutableLocals.containsKey(local) ? toArrayType(type) : type);
+                    result.add(methodMutableLocals.containsKey(local) ? toArrayType(type) : type);
                 }
                 return result.toArray(new Type[0]);
             }
@@ -437,7 +454,7 @@ class LambdaTreeWeaver implements Opcodes {
                 out.println("    parameters: " + parameters.keySet());
                 out.println("    method parameter types: " + newLambdaParameterTypes);
                 out.println("    expression type: " + expressionType);
-                out.println("    mutable locals: " + mutableLocals);
+                out.println("    mutable locals: " + getMutableLocals());
                 out.println("    final locals: " + locals);
 
                 if (newLambdaParameterTypes.size() != parameters.size())
@@ -601,6 +618,12 @@ class LambdaTreeWeaver implements Opcodes {
                 } else if (LONG_TYPE == samParameterType)
                     return L2I;
                 return -1;
+            }
+
+            Map<String, LocalVariableNode> getMutableLocals() {
+                Map<String, LocalVariableNode> result = new HashMap<String, LocalVariableNode>(methodMutableLocals);
+                result.keySet().retainAll(locals.keySet());
+                return result;
             }
         }
     }

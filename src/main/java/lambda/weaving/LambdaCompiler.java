@@ -50,7 +50,7 @@ public class LambdaCompiler {
         new LambdaCompiler().compile(args);
     }
 
-    LambdaTransformer transformer = new LambdaTransformer();
+    ILambdaTransformer transformer = ILambdaTransformer.Factory.create();
     byte[] buffer = new byte[8 * 1024];
 
     void compile(String[] args) throws Exception {
@@ -150,7 +150,7 @@ public class LambdaCompiler {
     }
 
     void writeGeneratedLambdas(File tempDir) throws FileNotFoundException, IOException {
-        for (Map.Entry<String, byte[]> lambdaClass : transformer.lambdasByClassName.entrySet()) {
+        for (Map.Entry<String, byte[]> lambdaClass : transformer.getLambdasByClassName().entrySet()) {
             File lambdaFile = new File(tempDir, lambdaClass.getKey().replace('.', '/'));
             FileOutputStream out = null;
             try {

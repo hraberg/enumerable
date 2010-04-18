@@ -22,12 +22,12 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-class LambdaTransformer implements Opcodes {
+class LambdaTransformer implements Opcodes, ILambdaTransformer {
     Map<String, byte[]> lambdasByClassName = new HashMap<String, byte[]>();
 
     ClassInjector injector = new ClassInjector();
 
-    public LambdaTransformer() {
+    LambdaTransformer() {
         debug("current class loader is " + getClass().getClassLoader());
     }
 
@@ -120,7 +120,11 @@ class LambdaTransformer implements Opcodes {
         return opcode >= ISTORE && opcode <= ASTORE;
     }
 
-    byte[] transform(String name, InputStream in) throws IOException {
+    public Map<String, byte[]> getLambdasByClassName() {
+        return lambdasByClassName;
+    }
+
+    public byte[] transform(String name, InputStream in) throws IOException {
         if (lambdasByClassName.containsKey(name)) {
             debug("generated lambda requested by the class loader " + name);
             return lambdasByClassName.get(name);
@@ -150,6 +154,6 @@ class LambdaTransformer implements Opcodes {
 
         injector.dump(name, bs);
         injector.verifyIfAsmUtilIsAvailable(bs);
-        injector.inject(getClass().getClassLoader(), name.replace('/', '.'), bs);
+        injector.inject(getClass().getClassLoader(), name, bs);
     }
 }
