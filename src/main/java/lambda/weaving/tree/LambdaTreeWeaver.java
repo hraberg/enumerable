@@ -29,8 +29,6 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.commons.AnalyzerAdapter;
-import org.objectweb.asm.commons.EmptyVisitor;
 import org.objectweb.asm.commons.Method;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -46,6 +44,9 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.BasicInterpreter;
+import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.util.ASMifierClassVisitor;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
 
@@ -107,7 +108,7 @@ class LambdaTreeWeaver implements Opcodes {
 
     class MethodAnalyzer {
         MethodNode m;
-        List<Integer> stackDepth;
+        Frame[] frames;
 
         List<LambdaAnalyzer> lambdas = new ArrayList<LambdaAnalyzer>();
         Map<String, LocalVariableNode> methodLocals = new LinkedHashMap<String, LocalVariableNode>();
@@ -134,7 +135,7 @@ class LambdaTreeWeaver implements Opcodes {
                     LambdaAnalyzer lambda = lambdas.get(currentLambda);
 
                     lambda.transform(instructions);
-                    lambda.instantiateLambda(m);
+                    lambda.instantiate(m);
 
                     i = lambdas.get(currentLambda).end;
 
@@ -153,6 +154,17 @@ class LambdaTreeWeaver implements Opcodes {
                         else
                             loadFirstElementOfArray(getType(local.desc));
                     }
+                } else if (n.getType() == IINC_INSN) {
+                    IincInsnNode iinc = (IincInsnNode) n;
+                    LocalVariableNode local = (LocalVariableNode) m.localVariables.get(iinc.var);
+
+                    if (methodMutableLocals.containsKey(local.name)) {
+                        loadArrayFromLocal(local);
+                        incrementInArray(m, iinc.incr);
+
+                    } else {
+                        n.accept(m);
+                    }
                 } else {
                     n.accept(m);
                 }
@@ -162,20 +174,16 @@ class LambdaTreeWeaver implements Opcodes {
             print(m, new OutputStreamWriter(out));
         }
 
-        void analyze() throws IOException {
+        void analyze() throws Exception {
             out.println(m.name + m.desc);
             StringWriter before = new StringWriter();
             print(m, before);
-            stackDepth = new ArrayList<Integer>();
 
-            AnalyzerAdapter analyzerAdapter = new AnalyzerAdapter(c.name, m.access, m.name, m.desc,
-                    new EmptyVisitor());
+            frames = new Analyzer(new BasicInterpreter()).analyze(c.name, m);
 
             int line = 0;
             for (int i = 0; i < m.instructions.size(); i++) {
                 AbstractInsnNode n = m.instructions.get(i);
-                n.accept(analyzerAdapter);
-                stackDepth.add(analyzerAdapter.stack == null ? 0 : analyzerAdapter.stack.size());
 
                 int type = n.getType();
                 if (type == AbstractInsnNode.METHOD_INSN) {
@@ -183,7 +191,7 @@ class LambdaTreeWeaver implements Opcodes {
 
                     if (isNewLambdaMethod(mi)) {
                         int end = i;
-                        int start = findInstructionAtStartOfLambda(end);
+                        int start = findInstructionAtStartOfLambda(end, getArgumentTypes(mi.desc).length);
 
                         LambdaAnalyzer lambda = new LambdaAnalyzer(currentLambdaId++, line, mi, start, end);
                         lambda.analyze();
@@ -207,12 +215,17 @@ class LambdaTreeWeaver implements Opcodes {
             }
         }
 
-        int findInstructionAtStartOfLambda(int end) {
-            int depth = stackDepth.get(end) - 1;
-            for (int i = end - 1; i >= 0; i--)
-                if (stackDepth.get(i) == depth)
-                    return i + 1;
+        int findInstructionAtStartOfLambda(int end, int arguments) {
+            int depth = getStackSize(end) - arguments;
+            for (int i = end - 1; i >= 0; i--) {
+                if (getStackSize(i) == depth)
+                    return i;
+            }
             throw new IllegalStateException("Could not find previous stack depth of " + depth);
+        }
+
+        int getStackSize(int i) {
+            return frames == null ? 0 : frames[i].getStackSize();
         }
 
         LocalVariableNode accessLocal(VarInsnNode vin) {
@@ -329,6 +342,30 @@ class LambdaTreeWeaver implements Opcodes {
             m.visitIntInsn(Opcodes.NEWARRAY, arrayType);
         }
 
+        void incrementInArray(MethodVisitor mv, int increment) {
+            // a[]
+            mv.visitInsn(ICONST_0);
+            // a[] 0
+            mv.visitInsn(DUP2);
+            // a[] 0 a[] 0
+            mv.visitInsn(IALOAD);
+            // a[] 0 a
+            loadInt(mv, increment);
+            // a[] 0 a i
+            mv.visitInsn(IADD);
+            // a[] 0 a+i
+            mv.visitInsn(IASTORE);
+        }
+
+        void loadInt(MethodVisitor mv, int value) {
+            if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE)
+                mv.visitIntInsn(Opcodes.BIPUSH, value);
+            else if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE)
+                mv.visitIntInsn(Opcodes.SIPUSH, value);
+            else
+                mv.visitLdcInsn(value);
+        }
+
         class LambdaAnalyzer {
             int id;
             int line;
@@ -378,14 +415,73 @@ class LambdaTreeWeaver implements Opcodes {
                 for (int i = start; i <= end; i++) {
                     AbstractInsnNode n = insns.get(i);
 
-                    if (isInSAMBody(i))
-                        n.accept(saMethod);
+                    if (isInSAMBody(i)) {
+                        int type = n.getType();
+                        if (type == VAR_INSN) {
+                            VarInsnNode vin = (VarInsnNode) n;
+                            LocalVariableNode local = (LocalVariableNode) m.localVariables.get(vin.var);
+                            loadLambdaField(local);
+
+                            if (methodMutableLocals.containsKey(local.name)) {
+                                if (isStoreInstruction(vin))
+                                    storeTopOfStackInArray(getType(local.desc));
+
+                                else
+                                    loadFirstElementOfArray(getType(local.desc));
+                            }
+                        } else if (type == FIELD_INSN) {
+                            FieldInsnNode fin = (FieldInsnNode) n;
+                            if (isLambdaParameterField(fin)) {
+                                accessParameter(fin);
+
+                            }
+                        } else if (type == IINC_INSN) {
+                            IincInsnNode iinc = (IincInsnNode) n;
+                            LocalVariableNode local = (LocalVariableNode) m.localVariables.get(iinc.var);
+                            loadLambdaField(local);
+                            incrementInArray(m, iinc.incr);
+
+                        } else {
+                            n.accept(saMethod);
+                        }
+                    }
                 }
 
                 returnFromSAMethod();
 
                 out.println("new lambda ================= ");
                 lambda.accept(new ASMifierClassVisitor(new PrintWriter(out)));
+            }
+
+            void accessParameter(FieldInsnNode fin) {
+                Type type = getType(fin.desc);
+                int realLocalIndex = getParameterRealLocalIndex(fin.name);
+
+                if (fin.getOpcode() == PUTFIELD) {
+                    saMethod.visitVarInsn(type.getOpcode(ISTORE), realLocalIndex);
+
+                } else {
+
+                    saMethod.visitVarInsn(type.getOpcode(ILOAD), realLocalIndex);
+                    if (isReference(type))
+                        saMethod.visitTypeInsn(CHECKCAST, type.getInternalName());
+                }
+            }
+
+            int getParameterRealLocalIndex(String name) {
+                List<Type> parameterTypes = getParameterTypes();
+                int index = 1;
+                for (int i = 0; i < parameterTypes.size(); i++)
+                    if (getParameterIndex(name) == i)
+                        break;
+                    else
+                        index += parameterTypes.get(i).getSize();
+                return index;
+            }
+
+            void loadLambdaField(LocalVariableNode local) {
+                saMethod.visitVarInsn(ALOAD, 0);
+                saMethod.visitFieldInsn(GETFIELD, lambdaClass(), getFieldNameForLocal(local), local.desc);
             }
 
             void createSAMethod() {
@@ -419,7 +515,7 @@ class LambdaTreeWeaver implements Opcodes {
                 mv.visitEnd();
             }
 
-            void instantiateLambda(MethodVisitor mv) {
+            void instantiate(MethodVisitor mv) {
                 mv.visitTypeInsn(NEW, lambdaClass());
                 mv.visitInsn(DUP);
 
@@ -445,7 +541,7 @@ class LambdaTreeWeaver implements Opcodes {
             void createAndInitializeFieldsWithAccessedLocals(MethodVisitor mv, Type[] parameters) {
                 int i = 1;
                 for (LocalVariableNode local : locals.values()) {
-                    String field = getFieldNameForLoca(local);
+                    String field = getFieldNameForLocal(local);
                     Type type = parameters[i - 1];
 
                     FieldVisitor fieldVisitor = lambda.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, field,
@@ -459,7 +555,7 @@ class LambdaTreeWeaver implements Opcodes {
                 }
             }
 
-            String getFieldNameForLoca(LocalVariableNode local) {
+            String getFieldNameForLocal(LocalVariableNode local) {
                 return local.name + "$" + local.index;
             }
 
@@ -517,7 +613,7 @@ class LambdaTreeWeaver implements Opcodes {
                     AbstractInsnNode n = m.instructions.get(i);
 
                     n.accept(asm);
-                    printInstruction(i, stackDepth.get(i), asm);
+                    printInstruction(i, i - start, getStackSize(i), asm);
 
                     int type = n.getType();
                     if (type == VAR_INSN)
@@ -648,12 +744,6 @@ class LambdaTreeWeaver implements Opcodes {
                 return getType(locals.get(local).desc);
             }
 
-            void printInstruction(int index, int depth, ASMifierMethodVisitor asm) {
-                out.print(index + "\t");
-                out.print(depth + "\t\t");
-                out.print(asm.getText().get(index - start));
-            }
-
             boolean returnNeedsUnboxing() {
                 return isReference(expressionType) && isPrimitive(sam.getReturnType());
             }
@@ -748,11 +838,15 @@ class LambdaTreeWeaver implements Opcodes {
 
     boolean isNewLambdaMethod(MethodInsnNode mi) throws IOException {
         MethodNode m = findMethod(mi);
+        if (m == null)
+            return false;
         return hasAnnotation(m, NewLambda.class) && hasAccess(m, ACC_STATIC);
     }
 
     boolean isLambdaParameterField(FieldInsnNode fi) throws IOException {
         FieldNode f = findField(fi);
+        if (f == null)
+            return false;
         return hasAnnotation(f, LambdaParameter.class) && hasAccess(f, ACC_STATIC);
     }
 
@@ -800,6 +894,12 @@ class LambdaTreeWeaver implements Opcodes {
             if (getType(an.desc).equals(getType(a)))
                 return true;
         return false;
+    }
+
+    void printInstruction(int index, int textIndex, int depth, ASMifierMethodVisitor asm) {
+        out.print(index + "\t");
+        out.print(depth + "\t\t");
+        out.print(asm.getText().get(textIndex));
     }
 
     void print(MethodNode m, Writer w) {

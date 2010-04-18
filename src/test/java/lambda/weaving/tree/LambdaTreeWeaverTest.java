@@ -69,7 +69,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
     }
 
     @Test
-    public void analytzingOneArgumentLambda() throws Exception {
+    public void analyzingOneArgumentLambda() throws Exception {
         class C {
             void m() {
                 λ(n, null);
