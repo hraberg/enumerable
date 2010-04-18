@@ -21,10 +21,14 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import lambda.annotation.LambdaLocal;
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
 
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.AnalyzerAdapter;
@@ -36,6 +40,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.IincInsnNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MemberNode;
@@ -43,6 +48,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.util.ASMifierClassVisitor;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
 
 class LambdaTreeWeaver implements Opcodes {
@@ -76,6 +82,16 @@ class LambdaTreeWeaver implements Opcodes {
         }
     }
 
+    ClassNode transform() throws Exception {
+        if (c == null)
+            analyze();
+
+        for (MethodAnalyzer ma : (methods))
+            ma.transform();
+
+        return c;
+    }
+
     class MethodAnalyzer {
         MethodNode m;
         List<Integer> stackDepth;
@@ -86,6 +102,48 @@ class LambdaTreeWeaver implements Opcodes {
 
         MethodAnalyzer(MethodNode m) {
             this.m = m;
+        }
+
+        void transform() throws IOException {
+            if (lambdas.isEmpty())
+                return;
+            int currentLambda = 0;
+            int realIndex = 0;
+            for (int i = 0; i < m.instructions.size(); i++, realIndex++) {
+                AbstractInsnNode n = m.instructions.get(realIndex);
+
+                if (currentLambda < lambdas.size() && i == lambdas.get(currentLambda).start) {
+                    LambdaAnalyzer lambda = lambdas.get(currentLambda);
+
+                    lambda.transform(realIndex);
+
+                    InsnList insns = new InsnList();
+                    for (LocalVariableNode local : lambda.locals.values()) {
+                        Type type = getType(local.desc);
+                        if (lambda.mutableLocals.containsKey(local.name))
+                            type = toArrayType(type);
+                        insns.add(new VarInsnNode(type.getOpcode(ILOAD), local.index));
+                    }
+                    String descriptor = getMethodDescriptor(VOID_TYPE, lambda.getConstructorParameters());
+                    insns.add(new MethodInsnNode(INVOKESPECIAL, lambda.lambdaClass(), "<init>", descriptor));
+                    System.out.println("real index " + realIndex);
+                    m.instructions.insert(m.instructions.get(realIndex), insns);
+
+                    realIndex += insns.size();
+
+                    currentLambda++;
+                }
+
+                if (n.getType() == VAR_INSN) {
+                    VarInsnNode vin = (VarInsnNode) n;
+                    LocalVariableNode local = (LocalVariableNode) m.localVariables.get(vin.var);
+                    if (methodMutableLocals.containsKey(local.name)) {
+                        System.out.println("SHOULD TURN THIS LOCAL INTO AN ARRAY");
+                    }
+                }
+            }
+            out.println("after ================= ");
+            print(m, new OutputStreamWriter(out));
         }
 
         void analyze() throws IOException {
@@ -130,8 +188,6 @@ class LambdaTreeWeaver implements Opcodes {
                 out.println();
                 out.println("before ================ ");
                 out.println(before);
-                out.println("after ================= ");
-                print(m, new OutputStreamWriter(out));
             }
         }
 
@@ -139,7 +195,7 @@ class LambdaTreeWeaver implements Opcodes {
             int depth = stackDepth.get(end) - 1;
             for (int i = end - 1; i >= 0; i--)
                 if (stackDepth.get(i) == depth)
-                    return i;
+                    return i + 1;
             throw new IllegalStateException("Could not find previous stack depth of " + depth);
         }
 
@@ -189,6 +245,8 @@ class LambdaTreeWeaver implements Opcodes {
             int start;
             int end;
             Method sam;
+            ClassNode lambda;
+            MethodNode samMethod;
 
             LambdaAnalyzer(int id, int line, MethodInsnNode mi, int start, int end) {
                 this.id = id;
@@ -204,6 +262,104 @@ class LambdaTreeWeaver implements Opcodes {
                         : newLambdaParameterTypes.get(newLambdaParameterTypes.size() - 1);
 
                 lambdaType = resolveLambdaType();
+            }
+
+            void transform(int realIndex) throws IOException {
+                lambda = new ClassNode();
+                lambda.visit(V1_5, ACC_FINAL | ACC_SYNTHETIC, lambdaClass(), null, getLambdaSuperType()
+                        .getInternalName(), getLambdaInterfaces());
+                createLambdaConstructor();
+
+                samMethod = (MethodNode) lambda.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, sam.getName(), sam
+                        .getDescriptor(), null, null);
+
+                for (int i = start; i <= end; i++) {
+                    AbstractInsnNode n = m.instructions.get(realIndex);
+                    m.instructions.remove(n);
+
+                    if (i >= bodyStart && i != end)
+                        samMethod.instructions.add(n);
+                }
+
+                samMethod.visitInsn(sam.getReturnType().getOpcode(IRETURN));
+                samMethod.visitMaxs(0, 0);
+                samMethod.visitEnd();
+
+                out.println("new lambda ================= ");
+                lambda.accept(new ASMifierClassVisitor(new PrintWriter(out)));
+            }
+
+            void createLambdaConstructor() throws IOException {
+                Type[] parameters = getConstructorParameters();
+                String descriptor = getMethodDescriptor(VOID_TYPE, parameters);
+
+                MethodVisitor mv = lambda.visitMethod(ACC_PUBLIC, "<init>", descriptor, null, null);
+                mv.visitCode();
+
+                createAndInitializeFieldsWithAccessedLocals(mv, parameters);
+
+                invokeSuperConstructor(mv);
+
+                mv.visitInsn(RETURN);
+                mv.visitMaxs(0, 0);
+                mv.visitEnd();
+            }
+
+            void invokeSuperConstructor(MethodVisitor mv) throws IOException {
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKESPECIAL, getLambdaSuperType().getInternalName(), "<init>", "()V");
+            }
+
+            void createAndInitializeFieldsWithAccessedLocals(MethodVisitor mv, Type[] parameters) {
+                int i = 1;
+                for (LocalVariableNode local : locals.values()) {
+                    String field = getFieldNameForLoca(local);
+                    Type type = parameters[i - 1];
+
+                    FieldVisitor fieldVisitor = lambda.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, field,
+                            type.getDescriptor(), null, null);
+                    addLambdaLocalAnnotation(local.name, fieldVisitor);
+                    fieldVisitor.visitEnd();
+
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitVarInsn(type.getOpcode(ILOAD), i++);
+                    mv.visitFieldInsn(PUTFIELD, lambdaClass(), field, type.getDescriptor());
+                }
+            }
+
+            String getFieldNameForLoca(LocalVariableNode local) {
+                return local.name + "$" + local.index;
+            }
+
+            void addLambdaLocalAnnotation(String local, FieldVisitor fieldVisitor) {
+                AnnotationVisitor annotationVisitor = fieldVisitor.visitAnnotation(
+                        getDescriptor(LambdaLocal.class), true);
+                annotationVisitor.visit("isReadOnly", !mutableLocals.containsKey(local));
+                annotationVisitor.visit("name", local);
+                annotationVisitor.visitEnd();
+            }
+
+            Type getLambdaSuperType() throws IOException {
+                Type type = lambdaType;
+                if (hasAccess(readClassNoCode(type.getInternalName()), ACC_INTERFACE))
+                    type = getType(Object.class);
+                return type;
+            }
+
+            String[] getLambdaInterfaces() throws IOException {
+                Type type = lambdaType;
+                if (hasAccess(readClassNoCode(type.getInternalName()), ACC_INTERFACE))
+                    return new String[] { type.getInternalName() };
+                return null;
+            }
+
+            Type[] getConstructorParameters() {
+                List<Type> result = new ArrayList<Type>();
+                for (String local : locals.keySet()) {
+                    Type type = getLocalVariableType(local);
+                    result.add(mutableLocals.containsKey(local) ? toArrayType(type) : type);
+                }
+                return result.toArray(new Type[0]);
             }
 
             Type resolveLambdaType() {
@@ -234,6 +390,7 @@ class LambdaTreeWeaver implements Opcodes {
                     int type = n.getType();
                     if (type == VAR_INSN)
                         localVariable((VarInsnNode) n);
+
                     if (type == METHOD_INSN) {
                         MethodInsnNode min = (MethodInsnNode) n;
 
@@ -258,7 +415,12 @@ class LambdaTreeWeaver implements Opcodes {
                         }
                     }
                 }
-                bodyStart = lastParameterStart + 1;
+                if (!parameters.isEmpty()) {
+                    bodyStart = lastParameterStart + 1;
+                    if (parameterHasConversionAtDefinition(getParameter(parameters.size() - 1)))
+                        bodyStart++;
+                } else
+                    bodyStart = start;
 
                 out.println("end =================== " + start + " -> " + end);
                 out.println("    body starts at: " + bodyStart);
@@ -397,14 +559,20 @@ class LambdaTreeWeaver implements Opcodes {
                 int index = getParameterIndex(name);
                 Type parameterType = getParameterTypes().get(index);
                 Type methodParameterType = newLambdaParameterTypes.get(index);
+
                 if (isPrimitive(parameterType) && isPrimitive(methodParameterType))
                     return !parameterType.equals(methodParameterType);
 
-                return isPrimitive(parameterType) && isReference(methodParameterType);
+                return (isPrimitive(parameterType) && isReference(methodParameterType))
+                        || (isReference(parameterType) && isPrimitive(methodParameterType));
             }
 
             int getParameterIndex(String name) {
                 return new ArrayList<String>(parameters.keySet()).indexOf(name);
+            }
+
+            String getParameter(int index) {
+                return new ArrayList<String>(parameters.keySet()).get(index);
             }
 
             boolean parameterNeedsNarrowConversionFromActualArgument(String name) {
@@ -457,6 +625,10 @@ class LambdaTreeWeaver implements Opcodes {
     boolean isLambdaParameterField(FieldInsnNode fi) throws IOException {
         FieldNode f = findField(fi);
         return hasAnnotation(f, LambdaParameter.class) && hasAccess(f, ACC_STATIC);
+    }
+
+    boolean hasAccess(ClassNode c, int acc) {
+        return (c.access & acc) != 0;
     }
 
     boolean hasAccess(MethodNode m, int acc) {

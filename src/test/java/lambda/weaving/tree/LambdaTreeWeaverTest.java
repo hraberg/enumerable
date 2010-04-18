@@ -21,6 +21,7 @@ import lambda.primitives.LambdaPrimitives;
 import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer;
 import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 
+import org.junit.After;
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
@@ -68,7 +69,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
     }
 
     @Test
-    public void analyzingOneArgumentLambda() throws Exception {
+    public void analytzingOneArgumentLambda() throws Exception {
         class C {
             void m() {
                 λ(n, null);
@@ -591,7 +592,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
             }
         }
 
-        LambdaTreeWeaver weaver = analyze(C.class);
+        analyze(C.class);
         assertTrue(weaver.fieldsThatNeedStaticAccessMethod.containsKey("p"));
     }
 
@@ -607,7 +608,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
             }
         }
 
-        LambdaTreeWeaver weaver = analyze(C.class);
+        analyze(C.class);
         assertTrue(weaver.methodsThatNeedStaticAccessMethod.containsKey("p"));
     }
 
@@ -621,7 +622,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
 
     @Test
     public void analyzingLambdaAccessingPrivateStaticField() throws Exception {
-        LambdaTreeWeaver weaver = analyze(PrivateStaticField.class);
+        analyze(PrivateStaticField.class);
         assertTrue(weaver.fieldsThatNeedStaticAccessMethod.containsKey("p"));
     }
 
@@ -637,7 +638,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
 
     @Test
     public void analyzingLambdaAccessingPrivateStaticMethod() throws Exception {
-        LambdaTreeWeaver weaver = analyze(PrivateStaticMethod.class);
+        analyze(PrivateStaticMethod.class);
         assertTrue(weaver.methodsThatNeedStaticAccessMethod.containsKey("p"));
     }
 
@@ -649,11 +650,17 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         return analyze(aClass).methods.get(1);
     }
 
+    @After
+    public void transform() throws Exception {
+        weaver.transform();
+    }
+
+    LambdaTreeWeaver weaver;
     Type object = getType(Object.class);
 
     LambdaTreeWeaver analyze(Class<?> aClass) throws IOException, Exception {
         ClassReader cr = new ClassReader(aClass.getName());
-        LambdaTreeWeaver weaver = new LambdaTreeWeaver(cr);
+        weaver = new LambdaTreeWeaver(cr);
         weaver.analyze();
         return weaver;
     }
