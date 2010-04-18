@@ -79,7 +79,7 @@ class LambdaTreeWeaver implements Opcodes {
     class MethodAnalyzer {
         MethodNode m;
         List<Integer> stackDepth;
-        int line;
+
         List<LambdaAnalyzer> lambdas = new ArrayList<LambdaAnalyzer>();
         Map<String, LocalVariableNode> methodLocals = new LinkedHashMap<String, LocalVariableNode>();
         Map<String, LocalVariableNode> methodMutableLocals = new LinkedHashMap<String, LocalVariableNode>();
@@ -97,6 +97,7 @@ class LambdaTreeWeaver implements Opcodes {
             AnalyzerAdapter analyzerAdapter = new AnalyzerAdapter(c.name, m.access, m.name, m.desc,
                     new EmptyVisitor());
 
+            int line = 0;
             for (int i = 0; i < m.instructions.size(); i++) {
                 AbstractInsnNode n = m.instructions.get(i);
                 n.accept(analyzerAdapter);
@@ -110,7 +111,7 @@ class LambdaTreeWeaver implements Opcodes {
                         int end = i;
                         int start = findInstructionAtStartOfLambda(end);
 
-                        LambdaAnalyzer lambda = new LambdaAnalyzer(currentLambdaId++, mi, start, end);
+                        LambdaAnalyzer lambda = new LambdaAnalyzer(currentLambdaId++, line, mi, start, end);
                         lambda.analyze();
                         lambdas.add(lambda);
                     }
@@ -135,9 +136,9 @@ class LambdaTreeWeaver implements Opcodes {
         }
 
         int findInstructionAtStartOfLambda(int end) {
-            int depth = stackDepth.get(end);
+            int depth = stackDepth.get(end) - 1;
             for (int i = end - 1; i >= 0; i--)
-                if (stackDepth.get(i) == depth - 1)
+                if (stackDepth.get(i) == depth)
                     return i;
             throw new IllegalStateException("Could not find previous stack depth of " + depth);
         }
@@ -170,14 +171,17 @@ class LambdaTreeWeaver implements Opcodes {
 
         class LambdaAnalyzer {
             int id;
-            Method newLambdaMethod;
+            int line;
 
-            List<Type> methodParameterTypes;
+            Method newLambdaMethod;
+            List<Type> newLambdaParameterTypes;
+
             Type lambdaType;
             Type expressionType;
 
             Set<String> parametersWithDefaultValue = new HashSet<String>();
             Map<String, FieldNode> parameters = new LinkedHashMap<String, FieldNode>();
+
             Map<String, LocalVariableNode> locals = new LinkedHashMap<String, LocalVariableNode>();
             Map<String, LocalVariableNode> mutableLocals = MethodAnalyzer.this.methodMutableLocals;
 
@@ -186,17 +190,18 @@ class LambdaTreeWeaver implements Opcodes {
             int end;
             Method sam;
 
-            LambdaAnalyzer(int id, MethodInsnNode mi, int start, int end) {
+            LambdaAnalyzer(int id, int line, MethodInsnNode mi, int start, int end) {
                 this.id = id;
+                this.line = line;
                 this.start = start;
                 this.end = end;
                 newLambdaMethod = new Method(mi.name, mi.desc);
 
-                methodParameterTypes = asList(newLambdaMethod.getArgumentTypes());
-                methodParameterTypes = methodParameterTypes.subList(0, methodParameterTypes.size() - 1);
+                newLambdaParameterTypes = asList(newLambdaMethod.getArgumentTypes());
+                newLambdaParameterTypes = newLambdaParameterTypes.subList(0, newLambdaParameterTypes.size() - 1);
 
-                expressionType = methodParameterTypes.isEmpty() ? getType(Object.class) : methodParameterTypes
-                        .get(methodParameterTypes.size() - 1);
+                expressionType = newLambdaParameterTypes.isEmpty() ? getType(Object.class)
+                        : newLambdaParameterTypes.get(newLambdaParameterTypes.size() - 1);
 
                 lambdaType = resolveLambdaType();
             }
@@ -268,14 +273,14 @@ class LambdaTreeWeaver implements Opcodes {
                     throw new IllegalStateException("Found no potential abstract method to override");
 
                 out.println("    parameters: " + parameters.keySet());
-                out.println("    method parameter types: " + methodParameterTypes);
+                out.println("    method parameter types: " + newLambdaParameterTypes);
                 out.println("    expression type: " + expressionType);
                 out.println("    mutable locals: " + mutableLocals);
                 out.println("    final locals: " + locals);
 
-                if (methodParameterTypes.size() != parameters.size())
+                if (newLambdaParameterTypes.size() != parameters.size())
                     throw new IllegalStateException("Got " + parameters.keySet() + " as parameters need exactly "
-                            + methodParameterTypes.size());
+                            + newLambdaParameterTypes.size());
             }
 
             @SuppressWarnings("unchecked")
@@ -292,7 +297,7 @@ class LambdaTreeWeaver implements Opcodes {
                 ClassNode cn = readClassNoCode(type.getInternalName());
                 for (MethodNode mn : (List<MethodNode>) cn.methods)
                     if (hasAccess(mn, ACC_ABSTRACT)
-                            && getArgumentTypes(mn.desc).length == methodParameterTypes.size())
+                            && getArgumentTypes(mn.desc).length == newLambdaParameterTypes.size())
                         return new Method(mn.name, mn.desc);
 
                 for (String anInterface : (List<String>) cn.interfaces)
@@ -308,9 +313,9 @@ class LambdaTreeWeaver implements Opcodes {
                 FieldNode f = findField(fin);
 
                 if (!parameters.containsKey(f.name)) {
-                    if (parameters.size() == methodParameterTypes.size())
+                    if (parameters.size() == newLambdaParameterTypes.size())
                         throw new IllegalStateException("Tried to define extra parameter, " + f.name
-                                + ", arity is " + methodParameterTypes.size() + ", defined parameters are "
+                                + ", arity is " + newLambdaParameterTypes.size() + ", defined parameters are "
                                 + parameters.keySet());
 
                     Type argumentType = getType(fin.desc);
@@ -326,7 +331,7 @@ class LambdaTreeWeaver implements Opcodes {
                             + " as "
                             + parameters.size()
                             + " out of "
-                            + methodParameterTypes.size()
+                            + newLambdaParameterTypes.size()
                             + (hasDefaultValue ? " (has default value starting at " + lastParameterStart + ")" : ""));
                 } else
                     out.println("  --  accessed parameter " + fin.name + " " + getType(f.desc).getClassName()
@@ -363,7 +368,85 @@ class LambdaTreeWeaver implements Opcodes {
                 out.print(depth + "\t\t");
                 out.print(asm.getText().get(index - start));
             }
+
+            boolean returnNeedsUnboxing() {
+                return isReference(expressionType) && isPrimitive(sam.getReturnType());
+            }
+
+            boolean returnNeedsBoxing() {
+                return isPrimitive(expressionType) && isReference(sam.getReturnType());
+            }
+
+            boolean parameterDefaultValueNeedsBoxing(String name) {
+                return isPrimitive(getType(parameters.get(name).desc));
+            }
+
+            boolean parameterNeedsUnboxing(String name) {
+                int index = getParameterIndex(name);
+                Type samParameterType = sam.getArgumentTypes()[index];
+                return isPrimitive(getParameterTypes().get(index)) && isReference(samParameterType);
+            }
+
+            boolean parameterNeedsBoxing(String name) {
+                int index = getParameterIndex(name);
+                Type samParameterType = sam.getArgumentTypes()[index];
+                return isReference(getParameterTypes().get(index)) && isPrimitive(samParameterType);
+            }
+
+            boolean parameterHasConversionAtDefinition(String name) {
+                int index = getParameterIndex(name);
+                Type parameterType = getParameterTypes().get(index);
+                Type methodParameterType = newLambdaParameterTypes.get(index);
+                if (isPrimitive(parameterType) && isPrimitive(methodParameterType))
+                    return !parameterType.equals(methodParameterType);
+
+                return isPrimitive(parameterType) && isReference(methodParameterType);
+            }
+
+            int getParameterIndex(String name) {
+                return new ArrayList<String>(parameters.keySet()).indexOf(name);
+            }
+
+            boolean parameterNeedsNarrowConversionFromActualArgument(String name) {
+                return parameterNarrowConversionOpcode(name) != -1;
+            }
+
+            int parameterNarrowConversionOpcode(String name) {
+                int index = getParameterIndex(name);
+                Type samParameterType = sam.getArgumentTypes()[index];
+                Type parameterType = getParameterTypes().get(index);
+                if (parameterType.equals(samParameterType))
+                    return -1;
+
+                if (DOUBLE_TYPE == samParameterType) {
+                    switch (parameterType.getSort()) {
+                    case BYTE:
+                    case CHAR:
+                    case SHORT:
+                    case INT:
+                        return D2I;
+                    case Type.FLOAT:
+                        return D2F;
+                    case Type.LONG:
+                        return D2L;
+                    }
+                } else if (LONG_TYPE == samParameterType)
+                    return L2I;
+                return -1;
+            }
         }
+    }
+
+    Type toArrayType(Type type) {
+        return getType("[" + type.getDescriptor());
+    }
+
+    boolean isReference(Type type) {
+        return type.getSort() == OBJECT || type.getSort() == ARRAY;
+    }
+
+    boolean isPrimitive(Type type) {
+        return !isReference(type) && type.getSort() != VOID;
     }
 
     boolean isNewLambdaMethod(MethodInsnNode mi) throws IOException {

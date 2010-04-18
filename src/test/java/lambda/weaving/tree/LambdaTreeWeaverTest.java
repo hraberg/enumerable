@@ -14,15 +14,20 @@ import lambda.Fn2;
 import lambda.Fn3;
 import lambda.TestBase;
 import lambda.annotation.LambdaParameter;
+import lambda.primitives.Fn1DtoI;
+import lambda.primitives.Fn2DDtoD;
+import lambda.primitives.Fn2LLtoL;
+import lambda.primitives.LambdaPrimitives;
 import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer;
 import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 @SuppressWarnings("unused")
-public class LambdaTreeWeaverTest extends TestBase {
+public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
     @Test
     public void analyzingZeroArgumentLambda() throws Exception {
         class C {
@@ -49,14 +54,17 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertTrue(lambda.mutableLocals.isEmpty());
 
         assertTrue(lambda.parameters.isEmpty());
-        assertTrue(lambda.methodParameterTypes.isEmpty());
+        assertTrue(lambda.newLambdaParameterTypes.isEmpty());
 
         assertEquals(object, lambda.expressionType);
         assertEquals(getType(Fn0.class), lambda.lambdaType);
 
         assertEquals("call", lambda.sam.getName());
         assertEquals(0, lambda.sam.getArgumentTypes().length);
+
         assertEquals(object, lambda.sam.getReturnType());
+        assertFalse(lambda.returnNeedsUnboxing());
+        assertFalse(lambda.returnNeedsBoxing());
     }
 
     @Test
@@ -73,9 +81,9 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertTrue(lambda.mutableLocals.isEmpty());
 
         assertEquals(list("n"), list(lambda.parameters.keySet()));
-        assertEquals(list(INT_TYPE), lambda.getParameterTypes());
 
-        assertEquals(list(object), lambda.methodParameterTypes);
+        assertEquals(list(INT_TYPE), lambda.getParameterTypes());
+        assertEquals(list(object), lambda.newLambdaParameterTypes);
 
         assertEquals(object, lambda.expressionType);
         assertEquals(getType(Fn1.class), lambda.lambdaType);
@@ -83,6 +91,9 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals("call", lambda.sam.getName());
         assertEquals(list(object), list(lambda.sam.getArgumentTypes()));
         assertEquals(object, lambda.sam.getReturnType());
+
+        assertTrue(lambda.parameterHasConversionAtDefinition("n"));
+        assertTrue(lambda.parameterNeedsUnboxing("n"));
     }
 
     @Test
@@ -101,7 +112,7 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals(list("s", "n"), list(lambda.parameters.keySet()));
         assertEquals(list(getType(String.class), INT_TYPE), lambda.getParameterTypes());
 
-        assertEquals(list(object, object), lambda.methodParameterTypes);
+        assertEquals(list(object, object), lambda.newLambdaParameterTypes);
 
         assertEquals(object, lambda.expressionType);
         assertEquals(getType(Fn2.class), lambda.lambdaType);
@@ -109,6 +120,11 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals("call", lambda.sam.getName());
         assertEquals(list(object, object), list(lambda.sam.getArgumentTypes()));
         assertEquals(object, lambda.sam.getReturnType());
+
+        assertFalse(lambda.parameterHasConversionAtDefinition("s"));
+        assertFalse(lambda.parameterNeedsUnboxing("s"));
+        assertTrue(lambda.parameterHasConversionAtDefinition("n"));
+        assertTrue(lambda.parameterNeedsUnboxing("n"));
     }
 
     @Test
@@ -127,7 +143,7 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals(list("s", "n", "b"), list(lambda.parameters.keySet()));
         assertEquals(list(getType(String.class), INT_TYPE, BOOLEAN_TYPE), lambda.getParameterTypes());
 
-        assertEquals(list(object, object, object), lambda.methodParameterTypes);
+        assertEquals(list(object, object, object), lambda.newLambdaParameterTypes);
 
         assertEquals(object, lambda.expressionType);
         assertEquals(getType(Fn3.class), lambda.lambdaType);
@@ -135,6 +151,13 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals("call", lambda.sam.getName());
         assertEquals(list(object, object, object), list(lambda.sam.getArgumentTypes()));
         assertEquals(object, lambda.sam.getReturnType());
+
+        assertFalse(lambda.parameterNeedsUnboxing("s"));
+        assertFalse(lambda.parameterHasConversionAtDefinition("s"));
+        assertTrue(lambda.parameterNeedsUnboxing("n"));
+        assertTrue(lambda.parameterHasConversionAtDefinition("n"));
+        assertTrue(lambda.parameterNeedsUnboxing("b"));
+        assertTrue(lambda.parameterHasConversionAtDefinition("b"));
     }
 
     @Test
@@ -311,14 +334,17 @@ public class LambdaTreeWeaverTest extends TestBase {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertTrue(lambda.parameters.isEmpty());
-        assertTrue(lambda.methodParameterTypes.isEmpty());
+        assertTrue(lambda.newLambdaParameterTypes.isEmpty());
 
         assertEquals(object, lambda.expressionType);
         assertEquals(getType(Runnable.class), lambda.lambdaType);
 
         assertEquals("run", lambda.sam.getName());
         assertEquals(0, lambda.sam.getArgumentTypes().length);
+
         assertEquals(VOID_TYPE, lambda.sam.getReturnType());
+        assertFalse(lambda.returnNeedsUnboxing());
+        assertFalse(lambda.returnNeedsBoxing());
     }
 
     @LambdaParameter
@@ -338,14 +364,163 @@ public class LambdaTreeWeaverTest extends TestBase {
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
         assertEquals(list("o1", "o2"), list(lambda.parameters.keySet()));
-        assertEquals(list(object, object), lambda.methodParameterTypes);
+        assertEquals(list(object, object), lambda.newLambdaParameterTypes);
         assertEquals(object, lambda.expressionType);
 
         assertEquals(getType(Comparator.class), lambda.lambdaType);
 
         assertEquals("compare", lambda.sam.getName());
         assertEquals(list(object, object), list(lambda.sam.getArgumentTypes()));
+
         assertEquals(INT_TYPE, lambda.sam.getReturnType());
+        assertTrue(lambda.returnNeedsUnboxing());
+        assertFalse(lambda.returnNeedsBoxing());
+    }
+
+    interface I {
+        long invoke(int x, Object y, double z);
+    }
+
+    @LambdaParameter
+    static Double dbl;
+
+    @Test
+    public void analyzingLambdaCreatedFromGenericCastWithTypesThatNeedConversion() throws Exception {
+        class C {
+            void m() {
+                I i = delegate(n, o1, dbl, 0);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(getType(I.class), lambda.lambdaType);
+        assertEquals("invoke", lambda.sam.getName());
+
+        assertEquals(list("n", "o1", "dbl"), list(lambda.parameters.keySet()));
+
+        assertEquals(list(INT_TYPE, object, DOUBLE_TYPE), list(lambda.sam.getArgumentTypes()));
+        assertEquals(list(INT_TYPE, object, getType(Double.class)), lambda.getParameterTypes());
+
+        assertFalse(lambda.parameterNeedsUnboxing("n"));
+        assertFalse(lambda.parameterNeedsBoxing("n"));
+
+        assertFalse(lambda.parameterNeedsUnboxing("o1"));
+        assertFalse(lambda.parameterNeedsBoxing("o1"));
+
+        assertFalse(lambda.parameterNeedsUnboxing("dbl"));
+        assertTrue(lambda.parameterNeedsBoxing("dbl"));
+
+        assertEquals(object, lambda.expressionType);
+        assertEquals(LONG_TYPE, lambda.sam.getReturnType());
+
+        assertTrue(lambda.returnNeedsUnboxing());
+        assertFalse(lambda.returnNeedsBoxing());
+    }
+
+    @Test
+    public void analyzingLambdaCreatedFromPrimitiveLambdaThatNeedsNarrowConversionFromDoubleToInt()
+            throws Exception {
+        class C {
+            void m() {
+                LambdaPrimitives.λ(d, idx, 0);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(getType(Fn2DDtoD.class), lambda.lambdaType);
+        assertEquals(list(DOUBLE_TYPE, DOUBLE_TYPE), list(lambda.sam.getArgumentTypes()));
+        assertEquals(list(DOUBLE_TYPE, INT_TYPE), lambda.getParameterTypes());
+
+        assertFalse(lambda.parameterNeedsUnboxing("d"));
+        assertFalse(lambda.parameterNeedsBoxing("d"));
+        assertFalse(lambda.parameterNeedsNarrowConversionFromActualArgument("d"));
+        assertEquals(-1, lambda.parameterNarrowConversionOpcode("d"));
+
+        assertFalse(lambda.parameterNeedsUnboxing("idx"));
+        assertFalse(lambda.parameterNeedsBoxing("idx"));
+        assertFalse(lambda.parameterHasConversionAtDefinition("d"));
+        assertTrue(lambda.parameterNeedsNarrowConversionFromActualArgument("idx"));
+        assertTrue(lambda.parameterHasConversionAtDefinition("idx"));
+        assertEquals(D2I, lambda.parameterNarrowConversionOpcode("idx"));
+
+        assertEquals(DOUBLE_TYPE, lambda.expressionType);
+        assertEquals(DOUBLE_TYPE, lambda.sam.getReturnType());
+    }
+
+    @Test
+    public void analyzingLambdaCreatedFromPrimitiveLambdaThatNeedsNarrowConversionFromDoubleToLong()
+            throws Exception {
+        class C {
+            void m() {
+                LambdaPrimitives.λ(d, l, 0);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(getType(Fn2DDtoD.class), lambda.lambdaType);
+        assertEquals(list(DOUBLE_TYPE, DOUBLE_TYPE), list(lambda.sam.getArgumentTypes()));
+        assertEquals(list(DOUBLE_TYPE, LONG_TYPE), lambda.getParameterTypes());
+
+        assertFalse(lambda.parameterNeedsUnboxing("l"));
+        assertFalse(lambda.parameterNeedsBoxing("l"));
+        assertTrue(lambda.parameterNeedsNarrowConversionFromActualArgument("l"));
+        assertEquals(D2L, lambda.parameterNarrowConversionOpcode("l"));
+    }
+
+    @LambdaParameter
+    static float fl;
+
+    @Test
+    public void analyzingLambdaCreatedFromPrimitiveLambdaThatNeedsNarrowConversionFromDoubleToFloat()
+            throws Exception {
+        class C {
+            void m() {
+                LambdaPrimitives.λ(d, fl, 0);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(getType(Fn2DDtoD.class), lambda.lambdaType);
+        assertEquals(list(DOUBLE_TYPE, DOUBLE_TYPE), list(lambda.sam.getArgumentTypes()));
+        assertEquals(list(DOUBLE_TYPE, FLOAT_TYPE), lambda.getParameterTypes());
+
+        assertFalse(lambda.parameterNeedsUnboxing("fl"));
+        assertFalse(lambda.parameterNeedsBoxing("fl"));
+        assertTrue(lambda.parameterNeedsNarrowConversionFromActualArgument("fl"));
+        assertEquals(D2F, lambda.parameterNarrowConversionOpcode("fl"));
+    }
+
+    @Test
+    public void analyzingLambdaCreatedFromPrimitiveLambdaThatNeedsNarrowConversionFromLongToInt() throws Exception {
+        class C {
+            void m() {
+                LambdaPrimitives.λ(l, idx, 0);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(getType(Fn2LLtoL.class), lambda.lambdaType);
+
+        assertEquals(list(LONG_TYPE, LONG_TYPE), list(lambda.sam.getArgumentTypes()));
+        assertEquals(list(LONG_TYPE, INT_TYPE), lambda.getParameterTypes());
+
+        assertFalse(lambda.parameterNeedsUnboxing("l"));
+        assertFalse(lambda.parameterNeedsBoxing("l"));
+        assertFalse(lambda.parameterNeedsNarrowConversionFromActualArgument("l"));
+        assertEquals(-1, lambda.parameterNarrowConversionOpcode("l"));
+
+        assertFalse(lambda.parameterNeedsUnboxing("idx"));
+        assertFalse(lambda.parameterNeedsBoxing("idx"));
+        assertTrue(lambda.parameterNeedsNarrowConversionFromActualArgument("idx"));
+        assertEquals(L2I, lambda.parameterNarrowConversionOpcode("idx"));
+
+        assertEquals(LONG_TYPE, lambda.expressionType);
+        assertEquals(LONG_TYPE, lambda.sam.getReturnType());
     }
 
     @Test
@@ -365,23 +540,45 @@ public class LambdaTreeWeaverTest extends TestBase {
         assertEquals(list(INT_TYPE), lambda.getParameterTypes());
 
         assertTrue(lambda.parametersWithDefaultValue.contains("n"));
+        assertTrue(lambda.parameterDefaultValueNeedsBoxing("n"));
     }
 
     @Test
     public void analyzingTwoArgumentLambdaWithDefaultValue() throws Exception {
         class C {
             void m() {
-                λ(n, m = 2, null);
+                λ(n, s = "", null);
             }
         }
 
         LambdaAnalyzer lambda = lambdaIn(C.class);
 
-        assertEquals(list("n", "m"), list(lambda.parameters.keySet()));
-        assertEquals(list(INT_TYPE, INT_TYPE), lambda.getParameterTypes());
+        assertEquals(list("n", "s"), list(lambda.parameters.keySet()));
+        assertEquals(list(INT_TYPE, getType(String.class)), lambda.getParameterTypes());
 
         assertFalse(lambda.parametersWithDefaultValue.contains("n"));
-        assertTrue(lambda.parametersWithDefaultValue.contains("m"));
+        assertTrue(lambda.parametersWithDefaultValue.contains("s"));
+
+        assertTrue(lambda.parameterDefaultValueNeedsBoxing("n"));
+        assertFalse(lambda.parameterDefaultValueNeedsBoxing("s"));
+    }
+
+    @Test
+    public void analyzingLambdaCreatedFromPrimitiveLambdaThatHasDefaultValue() throws Exception {
+        class C {
+            void m() {
+                LambdaPrimitives.λ(d = 2, 0);
+            }
+        }
+
+        LambdaAnalyzer lambda = lambdaIn(C.class);
+
+        assertEquals(getType(Fn1DtoI.class), lambda.lambdaType);
+        assertEquals(list(DOUBLE_TYPE), list(lambda.sam.getArgumentTypes()));
+        assertEquals(list(DOUBLE_TYPE), lambda.getParameterTypes());
+
+        assertTrue(lambda.parametersWithDefaultValue.contains("d"));
+        assertTrue(lambda.parameterDefaultValueNeedsBoxing("d"));
     }
 
     @Test
