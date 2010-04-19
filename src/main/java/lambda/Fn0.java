@@ -200,4 +200,8 @@ public abstract class Fn0<R> implements Serializable {
     public boolean isFalse() {
         return isFalseOrNull(call());
     }
+
+    public boolean isNull() {
+        return call() == null;
+    }
 }

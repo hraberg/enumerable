@@ -20,8 +20,10 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
 
     public abstract R call(A1 a1);
 
+    protected A1 default$1;
+
     public R call() {
-        return call(default$1());
+        return call(default$1 == null ? default$1 = default$1() : default$1);
     }
 
     protected A1 default$1() {

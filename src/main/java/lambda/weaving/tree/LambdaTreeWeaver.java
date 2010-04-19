@@ -266,10 +266,9 @@ class LambdaTreeWeaver implements Opcodes {
         }
 
         int resolveBranchesAtStartOfLambda(int i, LabelNode label) {
-            AbstractInsnNode n;
             int j = i;
             while (j-- >= 0) {
-                n = m.instructions.get(j);
+                AbstractInsnNode n = m.instructions.get(j);
                 if (n.getType() == JUMP_INSN) {
                     if (((JumpInsnNode) n).label == label) {
                         switch (n.getOpcode()) {
@@ -299,7 +298,7 @@ class LambdaTreeWeaver implements Opcodes {
         }
 
         int getStackSize(int i) {
-            return frames == null ? 0 : frames[i].getStackSize();
+            return frames[i] == null ? 0 : frames[i].getStackSize();
         }
 
         LocalVariableNode accessLocal(VarInsnNode vin) {
