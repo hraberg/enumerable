@@ -1,5 +1,6 @@
 package lambda;
 
+import static java.lang.Boolean.*;
 import static lambda.exception.UncheckedException.*;
 
 import java.io.Serializable;
@@ -149,5 +150,54 @@ public abstract class Fn0<R> implements Serializable {
 
     public String toString() {
         return getClass().getName();
+    }
+
+    public static boolean isNotFalseOrNull(Object obj) {
+        return obj != FALSE && obj != null;
+    }
+
+    public static boolean isFalseOrNull(Object result) {
+        return !isNotFalseOrNull(result);
+    }
+
+    public R unless(Fn0<Boolean> block) {
+        if (isFalseOrNull(block.call()))
+            return call();
+        return null;
+    }
+
+    public <B> B whileTrue(Fn0<B> block) {
+        B result = null;
+        while (isNotFalseOrNull(call()))
+            result = block.call();
+        return result;
+    }
+
+    public <B> B ifTrue(Fn0<B> block) {
+        if (isNotFalseOrNull(call()))
+            return block.call();
+        return null;
+    }
+
+    public <B> B ifFalse(Fn0<B> block) {
+        if (isFalseOrNull(call()))
+            return block.call();
+        return null;
+    }
+
+    public <B> boolean and(Fn0<B> block) {
+        return isNotFalseOrNull(call()) && isNotFalseOrNull(block.call());
+    }
+
+    public <B> boolean or(Fn0<B> block) {
+        return isNotFalseOrNull(call()) || isNotFalseOrNull(block.call());
+    }
+
+    public boolean isTrue() {
+        return isNotFalseOrNull(call());
+    }
+
+    public boolean isFalse() {
+        return isFalseOrNull(call());
     }
 }

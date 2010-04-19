@@ -1,7 +1,7 @@
 package lambda.enumerable.collection;
 
-import static java.lang.Boolean.*;
 import static java.util.Collections.*;
+import static lambda.Fn0.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -469,14 +469,6 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         }
 
         return allResults;
-    }
-
-    boolean isNotFalseOrNull(Object obj) {
-        return obj != FALSE && obj != null;
-    }
-
-    boolean isFalseOrNull(Object result) {
-        return !isNotFalseOrNull(result);
     }
 
     @SuppressWarnings("unchecked")

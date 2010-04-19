@@ -93,10 +93,18 @@ public class Lambda {
     }
 
     /**
-     * @see #fn(Object)
+     * Creates a new lambda with no arguments.
      */
     @NewLambda
     public static <R> Fn0<R> fn(R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * Creates an empty lambda expression returning null.
+     */
+    @NewLambda
+    public static <R> Fn0<R> fn() {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -129,6 +137,14 @@ public class Lambda {
      */
     @NewLambda
     public static <R> Fn0<R> λ(R block) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * @see #fn()
+     */
+    @NewLambda
+    public static <R> Fn0<R> λ() {
         throw new LambdaWeavingNotEnabledException();
     }
 }

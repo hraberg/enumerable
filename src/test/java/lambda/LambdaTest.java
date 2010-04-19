@@ -40,9 +40,15 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
-    public void creatingLambdaWithNoArgumentsUsingUnusedParameterMarker() throws Exception {
+    public void creatingLambdaWithNoArguments() throws Exception {
         Fn0<String> hello = λ("hello");
         assertEquals("hello", hello.call());
+    }
+
+    @Test
+    public void creatingLambdaWithNoExpression() throws Exception {
+        Fn0<?> none = λ();
+        assertNull(none.call());
     }
 
     @Test
@@ -162,6 +168,7 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void arities() throws Exception {
+        assertEquals(0, λ().arity);
         assertEquals(0, λ(null).arity);
         assertEquals(1, λ(n, null).arity);
         assertEquals(2, λ(n, m, null).arity);
@@ -519,6 +526,29 @@ public class LambdaTest extends TestBase {
 
         Fn2<Integer, Integer, String> toStringTimes = toString.compose(times);
         assertEquals("12", toStringTimes.call(3, 4));
+    }
+
+    @Test
+    public void comparsionsInZeroArgumentLambdas() throws Exception {
+        assertTrue(λ(true).call());
+        assertFalse(λ(false).call());
+
+        String s = null;
+        assertTrue(λ(s == null).call());
+        s = "";
+        assertTrue(λ(s != null).call());
+
+        assertTrue(λ(1 != 2).call());
+
+        int i = 5;
+        assertTrue(λ(i > 0).call());
+        assertFalse(λ(i < 0).call());
+        assertTrue(λ(i / 5 == 1).call());
+
+        assertTrue(λ(i == 5).call());
+        assertFalse(λ(i == 2).call());
+
+        assertFalse(λ(5 == i ? i > 6 : i < 7).call());
     }
 
     @SuppressWarnings("rawtypes")

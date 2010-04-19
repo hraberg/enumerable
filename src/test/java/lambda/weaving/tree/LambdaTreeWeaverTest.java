@@ -33,7 +33,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
     public void analyzingZeroArgumentLambda() throws Exception {
         class C {
             void m() {
-                λ(null);
+                λ();
             }
         }
 

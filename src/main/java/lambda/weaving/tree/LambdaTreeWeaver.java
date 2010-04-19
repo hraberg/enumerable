@@ -39,6 +39,8 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MemberNode;
@@ -188,6 +190,7 @@ class LambdaTreeWeaver implements Opcodes {
                     n.accept(m);
                 }
             }
+            m.visitMaxs(0, 0);
 
             debug("after ================= ");
             print(m, debug ? new OutputStreamWriter(out) : errors);
@@ -246,12 +249,53 @@ class LambdaTreeWeaver implements Opcodes {
         }
 
         int findInstructionAtStartOfLambda(int end, int arguments) {
+            if (arguments == 0)
+                return end;
             int depth = getStackSize(end) - arguments;
             for (int i = end - 1; i >= 0; i--) {
-                if (getStackSize(i) == depth)
+                if (getStackSize(i) == depth) {
+                    if (i > 0) {
+                        AbstractInsnNode n = m.instructions.get(i - 1);
+                        if (n.getType() == LABEL)
+                            return resolveBranchesAtStartOfLambda(i, (LabelNode) n);
+                    }
                     return i;
+                }
             }
             throw new IllegalStateException("Could not find previous stack depth of " + depth);
+        }
+
+        int resolveBranchesAtStartOfLambda(int i, LabelNode label) {
+            AbstractInsnNode n;
+            int j = i;
+            while (j-- >= 0) {
+                n = m.instructions.get(j);
+                if (n.getType() == JUMP_INSN) {
+                    if (((JumpInsnNode) n).label == label) {
+                        switch (n.getOpcode()) {
+                        case IFEQ:
+                        case IFNE:
+                        case IFLT:
+                        case IFGE:
+                        case IFGT:
+                        case IFLE:
+                        case IFNULL:
+                        case IFNONNULL:
+                            return findInstructionAtStartOfLambda(j, 1);
+                        case IF_ICMPEQ:
+                        case IF_ICMPNE:
+                        case IF_ICMPLT:
+                        case IF_ICMPGE:
+                        case IF_ICMPGT:
+                        case IF_ICMPLE:
+                        case IF_ACMPEQ:
+                        case IF_ACMPNE:
+                            return findInstructionAtStartOfLambda(j, 2);
+                        }
+                    }
+                }
+            }
+            return i;
         }
 
         int getStackSize(int i) {
@@ -439,7 +483,9 @@ class LambdaTreeWeaver implements Opcodes {
                 expressionType = newLambdaParameterTypes.isEmpty() ? getType(Object.class)
                         : newLambdaParameterTypes.get(newLambdaParameterTypes.size() - 1);
 
-                newLambdaParameterTypes = newLambdaParameterTypes.subList(0, newLambdaParameterTypes.size() - 1);
+                if (!newLambdaParameterTypes.isEmpty())
+                    newLambdaParameterTypes = newLambdaParameterTypes
+                            .subList(0, newLambdaParameterTypes.size() - 1);
 
                 lambdaType = resolveLambdaType();
             }
@@ -771,6 +817,9 @@ class LambdaTreeWeaver implements Opcodes {
             }
 
             void returnFromSAMethod() {
+                if (start == end)
+                    saMethod.visitInsn(Opcodes.ACONST_NULL);
+
                 handleBoxingAndUnboxingOfReturnFromLambda(sam.getReturnType(), expressionType);
                 saMethod.visitInsn(sam.getReturnType().getOpcode(IRETURN));
                 saMethod.visitMaxs(0, 0);
@@ -906,7 +955,7 @@ class LambdaTreeWeaver implements Opcodes {
                 if (debug)
                     out.print("index" + "\t");
                 if (debug)
-                    out.print("stack depth");
+                    out.print("stack");
                 debug("");
 
                 ASMifierMethodVisitor asm = new ASMifierMethodVisitor();
@@ -916,7 +965,7 @@ class LambdaTreeWeaver implements Opcodes {
                     AbstractInsnNode n = m.instructions.get(i);
 
                     n.accept(asm);
-                    printInstruction(i, i - start, getStackSize(i), asm);
+                    printInstruction(i, i - start, frames[i], asm);
 
                     int type = n.getType();
                     if (type == VAR_INSN)
@@ -1225,11 +1274,11 @@ class LambdaTreeWeaver implements Opcodes {
         return false;
     }
 
-    void printInstruction(int index, int textIndex, int depth, ASMifierMethodVisitor asm) {
+    void printInstruction(int index, int textIndex, Frame frame, ASMifierMethodVisitor asm) {
         if (debug)
             out.print(index + "\t");
         if (debug)
-            out.print(depth + "\t\t");
+            out.print(frame + "\t\t");
         if (debug)
             out.print(asm.getText().get(textIndex));
     }
