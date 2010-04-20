@@ -23,6 +23,7 @@
             <arg value="target/classes" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath location="../enumerable-agent-${enumerable.version}.jar" />
             <classpath location="target/classes" />
@@ -33,6 +34,7 @@
         <java fork="yes" classname="lambda.enumerable.EnumerableExample" failonerror="yes">
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath location="../enumerable-agent-${enumerable.version}.jar" />
             <classpath location="target/classes" />
@@ -54,6 +56,7 @@
                 <jvmarg value="-javaagent:../enumerable-agent-${enumerable.version}.jar" />
                 <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
                 <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+                <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
                 <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
                 <classpath location="target/classes" />
             </java>

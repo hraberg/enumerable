@@ -93,6 +93,7 @@
             <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath refid="enumerable.test.classpath" />
             <batchtest todir="target/junit">
@@ -120,6 +121,7 @@
             <arg value="target/enumerable-test-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath refid="enumerable.test.classpath" />
         </java>        
@@ -130,6 +132,7 @@
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath refid="enumerable.classpath" />
             <classpath location="target/enumerable-test-${enumerable.version}.jar" />
@@ -153,6 +156,7 @@
             <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath location="target/example-classes" />
         </java>
@@ -163,6 +167,7 @@
             <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="true" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath location="target/example-classes" />
             <classpath>
@@ -176,6 +181,7 @@
             <arg value="lambda.enumerable.EnumerableExample" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath refid="enumerable.example.classpath" />
         </java>
@@ -186,6 +192,7 @@
             <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath refid="enumerable.example.classpath" />
         </java>

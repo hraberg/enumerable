@@ -89,7 +89,7 @@ public class ControlBlocksTest {
     static BufferedReader r;
 
     @SuppressWarnings("serial")
-    public static <C extends Closeable> Fn1<C, ?> when(final Fn1<C, ?> block) {
+    public static <C extends Closeable> Fn1<C, ?> with(final Fn1<C, ?> block) {
         return new Fn1<C, Object>() {
             Closeable c;
 
@@ -123,7 +123,7 @@ public class ControlBlocksTest {
     boolean wasClosed;
 
     @Test
-    public void when() throws Exception {
+    public void with() throws Exception {
         BufferedReader br = new BufferedReader(new StringReader("hello\nworld") {
             public void close() {
                 super.close();
@@ -135,7 +135,7 @@ public class ControlBlocksTest {
         PrintWriter w = new PrintWriter(sw);
 
         String line;
-        when(λ(r = br, (line = r.readLine()) != null)).whileTrue(λ(w.printf(line + "\n")));
+        with(λ(r = br, (line = r.readLine()) != null)).whileTrue(λ(w.printf(line + "\n")));
 
         assertTrue(wasClosed);
         assertEquals("hello\nworld\n", sw.toString());
