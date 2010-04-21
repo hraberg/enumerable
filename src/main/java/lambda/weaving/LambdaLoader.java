@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import lambda.exception.LambdaWeavingNotEnabledException;
+import lambda.weaving.tree.LambdaTreeTransformer;
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     private static boolean isEnabled;
@@ -116,7 +117,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         packagesToSkip.add("com.sun.");
     }
 
-    ILambdaTransformer transformer = ILambdaTransformer.Factory.create();
+    LambdaTreeTransformer transformer = new LambdaTreeTransformer();
 
     protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         InputStream in = getResourceAsStream(name.replace('.', '/') + ".class");

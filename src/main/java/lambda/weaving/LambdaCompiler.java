@@ -18,6 +18,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 
+import lambda.weaving.tree.LambdaTreeTransformer;
+
 /**
  * AOT-compiler for lambdas, to side-step the need for the agent. Takes a list
  * of class directories/jars and compiles them in place, the originals will be
@@ -50,7 +52,7 @@ public class LambdaCompiler {
         new LambdaCompiler().compile(args);
     }
 
-    ILambdaTransformer transformer = ILambdaTransformer.Factory.create();
+    LambdaTreeTransformer transformer = new LambdaTreeTransformer();
     byte[] buffer = new byte[8 * 1024];
 
     void compile(String[] args) throws Exception {

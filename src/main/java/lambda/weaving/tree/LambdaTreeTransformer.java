@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lambda.weaving.ClassInjector;
-import lambda.weaving.ILambdaTransformer;
 import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 
 import org.objectweb.asm.ClassReader;
@@ -17,7 +16,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 
-public class LambdaTreeTransformer implements Opcodes, ILambdaTransformer {
+public class LambdaTreeTransformer implements Opcodes {
     Map<String, byte[]> lambdasByClassName = new HashMap<String, byte[]>();
 
     ClassInjector injector = new ClassInjector();
