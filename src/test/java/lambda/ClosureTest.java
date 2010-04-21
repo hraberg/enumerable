@@ -24,7 +24,7 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test(expected = ClassNotFoundException.class)
-    public void checkedExceptionInBlockPropagetsOut() throws Exception {
+    public void checkedExceptionInBlockPropagatesOut() throws Exception {
         Fn1<String, ? extends Class<?>> classForName = λ(s, Class.forName(s));
         assertEquals(String.class, classForName.call(String.class.getName()));
         classForName.call("class.not.Found");

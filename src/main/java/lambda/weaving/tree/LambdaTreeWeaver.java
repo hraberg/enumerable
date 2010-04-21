@@ -149,7 +149,7 @@ class LambdaTreeWeaver implements Opcodes {
             debug("processing " + method);
             Collections.sort(lambdas, new Comparator<LambdaAnalyzer>() {
                 public int compare(LambdaAnalyzer o1, LambdaAnalyzer o2) {
-                    return o1.start - o2.start;
+                    return o1.getStart() - o2.getStart();
                 }
             });
 
@@ -160,10 +160,10 @@ class LambdaTreeWeaver implements Opcodes {
 
             for (int i = 0; i < instructions.size(); i++) {
                 AbstractInsnNode n = instructions.get(i);
-                if (currentLambda < lambdas.size() && i == lambdas.get(currentLambda).start) {
+                if (currentLambda < lambdas.size() && i == lambdas.get(currentLambda).getStart()) {
                     LambdaAnalyzer lambda = lambdas.get(currentLambda);
 
-                    i = lambdas.get(currentLambda).end;
+                    i = lambdas.get(currentLambda).getEnd();
                     currentLambda++;
 
                     try {
@@ -219,8 +219,6 @@ class LambdaTreeWeaver implements Opcodes {
         }
 
         void analyze() throws Exception {
-            devDebug(m.name + m.desc);
-
             frames = new Analyzer(new BasicInterpreter()).analyze(c.name, m);
 
             int line = 0;
@@ -233,9 +231,11 @@ class LambdaTreeWeaver implements Opcodes {
 
                     if (isNewLambdaMethod(mi)) {
                         int end = i;
-                        int start = findInstructionAtStartOfLambda(end, getArgumentTypes(mi.desc).length);
 
-                        LambdaAnalyzer lambda = new LambdaAnalyzer(currentLambdaId++, line, mi, start, end);
+                        List<int[]> argumentRanges = findArgumentInstructionRangesOfLambda(end,
+                                getArgumentTypes(mi.desc).length);
+
+                        LambdaAnalyzer lambda = new LambdaAnalyzer(currentLambdaId++, line, mi, argumentRanges);
                         lambda.analyze();
                         lambdas.add(lambda);
                     }
@@ -257,16 +257,37 @@ class LambdaTreeWeaver implements Opcodes {
             }
         }
 
-        int findInstructionAtStartOfLambda(int end, int arguments) {
+        List<int[]> findArgumentInstructionRangesOfLambda(int end, int arguments) {
+            List<int[]> argumentRanges = new ArrayList<int[]>();
+
             if (arguments == 0)
-                return end;
-            int depth = getStackSize(end) - arguments;
-            for (int i = end - 1; i >= 0; i--) {
+                argumentRanges.add(new int[] { end, end - 1 });
+
+            while (arguments-- > 0) {
+                int start = findInstructionWithRelativeStackDepthOF(end, -1);
+                argumentRanges.add(0, new int[] { start, end - 1 });
+                end = start;
+            }
+
+            int i = 1;
+            for (int[] range : argumentRanges)
+                devDebug("argument: " + (i++) + " " + range[0] + " -> " + range[1]);
+
+            return argumentRanges;
+        }
+
+        int findInstructionWithRelativeStackDepthOF(int index, int relativeDepth) {
+            if (relativeDepth == 0)
+                return index;
+            int depth = getStackSize(index) + relativeDepth;
+            for (int i = index - 1; i >= 0; i--) {
                 if (getStackSize(i) == depth) {
                     if (i > 0) {
                         AbstractInsnNode n = m.instructions.get(i - 1);
                         if (n.getType() == LABEL)
-                            return resolveBranchesAtStartOfLambda(i, (LabelNode) n);
+                            return resolveBranches(i, (LabelNode) n);
+                        if (n.getType() == JUMP_INSN)
+                            continue;
                     }
                     return i;
                 }
@@ -274,9 +295,9 @@ class LambdaTreeWeaver implements Opcodes {
             throw new IllegalStateException("Could not find previous stack depth of " + depth);
         }
 
-        int resolveBranchesAtStartOfLambda(int i, LabelNode label) {
-            int j = i;
-            while (j-- >= 0) {
+        int resolveBranches(int end, LabelNode label) {
+            int start = lambdas.isEmpty() ? 0 : lambdas.get(lambdas.size() - 1).getEnd();
+            for (int j = start; j < end; j++) {
                 AbstractInsnNode n = m.instructions.get(j);
                 if (n.getType() == JUMP_INSN) {
                     if (((JumpInsnNode) n).label == label) {
@@ -289,7 +310,7 @@ class LambdaTreeWeaver implements Opcodes {
                         case IFLE:
                         case IFNULL:
                         case IFNONNULL:
-                            return findInstructionAtStartOfLambda(j, 1);
+                            return findInstructionWithRelativeStackDepthOF(j, -1);
                         case IF_ICMPEQ:
                         case IF_ICMPNE:
                         case IF_ICMPLT:
@@ -298,12 +319,12 @@ class LambdaTreeWeaver implements Opcodes {
                         case IF_ICMPLE:
                         case IF_ACMPEQ:
                         case IF_ACMPNE:
-                            return findInstructionAtStartOfLambda(j, 2);
+                            return findInstructionWithRelativeStackDepthOF(j, -2);
                         }
                     }
                 }
             }
-            return i;
+            return end;
         }
 
         int getStackSize(int i) {
@@ -472,21 +493,20 @@ class LambdaTreeWeaver implements Opcodes {
 
             Map<String, LocalVariableNode> locals = new LinkedHashMap<String, LocalVariableNode>();
 
-            int bodyStart;
             int lastParameterStart;
-            int start;
-            int end;
+            List<int[]> argumentRanges;
+
             Method sam;
             ClassNode lambda;
             MethodNode saMethod;
 
             ASMifierMethodVisitor devDebugAsm = new ASMifierMethodVisitor();
 
-            LambdaAnalyzer(int id, int line, MethodInsnNode mi, int start, int end) {
+            LambdaAnalyzer(int id, int line, MethodInsnNode mi, List<int[]> argumentRanges) {
                 this.id = id;
                 this.line = line;
-                this.start = start;
-                this.end = end;
+                this.argumentRanges = argumentRanges;
+
                 newLambdaMethod = new Method(mi.name, mi.desc);
 
                 newLambdaParameterTypes = asList(newLambdaMethod.getArgumentTypes());
@@ -514,14 +534,14 @@ class LambdaTreeWeaver implements Opcodes {
                     captureDefaultParameterValue(defaultParameter.getKey(), defaultParameter.getValue()[0],
                             defaultParameter.getValue()[1], instructions);
 
-                for (int i = start; i <= end; i++) {
+                for (int i = getBodyStart(); i < getEnd(); i++) {
                     AbstractInsnNode n = instructions.get(i);
 
-                    if (currentLambda < lambdas.size() && i == lambdas.get(currentLambda).start) {
+                    if (currentLambda < lambdas.size() && i == lambdas.get(currentLambda).getStart()) {
                         System.out.println("TRYING TO CREATE LAMBDA INSIDE LAMBDA");
                         LambdaAnalyzer lambda = lambdas.get(currentLambda);
 
-                        i = lambdas.get(currentLambda).end;
+                        i = lambdas.get(currentLambda).getEnd();
                         currentLambda++;
 
                         lambda.transform(instructions);
@@ -873,7 +893,7 @@ class LambdaTreeWeaver implements Opcodes {
             }
 
             void returnFromSAMethod() {
-                if (start == end)
+                if (getStart() == getEnd())
                     saMethod.visitInsn(Opcodes.ACONST_NULL);
 
                 handleBoxingAndUnboxingOfReturnFromLambda(sam.getReturnType(), expressionType);
@@ -906,7 +926,7 @@ class LambdaTreeWeaver implements Opcodes {
             }
 
             boolean isInSAMBody(int index) {
-                return index >= bodyStart && index != end;
+                return index >= getBodyStart() && index != getEnd();
             }
 
             void createLambdaConstructor() throws IOException {
@@ -1020,8 +1040,8 @@ class LambdaTreeWeaver implements Opcodes {
 
             Type resolveLambdaType() {
                 Type lambdaType = newLambdaMethod.getReturnType();
-                if (getType(Object.class).equals(lambdaType) && m.instructions.size() > end) {
-                    AbstractInsnNode n = m.instructions.get(end + 1);
+                if (getType(Object.class).equals(lambdaType) && m.instructions.size() > getEnd()) {
+                    AbstractInsnNode n = m.instructions.get(getEnd() + 1);
                     if (n.getOpcode() == CHECKCAST)
                         lambdaType = getObjectType(((TypeInsnNode) n).desc);
                 }
@@ -1029,14 +1049,14 @@ class LambdaTreeWeaver implements Opcodes {
             }
 
             void analyze() throws IOException {
-                devDebug("lambda ================ " + start + " -> " + end);
+                devDebug("lambda ================ " + getStart() + " -> " + getEnd());
                 devDebugPrintInstructionHeader();
 
-                lastParameterStart = start - 1;
-                for (int i = start; i <= end; i++) {
+                lastParameterStart = getStart() - 1;
+                for (int i = getStart(); i < getEnd(); i++) {
                     AbstractInsnNode n = m.instructions.get(i);
 
-                    devDebugPrintInstruction(i, i - start, frames[i], n);
+                    devDebugPrintInstruction(i, i - getStart(), frames[i], n);
 
                     int type = n.getType();
                     if (type == VAR_INSN)
@@ -1065,15 +1085,9 @@ class LambdaTreeWeaver implements Opcodes {
                         }
                     }
                 }
-                if (!parameters.isEmpty()) {
-                    bodyStart = lastParameterStart + 1;
-                    if (parameterHasConversionAtDefinition(getParameter(parameters.size() - 1)))
-                        bodyStart++;
-                } else
-                    bodyStart = start;
 
-                devDebug("end =================== " + start + " -> " + end);
-                devDebug("    body starts at: " + bodyStart);
+                devDebug("end =================== " + getStart() + " -> " + getEnd());
+                devDebug("    body starts at: " + getBodyStart());
                 devDebug("    type: " + lambdaType);
                 devDebug("    class: " + lambdaClass());
 
@@ -1286,6 +1300,18 @@ class LambdaTreeWeaver implements Opcodes {
                 Map<String, LocalVariableNode> result = new HashMap<String, LocalVariableNode>(methodMutableLocals);
                 result.keySet().retainAll(locals.keySet());
                 return result;
+            }
+
+            int getStart() {
+                return argumentRanges.get(0)[0];
+            }
+
+            int getEnd() {
+                return argumentRanges.get(argumentRanges.size() - 1)[1] + 1;
+            }
+
+            int getBodyStart() {
+                return argumentRanges.get(argumentRanges.size() - 1)[0];
             }
         }
 

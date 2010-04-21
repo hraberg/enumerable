@@ -27,6 +27,7 @@ import javax.swing.JButton;
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
 import lambda.exception.LambdaWeavingNotEnabledException;
+import lambda.primitives.Fn1ItoB;
 import lambda.primitives.Fn1ItoI;
 
 import org.junit.Test;
@@ -547,8 +548,16 @@ public class LambdaTest extends TestBase {
 
         assertTrue(λ(i == 5).call());
         assertFalse(λ(i == 2).call());
+    }
 
-        assertFalse(λ(5 == i ? i > 6 : i < 7).call());
+    @Test
+    public void comparsiosWithMutlipleLables() throws Exception {
+        int p = 2;
+        Fn1ItoB notDivisbleBy = λ(n, n <= p || (n % p) != 0);
+        assertTrue(notDivisbleBy.call(1));
+        assertTrue(notDivisbleBy.call(2));
+        assertTrue(notDivisbleBy.call(3));
+        assertFalse(notDivisbleBy.call(4));
     }
 
     @SuppressWarnings("rawtypes")

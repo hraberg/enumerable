@@ -22,43 +22,26 @@ public class ParallelLongArraySieveTest {
     static final int CERTAINTY = 8;
     static final int N = 20;
 
-    @Test
-    public void parallelLongArraySieveUsingInnerClasses() {
-        // create array of divisors
-        ParallelLongArray a = create(N - 1, defaultExecutor());
-        a.replaceWithMappedIndex(add2);
-
-        int i = 0;
-        long p = 2;
-        while (p * p < N) { // repeatedly filter
-            a = a.withFilter(notDivisibleBy(p)).all();
-            p = a.get(++i);
-        }
-
-        // check result
-        assertTrue(a.withFilter(notProbablePrime).isEmpty());
-    }
-
-    IntToLong add2 = new IntToLong() {
-        public long op(int i) {
-            return i + 2;
-        }
-    };
-
-    LongPredicate notDivisibleBy(final long p) {
-        return new LongPredicate() {
-            public boolean op(long n) {
-                return n <= p || (n % p) != 0;
-            }
-        };
-    }
-
-    LongPredicate notProbablePrime = new LongPredicate() {
-        public boolean op(long n) {
-            return !BigInteger.valueOf(n).isProbablePrime(CERTAINTY);
-        }
-    };
-
+    /*
+     * @Test public void parallelLongArraySieveUsingInnerClasses() { // create
+     * array of divisors ParallelLongArray a = create(N - 1, defaultExecutor());
+     * a.replaceWithMappedIndex(add2);
+     * 
+     * int i = 0; long p = 2; while (p * p < N) { // repeatedly filter a =
+     * a.withFilter(notDivisibleBy(p)).all(); p = a.get(++i); }
+     * 
+     * // check result assertTrue(a.withFilter(notProbablePrime).isEmpty()); }
+     * 
+     * IntToLong add2 = new IntToLong() { public long op(int i) { return i + 2;
+     * } };
+     * 
+     * LongPredicate notDivisibleBy(final long p) { return new LongPredicate() {
+     * public boolean op(long n) { return n <= p || (n % p) != 0; } }; }
+     * 
+     * LongPredicate notProbablePrime = new LongPredicate() { public boolean
+     * op(long n) { return !BigInteger.valueOf(n).isProbablePrime(CERTAINTY); }
+     * };
+     */
     @Test
     public void parallelLongArraySieveUsingLambdaOps() {
         // create array of divisors
