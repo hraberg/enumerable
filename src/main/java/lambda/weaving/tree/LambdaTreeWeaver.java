@@ -59,11 +59,14 @@ import org.objectweb.asm.util.ASMifierMethodVisitor;
 class LambdaTreeWeaver implements Opcodes {
     ClassNode c;
     int currentLambdaId = 1;
-    int accessMethods = 1;
     List<MethodAnalyzer> methods = new ArrayList<MethodAnalyzer>();
 
     Map<String, FieldNode> fieldsThatNeedStaticAccessMethod = new HashMap<String, FieldNode>();
     Map<String, MethodNode> methodsThatNeedStaticAccessMethod = new HashMap<String, MethodNode>();
+
+    Map<String, MethodNode> staticAccessMethodsByFieldName = new HashMap<String, MethodNode>();
+    Map<String, MethodNode> staticAccessMethodsByMethodNameAndDesc = new HashMap<String, MethodNode>();
+
     ClassReader cr;
 
     LambdaTreeWeaver(ClassReader cr) {
@@ -596,6 +599,7 @@ class LambdaTreeWeaver implements Opcodes {
 
                         else
                             loadFirstElementOfArray(mv, getType(local.desc));
+
                     } else {
                         loadLambdaField(mv, local, getType(local.desc));
 
@@ -603,14 +607,16 @@ class LambdaTreeWeaver implements Opcodes {
 
                 } else if (type == FIELD_INSN) {
                     FieldInsnNode fin = (FieldInsnNode) n;
-                    if (isLambdaParameterField(fin))
+                    if (isLambdaParameterField(fin)) {
                         accessParameter(mv, fin);
 
-                    else if (isPrivateFieldOnOwnerWhichNeedsAcccessMethodFromLambda(fin))
-                        createAndCallStaticAccessMethodToReplacePrivateFieldAccess(saMn, fin);
+                    } else if (isPrivateFieldOnOwnerWhichNeedsAcccessMethodFromLambda(fin)) {
+                        MethodNode am = getAccessMethodReplacingPrivateFieldAccess(fin);
+                        mv.visitMethodInsn(INVOKESTATIC, c.name, am.name, am.desc);
 
-                    else
+                    } else {
                         n.accept(mv);
+                    }
 
                 } else if (type == IINC_INSN) {
                     IincInsnNode iinc = (IincInsnNode) n;
@@ -623,41 +629,55 @@ class LambdaTreeWeaver implements Opcodes {
                 } else if (type == METHOD_INSN) {
                     MethodInsnNode mn = (MethodInsnNode) n;
 
-                    if (isPrivateMethodOnOwnerWhichNeedsAcccessMethodFromLambda(mn))
-                        createAndCallStaticAccessMethodToReplacePrivateMethodInvocation(mv, mn);
+                    if (isPrivateMethodOnOwnerWhichNeedsAcccessMethodFromLambda(mn)) {
+                        MethodNode am = getAccessMethodReplacingPrivateMethodInvocation(mn);
+                        mv.visitMethodInsn(INVOKESTATIC, c.name, am.name, am.desc);
 
-                    else
+                    } else {
                         n.accept(mv);
-
+                    }
                 } else {
                     n.accept(mv);
                 }
             }
 
-            void createAndCallStaticAccessMethodToReplacePrivateFieldAccess(MethodVisitor mv, FieldInsnNode fn) {
+            MethodNode getAccessMethodReplacingPrivateFieldAccess(FieldInsnNode fn) {
+                int opcode = fn.getOpcode();
+                boolean write = opcode == PUTFIELD || opcode == PUTSTATIC;
+
+                String key = fn.name.substring(0, 1).toUpperCase() + fn.name.substring(1);
+                key = (write ? "set" : "get") + key;
+                key = key + (opcode == GETSTATIC || opcode == PUTSTATIC ? "Static" : "");
+
+                if (staticAccessMethodsByFieldName.containsKey(key))
+                    return staticAccessMethodsByFieldName.get(key);
+
                 List<Type> argumentTypes = new ArrayList<Type>();
 
-                int opcode = fn.getOpcode();
                 if (opcode == GETFIELD || opcode == PUTFIELD)
                     argumentTypes.add(getObjectType(fn.owner));
 
-                if (opcode == PUTFIELD || opcode == PUTSTATIC)
+                if (write)
                     argumentTypes.add(getType(fn.desc));
 
                 Type returnType = getType(fn.desc);
-                MethodVisitor amv = createAndCallAccessMethodAndLoadArguments(mv, fn.owner, argumentTypes,
+                MethodNode am = createAccessMethodAndLoadArguments("field$" + fn.name, fn.owner, argumentTypes,
                         returnType);
 
-                fn.accept(amv);
+                fn.accept(am);
 
-                if (opcode == PUTFIELD || opcode == PUTSTATIC) {
+                if (write) {
                     int indexOfNewFieldValue = argumentTypes.size() - 1;
-                    amv.visitVarInsn(argumentTypes.get(indexOfNewFieldValue).getOpcode(ILOAD), indexOfNewFieldValue);
+                    am.visitVarInsn(argumentTypes.get(indexOfNewFieldValue).getOpcode(ILOAD), indexOfNewFieldValue);
                 }
 
-                amv.visitInsn(returnType.getOpcode(IRETURN));
-                amv.visitMaxs(0, 0);
-                amv.visitEnd();
+                am.visitInsn(returnType.getOpcode(IRETURN));
+                am.visitMaxs(0, 0);
+                am.visitEnd();
+
+                staticAccessMethodsByFieldName.put(key, am);
+
+                return am;
             }
 
             void debugLocalVariableAccess(LocalVariableNode local, boolean store) {
@@ -675,7 +695,11 @@ class LambdaTreeWeaver implements Opcodes {
                         + realLocalIndex);
             }
 
-            void createAndCallStaticAccessMethodToReplacePrivateMethodInvocation(MethodVisitor mv, MethodInsnNode mn) {
+            MethodNode getAccessMethodReplacingPrivateMethodInvocation(MethodInsnNode mn) {
+                String key = mn.name + mn.desc;
+                if (staticAccessMethodsByMethodNameAndDesc.containsKey(key))
+                    return staticAccessMethodsByMethodNameAndDesc.get(mn.name + mn.desc);
+
                 List<Type> argumentTypes = new ArrayList<Type>();
 
                 int opcode = mn.getOpcode();
@@ -685,32 +709,34 @@ class LambdaTreeWeaver implements Opcodes {
                 for (Type type : getArgumentTypes(mn.desc))
                     argumentTypes.add(type);
 
-                MethodVisitor amv = createAndCallAccessMethodAndLoadArguments(mv, mn.owner, argumentTypes,
+                MethodNode am = createAccessMethodAndLoadArguments("method$" + mn.name, mn.owner, argumentTypes,
                         getReturnType(mn.desc));
 
-                mn.accept(amv);
+                mn.accept(am);
 
-                amv.visitInsn(getReturnType(mn.desc).getOpcode(IRETURN));
-                amv.visitMaxs(0, 0);
-                amv.visitEnd();
+                am.visitInsn(getReturnType(mn.desc).getOpcode(IRETURN));
+                am.visitMaxs(0, 0);
+                am.visitEnd();
+
+                staticAccessMethodsByMethodNameAndDesc.put(key, am);
+
+                return am;
             }
 
-            MethodVisitor createAndCallAccessMethodAndLoadArguments(MethodVisitor mv, String owner,
-                    List<Type> argumentTypes, Type returnType) {
+            MethodNode createAccessMethodAndLoadArguments(String name, String owner, List<Type> argumentTypes,
+                    Type returnType) {
                 String accessMethodDescriptor = getMethodDescriptor(returnType, argumentTypes.toArray(new Type[0]));
-                String accessMethodName = "access$lambda$" + String.format("%03d_", accessMethods++);
+                String accessMethodName = "access$lambda$" + name;
 
-                mv.visitMethodInsn(INVOKESTATIC, owner, accessMethodName, accessMethodDescriptor);
-
-                MethodVisitor amv = c.visitMethod(ACC_STATIC + ACC_SYNTHETIC, accessMethodName,
+                MethodNode am = (MethodNode) c.visitMethod(ACC_STATIC + ACC_SYNTHETIC, accessMethodName,
                         accessMethodDescriptor, null, null);
-                amv.visitCode();
+                am.visitCode();
 
                 int i = 0;
                 for (Type type : argumentTypes)
-                    amv.visitVarInsn(type.getOpcode(ILOAD), i++);
+                    am.visitVarInsn(type.getOpcode(ILOAD), i++);
 
-                return amv;
+                return am;
             }
 
             boolean isPrivateFieldOnOwnerWhichNeedsAcccessMethodFromLambda(FieldInsnNode fn) throws IOException {
