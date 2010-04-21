@@ -152,11 +152,6 @@ class LambdaTreeWeaver implements Opcodes {
                 return;
 
             debug("processing " + method);
-            Collections.sort(lambdas, new Comparator<LambdaAnalyzer>() {
-                public int compare(LambdaAnalyzer o1, LambdaAnalyzer o2) {
-                    return o1.getStart() - o2.getStart();
-                }
-            });
 
             InsnList instructions = m.instructions;
             m.instructions = new InsnList();
@@ -241,25 +236,33 @@ class LambdaTreeWeaver implements Opcodes {
                     MethodInsnNode mi = (MethodInsnNode) n;
 
                     if (isNewLambdaMethod(mi)) {
-                        int end = i;
-
-                        List<int[]> argumentRanges = findArgumentInstructionRangesOfLambda(end,
+                        List<int[]> argumentRanges = findArgumentInstructionRangesOfLambda(i,
                                 getArgumentTypes(mi.desc).length);
 
                         LambdaAnalyzer lambda = new LambdaAnalyzer(currentLambdaId++, line, mi, argumentRanges);
-                        lambda.analyze();
+                        // lambda.analyze();
+
                         lambdas.add(lambda);
                     }
                 }
                 if (type == VAR_INSN)
-                    accessLocal((VarInsnNode) n);
+                    localVariable((VarInsnNode) n);
 
                 if (type == IINC_INSN)
-                    accessLocal((IincInsnNode) n);
+                    localVariable((IincInsnNode) n);
 
                 if (type == LINE)
                     line = ((LineNumberNode) n).line;
             }
+
+            Collections.sort(lambdas, new Comparator<LambdaAnalyzer>() {
+                public int compare(LambdaAnalyzer o1, LambdaAnalyzer o2) {
+                    return o1.getStart() - o2.getStart();
+                }
+            });
+
+            for (LambdaAnalyzer lambda : lambdas)
+                lambda.analyze();
 
             if (!lambdas.isEmpty()) {
                 devDebug("");
@@ -275,7 +278,7 @@ class LambdaTreeWeaver implements Opcodes {
                 argumentRanges.add(new int[] { end, end - 1 });
 
             while (arguments-- > 0) {
-                int start = findInstructionWithRelativeStackDepthOF(end, -1);
+                int start = findInstructionWithRelativeStackDepthOf(end, -1);
                 argumentRanges.add(0, new int[] { start, end - 1 });
                 end = start;
             }
@@ -283,7 +286,7 @@ class LambdaTreeWeaver implements Opcodes {
             return argumentRanges;
         }
 
-        int findInstructionWithRelativeStackDepthOF(int index, int relativeDepth) {
+        int findInstructionWithRelativeStackDepthOf(int index, int relativeDepth) {
             if (relativeDepth == 0)
                 return index;
             int depth = getStackSize(index) + relativeDepth;
@@ -317,7 +320,7 @@ class LambdaTreeWeaver implements Opcodes {
                         case IFLE:
                         case IFNULL:
                         case IFNONNULL:
-                            return findInstructionWithRelativeStackDepthOF(j, -1);
+                            return findInstructionWithRelativeStackDepthOf(j, -1);
                         case IF_ICMPEQ:
                         case IF_ICMPNE:
                         case IF_ICMPLT:
@@ -326,7 +329,7 @@ class LambdaTreeWeaver implements Opcodes {
                         case IF_ICMPLE:
                         case IF_ACMPEQ:
                         case IF_ACMPNE:
-                            return findInstructionWithRelativeStackDepthOF(j, -2);
+                            return findInstructionWithRelativeStackDepthOf(j, -2);
                         }
                     }
                 }
@@ -338,7 +341,7 @@ class LambdaTreeWeaver implements Opcodes {
             return frames[i] == null ? 0 : frames[i].getStackSize();
         }
 
-        LocalVariableNode accessLocal(VarInsnNode vin) {
+        LocalVariableNode localVariable(VarInsnNode vin) {
             LocalVariableNode local = getLocalVariable(vin.var);
             if (local == null)
                 return null;
@@ -350,7 +353,7 @@ class LambdaTreeWeaver implements Opcodes {
             return local;
         }
 
-        LocalVariableNode accessLocal(IincInsnNode iin) {
+        LocalVariableNode localVariable(IincInsnNode iin) {
             LocalVariableNode local = getLocalVariable(iin.var);
             if (local == null)
                 return local;
@@ -479,6 +482,8 @@ class LambdaTreeWeaver implements Opcodes {
         }
 
         class LambdaAnalyzer {
+            LambdaAnalyzer parent;
+
             int id;
             int line;
 
@@ -490,6 +495,7 @@ class LambdaTreeWeaver implements Opcodes {
 
             Set<String> parametersWithDefaultValue = new HashSet<String>();
             Map<String, FieldNode> parameters = new LinkedHashMap<String, FieldNode>();
+            Map<String, FieldNode> parentParameters = new LinkedHashMap<String, FieldNode>();
 
             Map<String, LocalVariableNode> locals = new LinkedHashMap<String, LocalVariableNode>();
 
@@ -544,7 +550,7 @@ class LambdaTreeWeaver implements Opcodes {
                         currentLambda++;
 
                         la.transform(instructions);
-                        la.instantiate(saMn, lambda);
+                        la.instantiate(saMn, this);
                     } else if (isInSAMBody(i))
                         handleInsnNodeInSAM(saMn, n);
                 }
@@ -763,8 +769,19 @@ class LambdaTreeWeaver implements Opcodes {
                 mv.visitEnd();
             }
 
-            void accessParameter(MethodVisitor mv, FieldInsnNode fin) {
+            void accessParameter(MethodVisitor mv, FieldInsnNode fin) throws IOException {
                 Type type = getType(fin.desc);
+                if (parentParameters.containsKey(fin.name)) {
+
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitFieldInsn(GETFIELD, lambdaClass(), getParentParameterName(fin.name), type
+                            .getDescriptor());
+                    debug("parameter " + fin.name + " " + getSimpleClassName(getType(fin.desc))
+                            + (fin.getOpcode() == PUTSTATIC ? " stored in" : " read from")
+                            + " parent lambda parameter");
+                    return;
+                }
+
                 int realLocalIndex = getParameterRealLocalIndex(fin.name);
 
                 debugLambdaParameterAccess(fin, realLocalIndex);
@@ -778,6 +795,10 @@ class LambdaTreeWeaver implements Opcodes {
                     if (isReference(type))
                         mv.visitTypeInsn(CHECKCAST, type.getInternalName());
                 }
+            }
+
+            String getParentParameterName(String name) {
+                return name + "$parentParameter";
             }
 
             int getParameterRealLocalIndex(String name) {
@@ -961,7 +982,7 @@ class LambdaTreeWeaver implements Opcodes {
                 mv.visitEnd();
             }
 
-            void instantiate(MethodVisitor mv, ClassNode parentLambda) {
+            void instantiate(MethodVisitor mv, LambdaAnalyzer parentLambda) {
                 mv.visitTypeInsn(NEW, lambdaClass());
                 mv.visitInsn(DUP);
 
@@ -970,7 +991,12 @@ class LambdaTreeWeaver implements Opcodes {
                 mv.visitMethodInsn(INVOKESPECIAL, lambdaClass(), "<init>", descriptor);
             }
 
-            void loadAccessedLocals(MethodVisitor mv, ClassNode parentLambda) {
+            void loadAccessedLocals(MethodVisitor mv, LambdaAnalyzer parentLambda) {
+                for (FieldNode f : parentParameters.values()) {
+                    mv.visitVarInsn(getType(f.desc).getOpcode(ILOAD), parentLambda
+                            .getParameterRealLocalIndex(f.name));
+
+                }
                 for (LocalVariableNode local : locals.values()) {
                     Type type = getType(local.desc);
                     if (methodMutableLocals.containsKey(local.name))
@@ -978,7 +1004,7 @@ class LambdaTreeWeaver implements Opcodes {
 
                     if (parentLambda != null) {
                         mv.visitVarInsn(ALOAD, 0);
-                        mv.visitFieldInsn(GETFIELD, parentLambda.name, getFieldNameForLocal(local), type
+                        mv.visitFieldInsn(GETFIELD, parentLambda.lambda.name, getFieldNameForLocal(local), type
                                 .getDescriptor());
 
                     } else
@@ -993,19 +1019,25 @@ class LambdaTreeWeaver implements Opcodes {
 
             void createAndInitializeFieldsWithAccessedLocals(MethodVisitor mv, Type[] parameters) {
                 int i = 1;
-                for (LocalVariableNode local : locals.values()) {
-                    String field = getFieldNameForLocal(local);
-                    Type type = parameters[i - 1];
-
-                    FieldVisitor fieldVisitor = lambda.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, field,
-                            type.getDescriptor(), null, null);
-                    addLambdaLocalAnnotation(local.name, fieldVisitor);
-                    fieldVisitor.visitEnd();
-
-                    mv.visitVarInsn(ALOAD, 0);
-                    mv.visitVarInsn(type.getOpcode(ILOAD), i++);
-                    mv.visitFieldInsn(PUTFIELD, lambdaClass(), field, type.getDescriptor());
+                for (FieldNode f : parentParameters.values()) {
+                    Type type = getType(f.desc);
+                    loadFieldFromArgument(mv, i++, f.name, getParentParameterName(f.name), type);
                 }
+                for (LocalVariableNode local : locals.values()) {
+                    Type type = parameters[i - 1];
+                    loadFieldFromArgument(mv, i++, local.name, getFieldNameForLocal(local), type);
+                }
+            }
+
+            void loadFieldFromArgument(MethodVisitor mv, int i, String name, String fieldName, Type type) {
+                FieldVisitor fieldVisitor = lambda.visitField(ACC_SYNTHETIC | ACC_PRIVATE | ACC_FINAL, fieldName,
+                        type.getDescriptor(), null, null);
+                addLambdaLocalAnnotation(name, fieldVisitor);
+                fieldVisitor.visitEnd();
+
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitVarInsn(type.getOpcode(ILOAD), i);
+                mv.visitFieldInsn(PUTFIELD, lambdaClass(), fieldName, type.getDescriptor());
             }
 
             String getFieldNameForLocal(LocalVariableNode local) {
@@ -1036,6 +1068,9 @@ class LambdaTreeWeaver implements Opcodes {
 
             Type[] getConstructorParameters() {
                 List<Type> result = new ArrayList<Type>();
+                for (FieldNode parentParameter : parentParameters.values())
+                    result.add(getType(parentParameter.desc));
+
                 for (String local : locals.keySet()) {
                     Type type = getLocalVariableType(local);
                     result.add(methodMutableLocals.containsKey(local) ? toArrayType(type) : type);
@@ -1074,6 +1109,7 @@ class LambdaTreeWeaver implements Opcodes {
             void analyze() throws IOException {
                 devDebug("lambda ================ " + getStart() + " -> " + getEnd());
                 devDebugPrintInstructionHeader();
+                resolveParentLambda();
 
                 for (int i = getStart(); i < getEnd(); i++) {
                     AbstractInsnNode n = m.instructions.get(i);
@@ -1082,7 +1118,7 @@ class LambdaTreeWeaver implements Opcodes {
 
                     int type = n.getType();
                     if (type == VAR_INSN)
-                        localVariable((VarInsnNode) n);
+                        methodLocalVariable((VarInsnNode) n);
 
                     if (type == METHOD_INSN) {
                         MethodInsnNode min = (MethodInsnNode) n;
@@ -1109,9 +1145,10 @@ class LambdaTreeWeaver implements Opcodes {
                 }
 
                 devDebug("end =================== " + getStart() + " -> " + getEnd());
-                int i = 1;
+                int i = 0;
                 for (int[] range : argumentRanges)
-                    devDebug("    " + (i < argumentRanges.size() ? ("argument " + (i++) + ": ") : "body: ")
+                    devDebug("    "
+                            + (i == argumentRanges.size() - 1 ? "body: " : "argument " + getParameter(i++) + ": ")
                             + range[0] + " -> " + range[1]);
                 devDebug("    type: " + lambdaType);
                 devDebug("    class: " + lambdaClass());
@@ -1128,6 +1165,9 @@ class LambdaTreeWeaver implements Opcodes {
                 devDebug("    expression type: " + expressionType);
                 devDebug("    mutable locals: " + getMutableLocals().keySet());
                 devDebug("    final locals: " + locals.keySet());
+                if (parent != null) {
+                    devDebug("    parent: " + parent.getStart() + " -> " + parent.getEnd());
+                }
 
                 if (newLambdaParameterTypes.size() != parameters.size())
                     throw new IllegalStateException("Got " + parameters.keySet() + " as parameters need exactly "
@@ -1151,6 +1191,12 @@ class LambdaTreeWeaver implements Opcodes {
                 out.print(devDebugAsm.getText().get(textIndex));
             }
 
+            void resolveParentLambda() {
+                for (int i = 0; i < lambdas.size(); i++)
+                    if (lambdas.get(i).getEnd() > getEnd() && lambdas.get(i).getStart() < getStart())
+                        parent = lambdas.get(i);
+            }
+
             @SuppressWarnings("unchecked")
             Method findSAM(Type type) throws IOException {
                 ClassNode cn = readClassNoCode(type.getInternalName());
@@ -1172,10 +1218,17 @@ class LambdaTreeWeaver implements Opcodes {
                 FieldNode f = findField(fin);
 
                 if (!parameters.containsKey(f.name)) {
-                    if (parameters.size() == newLambdaParameterTypes.size())
-                        throw new IllegalStateException("Tried to define extra parameter, " + f.name
-                                + ", arity is " + newLambdaParameterTypes.size() + ", defined parameters are "
-                                + parameters.keySet());
+                    // if (resolveParameter(f))
+                    if (parameters.size() == newLambdaParameterTypes.size()) {
+                        resolveParameter(f);
+                        // throw new
+                        // IllegalStateException("Tried to define extra parameter, "
+                        // + f.name
+                        // + ", arity is " + newLambdaParameterTypes.size() +
+                        // ", defined parameters are "
+                        // + parameters.keySet());
+                        return;
+                    }
 
                     Type argumentType = getType(fin.desc);
 
@@ -1199,8 +1252,19 @@ class LambdaTreeWeaver implements Opcodes {
                             + (fin.getOpcode() == PUTSTATIC ? "write" : "read") + ")");
             }
 
-            void localVariable(VarInsnNode vin) {
-                LocalVariableNode local = accessLocal(vin);
+            boolean resolveParameter(FieldNode f) throws IOException {
+                if (parameters.containsKey(f.name))
+                    return true;
+
+                if (parent == null)
+                    return false;
+
+                parentParameters.put(f.name, f);
+                return parent.resolveParameter(f);
+            }
+
+            void methodLocalVariable(VarInsnNode vin) {
+                LocalVariableNode local = localVariable(vin);
                 locals.put(local.name, local);
 
                 devDebug("  --  accessed var " + local.index + " " + local.name + " "
