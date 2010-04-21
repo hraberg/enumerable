@@ -159,9 +159,10 @@ class LambdaTreeWeaver implements Opcodes {
             });
 
             InsnList instructions = m.instructions;
-
             m.instructions = new InsnList();
-            initAccessedLocalsAndMethodArgumentsAsArrays();
+
+            for (LocalVariableNode local : getLocalsMutableFromLambdas().values())
+                initArray(m, local);
 
             for (int i = 0; i < instructions.size(); i++) {
                 AbstractInsnNode n = instructions.get(i);
@@ -279,10 +280,6 @@ class LambdaTreeWeaver implements Opcodes {
                 end = start;
             }
 
-            int i = 1;
-            for (int[] range : argumentRanges)
-                devDebug("argument: " + (i++) + " " + range[0] + " -> " + range[1]);
-
             return argumentRanges;
         }
 
@@ -386,13 +383,6 @@ class LambdaTreeWeaver implements Opcodes {
             mv.visitInsn(POP2);
             // a[] 0 x
             mv.visitInsn(type.getOpcode(IASTORE));
-        }
-
-        void initAccessedLocalsAndMethodArgumentsAsArrays() {
-            Map<String, LocalVariableNode> localsMutableFromLambdas = getLocalsMutableFromLambdas();
-
-            for (LocalVariableNode local : localsMutableFromLambdas.values())
-                initArray(m, local);
         }
 
         Map<String, LocalVariableNode> getLocalsMutableFromLambdas() {
@@ -555,9 +545,7 @@ class LambdaTreeWeaver implements Opcodes {
 
                         lambda.transform(instructions);
                         lambda.instantiate(saMn);
-                    }
-
-                    if (isInSAMBody(i))
+                    } else if (isInSAMBody(i))
                         handleInsnNodeInSAM(saMn, n);
                 }
 
@@ -1114,7 +1102,10 @@ class LambdaTreeWeaver implements Opcodes {
                 }
 
                 devDebug("end =================== " + getStart() + " -> " + getEnd());
-                devDebug("    body starts at: " + getBodyStart());
+                int i = 1;
+                for (int[] range : argumentRanges)
+                    devDebug("    " + (i < argumentRanges.size() ? ("argument " + (i++) + ": ") : "body: ")
+                            + range[0] + " -> " + range[1]);
                 devDebug("    type: " + lambdaType);
                 devDebug("    class: " + lambdaClass());
 

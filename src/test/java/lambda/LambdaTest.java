@@ -53,6 +53,12 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    public void nestedLambdas() throws Exception {
+        int four = λ(n, λ(n, n * n).call(n)).call(2);
+        assertEquals(4, four);
+    }
+
+    @Test
     public void applyWithOneArgument() throws Exception {
         Fn1<Integer, Integer> nTimesTwo = λ(n, n * 2);
         assertEquals(4, (int) nTimesTwo.apply(2));
