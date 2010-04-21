@@ -363,15 +363,15 @@ public class ClojureSeqs {
     /**
      * [coll]
      */
-    public static Object doall(Seqable coll) throws Exception {
-        return doall.invoke(coll);
+    public static ISeq doall(Seqable coll) throws Exception {
+        return (ISeq) doall.invoke(coll);
     }
 
     /**
      * [n coll]
      */
-    public static Object doall(Number n, Seqable coll) throws Exception {
-        return doall.invoke(n, coll);
+    public static ISeq doall(Number n, Seqable coll) throws Exception {
+        return (ISeq) doall.invoke(n, coll);
     }
 
     /**
