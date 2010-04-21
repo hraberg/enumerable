@@ -22,7 +22,7 @@ public class ClojureTest {
         Var found = Var.find(Symbol.create(RT.CURRENT_NS.ns.toString(), "square"));
         assertSame(square, found);
 
-        ISeq squares = map(square, list(2, 4));
+        ISeq squares = (map(square, list(2, 4)));
         assertEquals(list(4, 16), squares);
     }
 
@@ -42,6 +42,9 @@ public class ClojureTest {
     public void varargsExpansion() throws Exception {
         ISeq concat = (concat(list(1), list(2), list(3, 4), list(5)));
         assertEquals(list(1, 2, 3, 4, 5), concat);
+
+        ISeq interleave = (interleave(list(2, 4), list(3, 6), list(4, 8), list(5, 10), list(6, 12)));
+        assertEquals(vector(2, 3, 4, 5, 6, 4, 6, 8, 10, 12), interleave);
 
         ISeq mapcat = (mapcat(fn(n, m, list(n * m)), list(2, 4), list(3, 6)));
         assertEquals(list(6, 24), mapcat);

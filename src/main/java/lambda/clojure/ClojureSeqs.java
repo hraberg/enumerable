@@ -3,6 +3,7 @@ package lambda.clojure;
 import static clojure.lang.RT.*;
 import static java.util.Arrays.*;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -117,10 +118,10 @@ public class ClojureSeqs {
      * [x y & zs]
      */
     public static ISeq concat(Seqable x, Seqable y, Seqable... zs) throws Exception {
-        List<Seqable> args = new java.util.ArrayList<Seqable>();
-        args.addAll(asList(x, y));
-        args.addAll(asList(zs));
-        return (ISeq) concat.applyTo(seq(args));
+        ISeq args = concat(x, y);
+        for (Seqable z : zs)
+            args = concat(args, z);
+        return args;
     }
 
     /**
@@ -148,7 +149,7 @@ public class ClojureSeqs {
      * [f & colls]
      */
     public static ISeq mapcat(IFn f, Seqable... colls) throws Exception {
-        List<Object> args = new java.util.ArrayList<Object>();
+        List<Object> args = new ArrayList<Object>();
         args.add(f);
         args.addAll(asList(colls));
         return (ISeq) mapcat.applyTo(seq(args));
@@ -256,7 +257,7 @@ public class ClojureSeqs {
      * [c1 c2 & colls]
      */
     public static ISeq interleave(Seqable c1, Seqable c2, Seqable... colls) throws Exception {
-        List<Seqable> args = new java.util.ArrayList<Seqable>();
+        List<Seqable> args = new ArrayList<Seqable>();
         args.addAll(asList(c1, c2));
         args.addAll(asList(colls));
         return (ISeq) interleave.applyTo(seq(args));
