@@ -59,6 +59,27 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    public void nestedNestedLambdas() throws Exception {
+        int eight = λ(n, λ(n, n * λ(n, n * n).call(n)).call(n)).call(2);
+        assertEquals(8, eight);
+    }
+
+    @Test
+    public void nestedLambdasClosingOverLocalVariable() throws Exception {
+        int two = 2;
+        int eight = λ(n, λ(n, n * two).call(n)).call(4);
+        assertEquals(8, eight);
+    }
+
+    @Test
+    public void nestedNestedLambdasClosingOverLocalVariable() throws Exception {
+        int two = 2;
+        int four = 4;
+        int thirtytwo = λ(n, λ(n, two * n * λ(n, n * four).call(n)).call(n)).call(2);
+        assertEquals(32, thirtytwo);
+    }
+
+    @Test
     public void applyWithOneArgument() throws Exception {
         Fn1<Integer, Integer> nTimesTwo = λ(n, n * 2);
         assertEquals(4, (int) nTimesTwo.apply(2));

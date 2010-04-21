@@ -179,7 +179,7 @@ class LambdaTreeWeaver implements Opcodes {
                         debugDedent();
                     }
 
-                    lambda.instantiate(m);
+                    lambda.instantiate(m, null);
 
                 } else if (n.getType() == VAR_INSN) {
                     VarInsnNode vin = (VarInsnNode) n;
@@ -538,13 +538,13 @@ class LambdaTreeWeaver implements Opcodes {
                     AbstractInsnNode n = instructions.get(i);
 
                     if (currentLambda < lambdas.size() && i == lambdas.get(currentLambda).getStart()) {
-                        LambdaAnalyzer lambda = lambdas.get(currentLambda);
+                        LambdaAnalyzer la = lambdas.get(currentLambda);
 
                         i = lambdas.get(currentLambda).getEnd();
                         currentLambda++;
 
-                        lambda.transform(instructions);
-                        lambda.instantiate(saMn);
+                        la.transform(instructions);
+                        la.instantiate(saMn, lambda);
                     } else if (isInSAMBody(i))
                         handleInsnNodeInSAM(saMn, n);
                 }
@@ -961,21 +961,28 @@ class LambdaTreeWeaver implements Opcodes {
                 mv.visitEnd();
             }
 
-            void instantiate(MethodVisitor mv) {
+            void instantiate(MethodVisitor mv, ClassNode parentLambda) {
                 mv.visitTypeInsn(NEW, lambdaClass());
                 mv.visitInsn(DUP);
 
-                loadAccessedLocals(mv);
+                loadAccessedLocals(mv, parentLambda);
                 String descriptor = getMethodDescriptor(VOID_TYPE, getConstructorParameters());
                 mv.visitMethodInsn(INVOKESPECIAL, lambdaClass(), "<init>", descriptor);
             }
 
-            void loadAccessedLocals(MethodVisitor mv) {
+            void loadAccessedLocals(MethodVisitor mv, ClassNode parentLambda) {
                 for (LocalVariableNode local : locals.values()) {
                     Type type = getType(local.desc);
                     if (methodMutableLocals.containsKey(local.name))
                         type = toArrayType(type);
-                    mv.visitVarInsn(type.getOpcode(ILOAD), local.index);
+
+                    if (parentLambda != null) {
+                        mv.visitVarInsn(ALOAD, 0);
+                        mv.visitFieldInsn(GETFIELD, parentLambda.name, getFieldNameForLocal(local), type
+                                .getDescriptor());
+
+                    } else
+                        mv.visitVarInsn(type.getOpcode(ILOAD), local.index);
                 }
             }
 
