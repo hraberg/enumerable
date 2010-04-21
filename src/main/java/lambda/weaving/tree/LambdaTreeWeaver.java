@@ -239,10 +239,7 @@ class LambdaTreeWeaver implements Opcodes {
                         List<int[]> argumentRanges = findArgumentInstructionRangesOfLambda(i,
                                 getArgumentTypes(mi.desc).length);
 
-                        LambdaAnalyzer lambda = new LambdaAnalyzer(currentLambdaId++, line, mi, argumentRanges);
-                        // lambda.analyze();
-
-                        lambdas.add(lambda);
+                        lambdas.add(0, new LambdaAnalyzer(currentLambdaId++, line, mi, argumentRanges));
                     }
                 }
                 if (type == VAR_INSN)
@@ -1111,10 +1108,20 @@ class LambdaTreeWeaver implements Opcodes {
                 devDebugPrintInstructionHeader();
                 resolveParentLambda();
 
+                int childLambda = lambdas.indexOf(this) + 1;
+                boolean inChildLambda = false;
                 for (int i = getStart(); i < getEnd(); i++) {
                     AbstractInsnNode n = m.instructions.get(i);
 
                     devDebugPrintInstruction(i, i - getStart(), frames[i], n);
+                    if (childLambda < lambdas.size() && i >= lambdas.get(childLambda).getStart()) {
+                        inChildLambda = true;
+                    }
+
+                    if (childLambda < lambdas.size() && i > lambdas.get(childLambda).getEnd()) {
+                        inChildLambda = false;
+                        childLambda++;
+                    }
 
                     int type = n.getType();
                     if (type == VAR_INSN)
@@ -1133,7 +1140,7 @@ class LambdaTreeWeaver implements Opcodes {
                     if (type == FIELD_INSN) {
                         FieldInsnNode fin = (FieldInsnNode) n;
 
-                        if (isLambdaParameterField(fin)) {
+                        if (isLambdaParameterField(fin) && !inChildLambda) {
                             lambdaParameter(i, fin);
 
                         } else if (fin.owner.equals(c.name)) {
@@ -1220,13 +1227,10 @@ class LambdaTreeWeaver implements Opcodes {
                 if (!parameters.containsKey(f.name)) {
                     // if (resolveParameter(f))
                     if (parameters.size() == newLambdaParameterTypes.size()) {
-                        resolveParameter(f);
-                        // throw new
-                        // IllegalStateException("Tried to define extra parameter, "
-                        // + f.name
-                        // + ", arity is " + newLambdaParameterTypes.size() +
-                        // ", defined parameters are "
-                        // + parameters.keySet());
+                        if (!resolveParameter(f))
+                            throw new IllegalStateException("Tried to define extra parameter, " + f.name
+                                    + ", arity is " + newLambdaParameterTypes.size() + ", defined parameters are "
+                                    + parameters.keySet());
                         return;
                     }
 

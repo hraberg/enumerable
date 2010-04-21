@@ -100,6 +100,18 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    public void nestedZeroArgumentLambdasInOneArgumentLambda() throws Exception {
+        int four = λ(n, λ(4).call()).call(0);
+        assertEquals(4, four);
+    }
+
+    @Test
+    public void nestedZeroArgumentLambdas() throws Exception {
+        int four = λ(λ(4).call()).call();
+        assertEquals(4, four);
+    }
+
+    @Test
     public void applyWithOneArgument() throws Exception {
         Fn1<Integer, Integer> nTimesTwo = λ(n, n * 2);
         assertEquals(4, (int) nTimesTwo.apply(2));
