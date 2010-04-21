@@ -112,6 +112,18 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    public void nestedLambdasClosingOverMutableParentLambdaParameter() throws Exception {
+        int eight = λ(n, λ(m, n = n * m).call(n) + n).call(2);
+        assertEquals(8, eight);
+    }
+
+    @Test
+    public void nestedNesterLambdasClosingOverMutableParentLambdaParameter() throws Exception {
+        int eight = λ(n, λ(m, λ(n = n * m).call()).call(n) + n).call(2);
+        assertEquals(8, eight);
+    }
+
+    @Test
     public void applyWithOneArgument() throws Exception {
         Fn1<Integer, Integer> nTimesTwo = λ(n, n * 2);
         assertEquals(4, (int) nTimesTwo.apply(2));

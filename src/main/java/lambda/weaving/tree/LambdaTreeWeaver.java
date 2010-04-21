@@ -408,13 +408,16 @@ class LambdaTreeWeaver implements Opcodes {
         }
 
         void initializeArrayOnTopOfStackWithCurrentValueOfLocal(MethodVisitor mv, LocalVariableNode local) {
-            Type type = getType(local.desc);
+            initializeArrayOnTopOfStackWithCurrentValueOfLocal(mv, getType(local.desc), local.index);
+        }
+
+        void initializeArrayOnTopOfStackWithCurrentValueOfLocal(MethodVisitor mv, Type type, int index) {
             // a[]
             mv.visitInsn(DUP);
             // a[] a[]
             mv.visitInsn(ICONST_0);
             // a[] a[] 0
-            mv.visitVarInsn(type.getOpcode(ILOAD), local.index);
+            mv.visitVarInsn(type.getOpcode(ILOAD), index);
             // a[] a[] 0 x
             mv.visitInsn(type.getOpcode(IASTORE));
             // a[]
@@ -491,6 +494,7 @@ class LambdaTreeWeaver implements Opcodes {
             Type expressionType;
 
             Set<String> parametersWithDefaultValue = new HashSet<String>();
+            Set<String> parametersMutableFromChildLambdas = new HashSet<String>();
             Map<String, FieldNode> parameters = new LinkedHashMap<String, FieldNode>();
             Map<String, FieldNode> parentParameters = new LinkedHashMap<String, FieldNode>();
 
@@ -536,6 +540,12 @@ class LambdaTreeWeaver implements Opcodes {
                     int[] range = argumentRanges.get(getParameterIndex(parameter));
                     captureDefaultParameterValue(parameter, range[0], range[1], instructions);
                 }
+
+                for (String parameter : parametersMutableFromChildLambdas)
+                    if (parameters.containsKey(parameter)) {
+                        int index = getParameterRealLocalIndex(parameter);
+                        initArray(saMn, getParameterTypes().get(getParameterIndex(parameter)), index);
+                    }
 
                 for (int i = getBodyStart(); i < getEnd(); i++) {
                     AbstractInsnNode n = instructions.get(i);
@@ -630,6 +640,15 @@ class LambdaTreeWeaver implements Opcodes {
                 } else {
                     n.accept(mv);
                 }
+            }
+
+            void initArray(MethodVisitor mv, Type type, int index) {
+                mv.visitInsn(ICONST_1);
+                newArray(mv, type);
+
+                initializeArrayOnTopOfStackWithCurrentValueOfLocal(mv, type, index);
+
+                mv.visitVarInsn(ASTORE, index);
             }
 
             MethodNode getAccessMethodReplacingPrivateFieldAccess(FieldInsnNode fn) {
@@ -769,13 +788,7 @@ class LambdaTreeWeaver implements Opcodes {
             void accessParameter(MethodVisitor mv, FieldInsnNode fin) throws IOException {
                 Type type = getType(fin.desc);
                 if (parentParameters.containsKey(fin.name)) {
-
-                    mv.visitVarInsn(ALOAD, 0);
-                    mv.visitFieldInsn(GETFIELD, lambdaClass(), getParentParameterName(fin.name), type
-                            .getDescriptor());
-                    debug("parameter " + fin.name + " " + getSimpleClassName(getType(fin.desc))
-                            + (fin.getOpcode() == PUTSTATIC ? " stored in" : " read from")
-                            + " parent lambda parameter");
+                    accessParentParameter(mv, fin, type);
                     return;
                 }
 
@@ -783,15 +796,44 @@ class LambdaTreeWeaver implements Opcodes {
 
                 debugLambdaParameterAccess(fin, realLocalIndex);
 
-                if (fin.getOpcode() == PUTSTATIC) {
-                    mv.visitVarInsn(type.getOpcode(ISTORE), realLocalIndex);
+                if (parametersMutableFromChildLambdas.contains(fin.name)) {
+                    mv.visitVarInsn(ALOAD, realLocalIndex);
+
+                    if (fin.getOpcode() == PUTSTATIC)
+                        storeTopOfStackInArray(mv, type);
+
+                    else
+                        loadFirstElementOfArray(mv, type);
 
                 } else {
 
-                    mv.visitVarInsn(type.getOpcode(ILOAD), realLocalIndex);
-                    if (isReference(type))
-                        mv.visitTypeInsn(CHECKCAST, type.getInternalName());
+                    if (fin.getOpcode() == PUTSTATIC) {
+                        mv.visitVarInsn(type.getOpcode(ISTORE), realLocalIndex);
+
+                    } else {
+
+                        mv.visitVarInsn(type.getOpcode(ILOAD), realLocalIndex);
+                        if (isReference(type))
+                            mv.visitTypeInsn(CHECKCAST, type.getInternalName());
+                    }
                 }
+            }
+
+            void accessParentParameter(MethodVisitor mv, FieldInsnNode fin, Type type) {
+                mv.visitVarInsn(ALOAD, 0);
+                if (parametersMutableFromChildLambdas.contains(fin.name)) {
+                    mv.visitFieldInsn(GETFIELD, lambdaClass(), getParentParameterName(fin.name), toArrayType(type)
+                            .getDescriptor());
+                    if (fin.getOpcode() == PUTSTATIC)
+                        storeTopOfStackInArray(mv, type);
+                    else
+                        loadFirstElementOfArray(mv, type);
+                } else
+                    mv.visitFieldInsn(GETFIELD, lambdaClass(), getParentParameterName(fin.name), type
+                            .getDescriptor());
+
+                debug("parameter " + fin.name + " " + getSimpleClassName(getType(fin.desc))
+                        + (fin.getOpcode() == PUTSTATIC ? " stored in" : " read from") + " parent lambda parameter");
             }
 
             String getParentParameterName(String name) {
@@ -990,8 +1032,18 @@ class LambdaTreeWeaver implements Opcodes {
 
             void loadAccessedLocals(MethodVisitor mv, LambdaAnalyzer parentLambda) {
                 for (FieldNode f : parentParameters.values()) {
-                    mv.visitVarInsn(getType(f.desc).getOpcode(ILOAD), parentLambda
-                            .getParameterRealLocalIndex(f.name));
+                    Type type = getType(f.desc);
+                    if (parametersMutableFromChildLambdas.contains(f.name))
+                        type = toArrayType(type);
+
+                    if (parentLambda.parameters.containsKey(f.name))
+                        mv.visitVarInsn(type.getOpcode(ILOAD), parentLambda.getParameterRealLocalIndex(f.name));
+
+                    else {
+                        mv.visitVarInsn(ALOAD, 0);
+                        mv.visitFieldInsn(GETFIELD, parentLambda.lambda.name, getParentParameterName(f.name), type
+                                .getDescriptor());
+                    }
 
                 }
                 for (LocalVariableNode local : locals.values()) {
@@ -1017,7 +1069,7 @@ class LambdaTreeWeaver implements Opcodes {
             void createAndInitializeFieldsWithAccessedLocals(MethodVisitor mv, Type[] parameters) {
                 int i = 1;
                 for (FieldNode f : parentParameters.values()) {
-                    Type type = getType(f.desc);
+                    Type type = parameters[i - 1];
                     loadFieldFromArgument(mv, i++, f.name, getParentParameterName(f.name), type);
                 }
                 for (LocalVariableNode local : locals.values()) {
@@ -1065,8 +1117,11 @@ class LambdaTreeWeaver implements Opcodes {
 
             Type[] getConstructorParameters() {
                 List<Type> result = new ArrayList<Type>();
-                for (FieldNode parentParameter : parentParameters.values())
-                    result.add(getType(parentParameter.desc));
+                for (FieldNode parentParameter : parentParameters.values()) {
+                    Type type = getType(parentParameter.desc);
+                    result.add(parametersMutableFromChildLambdas.contains(parentParameter.name) ? toArrayType(type)
+                            : type);
+                }
 
                 for (String local : locals.keySet()) {
                     Type type = getLocalVariableType(local);
@@ -1225,9 +1280,8 @@ class LambdaTreeWeaver implements Opcodes {
                 FieldNode f = findField(fin);
 
                 if (!parameters.containsKey(f.name)) {
-                    // if (resolveParameter(f))
                     if (parameters.size() == newLambdaParameterTypes.size()) {
-                        if (!resolveParameter(f))
+                        if (!resolveParameter(fin))
                             throw new IllegalStateException("Tried to define extra parameter, " + f.name
                                     + ", arity is " + newLambdaParameterTypes.size() + ", defined parameters are "
                                     + parameters.keySet());
@@ -1256,15 +1310,20 @@ class LambdaTreeWeaver implements Opcodes {
                             + (fin.getOpcode() == PUTSTATIC ? "write" : "read") + ")");
             }
 
-            boolean resolveParameter(FieldNode f) throws IOException {
-                if (parameters.containsKey(f.name))
+            boolean resolveParameter(FieldInsnNode fin) throws IOException {
+                if (parameters.containsKey(fin.name)) {
+                    if (fin.getOpcode() == PUTSTATIC)
+                        parametersMutableFromChildLambdas.add(fin.name);
                     return true;
+                }
 
                 if (parent == null)
                     return false;
 
-                parentParameters.put(f.name, f);
-                return parent.resolveParameter(f);
+                if (fin.getOpcode() == PUTSTATIC)
+                    parametersMutableFromChildLambdas.add(fin.name);
+                parentParameters.put(fin.name, findField(fin));
+                return parent.resolveParameter(fin);
             }
 
             void methodLocalVariable(VarInsnNode vin) {
