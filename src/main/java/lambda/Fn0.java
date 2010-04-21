@@ -192,16 +192,4 @@ public abstract class Fn0<R> implements Serializable {
     public <B> boolean or(Fn0<B> block) {
         return isNotFalseOrNull(call()) || isNotFalseOrNull(block.call());
     }
-
-    public boolean isTrue() {
-        return isNotFalseOrNull(call());
-    }
-
-    public boolean isFalse() {
-        return isFalseOrNull(call());
-    }
-
-    public boolean isNull() {
-        return call() == null;
-    }
 }

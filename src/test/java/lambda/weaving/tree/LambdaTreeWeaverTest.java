@@ -93,7 +93,6 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(list(object), list(lambda.sam.getArgumentTypes()));
         assertEquals(object, lambda.sam.getReturnType());
 
-        assertTrue(lambda.parameterHasConversionAtDefinition("n"));
         assertTrue(lambda.parameterNeedsUnboxing("n"));
     }
 
@@ -122,9 +121,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(list(object, object), list(lambda.sam.getArgumentTypes()));
         assertEquals(object, lambda.sam.getReturnType());
 
-        assertFalse(lambda.parameterHasConversionAtDefinition("s"));
         assertFalse(lambda.parameterNeedsUnboxing("s"));
-        assertTrue(lambda.parameterHasConversionAtDefinition("n"));
         assertTrue(lambda.parameterNeedsUnboxing("n"));
     }
 
@@ -154,11 +151,8 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(object, lambda.sam.getReturnType());
 
         assertFalse(lambda.parameterNeedsUnboxing("s"));
-        assertFalse(lambda.parameterHasConversionAtDefinition("s"));
         assertTrue(lambda.parameterNeedsUnboxing("n"));
-        assertTrue(lambda.parameterHasConversionAtDefinition("n"));
         assertTrue(lambda.parameterNeedsUnboxing("b"));
-        assertTrue(lambda.parameterHasConversionAtDefinition("b"));
     }
 
     @Test
@@ -440,9 +434,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
 
         assertFalse(lambda.parameterNeedsUnboxing("idx"));
         assertFalse(lambda.parameterNeedsBoxing("idx"));
-        assertFalse(lambda.parameterHasConversionAtDefinition("d"));
         assertTrue(lambda.parameterNeedsNarrowConversionFromActualArgument("idx"));
-        assertTrue(lambda.parameterHasConversionAtDefinition("idx"));
         assertEquals(D2I, lambda.parameterNarrowConversionOpcode("idx"));
 
         assertEquals(DOUBLE_TYPE, lambda.expressionType);
@@ -539,7 +531,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(list("n"), list(lambda.parameters.keySet()));
         assertEquals(list(INT_TYPE), lambda.getParameterTypes());
 
-        assertTrue(lambda.parametersWithDefaultValue.containsKey("n"));
+        assertTrue(lambda.parametersWithDefaultValue.contains("n"));
         assertTrue(lambda.parameterDefaultValueNeedsBoxing("n"));
     }
 
@@ -556,8 +548,8 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(list("n", "s"), list(lambda.parameters.keySet()));
         assertEquals(list(INT_TYPE, getType(String.class)), lambda.getParameterTypes());
 
-        assertFalse(lambda.parametersWithDefaultValue.containsKey("n"));
-        assertTrue(lambda.parametersWithDefaultValue.containsKey("s"));
+        assertFalse(lambda.parametersWithDefaultValue.contains("n"));
+        assertTrue(lambda.parametersWithDefaultValue.contains("s"));
 
         assertTrue(lambda.parameterDefaultValueNeedsBoxing("n"));
         assertFalse(lambda.parameterDefaultValueNeedsBoxing("s"));
@@ -577,7 +569,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         assertEquals(list(DOUBLE_TYPE), list(lambda.sam.getArgumentTypes()));
         assertEquals(list(DOUBLE_TYPE), lambda.getParameterTypes());
 
-        assertTrue(lambda.parametersWithDefaultValue.containsKey("d"));
+        assertTrue(lambda.parametersWithDefaultValue.contains("d"));
         assertTrue(lambda.parameterDefaultValueNeedsBoxing("d"));
     }
 

@@ -16,42 +16,6 @@ import org.junit.Test;
 
 public class ControlBlocksTest {
     @Test
-    public void and() throws Exception {
-        assertTrue(λ(true).and(λ(true)));
-        assertFalse(λ(true).and(λ(false)));
-        assertFalse(λ(false).and(λ(true)));
-        assertFalse(λ(false).and(λ(false)));
-    }
-
-    @Test
-    public void or() throws Exception {
-        assertTrue(λ(true).or(λ(true)));
-        assertTrue(λ(true).or(λ(false)));
-        assertTrue(λ(false).or(λ(true)));
-        assertFalse(λ(false).or(λ(false)));
-    }
-
-    @Test
-    public void isTrue() throws Exception {
-        assertTrue(λ("").isTrue());
-        assertTrue(λ(true).isTrue());
-        assertFalse(λ(false).isTrue());
-    }
-
-    @Test
-    public void isFalse() throws Exception {
-        assertTrue(λ(null).isFalse());
-        assertTrue(λ(false).isFalse());
-        assertFalse(λ(true).isFalse());
-    }
-
-    @Test
-    public void isNull() throws Exception {
-        assertTrue(λ(null).isNull());
-        assertFalse(λ("").isNull());
-    }
-
-    @Test
     public void unless() throws Exception {
         int i = 1;
         λ(i = 5).unless(λ(i > 5));
@@ -144,7 +108,7 @@ public class ControlBlocksTest {
     public static Object cond(Fn0<?>... clauses) {
         assert clauses.length % 2 == 0;
         for (int i = 0; i < clauses.length; i += 2)
-            if (clauses[i].isTrue())
+            if (Fn0.isNotFalseOrNull(clauses[i].call()))
                 return clauses[i + 1].call();
         return null;
     }

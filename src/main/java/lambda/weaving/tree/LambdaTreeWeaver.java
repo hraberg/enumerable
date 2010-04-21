@@ -16,9 +16,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lambda.annotation.LambdaLocal;
 import lambda.annotation.LambdaParameter;
@@ -488,12 +490,11 @@ class LambdaTreeWeaver implements Opcodes {
             Type lambdaType;
             Type expressionType;
 
-            Map<String, int[]> parametersWithDefaultValue = new HashMap<String, int[]>();
+            Set<String> parametersWithDefaultValue = new HashSet<String>();
             Map<String, FieldNode> parameters = new LinkedHashMap<String, FieldNode>();
 
             Map<String, LocalVariableNode> locals = new LinkedHashMap<String, LocalVariableNode>();
 
-            int lastParameterStart;
             List<int[]> argumentRanges;
 
             Method sam;
@@ -530,15 +531,15 @@ class LambdaTreeWeaver implements Opcodes {
                 createLambdaConstructor();
                 createSAMethod();
 
-                for (Map.Entry<String, int[]> defaultParameter : parametersWithDefaultValue.entrySet())
-                    captureDefaultParameterValue(defaultParameter.getKey(), defaultParameter.getValue()[0],
-                            defaultParameter.getValue()[1], instructions);
+                for (String parameter : parametersWithDefaultValue) {
+                    int[] range = argumentRanges.get(getParameterIndex(parameter));
+                    captureDefaultParameterValue(parameter, range[0], range[1], instructions);
+                }
 
                 for (int i = getBodyStart(); i < getEnd(); i++) {
                     AbstractInsnNode n = instructions.get(i);
 
                     if (currentLambda < lambdas.size() && i == lambdas.get(currentLambda).getStart()) {
-                        System.out.println("TRYING TO CREATE LAMBDA INSIDE LAMBDA");
                         LambdaAnalyzer lambda = lambdas.get(currentLambda);
 
                         i = lambdas.get(currentLambda).getEnd();
@@ -1052,7 +1053,6 @@ class LambdaTreeWeaver implements Opcodes {
                 devDebug("lambda ================ " + getStart() + " -> " + getEnd());
                 devDebugPrintInstructionHeader();
 
-                lastParameterStart = getStart() - 1;
                 for (int i = getStart(); i < getEnd(); i++) {
                     AbstractInsnNode n = m.instructions.get(i);
 
@@ -1153,14 +1153,11 @@ class LambdaTreeWeaver implements Opcodes {
                                 + parameters.keySet());
 
                     Type argumentType = getType(fin.desc);
-                    boolean parameterHasConversionAtDefinition = !parameters.isEmpty()
-                            && parameterHasConversionAtDefinition(getParameter(parameters.size() - 1));
+
                     parameters.put(f.name, f);
                     boolean hasDefaultValue = fin.getOpcode() == PUTSTATIC;
                     if (hasDefaultValue)
-                        parametersWithDefaultValue.put(f.name, new int[] {
-                                lastParameterStart + 1 + (parameterHasConversionAtDefinition ? 1 : 0), i });
-                    lastParameterStart = i;
+                        parametersWithDefaultValue.add(f.name);
 
                     devDebug("  --  defined parameter "
                             + fin.name
@@ -1170,7 +1167,8 @@ class LambdaTreeWeaver implements Opcodes {
                             + parameters.size()
                             + " out of "
                             + newLambdaParameterTypes.size()
-                            + (hasDefaultValue ? " (has default value starting at " + lastParameterStart + ")" : ""));
+                            + (hasDefaultValue ? " (has default value starting at "
+                                    + argumentRanges.get(getParameterIndex(f.name))[0] + ")" : ""));
                 } else
                     devDebug("  --  accessed parameter " + fin.name + " " + getType(f.desc).getClassName() + " ("
                             + (fin.getOpcode() == PUTSTATIC ? "write" : "read") + ")");
@@ -1223,21 +1221,6 @@ class LambdaTreeWeaver implements Opcodes {
                 int index = getParameterIndex(name);
                 Type samParameterType = sam.getArgumentTypes()[index];
                 return isReference(getParameterTypes().get(index)) && isPrimitive(samParameterType);
-            }
-
-            boolean parameterHasConversionAtDefinition(String name) {
-                int index = getParameterIndex(name);
-                Type parameterType = getParameterTypes().get(index);
-                Type methodParameterType = newLambdaParameterTypes.get(index);
-                if (methodParameterType.equals(parameterType))
-                    return false;
-
-                if (isPrimitive(parameterType) && isPrimitive(methodParameterType))
-                    return skipImplicitWideningPrimitiveConversionAtLambdaParameterDefinition(methodParameterType,
-                            parameterType);
-
-                return (isPrimitive(parameterType) && isReference(methodParameterType))
-                        || (isReference(parameterType) && isPrimitive(methodParameterType));
             }
 
             boolean skipImplicitWideningPrimitiveConversionAtLambdaParameterDefinition(Type methodParameterType,
