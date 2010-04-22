@@ -12,7 +12,9 @@ import lambda.exception.LambdaWeavingNotEnabledException;
 import clojure.lang.AFunction;
 import clojure.lang.IFn;
 import clojure.lang.LispReader;
+import clojure.lang.Namespace;
 import clojure.lang.PersistentList;
+import clojure.lang.Symbol;
 import clojure.lang.Var;
 
 /**
@@ -24,7 +26,16 @@ import clojure.lang.Var;
 @SuppressWarnings("serial")
 public class LambdaClojure {
     static {
-        ClojureSeqs.init();
+        init();
+    }
+
+    static void init() {
+        try {
+            if (CURRENT_NS.get() == CLOJURE_NS)
+                CURRENT_NS.doReset(Namespace.findOrCreate(Symbol.create("user")));
+        } catch (Exception e) {
+            throw uncheck(e);
+        }
     }
 
     /**
@@ -35,8 +46,15 @@ public class LambdaClojure {
      * </pre>
      */
     public static Var defn(String name, IFn body) {
+        return def(name, body);
+    }
+
+    /**
+     * Defines a var in the current namespace.
+     */
+    public static Var def(String name, Object value) {
         try {
-            return var(CURRENT_NS.get().toString(), name, body);
+            return var(CURRENT_NS.get().toString(), name, value);
         } catch (Exception e) {
             throw uncheck(e);
         }

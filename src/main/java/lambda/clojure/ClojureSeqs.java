@@ -12,10 +12,8 @@ import clojure.lang.IPersistentMap;
 import clojure.lang.IPersistentSet;
 import clojure.lang.IPersistentVector;
 import clojure.lang.ISeq;
-import clojure.lang.Namespace;
 import clojure.lang.Range;
 import clojure.lang.Seqable;
-import clojure.lang.Symbol;
 import clojure.lang.Var;
 
 /**
@@ -41,16 +39,7 @@ public class ClojureSeqs {
      */
 
     static {
-        init();
-    }
-
-    static void init() {
-        try {
-            if (CURRENT_NS.get() == CLOJURE_NS)
-                CURRENT_NS.doReset(Namespace.findOrCreate(Symbol.create("user")));
-        } catch (Exception e) {
-            throw uncheck(e);
-        }
+        LambdaClojure.init();
     }
 
     /**

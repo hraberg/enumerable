@@ -31,7 +31,7 @@ public class ClojureTest {
     public void initDoesNotChangeNamespaceOtherThanClojureCore() throws Exception {
         try {
             CURRENT_NS.doReset(Namespace.findOrCreate(Symbol.create("my-ns")));
-            ClojureSeqs.init();
+            LambdaClojure.init();
             assertEquals("my-ns", RT.CURRENT_NS.get().toString());
         } finally {
             CURRENT_NS.doReset(Namespace.findOrCreate(Symbol.create("user")));
@@ -118,6 +118,6 @@ public class ClojureTest {
 
     @Before
     public void ensureClojureIsInitialzed() {
-        ClojureSeqs.init();
+        LambdaClojure.init();
     }
 }
