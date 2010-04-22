@@ -50,6 +50,18 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
     }
 
     /**
+     * Function composition, returns a {@link Fn0} that calls this function with
+     * the result of f.
+     */
+    public <X> Fn0<R> compose(final Fn0<? extends A1> f) {
+        return new Fn0<R>() {
+            public R call() {
+                return Fn1.this.call(f.call());
+            }
+        };
+    }
+
+    /**
      * Function composition, returns a {@link Fn1} that calls this function with
      * the result of f called with a1.
      */

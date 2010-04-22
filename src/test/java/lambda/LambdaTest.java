@@ -582,6 +582,16 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    public void fn1OfFn0FunctionComposition() throws Exception {
+        Fn1<Object, String> toString = λ(obj, obj.toString());
+        Fn0<Integer> ten = λ(10);
+        assertEquals(10, (int) ten.call());
+
+        Fn0<String> tenToString = toString.compose(ten);
+        assertEquals("10", tenToString.call());
+    }
+
+    @Test
     public void fn1OfFn1FunctionComposition() throws Exception {
         Fn1<Boolean, Boolean> not = λ(b, !b);
         Fn1<Integer, Boolean> even = λ(n, n % 2 == 0);
