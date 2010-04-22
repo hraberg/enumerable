@@ -1,12 +1,10 @@
 package lambda.clojure;
 
 import static clojure.lang.RT.*;
-import static java.util.Arrays.*;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
+import clojure.lang.ArraySeq;
 import clojure.lang.IFn;
 import clojure.lang.IPersistentMap;
 import clojure.lang.IPersistentSet;
@@ -22,6 +20,10 @@ import clojure.lang.Var;
  * <i>This file was originally generated, but has been edited by hand.</i>
  */
 public class ClojureSeqs {
+    static Var first = var("clojure.core", "first");
+    static Var rest = var("clojure.core", "rest");
+    static Var cons = var("clojure.core", "cons");
+
     static Var second = var("clojure.core", "second");
     static Var every = var("clojure.core", "every?");
     static Var notEvery = var("clojure.core", "not-every?");
@@ -51,11 +53,33 @@ public class ClojureSeqs {
     static Var into = var("clojure.core", "into");
     static Var distinct = var("clojure.core", "distinct");
     static Var set = var("clojure.core", "set");
+    static Var vec = var("clojure.core", "vec");
     static Var dorun = var("clojure.core", "dorun");
     static Var doall = var("clojure.core", "doall");
     static Var sort = var("clojure.core", "sort");
     static Var sortBy = var("clojure.core", "sort-by");
     static Var zipmap = var("clojure.core", "zipmap");
+
+    /**
+     * [coll]
+     */
+    public static Object first(Seqable coll) throws Exception {
+        return first.invoke(coll);
+    }
+
+    /**
+     * [coll]
+     */
+    public static ISeq rest(Seqable coll) throws Exception {
+        return (ISeq) rest.invoke(coll);
+    }
+
+    /**
+     * [x seq]
+     */
+    public static ISeq cons(Object x, Seqable seq) throws Exception {
+        return (ISeq) cons.invoke(x, seq);
+    }
 
     /**
      * [x]
@@ -117,10 +141,7 @@ public class ClojureSeqs {
      * [x y & zs]
      */
     public static ISeq concat(Seqable x, Seqable y, Seqable... zs) throws Exception {
-        ISeq args = concat(x, y);
-        for (Seqable z : zs)
-            args = concat(args, z);
-        return args;
+        return (ISeq) concat.applyTo(ArraySeq.create((Object[]) zs).cons(y).cons(x));
     }
 
     /**
@@ -148,10 +169,7 @@ public class ClojureSeqs {
      * [f & colls]
      */
     public static ISeq mapcat(IFn f, Seqable... colls) throws Exception {
-        List<Object> args = new ArrayList<Object>();
-        args.add(f);
-        args.addAll(asList(colls));
-        return (ISeq) mapcat.applyTo(seq(args));
+        return (ISeq) mapcat.applyTo(ArraySeq.create((Object[]) colls).cons(f));
     }
 
     /**
@@ -256,10 +274,7 @@ public class ClojureSeqs {
      * [c1 c2 & colls]
      */
     public static ISeq interleave(Seqable c1, Seqable c2, Seqable... colls) throws Exception {
-        List<Seqable> args = new ArrayList<Seqable>();
-        args.addAll(asList(c1, c2));
-        args.addAll(asList(colls));
-        return (ISeq) interleave.applyTo(seq(args));
+        return (ISeq) interleave.applyTo(ArraySeq.create((Object[]) colls).cons(c2).cons(c1));
     }
 
     /**
@@ -344,6 +359,13 @@ public class ClojureSeqs {
      */
     public static IPersistentSet set(Seqable coll) throws Exception {
         return (IPersistentSet) set.invoke(coll);
+    }
+
+    /**
+     * [coll]
+     */
+    public static IPersistentVector vec(Seqable coll) throws Exception {
+        return (IPersistentVector) vec.invoke(coll);
     }
 
     /**

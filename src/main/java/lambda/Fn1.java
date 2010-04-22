@@ -32,7 +32,7 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
 
     @SuppressWarnings("unchecked")
     public R apply(Object... args) {
-        if (args.length > 0)
+        if (args.length >= arity)
             return call((A1) args[0]);
         return super.apply(args);
     }

@@ -31,6 +31,15 @@ public class ClojureTest {
 
     @Test
     public void basicSequenceOperations() throws Exception {
+        Object first = (first(list(1, 2, 3)));
+        assertEquals(1, first);
+
+        ISeq rest = (rest((list(1, 2, 3))));
+        assertEquals(list(2, 3), rest);
+
+        ISeq cons = (cons(1, list(2, 3)));
+        assertEquals(list(1, 2, 3), cons);
+
         ISeq map = (map(fn(s, s.toUpperCase()), list("hello", "world")));
         assertEquals(list("HELLO", "WORLD"), map);
 
@@ -43,12 +52,12 @@ public class ClojureTest {
 
     @Test
     public void creatingPersistentCollections() throws Exception {
-        APersistentVector vector = (APersistentVector) vector("hello", "world");
+        APersistentVector vector = (APersistentVector) vec(list("hello", "world"));
         assertEquals("hello", vector.invoke(0));
         assertEquals("world", vector.invoke(1));
         assertEquals("[\"hello\" \"world\"]", vector.toString());
 
-        APersistentSet set = (APersistentSet) set("hello", "world");
+        APersistentSet set = (APersistentSet) set(list("hello", "world"));
         assertEquals("hello", set.invoke("hello"));
         assertEquals("world", set.invoke("world"));
         assertEquals("#{\"hello\" \"world\"}", set.toString());
