@@ -1,10 +1,17 @@
 package lambda.clojure;
 
+import static clojure.lang.Compiler.*;
 import static clojure.lang.RT.*;
+import static java.util.Arrays.*;
+
+import java.io.StringReader;
+
 import lambda.annotation.NewLambda;
 import lambda.exception.LambdaWeavingNotEnabledException;
-import clojure.lang.AFn;
+import clojure.lang.AFunction;
 import clojure.lang.IFn;
+import clojure.lang.LispReader;
+import clojure.lang.PersistentList;
 import clojure.lang.Var;
 
 /**
@@ -15,6 +22,10 @@ import clojure.lang.Var;
  */
 @SuppressWarnings("serial")
 public class LambdaClojure {
+    static {
+        ClojureSeqs.init();
+    }
+
     /**
      * Defines a {@link IFn} from a lambda in the current namespace, like this:
      * 
@@ -23,22 +34,42 @@ public class LambdaClojure {
      * </pre>
      */
     public static Var defn(String name, IFn body) throws Exception {
-        return var(CURRENT_NS.ns.name.getName(), name, body);
+        return var(CURRENT_NS.get().toString(), name, body);
     }
 
-    public static abstract class AFn0<R> extends AFn {
+    /**
+     * Turns the array of forms into a {@link PersistentList} and evaluates them
+     * using Clojure's {@link clojure.lang.Compiler}.
+     * <p>
+     * The objects must be forms Clojure understands, basically anything the
+     * {@link LispReader} can produce.
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R eval(Object... forms) throws Exception {
+        return (R) clojure.lang.Compiler.eval(PersistentList.create(asList(forms)));
+    }
+
+    /**
+     * Evaluates the code using Clojure's {@link clojure.lang.Compiler}.
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R eval(String code) throws Exception {
+        return (R) load(new StringReader(code));
+    }
+
+    public static abstract class AFn0<R> extends AFunction {
         public abstract R invoke() throws Exception;
     }
 
-    public static abstract class AFn1<R> extends AFn {
+    public static abstract class AFn1<R> extends AFunction {
         public abstract R invoke(Object arg1) throws Exception;
     }
 
-    public static abstract class AFn2<R> extends AFn {
+    public static abstract class AFn2<R> extends AFunction {
         public abstract R invoke(Object arg1, Object arg2) throws Exception;
     }
 
-    public static abstract class AFn3<R> extends AFn {
+    public static abstract class AFn3<R> extends AFunction {
         public abstract R invoke(Object arg1, Object arg2, Object arg3) throws Exception;
     }
 

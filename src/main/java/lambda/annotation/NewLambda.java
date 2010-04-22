@@ -13,8 +13,6 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  * <p>
  * The last argument to the method is the actual block expression. The other
  * arguments have to be {@link LambdaParameter} marking the blocks signature.
- * The first parameter can be {@link Unused} to create blocks that take no
- * parameters.
  * <p>
  * The return type of the block is the type of the block expression parameter.
  * 
@@ -29,7 +27,7 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  *  }
  * 
  *  String hello = "";
- *  Runnable runnable = runnable(_, hello = "hello");
+ *  Runnable runnable = runnable(hello = "hello");
  *  runnable.run();
  * </pre>
  * 
@@ -41,7 +39,7 @@ import lambda.exception.LambdaWeavingNotEnabledException;
  *      throw new LambdaWeavingNotEnabledException(); 
  *  }
  * 
- *  String hello = ""; Runnable runnable = delegate(_, hello = "hello");
+ *  String hello = ""; Runnable runnable = delegate(hello = "hello");
  *  runnable.run();
  * </pre>
  * 

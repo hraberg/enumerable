@@ -1,6 +1,7 @@
 package lambda.clojure;
 
 import static clojure.lang.RT.*;
+import static lambda.exception.UncheckedException.*;
 
 import java.util.Comparator;
 
@@ -10,52 +11,68 @@ import clojure.lang.IPersistentMap;
 import clojure.lang.IPersistentSet;
 import clojure.lang.IPersistentVector;
 import clojure.lang.ISeq;
+import clojure.lang.Namespace;
 import clojure.lang.Range;
 import clojure.lang.Seqable;
+import clojure.lang.Symbol;
 import clojure.lang.Var;
 
 /**
- * Facade for Clojure's Sequence library, used together with
- * {@link clojure.lang.RT} and {@link LambdaClojure}, which provides
- * Enumerable.java lambdas implementing {@link IFn}.
+ * Facade for the <a href="http://clojure.org/sequences">Clojure Seq
+ * library</a>, used together with {@link clojure.lang.RT} and
+ * {@link LambdaClojure}, which provides Enumerable.java lambdas implementing
+ * {@link IFn}.
  * <p>
  * <i>This file was originally generated, but has been edited by hand.</i>
  */
 public class ClojureSeqs {
-    static Var every = var("clojure.core", "every?");
-    static Var notEvery = var("clojure.core", "not-every?");
-    static Var some = var("clojure.core", "some");
-    static Var notAny = var("clojure.core", "not-any?");
-    static Var concat = var("clojure.core", "concat");
-    static Var map = var("clojure.core", "map");
-    static Var mapcat = var("clojure.core", "mapcat");
-    static Var filter = var("clojure.core", "filter");
-    static Var reduce = var("clojure.core", "reduce");
-    static Var take = var("clojure.core", "take");
-    static Var takeNth = var("clojure.core", "take-nth");
-    static Var takeWhile = var("clojure.core", "take-while");
-    static Var takeLast = var("clojure.core", "take-last");
-    static Var drop = var("clojure.core", "drop");
-    static Var dropWhile = var("clojure.core", "drop-while");
-    static Var dropLast = var("clojure.core", "drop-last");
-    static Var reverse = var("clojure.core", "reverse");
-    static Var cycle = var("clojure.core", "cycle");
-    static Var interleave = var("clojure.core", "interleave");
-    static Var splitAt = var("clojure.core", "split-at");
-    static Var splitWith = var("clojure.core", "split-with");
-    static Var repeat = var("clojure.core", "repeat");
-    static Var replicate = var("clojure.core", "replicate");
-    static Var iterate = var("clojure.core", "iterate");
-    static Var range = var("clojure.core", "range");
-    static Var into = var("clojure.core", "into");
-    static Var distinct = var("clojure.core", "distinct");
-    static Var set = var("clojure.core", "set");
-    static Var vec = var("clojure.core", "vec");
-    static Var dorun = var("clojure.core", "dorun");
-    static Var doall = var("clojure.core", "doall");
-    static Var sort = var("clojure.core", "sort");
-    static Var sortBy = var("clojure.core", "sort-by");
-    static Var zipmap = var("clojure.core", "zipmap");
+    static {
+        init();
+    }
+
+    static void init() {
+        try {
+            if (CURRENT_NS.deref() == CLOJURE_NS)
+                CURRENT_NS.doReset(Namespace.findOrCreate(Symbol.create("user")));
+        } catch (Exception e) {
+            throw uncheck(e);
+        }
+    }
+
+    public static Var every = var("clojure.core", "every?");
+    public static Var notEvery = var("clojure.core", "not-every?");
+    public static Var some = var("clojure.core", "some");
+    public static Var notAny = var("clojure.core", "not-any?");
+    public static Var concat = var("clojure.core", "concat");
+    public static Var map = var("clojure.core", "map");
+    public static Var mapcat = var("clojure.core", "mapcat");
+    public static Var filter = var("clojure.core", "filter");
+    public static Var reduce = var("clojure.core", "reduce");
+    public static Var take = var("clojure.core", "take");
+    public static Var takeNth = var("clojure.core", "take-nth");
+    public static Var takeWhile = var("clojure.core", "take-while");
+    public static Var takeLast = var("clojure.core", "take-last");
+    public static Var drop = var("clojure.core", "drop");
+    public static Var dropWhile = var("clojure.core", "drop-while");
+    public static Var dropLast = var("clojure.core", "drop-last");
+    public static Var reverse = var("clojure.core", "reverse");
+    public static Var cycle = var("clojure.core", "cycle");
+    public static Var interleave = var("clojure.core", "interleave");
+    public static Var splitAt = var("clojure.core", "split-at");
+    public static Var splitWith = var("clojure.core", "split-with");
+    public static Var repeat = var("clojure.core", "repeat");
+    public static Var replicate = var("clojure.core", "replicate");
+    public static Var iterate = var("clojure.core", "iterate");
+    public static Var range = var("clojure.core", "range");
+    public static Var into = var("clojure.core", "into");
+    public static Var distinct = var("clojure.core", "distinct");
+    public static Var set = var("clojure.core", "set");
+    public static Var vec = var("clojure.core", "vec");
+    public static Var dorun = var("clojure.core", "dorun");
+    public static Var doall = var("clojure.core", "doall");
+    public static Var sort = var("clojure.core", "sort");
+    public static Var sortBy = var("clojure.core", "sort-by");
+    public static Var zipmap = var("clojure.core", "zipmap");
 
     /**
      * [pred coll]
@@ -151,15 +168,17 @@ public class ClojureSeqs {
     /**
      * [f coll]
      */
-    public static Object reduce(IFn f, Seqable coll) throws Exception {
-        return reduce.invoke(f, coll);
+    @SuppressWarnings("unchecked")
+    public static <R> R reduce(IFn f, Seqable coll) throws Exception {
+        return (R) reduce.invoke(f, coll);
     }
 
     /**
      * [f start coll]
      */
-    public static Object reduce(IFn f, Object start, Seqable coll) throws Exception {
-        return reduce.invoke(f, start, coll);
+    @SuppressWarnings("unchecked")
+    public static <R> R reduce(IFn f, Object start, Seqable coll) throws Exception {
+        return (R) reduce.invoke(f, start, coll);
     }
 
     /**

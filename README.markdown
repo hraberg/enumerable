@@ -151,7 +151,7 @@ Now only calls matching the regular expression and the specidifed argument types
 
 ### Default Parameter Values
 
-Parameters to a Fn1, Fn2 or Fn3 can have a default value:
+Parameters to Fn1, Fn2 and Fn3 can have default values:
 
     Fn2<Double, Double, Double> nTimesMorPI = fn(n, m = Math.PI, n * m);
     assert 2.0 * Math.PI == nTimesMorPI.call(2.0);
@@ -167,7 +167,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Clojure Sequences
 
-The class [LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/LambdaClojure.java) allows you to create lambdas implementing interfaces from [clojure.lang.IFn](http://github.com/richhickey/clojure/blob/1.1.0/src/jvm/clojure/lang/IFn.java) to be used with [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/ClojureSeqs.java). You need clojure-1.1.0.jar or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
+The class [LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/richhickey/clojure/blob/1.1.0/src/jvm/clojure/lang/IFn.java) to be used with [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need clojure-1.1.0.jar or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
 
 ## Implementation
 

@@ -530,8 +530,8 @@ class LambdaTreeWeaver implements Opcodes {
                 debugLambdaStart();
 
                 lambda = new ClassNode();
-                lambda.visit(V1_5, ACC_FINAL | ACC_SYNTHETIC, lambdaClass(), null,
-                        getSuperType().getInternalName(), getLambdaInterfaces());
+                lambda.visit(V1_5, ACC_FINAL | ACC_SYNTHETIC | ACC_PUBLIC, lambdaClass(), null, getSuperType()
+                        .getInternalName(), getLambdaInterfaces());
 
                 createLambdaConstructor();
                 createSAMethod();
