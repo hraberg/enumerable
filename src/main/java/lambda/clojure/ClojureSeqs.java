@@ -20,11 +20,6 @@ import clojure.lang.Var;
  * <i>This file was originally generated, but has been edited by hand.</i>
  */
 public class ClojureSeqs {
-    static Var first = var("clojure.core", "first");
-    static Var rest = var("clojure.core", "rest");
-    static Var cons = var("clojure.core", "cons");
-
-    static Var second = var("clojure.core", "second");
     static Var every = var("clojure.core", "every?");
     static Var notEvery = var("clojure.core", "not-every?");
     static Var some = var("clojure.core", "some");
@@ -59,34 +54,6 @@ public class ClojureSeqs {
     static Var sort = var("clojure.core", "sort");
     static Var sortBy = var("clojure.core", "sort-by");
     static Var zipmap = var("clojure.core", "zipmap");
-
-    /**
-     * [coll]
-     */
-    public static Object first(Seqable coll) throws Exception {
-        return first.invoke(coll);
-    }
-
-    /**
-     * [coll]
-     */
-    public static ISeq rest(Seqable coll) throws Exception {
-        return (ISeq) rest.invoke(coll);
-    }
-
-    /**
-     * [x seq]
-     */
-    public static ISeq cons(Object x, Seqable seq) throws Exception {
-        return (ISeq) cons.invoke(x, seq);
-    }
-
-    /**
-     * [x]
-     */
-    public static Object second(Seqable x) throws Exception {
-        return second.invoke(x);
-    }
 
     /**
      * [pred coll]

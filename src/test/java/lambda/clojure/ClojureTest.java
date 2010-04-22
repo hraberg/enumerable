@@ -31,15 +31,6 @@ public class ClojureTest {
 
     @Test
     public void basicSequenceOperations() throws Exception {
-        Object first = (first(list(1, 2, 3)));
-        assertEquals(1, first);
-
-        ISeq rest = (rest((list(1, 2, 3))));
-        assertEquals(list(2, 3), rest);
-
-        ISeq cons = (cons(1, list(2, 3)));
-        assertEquals(list(1, 2, 3), cons);
-
         ISeq map = (map(fn(s, s.toUpperCase()), list("hello", "world")));
         assertEquals(list("HELLO", "WORLD"), map);
 
