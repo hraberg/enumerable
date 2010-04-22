@@ -37,4 +37,12 @@ public abstract class Fn3<A1, A2, A3, R> extends Fn2<A1, A2, R> {
             }
         };
     }
+
+    public Fn3<A1, A2, A3, Boolean> complement() {
+        return new Fn3<A1, A2, A3, Boolean>() {
+            public Boolean call(A1 a1, A2 a2, A3 a3) {
+                return isFalseOrNull(Fn3.this.call(a1, a2, a3));
+            }
+        };
+    }
 }

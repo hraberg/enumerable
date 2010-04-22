@@ -84,4 +84,12 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
             }
         };
     }
+
+    public Fn1<A1, Boolean> complement() {
+        return new Fn1<A1, Boolean>() {
+            public Boolean call(A1 a1) {
+                return isFalseOrNull(Fn1.this.call(a1));
+            }
+        };
+    }
 }

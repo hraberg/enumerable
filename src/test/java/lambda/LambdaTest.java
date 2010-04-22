@@ -601,6 +601,29 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    public void complementOfFn() throws Exception {
+        Fn0<Boolean> truth = λ(true);
+        assertTrue(truth.call());
+        assertFalse(truth.complement().call());
+
+        Fn0<Object> nullFn = λ(null);
+        assertNull(nullFn.call());
+        assertTrue(nullFn.complement().call());
+
+        Fn1<Integer, Boolean> isOdd = λ(n, n % 2 == 1);
+        assertTrue(isOdd.call(1));
+        assertFalse(isOdd.complement().call(1));
+
+        Fn2<Integer, Integer, Boolean> isSumOdd = λ(n, m, (Boolean) ((m + n) % 2 == 1));
+        assertTrue(isSumOdd.call(1, 2));
+        assertFalse(isSumOdd.complement().call(1, 2));
+
+        Fn3<Integer, Integer, Integer, Boolean> isSumEven = λ(n, m, i, (m + n + i) % 2 == 0);
+        assertTrue(isSumEven.call(1, 2, 1));
+        assertFalse(isSumEven.complement().call(1, 2, 1));
+    }
+
+    @Test
     public void comparsionsInZeroArgumentLambdas() throws Exception {
         assertTrue(λ(true).call());
         assertFalse(λ(false).call());

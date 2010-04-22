@@ -160,6 +160,10 @@ public abstract class Fn0<R> implements Serializable {
         return getClass().getName();
     }
 
+    /**
+     * Returns a function that will give the opposite boolean value of this
+     * function. Uses null as false when used with non boolean functions.
+     */
     public Fn0<Boolean> complement() {
         return new Fn0<Boolean>() {
             public Boolean call() {
@@ -168,12 +172,20 @@ public abstract class Fn0<R> implements Serializable {
         };
     }
 
+    /**
+     * Calls the given block with no arguments and executes this function if the
+     * result is false or null.
+     */
     public R unless(Fn0<Boolean> block) {
         if (isFalseOrNull(block.call()))
             return call();
         return null;
     }
 
+    /**
+     * Calls this function repeatedly with no arguments and executes the given
+     * block while the result is true or non null.
+     */
     public <B> B whileTrue(Fn0<B> block) {
         B result = null;
         while (isNotFalseOrNull(call()))
@@ -181,22 +193,38 @@ public abstract class Fn0<R> implements Serializable {
         return result;
     }
 
+    /**
+     * Calls this function with no arguments and executes the given block if the
+     * result is true or non null.
+     */
     public <B> B ifTrue(Fn0<B> block) {
         if (isNotFalseOrNull(call()))
             return block.call();
         return null;
     }
 
+    /**
+     * Calls this function with no arguments and executes the given block if the
+     * result is false or null.
+     */
     public <B> B ifFalse(Fn0<B> block) {
         if (isFalseOrNull(call()))
             return block.call();
         return null;
     }
 
+    /**
+     * Returns true if both this function and the given block evaluates to true
+     * of non null.
+     */
     public <B> boolean and(Fn0<B> block) {
         return isNotFalseOrNull(call()) && isNotFalseOrNull(block.call());
     }
 
+    /**
+     * Returns true if either this function or the given block evaluates to true
+     * of non null.
+     */
     public <B> boolean or(Fn0<B> block) {
         return isNotFalseOrNull(call()) || isNotFalseOrNull(block.call());
     }
