@@ -6,6 +6,7 @@ import static lambda.clojure.ClojureSeqs.*;
 import static lambda.clojure.ClojureSeqs.Vars.*;
 import static lambda.clojure.LambdaClojure.*;
 import static org.junit.Assert.*;
+import lambda.enumerable.Enumerable;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -114,6 +115,15 @@ public class ClojureTest {
         assertEquals(odd, (filter(isOdd, v)));
         assertEquals(odd, eval(filter, isOdd, v));
         assertEquals(odd, eval("(filter odd? v)"));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void interactingWithEnumerableJava() throws Exception {
+        APersistentVector v = eval("[1 2 3 4 5]");
+        IFn star = eval("*");
+
+        assertEquals(120, Enumerable.inject(v, 1, toFn2(star)));
     }
 
     @Before

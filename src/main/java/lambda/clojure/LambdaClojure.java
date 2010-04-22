@@ -7,6 +7,10 @@ import static lambda.exception.UncheckedException.*;
 
 import java.io.StringReader;
 
+import lambda.Fn0;
+import lambda.Fn1;
+import lambda.Fn2;
+import lambda.Fn3;
 import lambda.annotation.NewLambda;
 import lambda.exception.LambdaWeavingNotEnabledException;
 import clojure.lang.AFunction;
@@ -154,5 +158,65 @@ public class LambdaClojure {
     @NewLambda
     public static <A1, A2, A3, R> AFn3<R> fn(A1 a1, A2 a2, A3 a3, R body) {
         throw new LambdaWeavingNotEnabledException();
+    }
+
+    /**
+     * Wraps the {@link IFn} in a {@link Fn0}.
+     */
+    public static Fn0<Object> toFn0(final IFn f) {
+        return new Fn0<Object>() {
+            public Object call() {
+                try {
+                    return f.invoke();
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+        };
+    }
+
+    /**
+     * Wraps the {@link IFn} in a {@link Fn1}.
+     */
+    public static Fn1<Object, Object> toFn1(final IFn f) {
+        return new Fn1<Object, Object>() {
+            public Object call(Object a1) {
+                try {
+                    return f.invoke(a1);
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+        };
+    }
+
+    /**
+     * Wraps the {@link IFn} in a {@link Fn2}.
+     */
+    public static Fn2<Object, Object, Object> toFn2(final IFn f) {
+        return new Fn2<Object, Object, Object>() {
+            public Object call(Object a1, Object a2) {
+                try {
+                    return f.invoke(a1, a2);
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+        };
+    }
+
+    /**
+     * Wraps the {@link IFn} in a {@link Fn3}.
+     */
+    public static Fn3<Object, Object, Object, Object> toFn3(final IFn f) {
+        return new Fn3<Object, Object, Object, Object>() {
+            public Object call(Object a1, Object a2, Object a3) {
+                try {
+                    return f.invoke(a1, a2, a3);
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+        };
     }
 }
