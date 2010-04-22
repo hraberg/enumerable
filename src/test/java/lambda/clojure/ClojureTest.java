@@ -3,6 +3,7 @@ package lambda.clojure;
 import static clojure.lang.RT.*;
 import static lambda.Parameters.*;
 import static lambda.clojure.ClojureSeqs.*;
+import static lambda.clojure.ClojureSeqs.Vars.*;
 import static lambda.clojure.LambdaClojure.*;
 import static org.junit.Assert.*;
 
@@ -92,7 +93,7 @@ public class ClojureTest {
     }
 
     @Test
-    public void interacingWithClojure() throws Exception {
+    public void interactingWithClojure() throws Exception {
         eval("(def v [1 2 3 4 5])");
         IPersistentVector v = eval("v");
 

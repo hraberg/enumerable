@@ -1,6 +1,7 @@
 package lambda.clojure;
 
 import static clojure.lang.RT.*;
+import static lambda.clojure.ClojureSeqs.Vars.*;
 import static lambda.exception.UncheckedException.*;
 
 import java.util.Comparator;
@@ -39,40 +40,43 @@ public class ClojureSeqs {
         }
     }
 
-    public static Var every = var("clojure.core", "every?");
-    public static Var notEvery = var("clojure.core", "not-every?");
-    public static Var some = var("clojure.core", "some");
-    public static Var notAny = var("clojure.core", "not-any?");
-    public static Var concat = var("clojure.core", "concat");
-    public static Var map = var("clojure.core", "map");
-    public static Var mapcat = var("clojure.core", "mapcat");
-    public static Var filter = var("clojure.core", "filter");
-    public static Var reduce = var("clojure.core", "reduce");
-    public static Var take = var("clojure.core", "take");
-    public static Var takeNth = var("clojure.core", "take-nth");
-    public static Var takeWhile = var("clojure.core", "take-while");
-    public static Var takeLast = var("clojure.core", "take-last");
-    public static Var drop = var("clojure.core", "drop");
-    public static Var dropWhile = var("clojure.core", "drop-while");
-    public static Var dropLast = var("clojure.core", "drop-last");
-    public static Var reverse = var("clojure.core", "reverse");
-    public static Var cycle = var("clojure.core", "cycle");
-    public static Var interleave = var("clojure.core", "interleave");
-    public static Var splitAt = var("clojure.core", "split-at");
-    public static Var splitWith = var("clojure.core", "split-with");
-    public static Var repeat = var("clojure.core", "repeat");
-    public static Var replicate = var("clojure.core", "replicate");
-    public static Var iterate = var("clojure.core", "iterate");
-    public static Var range = var("clojure.core", "range");
-    public static Var into = var("clojure.core", "into");
-    public static Var distinct = var("clojure.core", "distinct");
-    public static Var set = var("clojure.core", "set");
-    public static Var vec = var("clojure.core", "vec");
-    public static Var dorun = var("clojure.core", "dorun");
-    public static Var doall = var("clojure.core", "doall");
-    public static Var sort = var("clojure.core", "sort");
-    public static Var sortBy = var("clojure.core", "sort-by");
-    public static Var zipmap = var("clojure.core", "zipmap");
+    public static class Vars {
+
+        public static Var every = var("clojure.core", "every?");
+        public static Var notEvery = var("clojure.core", "not-every?");
+        public static Var some = var("clojure.core", "some");
+        public static Var notAny = var("clojure.core", "not-any?");
+        public static Var concat = var("clojure.core", "concat");
+        public static Var map = var("clojure.core", "map");
+        public static Var mapcat = var("clojure.core", "mapcat");
+        public static Var filter = var("clojure.core", "filter");
+        public static Var reduce = var("clojure.core", "reduce");
+        public static Var take = var("clojure.core", "take");
+        public static Var takeNth = var("clojure.core", "take-nth");
+        public static Var takeWhile = var("clojure.core", "take-while");
+        public static Var takeLast = var("clojure.core", "take-last");
+        public static Var drop = var("clojure.core", "drop");
+        public static Var dropWhile = var("clojure.core", "drop-while");
+        public static Var dropLast = var("clojure.core", "drop-last");
+        public static Var reverse = var("clojure.core", "reverse");
+        public static Var cycle = var("clojure.core", "cycle");
+        public static Var interleave = var("clojure.core", "interleave");
+        public static Var splitAt = var("clojure.core", "split-at");
+        public static Var splitWith = var("clojure.core", "split-with");
+        public static Var repeat = var("clojure.core", "repeat");
+        public static Var replicate = var("clojure.core", "replicate");
+        public static Var iterate = var("clojure.core", "iterate");
+        public static Var range = var("clojure.core", "range");
+        public static Var into = var("clojure.core", "into");
+        public static Var distinct = var("clojure.core", "distinct");
+        public static Var set = var("clojure.core", "set");
+        public static Var vec = var("clojure.core", "vec");
+        public static Var dorun = var("clojure.core", "dorun");
+        public static Var doall = var("clojure.core", "doall");
+        public static Var sort = var("clojure.core", "sort");
+        public static Var sortBy = var("clojure.core", "sort-by");
+        public static Var zipmap = var("clojure.core", "zipmap");
+    }
 
     /**
      * [pred coll]
