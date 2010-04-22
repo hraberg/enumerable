@@ -56,7 +56,6 @@ public class ClojureSeqs {
     static Var sort = var("clojure.core", "sort");
     static Var sortBy = var("clojure.core", "sort-by");
     static Var zipmap = var("clojure.core", "zipmap");
-    static Var lazyCat = var("clojure.core", "lazy-cat");
 
     /**
      * [x]
@@ -408,12 +407,5 @@ public class ClojureSeqs {
      */
     public static IPersistentMap zipmap(Seqable keys, Seqable vals) throws Exception {
         return (IPersistentMap) zipmap.invoke(keys, vals);
-    }
-
-    /**
-     * [& colls]
-     */
-    public static ISeq lazyCat(Seqable... colls) throws Exception {
-        return (ISeq) lazyCat.applyTo(seq(colls));
     }
 }

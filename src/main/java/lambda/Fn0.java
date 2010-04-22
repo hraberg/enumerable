@@ -29,6 +29,14 @@ public abstract class Fn0<R> implements Serializable {
         };
     }
 
+    public static boolean isNotFalseOrNull(Object obj) {
+        return obj != FALSE && obj != null;
+    }
+
+    public static boolean isFalseOrNull(Object result) {
+        return !isNotFalseOrNull(result);
+    }
+
     public final int arity = 0;
 
     public abstract R call();
@@ -152,12 +160,12 @@ public abstract class Fn0<R> implements Serializable {
         return getClass().getName();
     }
 
-    public static boolean isNotFalseOrNull(Object obj) {
-        return obj != FALSE && obj != null;
-    }
-
-    public static boolean isFalseOrNull(Object result) {
-        return !isNotFalseOrNull(result);
+    public Fn0<Boolean> complement() {
+        return new Fn0<Boolean>() {
+            public Boolean call() {
+                return isFalseOrNull(Fn0.this.call());
+            }
+        };
     }
 
     public R unless(Fn0<Boolean> block) {
