@@ -90,6 +90,7 @@ If you add [`asm-all-3.2.jar`](http://forge.ow2.org/project/download.php?group_i
 
 * `lambda.weaving.debug` - will log to System.out and write all generated classes to disk if set to true.
 * `lambda.weaving.debug.classes.dir` - where to write the classes. Defaults to `target/generated-classes`.
+* `lambda.weaving.debug.dev` - will log lots of ASMified information about the transfromation to System.out if set to true.
 * `lambda.weaving.skipped.packages` - is a comma separated list of package prefixes to skip.
 
 ### LambdaParameter
@@ -109,14 +110,14 @@ Enumerable.java is not tied to the [Fn0](http://github.com/hraberg/enumerable/bl
 
     public class MyDomainLambdas {
         @NewLambda
-        public static <R> Callable<R> callable(Unused_ unused, R block) {
+        public static <R> Callable<R> callable(R block) {
             throw new LambdaWeavingNotEnabledException();
         }
     }
 
 This allows you to create a new anonymous instance of a *Callable* like this:
 
-    Callable<String> c = callable(_, "you called?");
+    Callable<String> c = callable("you called?");
 
 The call to the method marked with [@NewLambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/NewLambda.java) will be replaced with the creation of a new anonymous instance at runtime, as seen in the beginning of this document.
 
@@ -130,10 +131,6 @@ Alternatively, you can create an instance of any single abstract method interfac
     ActionListener a = delegate(event, out.printf(event + "\n"));
 
 This approach works best for functions which always take the same non generic type, like *ActionEvent* here.
-
-### Unused
-
-Note that the first parameter in the example above is marked as [Unused](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/Unused.java), this is required for functions that take no arguments to identify the start of the lambda.
 
 ### Proxies
 
@@ -154,7 +151,7 @@ Now only calls matching the regular expression and the specidifed argument types
 
 ### Default Parameter Values
 
-The second or third parameter to a Fn2 or Fn3 can have a default value:
+Parameters to a Fn1, Fn2 or Fn3 can have a default value:
 
     Fn2<Double, Double, Double> nTimesMorPI = fn(n, m = Math.PI, n * m);
     assert 2.0 * Math.PI == nTimesMorPI.call(2.0);
@@ -167,6 +164,10 @@ The class [LamdaOps](http://github.com/hraberg/enumerable/blob/master/src/main/j
 You need to have `jsr166y.jar` and `extra166y.jar` on your class path. They can be downloaded from the [Concurrency JSR-166 Interest Site](http://gee.cs.oswego.edu/dl/concurrency-interest/index.html). They can also be found in this repository in [`lib`](http://github.com/hraberg/enumerable/tree/master/lib/).
 
 The *LambdaOps* class is an example of a collection of static factory methods marked with *@NewLambda* as mentioned above. You can create your own factory classes in a similar way, Enumerable.java has no special support for the interfaces in [Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html).
+
+### Clojure Sequences
+
+The class [LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/LambdaClojure.java) allows you to create lambdas implementing interfaces from [clojure.lang.IFn]() to be used with [ClojureSeqz](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/ClojureSeqs.java). You need clojure-1.1.0.jar or later on your class path. Download from [clojure.org](http://www.clojure.org/).
 
 ## Implementation
 
@@ -205,7 +206,7 @@ Enumerable.java has 3 layers:
 
 #### lambda.weaving - transforms expressions into anonymous inner classes
 
-This layer uses ASM, and is directed by the annotations *@LambdaParameter*, and *@NewLambda* and the class *Unused* (for parameters). It's not coupled to the layer above, and you can build your own bridge layer by using these annotations.
+This layer uses ASM, and is directed by the annotations *@LambdaParameter* and *@NewLambda*. It's not coupled to the layer above, and you can build your own bridge layer by using these annotations.
 
 #### lambda - simple functional programming constructs
 
@@ -246,3 +247,5 @@ ASM 3.2 is Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](
 
 jsr166y and extra166y:
 Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and released to the public domain, as explained at http://creativecommons.org/licenses/publicdomain
+
+Clojure, Copyright Rich Hickey, released under the [EPL license](http://opensource.org/licenses/eclipse-1.0.php).

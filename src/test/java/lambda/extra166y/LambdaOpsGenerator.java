@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
 
 import lambda.annotation.NewLambda;
-import lambda.annotation.Unused;
 import lambda.exception.LambdaWeavingNotEnabledException;
 import extra166y.Ops;
 
@@ -19,7 +18,6 @@ class LambdaOpsGenerator {
         out.println("package lambda.extra166y;");
         out.println("");
         out.println("import " + NewLambda.class.getName() + ";");
-        out.println("import " + Unused.class.getName() + ";");
         out.println("import " + LambdaWeavingNotEnabledException.class.getName() + ";");
         out.println("import " + Ops.class.getName() + ".*;");
         out.println();
@@ -79,10 +77,6 @@ class LambdaOpsGenerator {
 
             Method op = anInterface.getMethods()[0];
             Class<?>[] parameterTypes = op.getParameterTypes();
-
-            if (parameterTypes.length == 0) {
-                out.print("Unused _, ");
-            }
 
             int arg = 1;
             int typeParameter = 0;

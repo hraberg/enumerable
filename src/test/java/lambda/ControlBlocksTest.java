@@ -1,6 +1,7 @@
 package lambda;
 
 import static lambda.Lambda.*;
+import static lambda.exception.UncheckedException.*;
 import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
@@ -24,9 +25,15 @@ public class ControlBlocksTest {
         assertEquals(5, i);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void unlessWithException() throws Exception {
+        String[] args = new String[0];
+        λ(raise(new IllegalArgumentException())).unless(λ(args.length > 0));
+    }
+
     @Test
     public void whileTrue() throws Exception {
-        int i = 1;
+        int i = 0;
         λ(i < 5).whileTrue(λ(i++));
         assertEquals(5, i);
     }

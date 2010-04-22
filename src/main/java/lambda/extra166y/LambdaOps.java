@@ -1,7 +1,6 @@
 package lambda.extra166y;
 
 import lambda.annotation.NewLambda;
-import lambda.annotation.Unused;
 import lambda.exception.LambdaWeavingNotEnabledException;
 import extra166y.Ops.*;
 
@@ -516,7 +515,7 @@ public class LambdaOps {
     }
 
     @NewLambda
-    public static Action action(Unused _, Object block) {
+    public static Action action(Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -531,7 +530,7 @@ public class LambdaOps {
     }
 
     @NewLambda
-    public static DoubleGenerator op(Unused _, double block) {
+    public static DoubleGenerator op(double block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -571,7 +570,7 @@ public class LambdaOps {
     }
 
     @NewLambda
-    public static LongGenerator op(Unused _, long block) {
+    public static LongGenerator op(long block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -616,7 +615,7 @@ public class LambdaOps {
     }
 
     @NewLambda
-    public static IntGenerator op(Unused _, int block) {
+    public static IntGenerator op(int block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -646,7 +645,7 @@ public class LambdaOps {
     }
 
     @NewLambda
-    public static <R> Generator<R> op(Unused _, R block) {
+    public static <R> Generator<R> op(R block) {
         throw new LambdaWeavingNotEnabledException();
     }
 

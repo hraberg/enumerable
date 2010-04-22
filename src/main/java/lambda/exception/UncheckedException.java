@@ -18,6 +18,13 @@ public class UncheckedException extends RuntimeException {
 
     Throwable wrapped;
 
+    /**
+     * Convenience method to throw exceptions from lambdas.
+     */
+    public static Exception raise(Exception e) throws RuntimeException {
+        throw uncheck(e);
+    }
+
     public static RuntimeException uncheck(Throwable t) {
         if (t.getCause() != null)
             return uncheck(t.getCause());
