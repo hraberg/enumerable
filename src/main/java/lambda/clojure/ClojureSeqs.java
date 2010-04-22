@@ -256,7 +256,7 @@ public class ClojureSeqs {
     /**
      * [pred coll]
      */
-    public static IPersistentVector split_with(IFn pred, Seqable coll) throws Exception {
+    public static IPersistentVector splitWith(IFn pred, Seqable coll) throws Exception {
         return (IPersistentVector) splitWith.invoke(pred, coll);
     }
 
