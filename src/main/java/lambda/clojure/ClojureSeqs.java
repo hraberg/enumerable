@@ -15,7 +15,9 @@ import clojure.lang.Seqable;
 import clojure.lang.Var;
 
 /**
- * Facade for Clojure's Sequence library.
+ * Facade for Clojure's Sequence library, used together with
+ * {@link clojure.lang.RT} and {@link LambdaClojure}, which provides
+ * Enumerable.java lambdas implementing {@link IFn}.
  * <p>
  * <i>This file was originally generated, but has been edited by hand.</i>
  */
