@@ -90,27 +90,30 @@ public class ClojureTest {
 
         ISeq mapcat = (mapcat(fn(n, m, list(n * m)), list(2, 4), list(3, 6)));
         assertEquals(list(6, 24), mapcat);
+
+        ISeq pmap = (pmap(fn(n, m, n * m), list(2, 4), list(3, 6)));
+        assertEquals(list(6, 24), pmap);
     }
 
     @Test
     public void interactingWithClojure() throws Exception {
-        eval("(def v [1 2 3 4 5])");
-        IPersistentVector v = eval("v");
+        _("(def v [1 2 3 4 5])");
+        IPersistentVector v = _("v");
 
         defn("times", fn(n, m, n * m));
-        IFn times = eval("times");
+        IFn times = _("times");
 
         int factorial = 120;
         assertEquals(factorial, (reduce(times, 1, v)));
-        assertEquals(factorial, eval(reduce, times, 1, v));
-        assertEquals(factorial, eval("(reduce times 1 v)"));
+        assertEquals(factorial, _(reduce, times, 1, v));
+        assertEquals(factorial, _("(reduce times 1 v)"));
 
-        IFn isOdd = eval("odd?");
+        IFn isOdd = _("odd?");
 
         ISeq odd = list(1, 3, 5);
         assertEquals(odd, (filter(isOdd, v)));
-        assertEquals(odd, eval(filter, isOdd, v));
-        assertEquals(odd, eval("(filter odd? v)"));
+        assertEquals(odd, _(filter, isOdd, v));
+        assertEquals(odd, _("(filter odd? v)"));
     }
 
     @Before

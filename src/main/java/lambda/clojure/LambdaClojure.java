@@ -3,6 +3,7 @@ package lambda.clojure;
 import static clojure.lang.Compiler.*;
 import static clojure.lang.RT.*;
 import static java.util.Arrays.*;
+import static lambda.exception.UncheckedException.*;
 
 import java.io.StringReader;
 
@@ -33,28 +34,60 @@ public class LambdaClojure {
      * Var square = defn(&quot;square&quot;, fn(n, n * n));
      * </pre>
      */
-    public static Var defn(String name, IFn body) throws Exception {
-        return var(CURRENT_NS.get().toString(), name, body);
+    public static Var defn(String name, IFn body) {
+        try {
+            return var(CURRENT_NS.get().toString(), name, body);
+        } catch (Exception e) {
+            throw uncheck(e);
+        }
     }
 
     /**
-     * Turns the array of forms into a {@link PersistentList} and evaluates them
-     * using Clojure's {@link clojure.lang.Compiler}.
+     * Turns the array of forms into a {@link PersistentList} and evaluates it
+     * using {@link clojure.lang.Compiler}.
      * <p>
      * The objects must be forms Clojure understands, basically anything the
      * {@link LispReader} can produce.
      */
     @SuppressWarnings("unchecked")
-    public static <R> R eval(Object... forms) throws Exception {
-        return (R) clojure.lang.Compiler.eval(PersistentList.create(asList(forms)));
+    public static <R> R eval(Object... forms) {
+        try {
+            return (R) clojure.lang.Compiler.eval(PersistentList.create(asList(forms)));
+        } catch (Exception e) {
+            throw uncheck(e);
+        }
     }
 
     /**
-     * Evaluates the code using Clojure's {@link clojure.lang.Compiler}.
+     * @see #eval(Object...)
      */
     @SuppressWarnings("unchecked")
-    public static <R> R eval(String code) throws Exception {
-        return (R) load(new StringReader(code));
+    public static <R> R _(Object... forms) {
+        return (R) eval(forms);
+    }
+
+    /**
+     * Evaluates the code using {@link clojure.lang.Compiler}. s
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R eval(String code) {
+        try {
+            return (R) load(new StringReader(code));
+        } catch (Exception e) {
+            throw uncheck(e);
+        }
+    }
+
+    /**
+     * @see #eval(String)
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R _(String code) {
+        try {
+            return (R) eval(code);
+        } catch (Exception e) {
+            throw uncheck(e);
+        }
     }
 
     public static abstract class AFn0<R> extends AFunction {
