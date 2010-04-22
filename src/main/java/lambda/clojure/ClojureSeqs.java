@@ -46,7 +46,7 @@ public class ClojureSeqs {
 
     static void init() {
         try {
-            if (CURRENT_NS.deref() == CLOJURE_NS)
+            if (CURRENT_NS.get() == CLOJURE_NS)
                 CURRENT_NS.doReset(Namespace.findOrCreate(Symbol.create("user")));
         } catch (Exception e) {
             throw uncheck(e);
@@ -281,7 +281,7 @@ public class ClojureSeqs {
      * [f start coll]
      */
     @SuppressWarnings("unchecked")
-    public static <R> R reduce(IFn f, Object start, Seqable coll) {
+    public static <R> R reduce(IFn f, R start, Seqable coll) {
         try {
             return (R) reduce.invoke(f, start, coll);
         } catch (Exception e) {

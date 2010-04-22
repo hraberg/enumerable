@@ -97,23 +97,23 @@ public class ClojureTest {
 
     @Test
     public void interactingWithClojure() throws Exception {
-        _("(def v [1 2 3 4 5])");
-        IPersistentVector v = _("v");
+        eval("(def v [1 2 3 4 5])");
+        IPersistentVector v = eval("v");
 
         defn("times", fn(n, m, n * m));
-        IFn times = _("times");
+        IFn times = eval("times");
 
-        int factorial = 120;
+        Integer factorial = 120;
         assertEquals(factorial, (reduce(times, 1, v)));
-        assertEquals(factorial, _(reduce, times, 1, v));
-        assertEquals(factorial, _("(reduce times 1 v)"));
+        assertEquals(factorial, eval(reduce, times, 1, v));
+        assertEquals(factorial, eval("(reduce times 1 v)"));
 
-        IFn isOdd = _("odd?");
+        IFn isOdd = eval("odd?");
 
         ISeq odd = list(1, 3, 5);
         assertEquals(odd, (filter(isOdd, v)));
-        assertEquals(odd, _(filter, isOdd, v));
-        assertEquals(odd, _("(filter odd? v)"));
+        assertEquals(odd, eval(filter, isOdd, v));
+        assertEquals(odd, eval("(filter odd? v)"));
     }
 
     @Before

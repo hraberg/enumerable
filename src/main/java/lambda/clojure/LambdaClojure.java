@@ -67,7 +67,7 @@ public class LambdaClojure {
     }
 
     /**
-     * Evaluates the code using {@link clojure.lang.Compiler}. s
+     * Evaluates the code using {@link clojure.lang.Compiler}.
      */
     @SuppressWarnings("unchecked")
     public static <R> R eval(String code) {
