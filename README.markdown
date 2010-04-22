@@ -167,7 +167,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Clojure Sequences
 
-The class [LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/LambdaClojure.java) allows you to create lambdas implementing interfaces from [clojure.lang.IFn]() to be used with [ClojureSeqz](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/ClojureSeqs.java). You need clojure-1.1.0.jar or later on your class path. Download from [clojure.org](http://www.clojure.org/).
+The class [LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/LambdaClojure.java) allows you to create lambdas implementing interfaces from [clojure.lang.IFn](http://github.com/richhickey/clojure/blob/1.1.0/src/jvm/clojure/lang/IFn.java) to be used with [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/ClojureSeqs.java). You need clojure-1.1.0.jar or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
 
 ## Implementation
 
