@@ -91,6 +91,11 @@ public class EnumerableOneEightTest extends TestBase {
     }
 
     @Test
+    public void collectElementsToDifferentTypeUsingSuperTypeBlock() throws Exception {
+        assertEquals(list("#1", "#2", "#3", "#4", "#5"), collect(oneToFive, λ(obj, "#" + obj)));
+    }
+
+    @Test
     public void selectMatchingMapEntries() throws Exception {
         List<Entry<String, Integer>> selected = select(stringsToInts, λ(s, n, n % 2 == 0));
         assertEquals(1, selected.size());
@@ -167,6 +172,11 @@ public class EnumerableOneEightTest extends TestBase {
     @Test
     public void anyNotNull() throws Exception {
         assertTrue(any(list("hello", null), λ(s, s)));
+    }
+
+    @Test
+    public void anyNotNullUsingSuperTypeblock() throws Exception {
+        assertTrue(any(list("hello", null), λ(obj, obj)));
     }
 
     @Test

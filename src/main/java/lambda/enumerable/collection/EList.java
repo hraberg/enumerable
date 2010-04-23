@@ -25,15 +25,15 @@ public class EList<E> extends ECollection<E> implements List<E> {
         new ArrayList<E>(length);
     }
 
-    public <R> EList<E> each(Fn1<E, R> block) {
+    public <R> EList<E> each(Fn1<? super E, R> block) {
         return (EList<E>) super.each(block);
     }
 
-    public <R> EList<E> eachWithIndex(Fn2<E, Integer, R> block) {
+    public <R> EList<E> eachWithIndex(Fn2<? super E, Integer, R> block) {
         return (EList<E>) super.eachWithIndex(block);
     }
 
-    public <R> EList<E> reverseEach(Fn1<E, R> block) {
+    public <R> EList<E> reverseEach(Fn1<? super E, R> block) {
         return (EList<E>) super.reverseEach(block);
     }
 

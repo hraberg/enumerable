@@ -25,17 +25,17 @@ public class EMap<K, V> extends EnumerableModule<Map.Entry<K, V>> implements Map
     }
 
     @SuppressWarnings("unchecked")
-    public <R> EMap<K, V> each(Fn1<Map.Entry<K, V>, R> block) {
+    public <R> EMap<K, V> each(Fn1<? super Map.Entry<K, V>, R> block) {
         return (EMap<K, V>) super.each(block);
     }
 
     @SuppressWarnings("unchecked")
-    public <R> EMap<K, V> eachWithIndex(Fn2<Map.Entry<K, V>, Integer, R> block) {
+    public <R> EMap<K, V> eachWithIndex(Fn2<? super Map.Entry<K, V>, Integer, R> block) {
         return (EMap<K, V>) super.eachWithIndex(block);
     }
 
     @SuppressWarnings("unchecked")
-    public <R> EMap<K, V> reverseEach(Fn1<Map.Entry<K, V>, R> block) {
+    public <R> EMap<K, V> reverseEach(Fn1<? super Map.Entry<K, V>, R> block) {
         return (EMap<K, V>) super.reverseEach(block);
     }
 
@@ -51,25 +51,25 @@ public class EMap<K, V> extends EnumerableModule<Map.Entry<K, V>> implements Map
         return new ECollection<V>(map.values());
     }
 
-    public <R> EMap<K, V> each(Fn2<K, V, R> block) {
+    public <R> EMap<K, V> each(Fn2<? super K, ? super V, R> block) {
         for (Entry<K, V> each : this)
             block.call(each.getKey(), each.getValue());
         return this;
     }
 
-    public <R> EMap<K, V> eachKey(Fn1<K, R> block) {
+    public <R> EMap<K, V> eachKey(Fn1<? super K, R> block) {
         for (K each : map.keySet())
             block.call(each);
         return this;
     }
 
-    public <R> EMap<K, V> eachValue(Fn1<V, R> block) {
+    public <R> EMap<K, V> eachValue(Fn1<? super V, R> block) {
         for (V each : map.values())
             block.call(each);
         return this;
     }
 
-    public EList<java.util.Map.Entry<K, V>> select(Fn2<K, V, Boolean> block) {
+    public EList<java.util.Map.Entry<K, V>> select(Fn2<? super K, ? super V, Boolean> block) {
         EList<Map.Entry<K, V>> result = new EList<Map.Entry<K, V>>();
         for (Map.Entry<K, V> each : this)
             if (block.call(each.getKey(), each.getValue()))

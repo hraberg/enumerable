@@ -57,21 +57,21 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return new EMap<K, V>(map);
     }
 
-    public boolean all(Fn1<E, ?> block) {
+    public boolean all(Fn1<? super E, ?> block) {
         for (E each : this)
             if (isFalseOrNull(block.call(each)))
                 return false;
         return true;
     }
 
-    public boolean any(Fn1<E, ?> block) {
+    public boolean any(Fn1<? super E, ?> block) {
         for (E each : this)
             if (isNotFalseOrNull(block.call(each)))
                 return true;
         return false;
     }
 
-    public <R> EList<R> collect(Fn1<E, R> block) {
+    public <R> EList<R> collect(Fn1<? super E, R> block) {
         EList<R> result = new EList<R>();
         for (E each : this)
             result.add(block.call(each));
@@ -96,11 +96,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return count;
     }
 
-    public int count(Fn1<E, Boolean> block) {
+    public int count(Fn1<? super E, Boolean> block) {
         return select(block).size();
     }
 
-    public <R> EList<E> cycle(int times, Fn1<E, R> block) {
+    public <R> EList<E> cycle(int times, Fn1<? super E, R> block) {
         EList<E> result = new EList<E>();
         while (times-- > 0)
             for (E each : this)
@@ -108,11 +108,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result.each(block);
     }
 
-    public E detect(Fn1<E, Boolean> block) {
+    public E detect(Fn1<? super E, Boolean> block) {
         return detect(null, block);
     }
 
-    public E detect(Fn0<E> ifNone, Fn1<E, Boolean> block) {
+    public E detect(Fn0<E> ifNone, Fn1<? super E, Boolean> block) {
         for (E each : this)
             if (block.call(each))
                 return each;
@@ -129,7 +129,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    public EList<E> dropWhile(Fn1<E, Boolean> block) {
+    public EList<E> dropWhile(Fn1<? super E, Boolean> block) {
         EList<E> result = new EList<E>();
         for (E next : this)
             if (!result.isEmpty() || !block.call(next))
@@ -137,7 +137,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    public <R> EnumerableModule<E> each(Fn1<E, R> block) {
+    public <R> EnumerableModule<E> each(Fn1<? super E, R> block) {
         for (E each : this)
             block.call(each);
         return this;
@@ -161,14 +161,14 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return null;
     }
 
-    public <R> EnumerableModule<E> eachWithIndex(Fn2<E, Integer, R> block) {
+    public <R> EnumerableModule<E> eachWithIndex(Fn2<? super E, Integer, R> block) {
         int i = 0;
         for (E each : this)
             block.call(each, i++);
         return this;
     }
 
-    public <M, R> M eachWithObject(M memo, Fn2<E, M, R> block) {
+    public <M, R> M eachWithObject(M memo, Fn2<? super E, M, R> block) {
         for (E each : this)
             block.call(each, memo);
         return memo;
@@ -178,19 +178,19 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return toList();
     }
 
-    public E find(Fn1<E, Boolean> block) {
+    public E find(Fn1<? super E, Boolean> block) {
         return detect(block);
     }
 
-    public E find(Fn0<E> ifNone, Fn1<E, Boolean> block) {
+    public E find(Fn0<E> ifNone, Fn1<? super E, Boolean> block) {
         return detect(ifNone, block);
     }
 
-    public EList<E> findAll(Fn1<E, Boolean> block) {
+    public EList<E> findAll(Fn1<? super E, Boolean> block) {
         return select(block);
     }
 
-    public int findIndex(Fn1<E, Boolean> block) {
+    public int findIndex(Fn1<? super E, Boolean> block) {
         int index = 0;
         for (E each : this)
             if (block.call(each))
@@ -220,7 +220,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return grep(pattern, Fn1.<E> identity());
     }
 
-    public <R> EList<R> grep(Pattern pattern, Fn1<E, R> block) {
+    public <R> EList<R> grep(Pattern pattern, Fn1<? super E, R> block) {
         EList<R> result = new EList<R>();
         for (E each : this)
             if (pattern.matcher(each.toString()).matches())
@@ -232,11 +232,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return grep(Pattern.compile(pattern));
     }
 
-    public <R> EList<R> grep(String pattern, Fn1<E, R> block) {
+    public <R> EList<R> grep(String pattern, Fn1<? super E, R> block) {
         return grep(Pattern.compile(pattern), block);
     }
 
-    public <R> EMap<R, EList<E>> groupBy(Fn1<E, R> block) {
+    public <R> EMap<R, EList<E>> groupBy(Fn1<? super E, R> block) {
         EMap<R, EList<E>> result = new EMap<R, EList<E>>();
         for (E each : this) {
             R key = block.call(each);
@@ -276,7 +276,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return initial;
     }
 
-    public <R> EList<R> map(Fn1<E, R> block) {
+    public <R> EList<R> map(Fn1<? super E, R> block) {
         return collect(block);
     }
 
@@ -286,11 +286,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     @SuppressWarnings("unchecked")
-    public E max(Fn2<E, E, Integer> block) {
+    public E max(Fn2<? super E, ? super E, Integer> block) {
         return min(reverseOrder((Comparator<E>) block.as(Comparator.class)));
     }
 
-    public <R extends Object & Comparable<? super R>> E maxBy(Fn1<E, R> block) {
+    public <R extends Object & Comparable<? super R>> E maxBy(Fn1<? super E, R> block) {
         return min(reverseOrder(new BlockResultComparator<E, R>(block)));
     }
 
@@ -304,11 +304,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     @SuppressWarnings("unchecked")
-    public E min(Fn2<E, E, Integer> block) {
+    public E min(Fn2<? super E, ? super E, Integer> block) {
         return min((Comparator<E>) block.as(Comparator.class));
     }
 
-    public <R extends Object & Comparable<? super R>> E minBy(Fn1<E, R> block) {
+    public <R extends Object & Comparable<? super R>> E minBy(Fn1<? super E, R> block) {
         return min(new BlockResultComparator<E, R>(block));
     }
 
@@ -319,25 +319,25 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    public EList<E> minMax(Fn2<E, E, Integer> block) {
+    public EList<E> minMax(Fn2<? super E, ? super E, Integer> block) {
         EList<E> result = new EList<E>();
         result.add(min(block));
         result.add(max(block));
         return result;
     }
 
-    public <R extends Object & Comparable<? super R>> EList<E> minMaxBy(Fn1<E, R> block) {
+    public <R extends Object & Comparable<? super R>> EList<E> minMaxBy(Fn1<? super E, R> block) {
         EList<E> result = new EList<E>();
         result.add(minBy(block));
         result.add(maxBy(block));
         return result;
     }
 
-    public boolean none(Fn1<E, ?> block) {
+    public boolean none(Fn1<? super E, ?> block) {
         return !any(block);
     }
 
-    public boolean one(Fn1<E, ?> block) {
+    public boolean one(Fn1<? super E, ?> block) {
         Object match = null;
         for (E each : this) {
             Object result = block.call(each);
@@ -350,7 +350,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return match != null;
     }
 
-    public EList<EList<E>> partition(Fn1<E, Boolean> block) {
+    public EList<EList<E>> partition(Fn1<? super E, Boolean> block) {
         EList<E> selected = new EList<E>();
         EList<E> rejected = new EList<E>();
         for (E each : this)
@@ -372,7 +372,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return inject(initial, block);
     }
 
-    public EList<E> reject(Fn1<E, Boolean> block) {
+    public EList<E> reject(Fn1<? super E, Boolean> block) {
         EList<E> result = new EList<E>();
         for (E each : this)
             if (!block.call(each))
@@ -380,25 +380,17 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    public <R> EnumerableModule<E> reverseEach(Fn1<E, R> block) {
+    public <R> EnumerableModule<E> reverseEach(Fn1<? super E, R> block) {
         List<E> result = asNewList();
         Collections.reverse(result);
         new EList<E>(result).each(block);
         return this;
     }
 
-    public EList<E> select(Fn1<E, Boolean> block) {
+    public EList<E> select(Fn1<? super E, Boolean> block) {
         EList<E> result = new EList<E>();
         for (E each : this)
             if (block.call(each))
-                result.add(each);
-        return result;
-    }
-
-    public <K, V> EList<Map.Entry<K, V>> select(Map<K, V> map, Fn2<K, V, Boolean> block) {
-        EList<Map.Entry<K, V>> result = new EList<Map.Entry<K, V>>();
-        for (Map.Entry<K, V> each : map.entrySet())
-            if (block.call(each.getKey(), each.getValue()))
                 result.add(each);
         return result;
     }
@@ -408,11 +400,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     @SuppressWarnings("unchecked")
-    public EList<E> sort(Fn2<E, E, Integer> block) {
+    public EList<E> sort(Fn2<? super E, ? super E, Integer> block) {
         return sort(block.as(Comparator.class));
     }
 
-    public <R extends Object & Comparable<? super R>> EList<E> sortBy(final Fn1<E, R> block) {
+    public <R extends Object & Comparable<? super R>> EList<E> sortBy(final Fn1<? super E, R> block) {
         return sortBySchwartzianTransform(block);
     }
 
@@ -428,7 +420,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    public EList<E> takeWhile(Fn1<E, Boolean> block) {
+    public EList<E> takeWhile(Fn1<? super E, Boolean> block) {
         EList<E> result = new EList<E>();
         for (E next : this)
             if (block.call(next))
@@ -446,7 +438,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return new ESet<E>(new HashSet<E>(asNewList()));
     }
 
-    public <R> ESet<R> toSet(Fn1<E, R> block) {
+    public <R> ESet<R> toSet(Fn1<? super E, R> block) {
         return new ESet<R>(new HashSet<R>(collect(block)));
     }
 
@@ -483,7 +475,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    E min(Comparator<E> comparator) {
+    E min(Comparator<? super E> comparator) {
         E result = null;
         for (E each : this)
             if (result == null || comparator.compare(each, result) < 0)
@@ -491,7 +483,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    EList<E> sort(Comparator<E> comparator) {
+    EList<E> sort(Comparator<? super E> comparator) {
         List<E> result = asNewList();
         Collections.sort(result, comparator);
         return new EList<E>(result);
@@ -512,7 +504,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     @SuppressWarnings("unchecked")
-    <R extends Object & Comparable<? super R>> EList<E> sortBySchwartzianTransform(Fn1<E, R> block) {
+    <R extends Object & Comparable<? super R>> EList<E> sortBySchwartzianTransform(Fn1<? super E, R> block) {
         EList<Pair<R>> pairs = new EList<Pair<R>>();
         for (E each : this)
             pairs.add(new Pair<R>(block.call(each), each));
@@ -526,9 +518,9 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     static class BlockResultComparator<E, R extends Object & Comparable<? super R>> implements Comparator<E> {
-        Fn1<E, R> block;
+        Fn1<? super E, R> block;
 
-        BlockResultComparator(Fn1<E, R> block) {
+        BlockResultComparator(Fn1<? super E, R> block) {
             this.block = block;
         }
 
@@ -539,9 +531,9 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     static class CachedBlockResultComparator<E, R extends Object & Comparable<? super R>> implements Comparator<E> {
         Map<E, R> cache = new HashMap<E, R>();
-        Fn1<E, R> block;
+        Fn1<? super E, R> block;
 
-        CachedBlockResultComparator(Fn1<E, R> block) {
+        CachedBlockResultComparator(Fn1<? super E, R> block) {
             this.block = block;
         }
 

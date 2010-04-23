@@ -19,15 +19,15 @@ public class ESet<E> extends ECollection<E> implements Set<E> {
         super(set);
     }
 
-    public <R> ESet<E> each(Fn1<E, R> block) {
+    public <R> ESet<E> each(Fn1<? super E, R> block) {
         return (ESet<E>) super.each(block);
     }
 
-    public <R> ESet<E> eachWithIndex(Fn2<E, Integer, R> block) {
+    public <R> ESet<E> eachWithIndex(Fn2<? super E, Integer, R> block) {
         return (ESet<E>) super.eachWithIndex(block);
     }
 
-    public <R> ESet<E> reverseEach(Fn1<E, R> block) {
+    public <R> ESet<E> reverseEach(Fn1<? super E, R> block) {
         return (ESet<E>) super.reverseEach(block);
     }
 

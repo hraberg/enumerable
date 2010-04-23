@@ -20,8 +20,6 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 @SuppressWarnings("serial")
 public class LambdaJRuby {
-    public static Ruby ruby = Ruby.getGlobalRuntime();
-
     public abstract static class RubyProcFnBase extends RubyProc {
         class FnBlockCallback implements BlockCallback {
             public IRubyObject call(ThreadContext context, IRubyObject[] args, Block block) {
@@ -30,21 +28,24 @@ public class LambdaJRuby {
 
                 if (args.length == 0)
                     result = RubyProcFnBase.this.call();
-                if (args.length == 1)
+
+                else if (args.length == 1)
                     result = RubyProcFnBase.this.call(rubyToJava(args[0]));
-                if (args.length == 2)
+
+                else if (args.length == 2)
                     result = RubyProcFnBase.this.call(rubyToJava(args[0]), rubyToJava(args[1]));
-                if (args.length == 3)
+
+                else if (args.length == 3)
                     result = RubyProcFnBase.this
                             .call(rubyToJava(args[0]), rubyToJava(args[1]), rubyToJava(args[2]));
 
-                return javaToRuby(ruby, result);
+                return javaToRuby(getRuntime(), result);
             }
         }
 
-        public RubyProcFnBase(Arity arity) {
-            super(ruby, ruby.getProc(), Block.Type.LAMBDA);
-            ThreadContext context = ruby.getThreadService().getCurrentContext();
+        public RubyProcFnBase(Ruby runtime, Arity arity) {
+            super(runtime, runtime.getProc(), Block.Type.LAMBDA);
+            ThreadContext context = getRuntime().getThreadService().getCurrentContext();
             initialize(context, CallBlock.newCallClosure(this, getType(), arity, new FnBlockCallback(), context));
         }
 
@@ -67,7 +68,7 @@ public class LambdaJRuby {
 
     public static abstract class RubyProcFn0 extends RubyProcFnBase {
         public RubyProcFn0() {
-            super(Arity.NO_ARGUMENTS);
+            super(Ruby.getGlobalRuntime(), Arity.NO_ARGUMENTS);
         }
 
         public abstract Object call();
@@ -75,7 +76,7 @@ public class LambdaJRuby {
 
     public static abstract class RubyProcFn1 extends RubyProcFnBase {
         public RubyProcFn1() {
-            super(Arity.ONE_REQUIRED);
+            super(Ruby.getGlobalRuntime(), Arity.ONE_REQUIRED);
         }
 
         public abstract Object call(Object arg0);
@@ -83,7 +84,7 @@ public class LambdaJRuby {
 
     public static abstract class RubyProcFn2 extends RubyProcFnBase {
         public RubyProcFn2() {
-            super(Arity.TWO_REQUIRED);
+            super(Ruby.getGlobalRuntime(), Arity.TWO_REQUIRED);
         }
 
         public abstract Object call(Object arg0, Object arg1);
@@ -91,7 +92,7 @@ public class LambdaJRuby {
 
     public static abstract class RubyProcFn3 extends RubyProcFnBase {
         public RubyProcFn3() {
-            super(Arity.THREE_REQUIRED);
+            super(Ruby.getGlobalRuntime(), Arity.THREE_REQUIRED);
         }
 
         public abstract Object call(Object arg0, Object arg1, Object arg2);
@@ -136,6 +137,7 @@ public class LambdaJRuby {
         return new Fn0<Object>() {
             public Object call() {
                 try {
+                    Ruby ruby = proc.getRuntime();
                     return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[0]));
                 } catch (Exception e) {
                     throw uncheck(e);
@@ -151,6 +153,7 @@ public class LambdaJRuby {
         return new Fn1<Object, Object>() {
             public Object call(Object a1) {
                 try {
+                    Ruby ruby = proc.getRuntime();
                     return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(),
                             new IRubyObject[] { javaToRuby(ruby, a1) }));
                 } catch (Exception e) {
@@ -167,6 +170,7 @@ public class LambdaJRuby {
         return new Fn2<Object, Object, Object>() {
             public Object call(Object a1, Object a2) {
                 try {
+                    Ruby ruby = proc.getRuntime();
                     return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
                             javaToRuby(ruby, a1), javaToRuby(ruby, a2) }));
                 } catch (Exception e) {
@@ -183,6 +187,7 @@ public class LambdaJRuby {
         return new Fn3<Object, Object, Object, Object>() {
             public Object call(Object a1, Object a2, Object a3) {
                 try {
+                    Ruby ruby = proc.getRuntime();
                     return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
                             javaToRuby(ruby, a1), javaToRuby(ruby, a2), javaToRuby(ruby, a3) }));
                 } catch (Exception e) {

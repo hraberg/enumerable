@@ -19,15 +19,15 @@ public class ECollection<E> extends EIterable<E> implements Collection<E> {
         super(collection);
     }
 
-    public <R> ECollection<E> each(Fn1<E, R> block) {
+    public <R> ECollection<E> each(Fn1<? super E, R> block) {
         return (ECollection<E>) super.each(block);
     }
 
-    public <R> ECollection<E> eachWithIndex(Fn2<E, Integer, R> block) {
+    public <R> ECollection<E> eachWithIndex(Fn2<? super E, Integer, R> block) {
         return (ECollection<E>) super.eachWithIndex(block);
     }
 
-    public <R> ECollection<E> reverseEach(Fn1<E, R> block) {
+    public <R> ECollection<E> reverseEach(Fn1<? super E, R> block) {
         return (ECollection<E>) super.reverseEach(block);
     }
 

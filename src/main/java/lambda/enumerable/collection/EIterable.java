@@ -16,15 +16,15 @@ public class EIterable<E> extends EnumerableModule<E> {
         this.iterable = iterable;
     }
 
-    public <R> EIterable<E> each(Fn1<E, R> block) {
+    public <R> EIterable<E> each(Fn1<? super E, R> block) {
         return (EIterable<E>) super.each(block);
     }
 
-    public <R> EIterable<E> eachWithIndex(Fn2<E, Integer, R> block) {
+    public <R> EIterable<E> eachWithIndex(Fn2<? super E, Integer, R> block) {
         return (EIterable<E>) super.eachWithIndex(block);
     }
 
-    public <R> EIterable<E> reverseEach(Fn1<E, R> block) {
+    public <R> EIterable<E> reverseEach(Fn1<? super E, R> block) {
         return (EIterable<E>) super.reverseEach(block);
     }
 
