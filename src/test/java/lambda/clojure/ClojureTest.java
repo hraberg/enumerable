@@ -154,8 +154,9 @@ public class ClojureTest {
 
     @Test
     public void interactingWithJRuby() throws Exception {
-        JRubyEngine instance = JRubyTest.getJRubyEngine();
-        RubyProc proc = (RubyProc) instance.eval("lambda {|n, m| n * m}");
+        JRubyEngine rb = JRubyTest.getJRubyEngine();
+
+        RubyProc proc = (RubyProc) rb.eval("lambda {|n, m| n * m}");
         IFn times = toIFn(LambdaJRuby.toFn2(proc));
 
         assertEquals(120L, reduce(times, list(1, 2, 3, 4, 5)));

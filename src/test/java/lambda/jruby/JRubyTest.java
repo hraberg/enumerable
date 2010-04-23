@@ -10,6 +10,7 @@ import java.util.List;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import lambda.Fn1;
 import lambda.Lambda;
 import lambda.clojure.LambdaClojure;
 import lambda.enumerable.Enumerable;
@@ -25,10 +26,10 @@ import clojure.lang.IFn;
 public class JRubyTest {
     @Test
     public void interactingWithJRuby() throws ScriptException {
-        JRubyEngine engine = getJRubyEngine();
+        JRubyEngine rb = getJRubyEngine();
 
-        engine.put("block", lambda(n, n * 2));
-        assertEquals(asList(2L, 4L, 6L), engine.eval("[1, 2, 3].collect &block"));
+        rb.put("block", lambda(n, n * 2));
+        assertEquals(asList(2L, 4L, 6L), rb.eval("[1, 2, 3].collect &block"));
     }
 
     @Test
@@ -42,32 +43,32 @@ public class JRubyTest {
 
     @Test
     public void convertRubyProcToFn() throws ScriptException {
-        JRubyEngine engine = getJRubyEngine();
+        JRubyEngine rb = getJRubyEngine();
 
-        RubyProc proc = (RubyProc) engine.eval("lambda {|s| s.upcase}");
+        RubyProc proc = (RubyProc) rb.eval("lambda {|s| s.upcase}");
         assertEquals("HELLO", toFn1(proc).call("hello"));
     }
 
     @Test
     public void convertRubyMethodProcToFn() throws ScriptException {
-        JRubyEngine engine = getJRubyEngine();
+        JRubyEngine rb = getJRubyEngine();
 
-        RubyProc proc = (RubyProc) engine.eval("(\"hello\".method :upcase).to_proc");
+        RubyProc proc = (RubyProc) rb.eval("(\"hello\".method :upcase).to_proc");
         assertEquals("HELLO", toFn0(proc).call());
     }
 
     @Test
     public void interactingWithEnumerableJava() throws Exception {
-        JRubyEngine engine = getJRubyEngine();
+        JRubyEngine rb = getJRubyEngine();
 
         List<Integer> list = asList(1, 2, 3);
-        assertEquals(asList(2L, 4L, 6L), Enumerable.collect(list, toFn1((RubyProc) engine
-                .eval("lambda {|n| n * 2}"))));
+        Fn1<Object, Object> block = toFn1((RubyProc) rb.eval("lambda {|n| n * 2}"));
+        assertEquals(asList(2L, 4L, 6L), Enumerable.collect(list, block));
     }
 
     @Test
     public void interactingWithClojure() throws Exception {
-        JRubyEngine engine = getJRubyEngine();
+        JRubyEngine rb = getJRubyEngine();
         Ruby ruby = Ruby.getGlobalRuntime();
 
         IFn star = LambdaClojure.eval("*");
@@ -76,8 +77,8 @@ public class JRubyTest {
         assertEquals(ruby.newFixnum(6), proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
                 ruby.newFixnum(3), ruby.newFixnum(2) }));
 
-        engine.put("block", proc);
-        assertEquals(120L, engine.eval("[1, 2, 3, 4, 5].inject &block"));
+        rb.put("block", proc);
+        assertEquals(120L, rb.eval("[1, 2, 3, 4, 5].inject &block"));
     }
 
     public static JRubyEngine getJRubyEngine() {
