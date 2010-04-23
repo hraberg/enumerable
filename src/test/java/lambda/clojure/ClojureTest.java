@@ -11,7 +11,11 @@ import javax.script.ScriptException;
 
 import lambda.Lambda;
 import lambda.enumerable.Enumerable;
+import lambda.jruby.JRubyTest;
+import lambda.jruby.LambdaJRuby;
 
+import org.jruby.RubyProc;
+import org.jruby.embed.jsr223.JRubyEngine;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -146,6 +150,15 @@ public class ClojureTest {
         IFn star = eval("*");
 
         assertEquals(120, Enumerable.inject(v, 1, toFn2(star)));
+    }
+
+    @Test
+    public void interactingWithJRuby() throws Exception {
+        JRubyEngine instance = JRubyTest.getJRubyEngine();
+        RubyProc proc = (RubyProc) instance.eval("lambda {|n, m| n * m}");
+        IFn times = toIFn(LambdaJRuby.toFn2(proc));
+
+        assertEquals(120L, reduce(times, list(1, 2, 3, 4, 5)));
     }
 
     @Before

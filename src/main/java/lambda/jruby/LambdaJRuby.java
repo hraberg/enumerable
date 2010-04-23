@@ -26,6 +26,8 @@ public class LambdaJRuby {
         class FnBlockCallback implements BlockCallback {
             public IRubyObject call(ThreadContext context, IRubyObject[] args, Block block) {
                 Object result = null;
+                args = getBlock().getBody().prepareArgumentsForCall(context, args, Block.Type.NORMAL);
+
                 if (args.length == 0)
                     result = RubyProcFnBase.this.call();
                 if (args.length == 1)

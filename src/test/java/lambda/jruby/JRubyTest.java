@@ -12,12 +12,15 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import lambda.Lambda;
+import lambda.clojure.LambdaClojure;
 import lambda.enumerable.Enumerable;
 
 import org.jruby.RubyProc;
 import org.jruby.embed.jsr223.JRubyEngine;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.junit.Test;
+
+import clojure.lang.IFn;
 
 public class JRubyTest {
     @Test
@@ -61,7 +64,21 @@ public class JRubyTest {
                 .eval("lambda {|n| n * 2}"))));
     }
 
-    JRubyEngine getJRubyEngine() {
+    @Test
+    public void interactingWithClojure() throws Exception {
+        JRubyEngine instance = getJRubyEngine();
+
+        IFn star = LambdaClojure.eval("*");
+        RubyProc proc = toProc(LambdaClojure.toFn2(star));
+
+        assertEquals(ruby.newFixnum(6), proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
+                ruby.newFixnum(3), ruby.newFixnum(2) }));
+
+        instance.put("block", proc);
+        assertEquals(120L, instance.eval("[1, 2, 3, 4, 5].inject &block"));
+    }
+
+    public static JRubyEngine getJRubyEngine() {
         System.setProperty("org.jruby.embed.localvariable.behavior", "persistent");
         ScriptEngineManager manager = new ScriptEngineManager();
         return (JRubyEngine) manager.getEngineByName("jruby");
