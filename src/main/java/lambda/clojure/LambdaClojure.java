@@ -70,6 +70,11 @@ public class LambdaClojure {
      * <p>
      * The objects must be forms Clojure understands, basically anything the
      * {@link LispReader} can produce.
+     * <p>
+     * Note that if you send in an {@link IFn} which is not a {@link Var}, the
+     * compiler will create a new instance of it, which may not be what you
+     * want. If you define your lambdas with {@link #defn(String, IFn)} it
+     * returns a {@link Var} which can be used here.
      */
     @SuppressWarnings("unchecked")
     public static <R> R eval(Object... forms) {

@@ -324,7 +324,7 @@ public class Enumerable {
      * @see #detect(Iterable, Fn0, Fn1)
      * @see #find(Iterable, Fn0, Fn1)
      */
-    public static <R> Fn0<R> ifNone(final R defaultValue) {
+    public static <R> Fn0<R> ifNone(R defaultValue) {
         return Fn0.constant(defaultValue);
     }
 
@@ -571,7 +571,7 @@ public class Enumerable {
      * then extract the filename from the result.
      */
     public static <E, R extends Object & Comparable<? super R>> EList<E> sortBy(Iterable<E> collection,
-            final Fn1<? super E, R> block) {
+            Fn1<? super E, R> block) {
         return extend(collection).sortBy(block);
     }
 
