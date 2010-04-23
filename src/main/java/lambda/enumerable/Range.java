@@ -25,15 +25,15 @@ public class Range extends EnumerableModule<Integer> {
         this.exclusive = exclusive;
     }
 
-    public <R> Range each(Fn1<Integer, R> block) {
+    public <R> Range each(Fn1<? super Integer, R> block) {
         return (Range) super.each(block);
     }
 
-    public <R> Range eachWithIndex(Fn2<Integer, Integer, R> block) {
+    public <R> Range eachWithIndex(Fn2<? super Integer, Integer, R> block) {
         return (Range) super.eachWithIndex(block);
     }
 
-    public <R> Range reverseEach(Fn1<Integer, R> block) {
+    public <R> Range reverseEach(Fn1<? super Integer, R> block) {
         return (Range) super.reverseEach(block);
     }
 
