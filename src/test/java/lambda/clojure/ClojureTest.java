@@ -159,7 +159,10 @@ public class ClojureTest {
         RubyProc proc = (RubyProc) rb.eval("lambda {|n, m| n * m}");
         IFn times = toIFn(LambdaJRuby.toFn2(proc));
 
-        assertEquals(120L, reduce(times, list(1, 2, 3, 4, 5)));
+        assertEquals(6L, times.invoke(2, 3));
+
+        defn("times-rb", times);
+        assertEquals(120L, eval("(reduce times-rb 1 [1, 2, 3, 4, 5])"));
     }
 
     @Before
