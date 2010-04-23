@@ -6,6 +6,10 @@ import static lambda.clojure.ClojureSeqs.*;
 import static lambda.clojure.ClojureSeqs.Vars.*;
 import static lambda.clojure.LambdaClojure.*;
 import static org.junit.Assert.*;
+
+import javax.script.ScriptException;
+
+import lambda.Lambda;
 import lambda.enumerable.Enumerable;
 
 import org.junit.Before;
@@ -101,8 +105,7 @@ public class ClojureTest {
         eval("(def v [1 2 3 4 5])");
         IPersistentVector v = eval("v");
 
-        defn("times", fn(n, m, n * m));
-        IFn times = eval("times");
+        IFn times = defn("times", fn(n, m, n * m));
 
         Integer factorial = 120;
         assertEquals(factorial, (reduce(times, 1, v)));
@@ -115,6 +118,25 @@ public class ClojureTest {
         assertEquals(odd, (filter(isOdd, v)));
         assertEquals(odd, eval(filter, isOdd, v));
         assertEquals(odd, eval("(filter odd? v)"));
+
+        IFn isEven = defn("is-even?", toIFn(Lambda.λ(n, n % 2 == 0)));
+
+        ISeq even = list(2, 4);
+        assertEquals(even, (filter(isEven, v)));
+        assertEquals(even, eval(filter, isEven, v));
+        assertEquals(even, eval("(filter is-even? v)"));
+    }
+
+    @Test
+    public void convertFnToIFn() throws Exception {
+        IFn fn = toIFn(Lambda.λ(s, s.toUpperCase()));
+        assertEquals("HELLO", fn.invoke("hello"));
+    }
+
+    @Test
+    public void convertIFnToFn() throws ScriptException {
+        IFn star = eval("*");
+        assertEquals(6, toFn2(star).call(2, 3));
     }
 
     @SuppressWarnings("unchecked")

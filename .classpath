@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/jsr166y.jar" sourcepath="lib/src/jsr166y.zip"/>
 	<classpathentry kind="lib" path="lib/asm-debug-all-3.2.jar" sourcepath="lib/src/asm-all-3.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/clojure-1.1.0.jar" sourcepath="lib/src/clojure-1.1.0-src.zip"/>
+	<classpathentry kind="lib" path="lib/jruby-1.4.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

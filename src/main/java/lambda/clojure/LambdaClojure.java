@@ -81,14 +81,6 @@ public class LambdaClojure {
     }
 
     /**
-     * @see #eval(Object...)
-     */
-    @SuppressWarnings("unchecked")
-    public static <R> R _(Object... forms) {
-        return (R) eval(forms);
-    }
-
-    /**
      * Evaluates the code using {@link clojure.lang.Compiler}.
      */
     @SuppressWarnings("unchecked")
@@ -100,39 +92,27 @@ public class LambdaClojure {
         }
     }
 
-    /**
-     * @see #eval(String)
-     */
-    @SuppressWarnings("unchecked")
-    public static <R> R _(String code) {
-        try {
-            return (R) eval(code);
-        } catch (Exception e) {
-            throw uncheck(e);
-        }
+    public static abstract class AFn0 extends AFunction {
+        public abstract Object invoke() throws Exception;
     }
 
-    public static abstract class AFn0<R> extends AFunction {
-        public abstract R invoke() throws Exception;
+    public static abstract class AFn1 extends AFunction {
+        public abstract Object invoke(Object arg1) throws Exception;
     }
 
-    public static abstract class AFn1<R> extends AFunction {
-        public abstract R invoke(Object arg1) throws Exception;
+    public static abstract class AFn2 extends AFunction {
+        public abstract Object invoke(Object arg1, Object arg2) throws Exception;
     }
 
-    public static abstract class AFn2<R> extends AFunction {
-        public abstract R invoke(Object arg1, Object arg2) throws Exception;
-    }
-
-    public static abstract class AFn3<R> extends AFunction {
-        public abstract R invoke(Object arg1, Object arg2, Object arg3) throws Exception;
+    public static abstract class AFn3 extends AFunction {
+        public abstract Object invoke(Object arg1, Object arg2, Object arg3) throws Exception;
     }
 
     /**
      * Creates a new lambda implementing {@link IFn} taking no arguments.
      */
     @NewLambda
-    public static <R> AFn0<R> fn(R body) {
+    public static AFn0 fn(Object body) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -140,7 +120,7 @@ public class LambdaClojure {
      * Creates a new lambda implementing {@link IFn} taking one argument.
      */
     @NewLambda
-    public static <A1, R> AFn1<R> fn(A1 a1, R body) {
+    public static AFn1 fn(Object a1, Object body) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -148,7 +128,7 @@ public class LambdaClojure {
      * Creates a new lambda implementing {@link IFn} taking two arguments.
      */
     @NewLambda
-    public static <A1, A2, R> AFn2<R> fn(A1 a1, A2 a2, R body) {
+    public static AFn2 fn(Object a1, Object a2, Object body) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -156,7 +136,7 @@ public class LambdaClojure {
      * Creates a new lambda implementing {@link IFn} taking three arguments.
      */
     @NewLambda
-    public static <A1, A2, A3, R> AFn3<R> fn(A1 a1, A2 a2, A3 a3, R body) {
+    public static AFn3 fn(Object a1, Object a2, Object a3, Object body) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -216,6 +196,54 @@ public class LambdaClojure {
                 } catch (Exception e) {
                     throw uncheck(e);
                 }
+            }
+        };
+    }
+
+    /**
+     * Wraps the {@link Fn0} in an {@link IFn}.
+     */
+    @SuppressWarnings("rawtypes")
+    public static IFn toIFn(final Fn0 f) {
+        return new AFn0() {
+            public Object invoke() throws Exception {
+                return f.call();
+            }
+        };
+    }
+
+    /**
+     * Wraps the {@link Fn1} in an {@link IFn}.
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static IFn toIFn(final Fn1 f) {
+        return new AFn1() {
+            public Object invoke(Object arg1) throws Exception {
+                return f.call(arg1);
+            }
+        };
+    }
+
+    /**
+     * Wraps the {@link Fn2} in an {@link IFn}.
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static IFn toIFn(final Fn2 f) {
+        return new AFn2() {
+            public Object invoke(Object arg1, Object arg2) throws Exception {
+                return f.call(arg1, arg2);
+            }
+        };
+    }
+
+    /**
+     * Wraps the {@link Fn3} in an {@link IFn}.
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static IFn toIFn(final Fn3 f) {
+        return new AFn3() {
+            public Object invoke(Object arg1, Object arg2, Object arg3) throws Exception {
+                return f.call(arg1, arg2, arg3);
             }
         };
     }

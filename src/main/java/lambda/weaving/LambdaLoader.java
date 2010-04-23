@@ -116,6 +116,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         packagesToSkip.add("junit.");
         packagesToSkip.add("com.sun.");
         packagesToSkip.add("clojure.");
+        packagesToSkip.add("org.jruby.");
     }
 
     LambdaTreeTransformer transformer = new LambdaTreeTransformer();

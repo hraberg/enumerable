@@ -13,7 +13,8 @@
         <pathelement location="lib/asm-all-3.2.jar" />
         <pathelement location="lib/jsr166y.jar" />
         <pathelement location="lib/extra166y.jar" />
-        <pathelement location="lib/clojure-1.1.0-master-20091202.150145-1.jar" />
+        <pathelement location="lib/clojure-1.1.0.jar" />
+        <pathelement location="lib/jruby-1.4.0.jar" />
     </path>
     <path id="enumerable.example.classpath">
         <pathelement location="target/example-classes" />
