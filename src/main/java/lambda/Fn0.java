@@ -173,7 +173,7 @@ public abstract class Fn0<R> implements Serializable {
     }
 
     /**
-     * Executes this function if the argument is false or null.
+     * Executes this function if the argument is false.
      */
     public R unless(boolean test) {
         if (!test)
