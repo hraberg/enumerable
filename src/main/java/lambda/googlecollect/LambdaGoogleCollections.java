@@ -24,11 +24,6 @@ import com.google.common.collect.Sets;
  */
 public class LambdaGoogleCollections {
     @NewLambda
-    public static <T> Supplier<T> fn() {
-        throw new LambdaWeavingNotEnabledException();
-    }
-
-    @NewLambda
     public static <F, T> Function<F, T> function(F from, T to) {
         throw new LambdaWeavingNotEnabledException();
     }
