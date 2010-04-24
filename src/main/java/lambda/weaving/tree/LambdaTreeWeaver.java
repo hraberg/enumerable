@@ -80,7 +80,7 @@ class LambdaTreeWeaver implements Opcodes {
                 return this;
 
             c = new ClassNode();
-            cr.accept(c, EXPAND_FRAMES);
+            cr.accept(c, 0);
 
             devDebug(c.name);
             devDebug("");
@@ -218,9 +218,11 @@ class LambdaTreeWeaver implements Opcodes {
             mv.visitEnd();
         }
 
+        @SuppressWarnings("unchecked")
         LocalVariableNode getLocalVariable(int var) {
-            if (var < m.localVariables.size())
-                return (LocalVariableNode) m.localVariables.get(var);
+            for (LocalVariableNode local : (List<LocalVariableNode>) m.localVariables)
+                if (var == local.index)
+                    return local;
             return null;
         }
 
@@ -293,8 +295,10 @@ class LambdaTreeWeaver implements Opcodes {
                         AbstractInsnNode n = m.instructions.get(i - 1);
                         if (n.getType() == LABEL)
                             return resolveBranches(i, (LabelNode) n);
-                        if (n.getType() == JUMP_INSN)
+
+                        else if (n.getType() == FRAME || n.getType() == JUMP_INSN)
                             continue;
+
                     }
                     return i;
                 }

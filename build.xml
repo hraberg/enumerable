@@ -4,7 +4,7 @@
 		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
 	</description>
 
-    <property name="enumerable.version" value="0.1.3" />
+    <property name="enumerable.version" value="0.2.0" />
     <property file="lambda.weaving.properties" />
     <tstamp />
 
@@ -154,7 +154,7 @@
     <target name="example" depends="example-with-agent" />
 
     <target name="example-with-agent" depends="agent-jar">
-        <java fork="yes" classname="lambda.enumerable.EnumerableExample">
+        <java fork="yes" classname="lambda.enumerable.EnumerableExample" failonerror="yes">
             <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
@@ -165,7 +165,7 @@
     </target>
 
     <target name="example-with-verifier" depends="agent-jar">
-        <java fork="yes" classname="lambda.enumerable.EnumerableExample">
+        <java fork="yes" classname="lambda.enumerable.EnumerableExample" failonerror="yes">
             <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="true" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
@@ -179,7 +179,7 @@
     </target>
 
     <target name="example-with-loader" depends="agent-jar">
-        <java fork="yes" classname="lambda.weaving.LambdaLoader">
+        <java fork="yes" classname="lambda.weaving.LambdaLoader" failonerror="yes">
             <arg value="lambda.enumerable.EnumerableExample" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
@@ -190,7 +190,7 @@
     </target>
 
     <target name="microbench" depends="agent-jar">
-        <java fork="yes" classname="lambda.MicroBench">
+        <java fork="yes" classname="lambda.MicroBench" failonerror="yes">
             <jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
@@ -249,11 +249,12 @@
         </tar>
     </target>
 
-    <target name="dist" depends="dist-no-test, example-with-loader, aot-tests">
+    <target name="dist" depends="dist-no-test, example-with-loader, aot-tests, microbench">
         <echo message="Ensuring that the example project in ${enumerable.dist.name}.tgz works" />
         <delete dir="target/${enumerable.dist.name}" />
         <untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />
         <ant dir="target/${enumerable.dist.name}/example" inheritall="false" />
+        <ant dir="target/${enumerable.dist.name}/example" target="microbench" inheritall="false" />
         <ant dir="target/${enumerable.dist.name}/example" target="aot-example" inheritall="false" />
     </target>
     

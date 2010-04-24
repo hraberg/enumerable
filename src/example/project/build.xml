@@ -52,7 +52,7 @@
     <macrodef name="enumerable-java">
         <attribute name="classname"/>
         <sequential>
-            <java fork="yes" classname="@{classname}">
+            <java fork="yes" classname="@{classname}" failonerror="yes">
                 <jvmarg value="-javaagent:../enumerable-agent-${enumerable.version}.jar" />
                 <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
                 <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
