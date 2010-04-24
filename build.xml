@@ -4,7 +4,7 @@
 		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
 	</description>
 
-    <property name="enumerable.version" value="0.2.0" />
+    <property name="enumerable.version" value="0.2.1" />
     <property file="lambda.weaving.properties" />
     <tstamp />
 
@@ -14,7 +14,7 @@
         <pathelement location="lib/jsr166y.jar" />
         <pathelement location="lib/extra166y.jar" />
         <pathelement location="lib/clojure-1.1.0.jar" />
-        <pathelement location="lib/jruby-1.4.0.jar" />
+        <pathelement location="lib/jruby-1.5.0.RC1.jar" />
         <pathelement location="lib/google-collect-1.0.jar" />
     </path>
     <path id="enumerable.example.classpath">
