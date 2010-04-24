@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/asm-debug-all-3.2.jar" sourcepath="lib/src/asm-all-3.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/clojure-1.1.0.jar" sourcepath="lib/src/clojure-1.1.0-src.zip"/>
 	<classpathentry kind="lib" path="lib/jruby-1.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-collect-1.0.jar" sourcepath="lib/src/google-collect-src-1.0.zip"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

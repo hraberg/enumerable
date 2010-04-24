@@ -175,6 +175,10 @@ The class [LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/m
 
 [LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java)  You need jruby-1.4.0.jar or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
 
+### Google Collections
+
+[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](), [Predicate]() and [Supplier]() from [Google Collections](). You need google-collect-1.0.jar on your class path. Download from (Google Collections)[http://google-collections.googlecode.com/files/].
+
 ## Implementation
 
 [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java) and [EnumerableArrays](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/EnumerableArrays.java) act as a facades for the implementation in [EnumerableModule](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/collection/EnumerableModule.java) and [EMap](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/collection/EMap.java).

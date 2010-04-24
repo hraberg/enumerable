@@ -156,7 +156,7 @@ public class ClojureTest {
     public void interactingWithJRuby() throws Exception {
         JRubyEngine rb = JRubyTest.getJRubyEngine();
 
-        RubyProc proc = (RubyProc) rb.eval("lambda {|n, m| n * m}");
+        RubyProc proc = (RubyProc) rb.eval(":*.to_proc");
         IFn times = toIFn(LambdaJRuby.toFn2(proc));
 
         assertEquals(6L, times.invoke(2, 3));
