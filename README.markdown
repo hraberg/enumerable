@@ -84,6 +84,8 @@ Open *lambda.enumerable.EnumerableExample* to get started. The example bootstrap
 
 ### Verifier
 
+*Disabled right now, use lambda.weaving.debug.dev instead*
+
 If you add [`asm-all-3.2.jar`](http://forge.ow2.org/project/download.php?group_id=23&file_id=12944) to your classpath, classes will be verified before loaded into the JVM and problems will be logged to the console.
 
 ### System Properties
@@ -171,7 +173,7 @@ The class [LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/m
 
 ### JRuby Blocks
 
-[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java)  You need jruby-1.4.0.jar or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
+[LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java)  You need jruby-1.4.0.jar or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
 
 ## Implementation
 

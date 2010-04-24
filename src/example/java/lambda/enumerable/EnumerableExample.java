@@ -64,10 +64,10 @@ public class EnumerableExample {
          * at the same time. StringBuffer#append returns the buffer, so each
          * element of stringsSoFar will contain the buffer up to that point.
          */
-        StringBuffer hello = new StringBuffer("");
-        List<String> stringsSoFar = collect(strings, λ(s, hello.append(s).toString()));
+        StringBuffer sb = new StringBuffer("");
+        List<String> stringsSoFar = collect(strings, λ(s, sb.append(s).toString()));
         out.println(stringsSoFar);
-        out.println(hello);
+        out.println(sb);
 
         List<Integer> ints = asList(5, 1, 8, 4, 6, 3, 10, 2, 7, 9);
         out.println(ints);
@@ -152,7 +152,7 @@ public class EnumerableExample {
         /*
          * Count is the same as select(..).size()
          */
-        int divisableByThree = select(ints, λ(n, n % 3 == 0)).size();
+        int divisableByThree = count(ints, λ(n, n % 3 == 0));
         out.println(divisableByThree);
 
         /*
@@ -228,8 +228,7 @@ public class EnumerableExample {
         out.println(absolutes);
 
         /*
-         * You cannot nest lambda constructs as the weaver doesn't support it,
-         * but you can use more than one in the same larger expression like
+         * You can use more than one lambda in the same larger expression like
          * this, using the returned EIterable.
          */
         List<Integer> oddTimesSum = collect(ints, λ(n, n * sum)).select(λ(n, n % 2 == 1));
