@@ -5,7 +5,6 @@ import static lambda.Parameters.*;
 import static lambda.googlecollect.LambdaGoogleCollections.*;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import lambda.Lambda;
@@ -21,10 +20,10 @@ public class GoogleCollectionsTest extends TestBase {
     @Test
     public void interactingWithGoogleCollections() throws Exception {
         Collection<String> transform = transform(list("hello", "world"), function(s, s.toUpperCase()));
-        assertEquals(list("HELLO", "WORLD"), new ArrayList<String>(transform));
+        assertEquals(list("HELLO", "WORLD"), list(transform));
 
         Collection<Integer> filter = filter(list(1, 2, 3, 4, 5), predicate(n, n % 2 == 0));
-        assertEquals(list(2, 4), new ArrayList<Integer>(filter));
+        assertEquals(list(2, 4), list(filter));
     }
 
     @Test
@@ -35,11 +34,7 @@ public class GoogleCollectionsTest extends TestBase {
 
     @Test
     public void convertFunctionnToFn1() {
-        Function<Integer, Integer> square = new Function<Integer, Integer>() {
-            public Integer apply(Integer from) {
-                return from * from;
-            }
-        };
+        Function<Integer, Integer> square = function(n, n * n);
         assertEquals(9, (int) toFn1(square).call(3));
     }
 
@@ -52,11 +47,7 @@ public class GoogleCollectionsTest extends TestBase {
 
     @Test
     public void convertPredicateToFn1() {
-        Predicate<Integer> even = new Predicate<Integer>() {
-            public boolean apply(Integer from) {
-                return from % 2 == 0;
-            }
-        };
+        Predicate<Integer> even = predicate(n, n % 2 == 0);
         assertTrue(toFn1(even).call(2));
         assertFalse(toFn1(even).call(1));
     }
@@ -69,11 +60,7 @@ public class GoogleCollectionsTest extends TestBase {
 
     @Test
     public void convertSupplierToFn0() {
-        Supplier<Integer> one = new Supplier<Integer>() {
-            public Integer get() {
-                return 1;
-            }
-        };
+        Supplier<Integer> one = supplier(1);
         assertEquals(1, (int) toFn0(one).call());
     }
 }

@@ -39,7 +39,7 @@ public class LambdaGoogleCollections {
     }
 
     @NewLambda
-    public static <T> Supplier<T> supplier() {
+    public static <T> Supplier<T> supplier(T value) {
         throw new LambdaWeavingNotEnabledException();
     }
 
