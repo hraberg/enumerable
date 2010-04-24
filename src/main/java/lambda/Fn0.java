@@ -173,11 +173,10 @@ public abstract class Fn0<R> implements Serializable {
     }
 
     /**
-     * Calls the given block with no arguments and executes this function if the
-     * result is false or null.
+     * Executes this function if the argument is false or null.
      */
-    public R unless(Fn0<Boolean> block) {
-        if (isFalseOrNull(block.call()))
+    public R unless(boolean test) {
+        if (!test)
             return call();
         return null;
     }

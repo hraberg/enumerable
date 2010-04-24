@@ -19,16 +19,16 @@ public class ControlBlocksTest {
     @Test
     public void unless() throws Exception {
         int i = 1;
-        λ(i = 5).unless(λ(i > 5));
+        λ(i = 5).unless(i > 5);
         assertEquals(5, i);
-        λ(i = 10).unless(λ(i == 5));
+        λ(i = 10).unless(i == 5);
         assertEquals(5, i);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void unlessWithException() throws Exception {
         String[] args = new String[0];
-        λ(raise(new IllegalArgumentException())).unless(λ(args.length > 0));
+        λ(raise(new IllegalArgumentException())).unless(args.length > 0);
     }
 
     @Test
