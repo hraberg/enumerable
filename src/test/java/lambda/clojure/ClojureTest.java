@@ -8,6 +8,7 @@ import static lambda.clojure.LambdaClojure.*;
 import static org.junit.Assert.*;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import lambda.Lambda;
@@ -34,9 +35,11 @@ import clojure.lang.Symbol;
 import clojure.lang.Var;
 
 public class ClojureTest {
+    ScriptEngine clj;
+
     @Test
     public void inUserNamespaceByDefault() throws Exception {
-        assertEquals("user", RT.CURRENT_NS.get().toString());
+        assertEquals("user", eval("*ns*").toString());
     }
 
     @Test
@@ -44,10 +47,28 @@ public class ClojureTest {
         try {
             CURRENT_NS.doReset(Namespace.findOrCreate(Symbol.create("my-ns")));
             LambdaClojure.init();
-            assertEquals("my-ns", RT.CURRENT_NS.get().toString());
+            assertEquals("my-ns", CURRENT_NS.get().toString());
         } finally {
             CURRENT_NS.doReset(Namespace.findOrCreate(Symbol.create("user")));
         }
+    }
+
+    @Test
+    public void evalUsingThreadBindings() throws Exception {
+        try {
+            Var.pushThreadBindings(RT.map(RT.CURRENT_NS, RT.CURRENT_NS.deref()));
+            assertEquals("my-ns", eval("(in-ns 'my-ns)").toString());
+        } finally {
+            Var.popThreadBindings();
+        }
+        assertEquals("user", eval("*ns*").toString());
+
+    }
+
+    @Test
+    public void clojureEngineDoesNotChangeNamespaceBetweenInvocations() throws Exception {
+        assertEquals("my-ns", clj.eval("(in-ns 'my-ns)").toString());
+        assertEquals("user", clj.eval("*ns*").toString());
     }
 
     @Test
@@ -135,6 +156,24 @@ public class ClojureTest {
     }
 
     @Test
+    public void interactingWithClojureEngine() throws Exception {
+        eval("(def v [1 2 3 4 5])");
+
+        defn("times", fn(n, m, n * m));
+
+        Integer factorial = 120;
+        assertEquals(factorial, clj.eval("(reduce times 1 v)"));
+
+        ISeq odd = list(1, 3, 5);
+        assertEquals(odd, clj.eval("(filter odd? v)"));
+
+        defn("is-even?", toIFn(Lambda.λ(n, n % 2 == 0)));
+
+        ISeq even = list(2, 4);
+        assertEquals(even, clj.eval("(filter is-even? v)"));
+    }
+
+    @Test
     public void convertFnToIFn() throws Exception {
         IFn fn = toIFn(Lambda.λ(s, s.toUpperCase()));
         assertEquals("HELLO", fn.invoke("hello"));
@@ -149,8 +188,8 @@ public class ClojureTest {
     @SuppressWarnings("unchecked")
     @Test
     public void interactingWithEnumerableJava() throws Exception {
-        APersistentVector v = eval("[1 2 3 4 5]");
-        IFn star = eval("*");
+        APersistentVector v = (APersistentVector) clj.eval("[1 2 3 4 5]");
+        IFn star = (IFn) clj.eval("*");
 
         assertEquals(120, Enumerable.inject(v, 1, toFn2(star)));
     }
@@ -165,7 +204,7 @@ public class ClojureTest {
         assertEquals(6L, times.invoke(2, 3));
 
         defn("times-rb", times);
-        assertEquals(120L, eval("(reduce times-rb 1 [1, 2, 3, 4, 5])"));
+        assertEquals(120L, clj.eval("(reduce times-rb 1 [1, 2, 3, 4, 5])"));
     }
 
     @Test
@@ -178,7 +217,17 @@ public class ClojureTest {
         assertEquals(6.0, times.invoke(2, 3));
 
         defn("times-js", times);
-        assertEquals(120.0, eval("(reduce times-js 1 [1, 2, 3, 4, 5])"));
+        assertEquals(120.0, clj.eval("(reduce times-js 1 [1, 2, 3, 4, 5])"));
+    }
+
+    @Before
+    public void initEngine() {
+        clj = getClojureEngine();
+    }
+
+    public static ScriptEngine getClojureEngine() {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        return manager.getEngineByName("Clojure");
     }
 
     @Before

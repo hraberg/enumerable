@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="lib/clojure-1.1.0.jar" sourcepath="lib/src/clojure-1.1.0-src.zip"/>
 	<classpathentry kind="lib" path="lib/jruby-1.5.0.RC1.jar" sourcepath="lib/src/jruby-src-1.5.0.RC1.zip"/>
 	<classpathentry kind="lib" path="lib/google-collect-1.0.jar" sourcepath="lib/src/google-collect-src-1.0.zip"/>
+	<classpathentry kind="lib" path="lib/clojure-jsr223.jar" sourcepath="lib/src/clojure-jsr223-src.zip"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

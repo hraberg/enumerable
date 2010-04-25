@@ -13,6 +13,7 @@ import javax.script.ScriptException;
 
 import lambda.Fn1;
 import lambda.Lambda;
+import lambda.clojure.ClojureTest;
 import lambda.clojure.LambdaClojure;
 import lambda.enumerable.Enumerable;
 import lambda.javascript.JavaScriptTest;
@@ -68,7 +69,7 @@ public class JRubyTest {
     public void interactingWithClojure() throws Exception {
         Ruby ruby = Ruby.getGlobalRuntime();
 
-        IFn star = LambdaClojure.eval("*");
+        IFn star = (IFn) ClojureTest.getClojureEngine().eval("*");
         RubyProc proc = toProc(LambdaClojure.toFn2(star));
 
         assertEquals(ruby.newFixnum(6), proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {

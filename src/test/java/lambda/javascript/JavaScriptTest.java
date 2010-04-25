@@ -13,6 +13,7 @@ import javax.script.ScriptException;
 
 import lambda.Fn1;
 import lambda.Lambda;
+import lambda.clojure.ClojureTest;
 import lambda.clojure.LambdaClojure;
 import lambda.enumerable.Enumerable;
 import lambda.javascript.LambdaJavaScript.FunctionFn2;
@@ -57,7 +58,7 @@ public class JavaScriptTest {
 
     @Test
     public void interactingWithClojure() throws Exception {
-        IFn star = LambdaClojure.eval("*");
+        IFn star = (IFn) ClojureTest.getClojureEngine().eval("*");
         FunctionFn2 f = toFunction(LambdaClojure.toFn2(star));
 
         js.put("f", f);
