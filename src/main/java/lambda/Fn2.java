@@ -38,6 +38,23 @@ public abstract class Fn2<A1, A2, R> extends Fn1<A1, R> {
         };
     }
 
+    /**
+     * Currying, returns a {@link Fn1} which takes a1 as its argument and
+     * returns another Fn1 which takes a2, which invokes this function with a1
+     * and a2 when called.
+     */
+    public Fn1<A1, Fn1<A2, R>> curry2() {
+        return new Fn1<A1, Fn1<A2, R>>() {
+            public Fn1<A2, R> call(final A1 a1) {
+                return new Fn1<A2, R>() {
+                    public R call(A2 a2) {
+                        return Fn2.this.call(a1, a2);
+                    }
+                };
+            }
+        };
+    }
+
     public Fn2<A1, A2, Boolean> complement() {
         return new Fn2<A1, A2, Boolean>() {
             public Boolean call(A1 a1, A2 a2) {

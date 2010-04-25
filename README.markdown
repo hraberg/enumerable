@@ -261,3 +261,5 @@ Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and
 Clojure, Copyright Rich Hickey, released under the [EPL license](http://opensource.org/licenses/eclipse-1.0.php).
 
 JRuby is Copyright (c) 2007-2010 The JRuby project, and is released under a [tri CPL/GPL/LGPL license](http://github.com/jruby/jruby/blob/1.4.0/COPYING).
+
+Google Collections, Copyright (C) 2008 Google Inc. Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).

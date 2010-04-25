@@ -582,6 +582,24 @@ public class LambdaTest extends TestBase {
     }
 
     @Test
+    public void curryingFn2() throws Exception {
+        Fn2<String, Integer, String> withPrefixString = λ(s, n, s + n);
+        assertEquals("prefix: 2", withPrefixString.call("prefix: ", 2));
+
+        Fn1<String, Fn1<Integer, String>> add = withPrefixString.curry2();
+        assertEquals("result: 2", add.call("result: ").call(2));
+    }
+
+    @Test
+    public void curryingFn3() throws Exception {
+        Fn3<String, Integer, Integer, String> addWithPrefixString = λ(s, n, m, s + (n + m));
+        assertEquals("prefix: 5", addWithPrefixString.call("prefix: ", 2, 3));
+
+        Fn1<String, Fn1<Integer, Fn1<Integer, String>>> add = addWithPrefixString.curry3();
+        assertEquals("result: 2", add.call("result: ").call(1).call(1));
+    }
+
+    @Test
     public void fn1OfFn0FunctionComposition() throws Exception {
         Fn1<Object, String> toString = λ(obj, obj.toString());
         Fn0<Integer> ten = λ(10);
