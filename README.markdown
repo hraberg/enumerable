@@ -177,7 +177,7 @@ The class [LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/m
 
 ### Google Collections
 
-[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](), [Predicate]() and [Supplier]() from [Google Collections](). You need google-collect-1.0.jar on your class path. Download from (Google Collections)[http://google-collections.googlecode.com/files/].
+[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Google Collections](http://code.google.com/p/google-collections/). You need google-collect-1.0.jar on your class path. Download from [Google Collections](http://google-collections.googlecode.com/files/).
 
 ## Implementation
 
