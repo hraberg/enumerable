@@ -7,18 +7,21 @@ import static lambda.clojure.ClojureSeqs.Vars.*;
 import static lambda.clojure.LambdaClojure.*;
 import static org.junit.Assert.*;
 
+import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import lambda.Lambda;
 import lambda.enumerable.Enumerable;
+import lambda.javascript.JavaScriptTest;
+import lambda.javascript.LambdaJavaScript;
 import lambda.jruby.JRubyTest;
 import lambda.jruby.LambdaJRuby;
 
 import org.jruby.RubyProc;
-import org.jruby.embed.jsr223.JRubyEngine;
 import org.junit.Before;
 import org.junit.Test;
 
+import sun.org.mozilla.javascript.internal.Function;
 import clojure.lang.APersistentMap;
 import clojure.lang.APersistentSet;
 import clojure.lang.APersistentVector;
@@ -154,7 +157,7 @@ public class ClojureTest {
 
     @Test
     public void interactingWithJRuby() throws Exception {
-        JRubyEngine rb = JRubyTest.getJRubyEngine();
+        ScriptEngine rb = JRubyTest.getJRubyEngine();
 
         RubyProc proc = (RubyProc) rb.eval(":*.to_proc");
         IFn times = toIFn(LambdaJRuby.toFn2(proc));
@@ -163,6 +166,19 @@ public class ClojureTest {
 
         defn("times-rb", times);
         assertEquals(120L, eval("(reduce times-rb 1 [1, 2, 3, 4, 5])"));
+    }
+
+    @Test
+    public void interactingWithJavaScript() throws Exception {
+        ScriptEngine js = JavaScriptTest.getJavaScriptEngine();
+
+        Function f = (Function) js.eval("var f = function(n, m) { return n * m; }; f;");
+        IFn times = toIFn(LambdaJavaScript.toFn2(f));
+
+        assertEquals(6.0, times.invoke(2, 3));
+
+        defn("times-js", times);
+        assertEquals(120.0, eval("(reduce times-js 1 [1, 2, 3, 4, 5])"));
     }
 
     @Before

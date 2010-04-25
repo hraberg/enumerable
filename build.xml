@@ -7,7 +7,9 @@
     <property name="enumerable.version" value="0.2.1" />
     <property file="lambda.weaving.properties" />
     <tstamp />
-
+    
+    <echo message="${java.home}/lib/rt.jar" />
+    
     <path id="enumerable.classpath">
         <pathelement location="target/classes" />
         <pathelement location="lib/asm-all-3.2.jar" />
@@ -16,6 +18,7 @@
         <pathelement location="lib/clojure-1.1.0.jar" />
         <pathelement location="lib/jruby-1.5.0.RC1.jar" />
         <pathelement location="lib/google-collect-1.0.jar" />
+        <pathelement location="lib/sun.org.mozilla.javascript.internal.jar" />
     </path>
     <path id="enumerable.example.classpath">
         <pathelement location="target/example-classes" />

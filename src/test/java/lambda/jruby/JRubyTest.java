@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
@@ -14,18 +15,20 @@ import lambda.Fn1;
 import lambda.Lambda;
 import lambda.clojure.LambdaClojure;
 import lambda.enumerable.Enumerable;
+import lambda.javascript.JavaScriptTest;
+import lambda.javascript.LambdaJavaScript;
 
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
-import org.jruby.embed.jsr223.JRubyEngine;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import sun.org.mozilla.javascript.internal.Function;
 import clojure.lang.IFn;
 
 public class JRubyTest {
-    private JRubyEngine rb;
+    ScriptEngine rb;
 
     @Test
     public void interactingWithJRuby() throws ScriptException {
@@ -75,14 +78,29 @@ public class JRubyTest {
         assertEquals(120L, rb.eval("[1, 2, 3, 4, 5].inject &block"));
     }
 
+    @Test
+    public void interactingWithJavaScript() throws Exception {
+        Ruby ruby = Ruby.getGlobalRuntime();
+        ScriptEngine js = JavaScriptTest.getJavaScriptEngine();
+
+        Function f = (Function) js.eval("var f = function(n, m) { return n * m; }; f;");
+        RubyProc proc = toProc(LambdaJavaScript.toFn2(f));
+
+        assertEquals(ruby.newFloat(6), proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
+                ruby.newFixnum(2), ruby.newFixnum(3) }));
+
+        rb.put("block", proc);
+        assertEquals(120.0, rb.eval("[1, 2, 3, 4, 5].inject &block"));
+    }
+
     @Before
     public void initEngine() {
         rb = getJRubyEngine();
     }
 
-    public static JRubyEngine getJRubyEngine() {
+    public static ScriptEngine getJRubyEngine() {
         System.setProperty("org.jruby.embed.localvariable.behavior", "persistent");
         ScriptEngineManager manager = new ScriptEngineManager();
-        return (JRubyEngine) manager.getEngineByName("jruby");
+        return manager.getEngineByName("jruby");
     }
 }

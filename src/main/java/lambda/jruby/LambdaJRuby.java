@@ -1,6 +1,5 @@
 package lambda.jruby;
 
-import static lambda.exception.UncheckedException.*;
 import static org.jruby.javasupport.JavaEmbedUtils.*;
 import lambda.Fn0;
 import lambda.Fn1;
@@ -53,15 +52,15 @@ public class LambdaJRuby {
             return null;
         }
 
-        public Object call(Object arg0) {
+        public Object call(Object a1) {
             return null;
         }
 
-        public Object call(Object arg0, Object arg2) {
+        public Object call(Object a1, Object a2) {
             return null;
         }
 
-        public Object call(Object arg0, Object arg2, Object arg3) {
+        public Object call(Object a1, Object a2, Object a3) {
             return null;
         }
     }
@@ -79,7 +78,7 @@ public class LambdaJRuby {
             super(Ruby.getGlobalRuntime(), Arity.ONE_REQUIRED);
         }
 
-        public abstract Object call(Object arg0);
+        public abstract Object call(Object a1);
     }
 
     public static abstract class RubyProcFn2 extends RubyProcFnBase {
@@ -87,7 +86,7 @@ public class LambdaJRuby {
             super(Ruby.getGlobalRuntime(), Arity.TWO_REQUIRED);
         }
 
-        public abstract Object call(Object arg0, Object arg1);
+        public abstract Object call(Object a1, Object a2);
     }
 
     public static abstract class RubyProcFn3 extends RubyProcFnBase {
@@ -95,7 +94,7 @@ public class LambdaJRuby {
             super(Ruby.getGlobalRuntime(), Arity.THREE_REQUIRED);
         }
 
-        public abstract Object call(Object arg0, Object arg1, Object arg2);
+        public abstract Object call(Object a1, Object a2, Object a3);
     }
 
     /**
@@ -110,7 +109,7 @@ public class LambdaJRuby {
      * Creates a new lambda extending {@link RubyProc} taking one argument.
      */
     @NewLambda
-    public static RubyProcFn1 lambda(Object arg0, Object block) {
+    public static RubyProcFn1 lambda(Object a1, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -118,7 +117,7 @@ public class LambdaJRuby {
      * Creates a new lambda extending {@link RubyProc} taking two arguments.
      */
     @NewLambda
-    public static RubyProcFn2 lambda(Object arg0, Object arg1, Object block) {
+    public static RubyProcFn2 lambda(Object a1, Object a2, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -126,7 +125,7 @@ public class LambdaJRuby {
      * Creates a new lambda extending {@link RubyProc} taking three arguments.
      */
     @NewLambda
-    public static RubyProcFn3 lambda(Object arg0, Object arg1, Object arg2, Object block) {
+    public static RubyProcFn3 lambda(Object a1, Object a2, Object a3, Object block) {
         throw new LambdaWeavingNotEnabledException();
     }
 
@@ -136,12 +135,8 @@ public class LambdaJRuby {
     public static Fn0<Object> toFn0(final RubyProc proc) {
         return new Fn0<Object>() {
             public Object call() {
-                try {
-                    Ruby ruby = proc.getRuntime();
-                    return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[0]));
-                } catch (Exception e) {
-                    throw uncheck(e);
-                }
+                Ruby ruby = proc.getRuntime();
+                return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[0]));
             }
         };
     }
@@ -152,13 +147,9 @@ public class LambdaJRuby {
     public static Fn1<Object, Object> toFn1(final RubyProc proc) {
         return new Fn1<Object, Object>() {
             public Object call(Object a1) {
-                try {
-                    Ruby ruby = proc.getRuntime();
-                    return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(),
-                            new IRubyObject[] { javaToRuby(ruby, a1) }));
-                } catch (Exception e) {
-                    throw uncheck(e);
-                }
+                Ruby ruby = proc.getRuntime();
+                return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(),
+                        new IRubyObject[] { javaToRuby(ruby, a1) }));
             }
         };
     }
@@ -169,13 +160,9 @@ public class LambdaJRuby {
     public static Fn2<Object, Object, Object> toFn2(final RubyProc proc) {
         return new Fn2<Object, Object, Object>() {
             public Object call(Object a1, Object a2) {
-                try {
-                    Ruby ruby = proc.getRuntime();
-                    return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
-                            javaToRuby(ruby, a1), javaToRuby(ruby, a2) }));
-                } catch (Exception e) {
-                    throw uncheck(e);
-                }
+                Ruby ruby = proc.getRuntime();
+                return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
+                        javaToRuby(ruby, a1), javaToRuby(ruby, a2) }));
             }
         };
     }
@@ -186,13 +173,9 @@ public class LambdaJRuby {
     public static Fn3<Object, Object, Object, Object> toFn3(final RubyProc proc) {
         return new Fn3<Object, Object, Object, Object>() {
             public Object call(Object a1, Object a2, Object a3) {
-                try {
-                    Ruby ruby = proc.getRuntime();
-                    return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
-                            javaToRuby(ruby, a1), javaToRuby(ruby, a2), javaToRuby(ruby, a3) }));
-                } catch (Exception e) {
-                    throw uncheck(e);
-                }
+                Ruby ruby = proc.getRuntime();
+                return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
+                        javaToRuby(ruby, a1), javaToRuby(ruby, a2), javaToRuby(ruby, a3) }));
             }
         };
     }
@@ -204,11 +187,7 @@ public class LambdaJRuby {
     public static RubyProc toProc(final Fn0 fn) {
         return new RubyProcFn0() {
             public Object call() {
-                try {
-                    return fn.call();
-                } catch (Exception e) {
-                    throw uncheck(e);
-                }
+                return fn.call();
             }
         };
     }
@@ -219,12 +198,8 @@ public class LambdaJRuby {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static RubyProc toProc(final Fn1 fn) {
         return new RubyProcFn1() {
-            public Object call(Object arg0) {
-                try {
-                    return fn.call(arg0);
-                } catch (Exception e) {
-                    throw uncheck(e);
-                }
+            public Object call(Object a1) {
+                return fn.call(a1);
             }
         };
     }
@@ -235,12 +210,8 @@ public class LambdaJRuby {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static RubyProc toProc(final Fn2 fn) {
         return new RubyProcFn2() {
-            public Object call(Object arg0, Object arg1) {
-                try {
-                    return fn.call(arg0, arg1);
-                } catch (Exception e) {
-                    throw uncheck(e);
-                }
+            public Object call(Object a1, Object a2) {
+                return fn.call(a1, a2);
             }
         };
     }
@@ -251,12 +222,8 @@ public class LambdaJRuby {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static RubyProc toProc(final Fn3 fn) {
         return new RubyProcFn3() {
-            public Object call(Object arg0, Object arg1, Object arg2) {
-                try {
-                    return fn.call(arg0, arg1, arg2);
-                } catch (Exception e) {
-                    throw uncheck(e);
-                }
+            public Object call(Object a1, Object a2, Object a3) {
+                return fn.call(a1, a2, a3);
             }
         };
     }
