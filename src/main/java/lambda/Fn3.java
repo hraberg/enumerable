@@ -39,6 +39,15 @@ public abstract class Fn3<A1, A2, A3, R> extends Fn2<A1, A2, R> {
     }
 
     /**
+     * Currying Fn3 requires calling {@link #curry3()}.
+     * 
+     * @throws UnsupportedOperationException
+     */
+    public Fn1<A1, Fn1<A2, R>> curry2() {
+        throw new UnsupportedOperationException("Use curry3 to curry Fn3");
+    }
+
+    /**
      * Currying, returns a {@link Fn1} which takes a1 as its argument and
      * returns another Fn1 which takes a2, which returns another Fn1 which takes
      * a3 which invokes this function with a1, a2 and a3 when called.

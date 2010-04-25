@@ -599,6 +599,12 @@ public class LambdaTest extends TestBase {
         assertEquals("result: 2", add.call("result: ").call(1).call(1));
     }
 
+    @Test(expected = UnsupportedOperationException.class)
+    public void curryingFn3UsingCurry2ThrowsException() throws Exception {
+        Fn3<String, Integer, Integer, String> addWithPrefixString = λ(s, n, m, s + (n + m));
+        addWithPrefixString.curry2();
+    }
+
     @Test
     public void fn1OfFn0FunctionComposition() throws Exception {
         Fn1<Object, String> toString = λ(obj, obj.toString());

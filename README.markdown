@@ -258,7 +258,7 @@ ASM 3.2 is Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](
 jsr166y and extra166y:
 Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and released to the public domain, as explained at http://creativecommons.org/licenses/publicdomain
 
-Clojure, Copyright Rich Hickey, released under the [EPL license](http://opensource.org/licenses/eclipse-1.0.php).
+Clojure, Copyright (c) Rich Hickey, released under the [EPL license](http://opensource.org/licenses/eclipse-1.0.php).
 
 JRuby is Copyright (c) 2007-2010 The JRuby project, and is released under a [tri CPL/GPL/LGPL license](http://github.com/jruby/jruby/blob/1.4.0/COPYING).
 
