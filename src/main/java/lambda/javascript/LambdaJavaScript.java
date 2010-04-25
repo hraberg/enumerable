@@ -18,31 +18,39 @@ public class LambdaJavaScript {
             Object result = null;
             if (args.length == 0)
                 result = call();
-            if (args.length == 1)
+
+            else if (args.length == 1)
                 result = call(args[0]);
-            if (args.length == 2)
+
+            else if (args.length == 2)
                 result = call(args[0], args[1]);
-            if (args.length == 3)
+
+            else if (args.length == 3)
                 result = call(args[0], args[1], args[2]);
+
+            else
+                throw new IllegalArgumentException(
+                        "Tried to call JavaScript BaseFunctionFn with too many arguments: " + args.length);
+
             if (result instanceof Number)
                 return Context.toNumber(result);
             return Context.javaToJS(result, scope);
         }
 
         protected Object call() {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         protected Object call(Object a1) {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         protected Object call(Object a1, Object a2) {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         protected Object call(Object a1, Object a2, Object a3) {
-            return null;
+            throw new UnsupportedOperationException();
         }
     }
 

@@ -37,6 +37,9 @@ public class LambdaJRuby {
                 else if (args.length == 3)
                     result = RubyProcFnBase.this
                             .call(rubyToJava(args[0]), rubyToJava(args[1]), rubyToJava(args[2]));
+                else
+                    throw new IllegalArgumentException(
+                            "Tried to call JRuby RubyProcFnBase with too many arguments: " + args.length);
 
                 return javaToRuby(getRuntime(), result);
             }
@@ -49,19 +52,19 @@ public class LambdaJRuby {
         }
 
         public Object call() {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         public Object call(Object a1) {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         public Object call(Object a1, Object a2) {
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         public Object call(Object a1, Object a2, Object a3) {
-            return null;
+            throw new UnsupportedOperationException();
         }
     }
 
