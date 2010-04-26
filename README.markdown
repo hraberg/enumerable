@@ -262,4 +262,6 @@ Clojure, Copyright (c) Rich Hickey, released under the [EPL license](http://open
 
 JRuby is Copyright (c) 2007-2010 The JRuby project, and is released under a [tri CPL/GPL/LGPL license](http://github.com/jruby/jruby/blob/1.4.0/COPYING).
 
+Rhino is Copyright (C) 1997-1999 Norris Boyd/Netscape Communications Corporation. The majority of Rhino is MPL 1.1 / GPL 2.0 dual licensed.
+
 Google Collections, Copyright (C) 2008 Google Inc. Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).

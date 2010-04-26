@@ -11,6 +11,11 @@ import sun.org.mozilla.javascript.internal.Context;
 import sun.org.mozilla.javascript.internal.Function;
 import sun.org.mozilla.javascript.internal.Scriptable;
 
+/**
+ * This is class is similar {@link lambda.Lambda}, but instead of creating
+ * lambdas inheriting from {@link lambda.Fn0} it creates lambdas extending
+ * {@link Function} to be used together with Rhino.
+ */
 @SuppressWarnings("serial")
 public class LambdaJavaScript {
     public static abstract class BaseFunctionFn extends BaseFunction {

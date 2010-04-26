@@ -17,6 +17,11 @@ import org.jruby.runtime.CallBlock;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
+/**
+ * This is class is similar {@link lambda.Lambda}, but instead of creating
+ * lambdas inheriting from {@link lambda.Fn0} it creates lambdas extending
+ * {@link RubyProc} to be used together with JRuby.
+ */
 @SuppressWarnings("serial")
 public class LambdaJRuby {
     public abstract static class RubyProcFnBase extends RubyProc {
