@@ -35,12 +35,34 @@ public class JavaScriptTest {
     public void interactingWithJavaScript() throws ScriptException {
         js.put("f", function(n, n * 2));
         assertEquals(4.0, js.eval("f(2);"));
+
+        js.put("f", function(b, !b));
+        assertTrue((Boolean) js.eval("f(false);"));
+
+        js.put("f", function(s, s.toUpperCase()));
+        assertEquals("HELLO", js.eval("f('hello');"));
+
+        js.put("f", function(obj, obj));
+        assertNull(js.eval("f(undefined);"));
+        assertNull(js.eval("f(null);"));
     }
 
     @Test
     public void convertFnToFunction() throws ScriptException {
         Function f = toFunction(Lambda.λ(s, s.toUpperCase()));
         assertEquals("HELLO", f.call(Context.getCurrentContext(), null, null, new Object[] { "hello" }));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void convertedFunctionThrowsExceptionWhenCalledWithTooFewArguments() throws ScriptException {
+        Function f = toFunction(Lambda.λ(s, s.toUpperCase()));
+        f.call(Context.getCurrentContext(), null, null, new Object[0]);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void convertedFunctionThrowsExceptionWhenCalledWithTooManyArguments() throws ScriptException {
+        Function f = toFunction(Lambda.λ(s, s.toUpperCase()));
+        f.call(Context.getCurrentContext(), null, null, new Object[] { "hello", "world" });
     }
 
     @Test

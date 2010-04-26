@@ -27,8 +27,10 @@ public class LambdaJRuby {
     public abstract static class RubyProcFnBase extends RubyProc {
         class FnBlockCallback implements BlockCallback {
             public IRubyObject call(ThreadContext context, IRubyObject[] args, Block block) {
-                Object result = null;
                 args = getBlock().getBody().prepareArgumentsForCall(context, args, Block.Type.NORMAL);
+                getBlock().arity().checkArity(context.getRuntime(), args);
+
+                Object result = null;
 
                 if (args.length == 0)
                     result = RubyProcFnBase.this.call();
@@ -42,9 +44,6 @@ public class LambdaJRuby {
                 else if (args.length == 3)
                     result = RubyProcFnBase.this
                             .call(rubyToJava(args[0]), rubyToJava(args[1]), rubyToJava(args[2]));
-                else
-                    throw new IllegalArgumentException(
-                            "Tried to call JRuby RubyProcFnBase with too many arguments: " + args.length);
 
                 return javaToRuby(getRuntime(), result);
             }
@@ -83,7 +82,7 @@ public class LambdaJRuby {
 
     public static abstract class RubyProcFn1 extends RubyProcFnBase {
         public RubyProcFn1() {
-            super(Ruby.getGlobalRuntime(), Arity.ONE_REQUIRED);
+            super(Ruby.getGlobalRuntime(), Arity.ONE_ARGUMENT);
         }
 
         public abstract Object call(Object a1);
@@ -91,7 +90,7 @@ public class LambdaJRuby {
 
     public static abstract class RubyProcFn2 extends RubyProcFnBase {
         public RubyProcFn2() {
-            super(Ruby.getGlobalRuntime(), Arity.TWO_REQUIRED);
+            super(Ruby.getGlobalRuntime(), Arity.TWO_ARGUMENTS);
         }
 
         public abstract Object call(Object a1, Object a2);
@@ -99,7 +98,7 @@ public class LambdaJRuby {
 
     public static abstract class RubyProcFn3 extends RubyProcFnBase {
         public RubyProcFn3() {
-            super(Ruby.getGlobalRuntime(), Arity.THREE_REQUIRED);
+            super(Ruby.getGlobalRuntime(), Arity.THREE_ARGUMENTS);
         }
 
         public abstract Object call(Object a1, Object a2, Object a3);

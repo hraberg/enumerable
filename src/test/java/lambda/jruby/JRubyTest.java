@@ -21,6 +21,7 @@ import lambda.javascript.LambdaJavaScript;
 
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
+import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +45,31 @@ public class JRubyTest {
         RubyProc proc = toProc(Lambda.λ(s, s.toUpperCase()));
         assertEquals(ruby.newString("HELLO"), proc.call(ruby.getThreadService().getCurrentContext(),
                 new IRubyObject[] { ruby.newString("hello") }));
+    }
+
+    @Test(expected = RaiseException.class)
+    public void convertedRubyProcRaisesArgumentErrorWhenCalledWithTooFewArguments() throws ScriptException {
+        Ruby ruby = Ruby.getGlobalRuntime();
+        try {
+            RubyProc proc = toProc(Lambda.λ(s, s.toUpperCase()));
+            proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[0]);
+        } catch (RaiseException e) {
+            assertEquals(ruby.getArgumentError(), e.getException().getType());
+            throw e;
+        }
+    }
+
+    @Test(expected = RaiseException.class)
+    public void convertedRubyProcRaisesArgumentErrorWhenCalledWithTooManyArguments() throws ScriptException {
+        Ruby ruby = Ruby.getGlobalRuntime();
+        try {
+            RubyProc proc = toProc(Lambda.λ(s, s.toUpperCase()));
+            proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] { ruby.newString("hello"),
+                    ruby.newString("world") });
+        } catch (RaiseException e) {
+            assertEquals(ruby.getArgumentError(), e.getException().getType());
+            throw e;
+        }
     }
 
     @Test

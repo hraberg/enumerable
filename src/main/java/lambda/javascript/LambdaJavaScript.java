@@ -20,6 +20,11 @@ import sun.org.mozilla.javascript.internal.Scriptable;
 public class LambdaJavaScript {
     public static abstract class BaseFunctionFn extends BaseFunction {
         public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+            if (args.length != getArity())
+                throw new IllegalArgumentException(
+                        "Tried to call JavaScript BaseFunctionFn with wrong number of arguments, " + args.length
+                                + " for " + getArity());
+
             Object result = null;
             if (args.length == 0)
                 result = call();
@@ -33,12 +38,9 @@ public class LambdaJavaScript {
             else if (args.length == 3)
                 result = call(args[0], args[1], args[2]);
 
-            else
-                throw new IllegalArgumentException(
-                        "Tried to call JavaScript BaseFunctionFn with too many arguments: " + args.length);
-
             if (result instanceof Number)
                 return Context.toNumber(result);
+
             return Context.javaToJS(result, scope);
         }
 
@@ -61,18 +63,34 @@ public class LambdaJavaScript {
 
     public static abstract class FunctionFn0 extends BaseFunctionFn {
         public abstract Object call();
+
+        public int getArity() {
+            return 0;
+        }
     }
 
     public static abstract class FunctionFn1 extends BaseFunctionFn {
         public abstract Object call(Object a1);
+
+        public int getArity() {
+            return 1;
+        }
     }
 
     public static abstract class FunctionFn2 extends BaseFunctionFn {
         public abstract Object call(Object a1, Object a2);
+
+        public int getArity() {
+            return 2;
+        }
     }
 
     public static abstract class FunctionFn3 extends BaseFunctionFn {
         public abstract Object call(Object a1, Object a2, Object a3);
+
+        public int getArity() {
+            return 3;
+        }
     }
 
     /**
