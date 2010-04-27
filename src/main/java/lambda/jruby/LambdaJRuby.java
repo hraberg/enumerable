@@ -27,7 +27,7 @@ public class LambdaJRuby {
     public abstract static class RubyProcFnBase extends RubyProc {
         class FnBlockCallback implements BlockCallback {
             public IRubyObject call(ThreadContext context, IRubyObject[] args, Block block) {
-                args = getBlock().getBody().prepareArgumentsForCall(context, args, Block.Type.NORMAL);
+                args = getNormalArgumentsFromCallBlocksSingleRestArg(context, args);
                 getBlock().arity().checkArity(context.getRuntime(), args);
 
                 Object result = null;
@@ -47,6 +47,10 @@ public class LambdaJRuby {
 
                 return javaToRuby(getRuntime(), result);
             }
+
+            IRubyObject[] getNormalArgumentsFromCallBlocksSingleRestArg(ThreadContext context, IRubyObject[] args) {
+                return getBlock().getBody().prepareArgumentsForCall(context, args, Block.Type.NORMAL);
+            }
         }
 
         public RubyProcFnBase(Ruby runtime, Arity arity) {
@@ -55,19 +59,19 @@ public class LambdaJRuby {
             initialize(context, CallBlock.newCallClosure(this, getType(), arity, new FnBlockCallback(), context));
         }
 
-        public Object call() {
+        protected Object call() {
             throw new UnsupportedOperationException();
         }
 
-        public Object call(Object a1) {
+        protected Object call(Object a1) {
             throw new UnsupportedOperationException();
         }
 
-        public Object call(Object a1, Object a2) {
+        protected Object call(Object a1, Object a2) {
             throw new UnsupportedOperationException();
         }
 
-        public Object call(Object a1, Object a2, Object a3) {
+        protected Object call(Object a1, Object a2, Object a3) {
             throw new UnsupportedOperationException();
         }
     }

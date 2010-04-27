@@ -127,7 +127,8 @@ public interface IEnumerable<E> extends Iterable<E> {
     E find(Fn0<E> ifNone, Fn1<? super E, Boolean> block);
 
     /**
-     * @see #select(Fn1)
+     * Returns a list containing all elements of collection for which block is
+     * not false.
      */
     EList<E> findAll(Fn1<? super E, Boolean> block);
 
@@ -180,7 +181,7 @@ public interface IEnumerable<E> extends Iterable<E> {
     /**
      * @see #member(Object)
      */
-    boolean includes(Object obj);
+    boolean include(Object obj);
 
     /**
      * Combines the elements of collection by applying the block to an
@@ -306,8 +307,7 @@ public interface IEnumerable<E> extends Iterable<E> {
     <R> IEnumerable<E> reverseEach(Fn1<? super E, R> block);
 
     /**
-     * Returns a list containing all elements of collection for which block is
-     * not false.
+     * @see #findAll(Fn1)
      */
     EList<E> select(Fn1<? super E, Boolean> block);
 

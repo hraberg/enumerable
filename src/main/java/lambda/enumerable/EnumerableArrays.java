@@ -224,8 +224,8 @@ public class EnumerableArrays {
     /**
      * @see #member(Object[], Object)
      */
-    public static <E> boolean includes(E[] array, Object obj) {
-        return Enumerable.includes(asList(array), obj);
+    public static <E> boolean include(E[] array, Object obj) {
+        return Enumerable.include(asList(array), obj);
     }
 
     /**

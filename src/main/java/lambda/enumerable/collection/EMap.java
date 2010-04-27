@@ -132,4 +132,8 @@ public class EMap<K, V> extends EnumerableModule<Map.Entry<K, V>> implements Map
     public String toString() {
         return map.toString();
     }
+
+    public Map<K, V> delegate() {
+        return map;
+    }
 }

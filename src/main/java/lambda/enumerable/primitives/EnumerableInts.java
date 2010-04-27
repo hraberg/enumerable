@@ -220,7 +220,7 @@ public class EnumerableInts {
     /**
      * @see #member(int[], int)
      */
-    public static boolean includes(int[] array, int value) {
+    public static boolean include(int[] array, int value) {
         return member(array, value);
     }
 

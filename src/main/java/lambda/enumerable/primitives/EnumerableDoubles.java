@@ -236,7 +236,7 @@ public class EnumerableDoubles {
     /**
      * @see #member(double[], double)
      */
-    public static boolean includes(double[] array, double value) {
+    public static boolean include(double[] array, double value) {
         return member(array, value);
     }
 

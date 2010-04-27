@@ -331,8 +331,8 @@ public class Enumerable {
     /**
      * @see #member(Iterable, Object)
      */
-    public static <E> boolean includes(Iterable<E> collection, Object obj) {
-        return extend(collection).includes(obj);
+    public static <E> boolean include(Iterable<E> collection, Object obj) {
+        return extend(collection).include(obj);
     }
 
     /**
@@ -393,7 +393,7 @@ public class Enumerable {
      * using {@link Object#equals(Object)}.
      */
     public static <E> boolean member(Iterable<E> collection, Object obj) {
-        return extend(collection).includes(obj);
+        return extend(collection).include(obj);
     }
 
     /**

@@ -100,6 +100,11 @@ public class EnumerableOneNineTest extends TestBase {
         assertEquals(list(1, 2), first(oneToFive, 2));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void firstThrowsExceptionForNegativeN() throws Exception {
+        first(oneToFive, -1);
+    }
+
     @Test
     public void groupByResultOfBlock() throws Exception {
         EMap<String, EList<Integer>> groupBy = groupBy(oneToFive, λ(n, n % 2 == 0 ? "even" : "odd"));

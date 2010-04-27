@@ -325,6 +325,12 @@ public class EnumerableOneEightTest extends TestBase {
         assertTrue(result.isEmpty());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void eachConsThrowsExceptionIfNIsZeroOrLess() throws Exception {
+        List<List<Integer>> result = list();
+        eachCons(oneToFive, 0, λ(list, result.add(list)));
+    }
+
     @Test
     public void eachSliceCallsBlockForEachSliceOfNElements() throws Exception {
         List<List<Integer>> result = list();
@@ -342,6 +348,12 @@ public class EnumerableOneEightTest extends TestBase {
         eachSlice(oneToFive, 6, λ(list, result.add(list)));
         assertEquals(1, result.size());
         assertEquals(oneToFive, result.get(0));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void eachSliceThrowsExceptionIfNIsZeroOrLess() throws Exception {
+        List<List<Integer>> result = list();
+        eachSlice(oneToFive, 0, λ(list, result.add(list)));
     }
 
     @Test

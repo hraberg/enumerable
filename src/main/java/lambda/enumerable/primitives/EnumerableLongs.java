@@ -220,7 +220,7 @@ public class EnumerableLongs {
     /**
      * @see #member(long[], long)
      */
-    public static boolean includes(long[] array, long value) {
+    public static boolean include(long[] array, long value) {
         return member(array, value);
     }
 

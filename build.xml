@@ -66,6 +66,9 @@
             <src path="src/test/java" />
             <classpath refid="enumerable.test.classpath" />
         </javac>
+        <copy todir="target/test-classes">
+            <fileset dir="src/test/jruby" includes="**/*" />
+        </copy>
 
         <property name="enumerable.git.commit" value="&lt;git commit info not available&gt;" />
         <echo file="target/classes/lambda/weaving/version.properties">
