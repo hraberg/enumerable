@@ -8,20 +8,24 @@ import 'lambda.enumerable.EnumerableJRubyTest'
 module EnumerableJava
   def self.included(host)
     host.class_eval do
-      alias :original_each :each
-      alias :original_to_a :to_a
       instance_methods(false).select {|m| Enumerable.method_defined? m}.each {|m| remove_method m}
-
-      def each &block
-        EnumerableJRubyTest.debug "calling each"
-        to_java.each(to_fn block).delegate
-      end
     end
   end
 
+  def to_a
+  	puts "calling to_a`"
+    to_java.to_list.to_a
+  end
+
   private
+  def internal_to_a
+  	a = []
+  	each {|o| a << o }
+  	a
+  end
+
   def to_java
-    EnumerableModule.extend(Array == self.class || Hash == self.class ? self : original_to_a)
+    EnumerableModule.extend(Array == self.class || Hash == self.class ? self : internal_to_a)
   end
 
   def to_fn proc
@@ -52,20 +56,22 @@ class Array
 end
 
 module java::util::List
-	remove_method :sort
+  remove_method :sort
 end
 
 module Enumerable
+  def self.included(host)
+    host.class_eval do
+      include EnumerableJava
+      EnumerableJRubyTest.debug "included EnumerableJava in #{host}"
+    end
+  end    
+
   @@original_instance_methods = instance_methods
   instance_methods.each {|m| remove_method m unless m =~ /^enum/}
 
   def respond_to?(method)
     @@original_instance_methods.member?(method.to_s) || super
-  end
-
-  def to_a
-    EnumerableJRubyTest.debug "calling to_a"
-    to_java.to_list.to_a
   end
 
   def method_missing(name, *args, &block)
@@ -95,7 +101,7 @@ module Enumerable
     elsif o.class.include? Java::JavaUtil::Map
       h = {}
       h.put_all o
-      h.each {|e| h[e.key] = unnest_java_collections e.value}
+      h.each {|kv| h[kv[0]] = unnest_java_collections kv[1]}
     elsif o == Java::LambdaEnumerableCollection::EList
       Array
     elsif o == Java::LambdaEnumerableCollection::EMap

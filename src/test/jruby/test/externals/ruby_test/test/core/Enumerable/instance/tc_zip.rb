@@ -10,12 +10,6 @@ class TC_Enumerable_Zip_InstanceMethod < Test::Unit::TestCase
       def to_ary
          ['x', 'y', 'z']
       end
-      
-      def to_a
-      	to_ary
-  	  end
-  	  
-  	  include EnumerableJava
    end
 
    def setup

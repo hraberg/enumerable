@@ -72,7 +72,7 @@ test_equal([[1, 4, 7], [2, 5, 8], [3, 6, 9]],(1..3).zip(a, b))
 test_equal([[1], [2], [3]],(1..3).zip)
 
 test_exception(ArgumentError) {
-   ['a'].grep {/foo/}
+  ['a'].grep {/foo/}
 }
 
 test_equal([Array],[['foo']].map {|a|a.class})

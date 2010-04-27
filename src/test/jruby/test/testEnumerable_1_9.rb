@@ -2,19 +2,12 @@ require 'test/minirunit'
 
 class TestEnumerable
   include Enumerable
-
   def initialize(value)
     @value = value
   end
   def each(&block)
     @value.each(&block)
   end
-
-  def to_a
-    @value.to_a
-  end
-
-  include EnumerableJava
 end
 
 test_equal nil, TestEnumerable.new([]).first
