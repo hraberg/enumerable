@@ -51,11 +51,29 @@ public class Enumerable {
     }
 
     /**
+     * Passes each element of the collection to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block never
+     * returns false or null.
+     */
+    public static <E> boolean all(Iterable<E> collection) {
+        return extend(collection).all();
+    }
+
+    /**
      * Passes each element of the collection to the given block. The method
      * returns true if the block ever returns a value other than false or null.
      */
     public static <E> boolean any(Iterable<E> collection, Fn1<? super E, ?> block) {
         return extend(collection).any(block);
+    }
+
+    /**
+     * Passes each element of the collection to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block ever returns
+     * a value other than false or null.
+     */
+    public static <E> boolean any(Iterable<E> collection) {
+        return extend(collection).any();
     }
 
     /**
@@ -455,11 +473,29 @@ public class Enumerable {
     }
 
     /**
+     * Passes each element of the collection to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block never
+     * returns a value other than false or null.
+     */
+    public static <E> boolean none(Iterable<E> collection) {
+        return extend(collection).none();
+    }
+
+    /**
      * Passes each element of the collection to the given block. The method
      * returns true if the block returns true exactly one time.
      */
     public static <E> boolean one(Iterable<E> collection, Fn1<? super E, ?> block) {
         return extend(collection).one(block);
+    }
+
+    /**
+     * Passes each element of the collection to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block returns true
+     * exactly one time.
+     */
+    public static <E> boolean one(Iterable<E> collection) {
+        return extend(collection).one();
     }
 
     /**

@@ -122,11 +122,11 @@ public class EnumerableCollectionsTest extends TestBase {
             timeSchwartzianTransform += nanoTime() - now;
 
             now = nanoTime();
-            actual = files.sort(new EnumerableModule.CachedBlockResultComparator<String, Long>(lastModifiedBlock));
+            actual = files.sortInternal(new EnumerableModule.CachedBlockResultComparator<String, Long>(lastModifiedBlock));
             timeWithCache += nanoTime() - now;
 
             now = nanoTime();
-            actual = files.sort(new EnumerableModule.BlockResultComparator<String, Long>(lastModifiedBlock));
+            actual = files.sortInternal(new EnumerableModule.BlockResultComparator<String, Long>(lastModifiedBlock));
             timeNoCache += nanoTime() - now;
         }
 

@@ -31,6 +31,7 @@ test_equal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], test2.to_a)
 test_equal(test1, test1.entries)
 test_equal([0, 1, 2, 3, 5, 5, 7, 43, 44, 53, 221, 6352],test1.sort)
 test_equal(["flea", "kea", "rhea"],test3.sort)
+# FIXME: this is only skipped because the wrong sort metod is found on EList
 #test_equal([10, 9, 8, 7, 6, 5, 4, 3, 2, 1],test4.sort { |a,b| b<=>a })
 test_equal(["fig", "pear", "apple"],test5.sort_by { |word| word.length })
 # Skipped as Enumerable.java doesn't use the === to match patterns
@@ -60,10 +61,10 @@ test_equal("albatross",%w(albatross dog horse).min)
 test_equal("dog",%w(albatross dog horse).min {|a,b| a.length <=> b.length })
 test_equal(true,%w{ ant bear cat}.all? {|word| word.length >= 3})
 test_equal(false,%w{ ant bear cat}.all? {|word| word.length >= 4})
-#test_equal(false,[ nil, true, 99 ].all?)
+test_equal(false,[ nil, true, 99 ].all?)
 test_equal(true,%w{ ant bear cat}.any? {|word| word.length >= 3})
 test_equal(true,%w{ ant bear cat}.any? {|word| word.length >= 4})
-#test_equal(true,[ nil, true, 99 ].any?)
+test_equal(true,[ nil, true, 99 ].any?)
   a = [ 4, 5, 6 ]
   b = [ 7, 8, 9 ]
 test_equal([[1, 4, 7], [2, 5, 8], [3, 6, 9]],(1..3).zip(a, b))

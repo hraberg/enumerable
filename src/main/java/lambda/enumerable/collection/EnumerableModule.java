@@ -65,11 +65,19 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return true;
     }
 
+    public boolean all() {
+        return all(Fn1.identity());
+    }
+
     public boolean any(Fn1<? super E, ?> block) {
         for (E each : this)
             if (isNotFalseOrNull(block.call(each)))
                 return true;
         return false;
+    }
+
+    public boolean any() {
+        return any(Fn1.identity());
     }
 
     public <R> EList<R> collect(Fn1<? super E, R> block) {
@@ -354,6 +362,10 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return !any(block);
     }
 
+    public boolean none() {
+        return none(Fn1.identity());
+    }
+
     public boolean one(Fn1<? super E, ?> block) {
         Object match = null;
         for (E each : this) {
@@ -365,6 +377,10 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
                     match = result;
         }
         return match != null;
+    }
+
+    public boolean one() {
+        return one(Fn1.identity());
     }
 
     public EList<EList<E>> partition(Fn1<? super E, Boolean> block) {
@@ -409,11 +425,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public EList<E> sort() {
-        return sort((Comparator<E>) null);
+        return sortInternal((Comparator<E>) null);
     }
 
     public EList<E> sort(final Fn2<? super E, ? super E, Integer> block) {
-        return sort(new Comparator<E>() {
+        return sortInternal(new Comparator<E>() {
             public int compare(E o1, E o2) {
                 return ((Number) block.call(o1, o2)).intValue();
             }
@@ -503,7 +519,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    EList<E> sort(Comparator<? super E> comparator) {
+    EList<E> sortInternal(Comparator<? super E> comparator) {
         List<E> result = asNewList();
         Collections.sort(result, comparator);
         return new EList<E>(result);

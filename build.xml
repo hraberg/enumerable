@@ -8,8 +8,6 @@
     <property file="lambda.weaving.properties" />
     <tstamp />
     
-    <echo message="${java.home}/lib/rt.jar" />
-    
     <path id="enumerable.classpath">
         <pathelement location="target/classes" />
         <pathelement location="lib/asm-all-3.2.jar" />

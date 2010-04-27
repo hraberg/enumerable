@@ -32,28 +32,21 @@ public class EnumerableJRubyTest {
         eval("test4 = (1..10)");
         // assertEquals(eval("[10, 9, 8, 7, 6, 5, 4, 3, 2, 1]"),
         // eval("test4.sort { |a,b| b<=>a }"));
-        // eval("test6 = 1..100");
-        // assertEquals(eval("[38, 39, 40, 41, 42, 43, 44]"),
-        // eval("test6.grep(38..44)"));
         assertEquals(37L, eval("(1..10).detect(lambda { 37 }) {|i| i % 5 == 0 and i % 7 == 0 }"));
         assertEquals(eval("[[2, 4, 6], [1, 3, 5]]"), eval("(1..6).partition {|i| (i&1).zero?}"));
         assertTrue((Boolean) eval("(1..10).include?(5)"));
-        // assertEquals(eval("[[\"cat\n\", 1], [\"dog\", nil]]"),
-        // eval("\"cat\ndog\".zip([1])"));
         assertEquals(eval("[[1], [2], [3]]"), eval("(1..3).zip"));
         assertEquals(eval("[Array]"), eval("[['foo']].map {|a|a.class}"));
-        // eval("class Test2Enumerable; def == other; true; end; end");
-        // assertTrue((Boolean) eval("[Test2Enumerable.new].member?(\"foo\")"));
     }
 
     @Test
     public void testEnumerableRb() throws Exception {
-        load("/testEnumerable.rb");
+        load("/test/testEnumerable.rb");
     }
 
     @Test
     public void testEnumerable_1_9Rb() throws Exception {
-        load("/testEnumerable_1_9.rb");
+        load("/test/testEnumerable_1_9.rb");
     }
 
     @BeforeClass

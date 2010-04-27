@@ -26,10 +26,24 @@ public interface IEnumerable<E> extends Iterable<E> {
     boolean all(Fn1<? super E, ?> block);
 
     /**
+     * Passes each element of the collection to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block never
+     * returns false or null.
+     */
+    boolean all();
+
+    /**
      * Passes each element of the collection to the given block. The method
      * returns true if the block ever returns a value other than false or null.
      */
     boolean any(Fn1<? super E, ?> block);
+
+    /**
+     * Passes each element of the collection to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block ever returns
+     * a value other than false or null.
+     */
+    boolean any();
 
     /**
      * Returns a new list with the results of running block once for every
@@ -272,10 +286,24 @@ public interface IEnumerable<E> extends Iterable<E> {
     boolean none(Fn1<? super E, ?> block);
 
     /**
+     * Passes each element of the collection to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block never
+     * returns a value other than false or null.
+     */
+    boolean none();
+
+    /**
      * Passes each element of the collection to the given block. The method
      * returns true if the block returns true exactly one time.
      */
     boolean one(Fn1<? super E, ?> block);
+
+    /**
+     * Passes each element of the collection to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block returns true
+     * exactly one time.
+     */
+    boolean one();
 
     /**
      * Returns two lists, the first containing the elements of collection for

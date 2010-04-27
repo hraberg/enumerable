@@ -41,11 +41,29 @@ public class EnumerableArrays {
     }
 
     /**
+     * Passes each element of the array to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block never
+     * returns false or null.
+     */
+    public static <E> boolean all(E[] array) {
+        return Enumerable.all(asList(array));
+    }
+
+    /**
      * Passes each element of the array to the given block. The method returns
      * true if the block ever returns a value other than false or null.
      */
     public static <E> boolean any(E[] array, Fn1<? super E, ?> block) {
         return Enumerable.any(asList(array), block);
+    }
+
+    /**
+     * Passes each element of the array to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block ever returns
+     * a value other than false or null.
+     */
+    public static <E> boolean any(E[] array) {
+        return Enumerable.any(asList(array));
     }
 
     /**
@@ -351,11 +369,29 @@ public class EnumerableArrays {
     }
 
     /**
+     * Passes each element of the array to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block never
+     * returns a value other than false or null.
+     */
+    public static <E> boolean none(E[] array) {
+        return Enumerable.none(asList(array));
+    }
+
+    /**
      * Passes each element of the array to the given block. The method returns
      * true if the block returns true exactly one time.
      */
     public static <E> boolean one(E[] array, Fn1<? super E, ?> block) {
         return Enumerable.one(asList(array), block);
+    }
+
+    /**
+     * Passes each element of the array to the an implicit block of
+     * {@link Fn1#identity()}. The method returns true if the block returns true
+     * exactly one time.
+     */
+    public static <E> boolean one(E[] array) {
+        return Enumerable.one(asList(array));
     }
 
     /**
