@@ -4,8 +4,6 @@ import 'lambda.Fn1'
 import 'lambda.enumerable.collection.EnumerableModule'
 import 'lambda.jruby.LambdaJRuby'
 import 'lambda.enumerable.EnumerableJRubyTest'
-import 'org.jruby.javasupport.JavaEmbedUtils'
-import 'org.jruby.Ruby'
 
 module EnumerableJava
   def self.included(host)
@@ -86,7 +84,6 @@ module Enumerable
   def unnest_java_collections o
     if o.class.include? Java::JavaUtil::List
       o.to_a.collect! {|e| unnest_java_collections e}
-
     elsif o.class.include? Java::JavaUtil::Map
       h = {}
       h.put_all o
@@ -100,4 +97,3 @@ module Enumerable
     end
   end
 end
-

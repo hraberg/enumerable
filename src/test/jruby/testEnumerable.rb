@@ -33,6 +33,7 @@ test_equal([0, 1, 2, 3, 5, 5, 7, 43, 44, 53, 221, 6352],test1.sort)
 test_equal(["flea", "kea", "rhea"],test3.sort)
 #test_equal([10, 9, 8, 7, 6, 5, 4, 3, 2, 1],test4.sort { |a,b| b<=>a })
 test_equal(["fig", "pear", "apple"],test5.sort_by { |word| word.length })
+# Skipped as Enumerable.java doesn't use the === to match patterns
 #test_equal([38, 39, 40, 41, 42, 43, 44], test6.grep(38..44))
 test_equal(nil,(1..10).detect {|i| i % 5 == 0 and i % 7 == 0 })
 test_equal(35,(1..100).detect {|i| i % 5 == 0 and i % 7 == 0 })
@@ -66,8 +67,9 @@ test_equal(true,%w{ ant bear cat}.any? {|word| word.length >= 4})
   a = [ 4, 5, 6 ]
   b = [ 7, 8, 9 ]
 test_equal([[1, 4, 7], [2, 5, 8], [3, 6, 9]],(1..3).zip(a, b))
+# Skipped as Enumerable.java doesn't support Strings
 #test_equal([["cat\n", 1], ["dog", nil]],"cat\ndog".zip([1]))
-#test_equal([[1], [2], [3]],(1..3).zip)
+test_equal([[1], [2], [3]],(1..3).zip)
 
 test_exception(ArgumentError) {
    ['a'].grep {/foo/}
@@ -81,4 +83,5 @@ class Test2Enumerable
     end
 end
 
-# test_equal true, [Test2Enumerable.new].member?("foo")
+# Skipped as Enumerable.java will pass in "foo" as a plan java.lang.String which won't pass ==
+#test_equal true, [Test2Enumerable.new].member?("foo")

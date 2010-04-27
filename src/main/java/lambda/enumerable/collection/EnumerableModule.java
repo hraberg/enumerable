@@ -458,6 +458,10 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return new ESet<R>(new HashSet<R>(collect(block)));
     }
 
+    public EList<EList<?>> zip() {
+        return zip(new Iterable<?>[0]);
+    }
+
     public EList<EList<?>> zip(Iterable<?>... args) {
         EList<EList<?>> allResults = new EList<EList<?>>();
 
