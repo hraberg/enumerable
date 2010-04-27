@@ -31,8 +31,7 @@ test_equal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], test2.to_a)
 test_equal(test1, test1.entries)
 test_equal([0, 1, 2, 3, 5, 5, 7, 43, 44, 53, 221, 6352],test1.sort)
 test_equal(["flea", "kea", "rhea"],test3.sort)
-# FIXME: this is only skipped because the wrong sort metod is found on EList
-#test_equal([10, 9, 8, 7, 6, 5, 4, 3, 2, 1],test4.sort { |a,b| b<=>a })
+test_equal([10, 9, 8, 7, 6, 5, 4, 3, 2, 1],test4.sort { |a,b| b<=>a })
 test_equal(["fig", "pear", "apple"],test5.sort_by { |word| word.length })
 # Skipped as Enumerable.java doesn't use the === to match patterns
 #test_equal([38, 39, 40, 41, 42, 43, 44], test6.grep(38..44))

@@ -21,6 +21,11 @@ class MyEnumGrep
       yield @arg2
       yield @arg3
    end
+
+   def to_a
+     [@arg1, @arg2, @arg3]
+   end
+   include EnumerableJava
 end
 
 class TC_Enumerable_Grep_InstanceMethod < Test::Unit::TestCase

@@ -24,7 +24,12 @@ class TestEnumerable < Test::Unit::TestCase
         i += 1
       end
     end
+    
+    def to_a
+      @arr
+    end
 
+	include EnumerableJava
   end
 
   def E(*elements)

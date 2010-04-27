@@ -51,6 +51,10 @@ class Array
   include EnumerableJava
 end
 
+module java::util::List
+	remove_method :sort
+end
+
 module Enumerable
   @@original_instance_methods = instance_methods
   instance_methods.each {|m| remove_method m unless m =~ /^enum/}
@@ -66,6 +70,7 @@ module Enumerable
 
   def method_missing(name, *args, &block)
     EnumerableJRubyTest.debug "calling #{name} with #{args} #{block}"
+
     args = args.push(to_fn block) if block_given?
     args.collect! {|a| a.class == Proc ? to_fn(a) : a}
 
@@ -73,6 +78,9 @@ module Enumerable
 
     begin
       result = to_java.send name, *args
+      unnest_java_collections result
+    rescue ArgumentError
+      result = to_java.send name, Fn1.identity
       unnest_java_collections result
     rescue NameError, Java::JavaLang::IllegalArgumentException => e
       EnumerableJRubyTest.debug e.to_s
