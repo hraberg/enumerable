@@ -51,7 +51,7 @@ public class EnumerableJRubyTest {
 
     @BeforeClass
     public static void enumerableJava() throws ScriptException {
-        load("/enumerableJava.rb");
+        load("/enumerable_java.rb");
     }
 
     static void load(String test) throws ScriptException {
