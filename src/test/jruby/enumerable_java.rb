@@ -13,7 +13,6 @@ module EnumerableJava
   end
 
   def to_a
-  	puts "calling to_a`"
     to_java.to_list.to_a
   end
 
