@@ -1,6 +1,7 @@
 package lambda.enumerable.jruby;
 
 import static java.lang.System.*;
+import static lambda.exception.UncheckedException.*;
 
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -15,23 +16,23 @@ import lambda.weaving.Debug;
 import org.junit.Before;
 
 public class JRubyTestBase {
-    static boolean debug = Debug.debug;
-    ScriptEngine rb = JRubyTest.getJRubyEngine();
+    public static boolean debug = Debug.debug;
+    public ScriptEngine rb = JRubyTest.getJRubyEngine();
 
     @Before
     public void monkeyPatchJRubyEnumerableToUseEnumerableJava() throws ScriptException {
         require("enumerable_java");
     }
 
-    void load(String test) throws ScriptException {
+    public void load(String test) throws ScriptException {
         rb.eval(new InputStreamReader(JRubyTestBase.class.getResourceAsStream(test)));
     }
 
-    void require(String file) throws ScriptException {
+    public void require(String file) throws ScriptException {
         rb.eval("require '" + file + "'");
     }
 
-    Object eval(String script) throws ScriptException {
+    public Object eval(String script) throws ScriptException {
         return rb.eval(script);
     }
 
@@ -49,7 +50,7 @@ public class JRubyTestBase {
                 out.println(writer);
         } catch (ScriptException e) {
             out.println(writer);
-            throw e;
+            throw uncheck(e);
         } finally {
             rb.getContext().setWriter(originalWriter);
         }
