@@ -301,11 +301,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     public E max() {
         Comparator<E> reverseOrder = reverseOrder();
-        return min(reverseOrder);
+        return minInternal(reverseOrder);
     }
 
     public E max(final Fn2<? super E, ? super E, Integer> block) {
-        return min(reverseOrder(new Comparator<E>() {
+        return minInternal(reverseOrder(new Comparator<E>() {
             public int compare(E o1, E o2) {
                 return ((Number) block.call(o1, o2)).intValue();
             }
@@ -313,7 +313,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public <R extends Object & Comparable<? super R>> E maxBy(Fn1<? super E, R> block) {
-        return min(reverseOrder(new BlockResultComparator<E, R>(block)));
+        return minInternal(reverseOrder(new BlockResultComparator<E, R>(block)));
     }
 
     public boolean member(Object obj) {
@@ -322,11 +322,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     public E min() {
         Comparator<E> naturalOrder = naturalOrder();
-        return min(naturalOrder);
+        return minInternal(naturalOrder);
     }
 
     public E min(final Fn2<? super E, ? super E, Integer> block) {
-        return min(new Comparator<E>() {
+        return minInternal(new Comparator<E>() {
             public int compare(E o1, E o2) {
                 return ((Number) block.call(o1, o2)).intValue();
             }
@@ -334,7 +334,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public <R extends Object & Comparable<? super R>> E minBy(Fn1<? super E, R> block) {
-        return min(new BlockResultComparator<E, R>(block));
+        return minInternal(new BlockResultComparator<E, R>(block));
     }
 
     public EList<E> minMax() {
@@ -511,7 +511,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    E min(Comparator<? super E> comparator) {
+    E minInternal(Comparator<? super E> comparator) {
         E result = null;
         for (E each : this)
             if (result == null || comparator.compare(each, result) < 0)
