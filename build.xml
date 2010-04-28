@@ -15,7 +15,7 @@
         <pathelement location="lib/extra166y.jar" />
         <pathelement location="lib/clojure-1.1.0.jar" />
         <pathelement location="lib/clojure-jsr223.jar" />
-        <pathelement location="lib/jruby-1.5.0.RC1.jar" />
+        <pathelement location="lib/jruby-complete-1.5.0.RC1.jar" />
         <pathelement location="lib/google-collect-1.0.jar" />
         <pathelement location="lib/sun.org.mozilla.javascript.internal.jar" />
     </path>
