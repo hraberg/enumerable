@@ -123,7 +123,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     public E detect(Fn0<E> ifNone, Fn1<? super E, Boolean> block) {
         for (E each : this)
-            if (block.call(each))
+            if (isNotFalseOrNull(block.call(each)))
                 return each;
         return ifNone == null ? null : ifNone.call();
     }
@@ -141,7 +141,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     public EList<E> dropWhile(Fn1<? super E, Boolean> block) {
         EList<E> result = new EList<E>();
         for (E next : this)
-            if (!result.isEmpty() || !block.call(next))
+            if (!result.isEmpty() || isFalseOrNull(block.call(next)))
                 result.add(next);
         return result;
     }
@@ -202,7 +202,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     public EList<E> findAll(Fn1<? super E, Boolean> block) {
         EList<E> result = new EList<E>();
         for (E each : this)
-            if (block.call(each))
+            if (isNotFalseOrNull(block.call(each)))
                 result.add(each);
         return result;
     }
@@ -210,7 +210,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     public int findIndex(Fn1<? super E, Boolean> block) {
         int index = 0;
         for (E each : this)
-            if (block.call(each))
+            if (isNotFalseOrNull(block.call(each)))
                 return index;
             else
                 index++;
@@ -387,7 +387,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         EList<E> selected = new EList<E>();
         EList<E> rejected = new EList<E>();
         for (E each : this)
-            if (block.call(each))
+            if (isNotFalseOrNull(block.call(each)))
                 selected.add(each);
             else
                 rejected.add(each);
@@ -408,7 +408,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     public EList<E> reject(Fn1<? super E, Boolean> block) {
         EList<E> result = new EList<E>();
         for (E each : this)
-            if (!block.call(each))
+            if (isFalseOrNull(block.call(each)))
                 result.add(each);
         return result;
     }
@@ -455,7 +455,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     public EList<E> takeWhile(Fn1<? super E, Boolean> block) {
         EList<E> result = new EList<E>();
         for (E next : this)
-            if (block.call(next))
+            if (isNotFalseOrNull(block.call(next)))
                 result.add(next);
             else
                 return result;

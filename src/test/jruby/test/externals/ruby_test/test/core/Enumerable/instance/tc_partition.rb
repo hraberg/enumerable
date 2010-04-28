@@ -36,7 +36,9 @@ class TC_Enumerable_Partition_InstanceMethod < Test::Unit::TestCase
 =begin
       assert_raise(LocalJumpError){ @enum.partition }
 =end
-      assert_raise(ArgumentError){ @enum.partition(true) }
+      # Enumerable.java will raise TypeError here, as true will fail to be coerced into a block
+      # assert_raise(ArgumentError){ @enum.partition(true) }
+      assert_raise(TypeError){ @enum.partition(true) }
    end
 
    def teardown

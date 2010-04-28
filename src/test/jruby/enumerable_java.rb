@@ -5,49 +5,72 @@ import 'lambda.enumerable.collection.EnumerableModule'
 import 'lambda.jruby.LambdaJRuby'
 import 'lambda.enumerable.jruby.JRubyTestBase'
 
+# Redefines Enumerable in JRuby to use Enumerable.java.
+# It 'almost' works as long as there's not too much duck typing going on.
+#
+# require 'enumerable_java' will include EnumerableJava in anyone who includes Enumerable.
+# It also patches Array, Hash and Range when first loaded.
+#
+# This patch is mainly for running tests written in Ruby against Enumerable.java.
+
+JRubyTestBase.debug "Loading Enumerable.java MonkeyPatch"
+
 module Enumerable
   def self.included(host)
     host.class_eval do
-      include EnumerableJava
-      JRubyTestBase.debug "included EnumerableJava in #{host}"
+      JRubyTestBase.debug "included Enumerable in #{host}"
+      include EnumerableJava unless host.include? EnumerableJava
     end
   end
 
+  JRubyTestBase.debug "undefining the Enumerable methods (except /^enum/)"
   @@original_instance_methods = instance_methods
-  instance_methods.each {|m| remove_method m unless m =~ /^enum/}
+  instance_methods.each {|m| undef_method m unless m =~ /^enum/}
   
   def self.original_method?(method)
+    # Cannot use include? here as this method will be used by EnumerableJava before the dust has settled
     @@original_instance_methods.each{|m| return true if m == method}
     false
   end
   
   def respond_to?(method)
-    @@original_instance_methods.member?(method.to_s) || super
+    @@original_instance_methods.include?(method.to_s) || super
   end
-
+  
   def method_missing(name, *args, &block)
-    j = to_java
-    JRubyTestBase.debug "calling #{name} with #{args} #{block} on #{self.class} as #{j.class}"
+    java_object = to_java
+    JRubyTestBase.debug "calling #{name} with #{args.inspect} #{block_given? ? block : "<no block>"} on #{self.class} as #{java_object.class}"
 
-    args = args.push(to_fn block) if block_given?
-    args.collect! {|a| a.class == Proc ? to_fn(a) : a}
+    args = args << to_fn(block) if block_given?
+    args.collect! {|a| a.is_a?(Proc) ? to_fn(a) : a}
+    args.collect! {|a| a.is_a?(Regexp) ? a.to_s : a}
 
-    name = name.to_s.sub "?", ""
+    java_name = name.to_s.sub "?", ""
 
     begin
-      result = j.send name, *args
-      return self if j.equal? result
-      unnest_java_collections result
-    rescue ArgumentError
-      result = j.send name, Fn1.identity
-      return self if j.equal? result
-      unnest_java_collections result
-    rescue NoMethodError
+      result = java_object.send java_name, *args
+    rescue ArgumentError => e
+      raise e if [:include?, :member?].include? name
+
+      JRubyTestBase.debug "caught ArgumentError, trying again with implicit block"
+      begin
+        result = java_object.send java_name, Fn1.identity
+      rescue
+        raise e
+      end
+    rescue NoMethodError, TypeError
       raise
+    rescue Java::JavaLang::NullPointerException => e
+      JRubyTestBase.debug "caught NullPointerException, will rereaise as NoMethodError"
+      raise NoMethodError, e.to_s
     rescue NameError, Java::JavaLang::ClassCastException, Java::JavaLang::IllegalArgumentException => e
-      JRubyTestBase.debug e.to_s
+      raise LocalJumpError if [:inject].include?(name) && !block_given?
+
+      JRubyTestBase.debug "caught #{e.class} \"#{e.to_s}\", will reraise as ArgumentError"
       raise ArgumentError, e.to_s
     end
+    return self if java_object.equal? result
+    unnest_java_collections result
   end
 
   private
@@ -71,6 +94,8 @@ end
 module EnumerableJava
   def self.included(host)
     host.class_eval do
+      JRubyTestBase.debug "included EnumerableJava in #{host}"
+      JRubyTestBase.debug "undefining methods shadowing Enumerable on #{host}"
       instance_methods(false).select {|m| Enumerable.original_method? m}.each do |m|
         JRubyTestBase.debug "undefining #{m} on #{host}"
         undef_method m
@@ -84,11 +109,6 @@ module EnumerableJava
     to_java.to_list.to_a
   end
   
-  # defined in Kernel haven't found a good way to get rid of it
-  def select &block
-    find_all block
-  end
-
   private
   def internal_to_a
   	a = []

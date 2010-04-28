@@ -34,7 +34,9 @@ class TC_Enumerable_EachWithIndex_InstanceMethod < Test::Unit::TestCase
 
    def test_each_with_index_basic
       assert_respond_to(@enum, :each_with_index)
-      assert_nothing_raised{ @enum.each_with_index{} }
+      # Enumerable.java is strict about the number of arguments a block takes.
+      # assert_nothing_raised{ @enum.each_with_index{} }
+      assert_nothing_raised{ @enum.each_with_index{|e, i|} }
    end
 
    def test_each_with_index

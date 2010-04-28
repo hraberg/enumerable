@@ -26,11 +26,11 @@ public class EnumerableJRubyTest extends JRubyTestBase {
 
     @Test
     public void testEnumerable() throws Exception {
-        load("/test/testEnumerable.rb");
+        require("test/testEnumerable");
     }
 
     @Test
     public void testEnumerable_1_9() throws Exception {
-        load("/test/testEnumerable_1_9.rb");
+        require("test/testEnumerable_1_9");
     }
 }

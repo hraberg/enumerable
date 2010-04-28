@@ -1,7 +1,6 @@
 package lambda.enumerable.jruby;
 
 import static java.lang.System.*;
-import static lambda.exception.UncheckedException.*;
 
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -13,25 +12,23 @@ import javax.script.ScriptException;
 import lambda.jruby.JRubyTest;
 import lambda.weaving.Debug;
 
+import org.junit.Before;
+
 public class JRubyTestBase {
     static boolean debug = Debug.debug;
     ScriptEngine rb = JRubyTest.getJRubyEngine();
 
-    static {
-        try {
-            monkeyPatchJRubyEnumerableToUseEnumerableJava();
-        } catch (ScriptException e) {
-            throw uncheck(e);
-        }
-    }
-
-    public static void monkeyPatchJRubyEnumerableToUseEnumerableJava() throws ScriptException {
-        JRubyTest.getJRubyEngine().eval(
-                new InputStreamReader(JRubyTestBase.class.getResourceAsStream("/enumerable_java.rb")));
+    @Before
+    public void monkeyPatchJRubyEnumerableToUseEnumerableJava() throws ScriptException {
+        require("enumerable_java");
     }
 
     void load(String test) throws ScriptException {
         rb.eval(new InputStreamReader(JRubyTestBase.class.getResourceAsStream(test)));
+    }
+
+    void require(String file) throws ScriptException {
+        rb.eval("require '" + file + "'");
     }
 
     Object eval(String script) throws ScriptException {
@@ -43,10 +40,13 @@ public class JRubyTestBase {
         Writer originalWriter = rb.getContext().getWriter();
         rb.getContext().setWriter(writer);
         try {
-            load(file);
-            eval("require 'test/unit/ui/console/testrunner'");
+            require(file);
+            require("test/unit/ui/console/testrunner");
             eval("r = Test::Unit::UI::Console::TestRunner.run(" + testClass + ")");
             eval("raise r.to_s unless r.passed?");
+
+            if (debug)
+                out.println(writer);
         } catch (ScriptException e) {
             out.println(writer);
             throw e;
