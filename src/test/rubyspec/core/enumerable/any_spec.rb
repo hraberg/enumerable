@@ -21,15 +21,11 @@ describe "Enumerable#any?" do
   end
 
   it "raises an ArgumentError when any arguments provided" do
-    # Enumerable.java works like this, the argument is the excepted block
-    # lambda { @enum.any?(Proc.new {}) }.should raise_error(ArgumentError)
-    # Enumerable.java treats this as a null block, the NPE is turned into a NoMethodError
-    # lambda { @enum.any?(nil) }.should raise_error(ArgumentError)
-    lambda { @enum.any?(nil) }.should raise_error(NoMethodError)
+    lambda { @enum.any?(Proc.new {}) }.should raise_error(ArgumentError)
+    lambda { @enum.any?(nil) }.should raise_error(ArgumentError)
     lambda { @empty.any?(1) }.should raise_error(ArgumentError)
-    # Enumerable.java will retry these with an implicit block as they raise ArgumentError 2 (or 3) for 1
-    # lambda { @enum1.any?(1) {} }.should raise_error(ArgumentError)
-    # lambda { @enum2.any?(1, 2, 3) {} }.should raise_error(ArgumentError)
+    lambda { @enum1.any?(1) {} }.should raise_error(ArgumentError)
+    lambda { @enum2.any?(1, 2, 3) {} }.should raise_error(ArgumentError)
   end
 
   it "does not hide exceptions out of #each" do

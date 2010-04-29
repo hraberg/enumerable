@@ -43,7 +43,6 @@ module Enumerable
 
     args = args << to_fn(block) if block_given?
     args.collect! {|a| a.is_a?(Proc) ? to_fn(a) : a}
-    args.collect! {|a| a.is_a?(Regexp) ? a.to_s : a}
 
     java_name = name.to_s.sub "?", ""
 

@@ -110,6 +110,8 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public <R> EList<E> cycle(int times, Fn1<? super E, R> block) {
+        if (times < 0)
+            return null;
         EList<E> result = new EList<E>();
         while (times-- > 0)
             for (E each : this)

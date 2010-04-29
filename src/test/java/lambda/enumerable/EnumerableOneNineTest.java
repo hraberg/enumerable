@@ -38,6 +38,16 @@ public class EnumerableOneNineTest extends TestBase {
     }
 
     @Test
+    public void cycleCollectionZeroTimesReturnsEmptyList() throws Exception {
+        assertEquals(list(), cycle(oneToFive, 0, λ(n, n)));
+    }
+
+    @Test
+    public void cycleCollectionNegativeTimesReturnsNull() throws Exception {
+        assertNull(cycle(oneToFive, -1, λ(n, n)));
+    }
+
+    @Test
     public void dropNElements() throws Exception {
         assertEquals(list(4, 5), drop(oneToFive, 3));
     }
