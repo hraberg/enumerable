@@ -97,25 +97,45 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return count;
     }
 
+    @SuppressWarnings("unchecked")
     public int count(E obj) {
+        if (obj instanceof Fn1<?, ?>)
+            return count((Fn1<E, Boolean>) obj);
         int count = 0;
-        for (E each : this)
-            if (obj.equals(each))
-                count++;
+        if (obj == null) {
+            for (E each : this)
+                if (each == null)
+                    count++;
+        } else {
+            for (E each : this)
+                if (obj.equals(each))
+                    count++;
+        }
         return count;
     }
 
+    @SuppressWarnings("unchecked")
     public int count(Fn1<? super E, Boolean> block) {
+        if (!(block instanceof Fn1<?, ?>))
+            return count((E) block);
         return select(block).size();
     }
 
+    public <R> EList<E> cycle(Fn1<? super E, R> block) {
+        while (true)
+            for (E each : this)
+                block.call(each);
+    }
+
     public <R> EList<E> cycle(int times, Fn1<? super E, R> block) {
-        if (times < 0)
+        if (times <= 0)
             return null;
+        EList<E> list = new EList<E>();
+        for (E each : this)
+            list.add(each);
         EList<E> result = new EList<E>();
         while (times-- > 0)
-            for (E each : this)
-                result.add(each);
+            result.addAll(list);
         return result.each(block);
     }
 
@@ -132,7 +152,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     public EList<E> drop(int n) {
         if (n < 0)
-            throw new IllegalArgumentException("Attempt to drop negative size");
+            throw new IllegalArgumentException("attempt to drop negative size");
         EList<E> result = new EList<E>();
         for (E each : this)
             if (n-- <= 0)
@@ -156,7 +176,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     public <R> Object eachCons(int n, Fn1<List<E>, R> block) {
         if (n <= 0)
-            throw new IllegalArgumentException("Invalid size");
+            throw new IllegalArgumentException("invalid size");
         List<E> list = asNewList();
         for (int i = 0; i + n <= list.size(); i++)
             if (n + i <= list.size())
@@ -166,10 +186,10 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     public <R> Object eachSlice(int n, Fn1<List<E>, R> block) {
         if (n <= 0)
-            throw new IllegalArgumentException("Invalid size");
+            throw new IllegalArgumentException("invalid size");
         List<E> list = asNewList();
-        for (int i = 0; i <= list.size(); i += n)
-            if (i + n > list.size())
+        for (int i = 0; i < list.size(); i += n)
+            if (i + n >= list.size())
                 block.call(list.subList(i, list.size()));
             else
                 block.call(list.subList(i, i + n));
@@ -209,6 +229,17 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
+    @SuppressWarnings("serial")
+    public int findIndex(final E obj) {
+        return findIndex(new Fn1<E, Boolean>() {
+            public Boolean call(E a1) {
+                if (obj == null)
+                    return a1 == null;
+                return obj.equals(a1);
+            }
+        });
+    }
+
     public int findIndex(Fn1<? super E, Boolean> block) {
         int index = 0;
         for (E each : this)
@@ -226,15 +257,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     }
 
     public EList<E> first(int n) {
-        if (n < 0)
-            throw new IllegalArgumentException("Negative array size");
-        EList<E> result = new EList<E>();
-        for (E each : this)
-            if (n-- > 0)
-                result.add(each);
-            else
-                return result;
-        return result;
+        return take(n);
     }
 
     public EList<E> grep(Pattern pattern) {
@@ -444,7 +467,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     public EList<E> take(int n) {
         if (n < 0)
-            throw new IllegalArgumentException("Attempt to take negative size");
+            throw new IllegalArgumentException("attempt to take negative size");
         EList<E> result = new EList<E>();
         for (E each : this)
             if (n-- > 0)

@@ -41,10 +41,12 @@ describe "Enumerable#each_cons" do
     acc.should == []
   end
 
-  it "yields only as much as needed" do
-    cnt = EnumerableSpecs::EachCounter.new(1, 2, :stop, "I said stop!", :got_it)
-    cnt.each_cons(2) {|g| break 42 if g[-1] == :stop }.should == 42
-    cnt.times_yielded.should == 3
+  platform_is_not :enumerable_java do
+    it "yields only as much as needed" do
+      cnt = EnumerableSpecs::EachCounter.new(1, 2, :stop, "I said stop!", :got_it)
+      cnt.each_cons(2) {|g| break 42 if g[-1] == :stop }.should == 42
+      cnt.times_yielded.should == 3
+    end
   end
 
   ruby_version_is '1.8.7' do

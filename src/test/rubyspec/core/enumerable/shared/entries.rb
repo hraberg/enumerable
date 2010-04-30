@@ -4,11 +4,13 @@ describe :enumerable_entries, :shared => true do
     numerous.send(@method).should == [1, nil, "a", 2, false, true]
   end
   
-  ruby_version_is '1.8.7' do
-    it "passes arguments to each" do
-      count = EnumerableSpecs::EachCounter.new(1, 2, 3)
-      count.to_a(:hello, "world").should == [1, 2, 3]
-      count.arguments_passed.should == [:hello, "world"]
+  platform_is_not :enumerable_java do
+    ruby_version_is '1.8.7' do
+      it "passes arguments to each" do
+        count = EnumerableSpecs::EachCounter.new(1, 2, 3)
+        count.to_a(:hello, "world").should == [1, 2, 3]
+        count.arguments_passed.should == [:hello, "world"]
+      end
     end
   end
 end

@@ -2,17 +2,29 @@ package lambda.enumerable.jruby;
 
 import static java.lang.System.*;
 import static lambda.exception.UncheckedException.*;
+import static org.jruby.javasupport.JavaEmbedUtils.*;
 
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import lambda.Fn0;
+import lambda.Fn1;
+import lambda.Fn2;
 import lambda.jruby.JRubyTest;
 import lambda.weaving.Debug;
 
+import org.jruby.Ruby;
+import org.jruby.RubyArray;
+import org.jruby.RubyHash;
+import org.jruby.RubyProc;
+import org.jruby.runtime.builtin.IRubyObject;
 import org.junit.Before;
 
 public class JRubyTestBase {
@@ -21,7 +33,11 @@ public class JRubyTestBase {
 
     @Before
     public void monkeyPatchJRubyEnumerableToUseEnumerableJava() throws ScriptException {
-        require("enumerable_java");
+        require(enumerableJava());
+    }
+
+    public String enumerableJava() {
+        return "enumerable_java";
     }
 
     public void load(String test) throws ScriptException {
@@ -59,5 +75,52 @@ public class JRubyTestBase {
     public static void debug(String msg) {
         if (debug)
             out.println(msg);
+    }
+
+    @SuppressWarnings("serial")
+    public static Fn0<Object> toFn0(final RubyProc proc) {
+        return new Fn0<Object>() {
+            public Object call() {
+                Ruby ruby = proc.getRuntime();
+                return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[0]));
+            }
+        };
+    }
+
+    @SuppressWarnings("serial")
+    public static Fn1<Object, Object> toFn1(final RubyProc proc) {
+        return new Fn1<Object, Object>() {
+            public Object call(Object a1) {
+                Ruby ruby = proc.getRuntime();
+                return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(),
+                        new IRubyObject[] { javaInRubyToRuby(ruby, a1) }));
+            }
+        };
+    }
+
+    @SuppressWarnings("serial")
+    public static Fn2<Object, Object, Object> toFn2(final RubyProc proc) {
+        return new Fn2<Object, Object, Object>() {
+            public Object call(Object a1, Object a2) {
+                Ruby ruby = proc.getRuntime();
+                return rubyToJava(proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
+                        javaInRubyToRuby(ruby, a1), javaInRubyToRuby(ruby, a2) }));
+            }
+        };
+    }
+
+    protected static IRubyObject javaInRubyToRuby(Ruby ruby, Object value) {
+        if (value instanceof List<?> && !(value instanceof RubyArray)) {
+            RubyArray array = RubyArray.newArray(ruby);
+            array.addAll((Collection<?>) value);
+            return array;
+        }
+
+        if (value instanceof Map<?, ?> && !(value instanceof RubyHash)) {
+            RubyHash hash = RubyHash.newHash(ruby);
+            hash.putAll((Map<?, ?>) value);
+            return hash;
+        }
+        return javaToRuby(ruby, value);
     }
 }

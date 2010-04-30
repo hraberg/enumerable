@@ -33,13 +33,20 @@ public class EnumerableOneNineTest extends TestBase {
     }
 
     @Test
-    public void cycleCollectionNTimes() throws Exception {
+    public void cycleCollection2Times() throws Exception {
         assertEquals(oneToFiveTwice, cycle(oneToFive, 2, λ(n, n)));
     }
 
     @Test
-    public void cycleCollectionZeroTimesReturnsEmptyList() throws Exception {
-        assertEquals(list(), cycle(oneToFive, 0, λ(n, n)));
+    public void cycleCollectionNTimes() throws Exception {
+        List<Integer> oneToFiveThrice = list(oneToFiveTwice);
+        oneToFiveThrice.addAll(oneToFive);
+        assertEquals(oneToFiveThrice, cycle(oneToFive, 3, λ(n, n)));
+    }
+
+    @Test
+    public void cycleCollectionZeroTimesReturnsNull() throws Exception {
+        assertNull(cycle(oneToFive, 0, λ(n, n)));
     }
 
     @Test

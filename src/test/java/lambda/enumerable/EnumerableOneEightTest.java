@@ -343,7 +343,15 @@ public class EnumerableOneEightTest extends TestBase {
     }
 
     @Test
-    public void eachSliceDoesReturnRestOfListIfNIsGreaterThanAvailableElements() throws Exception {
+    public void eachSliceDoesReturnListIfNIsSize() throws Exception {
+        List<List<Integer>> result = list();
+        eachSlice(oneToFive, oneToFive.size(), λ(list, result.add(list)));
+        assertEquals(1, result.size());
+        assertEquals(oneToFive, result.get(0));
+    }
+
+    @Test
+    public void eachSliceDoesReturnListIfNIsGreaterThanAvailableElements() throws Exception {
         List<List<Integer>> result = list();
         eachSlice(oneToFive, 6, λ(list, result.add(list)));
         assertEquals(1, result.size());
