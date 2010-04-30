@@ -36,9 +36,11 @@ describe "Enumerable#drop_while" do
       enum.times_yielded.should == 3
     end
 
-    it "doesn't return self when it could" do
-      a = [1,2,3]
-      a.drop_while{false}.should_not equal(a)
+    platform_is_not :enumerable_java do
+      it "doesn't return self when it could" do
+        a = [1,2,3]
+        a.drop_while{false}.should_not equal(a)
+      end
     end
   end
 end

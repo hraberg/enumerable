@@ -38,18 +38,22 @@ describe "Enumerable#sort" do
     }.should == [true, true, nil, nil, nil, nil, nil, false, false]
   end
 
-  it "compare values returned by block with 0" do
-    EnumerableSpecs::Numerous.new.sort { |n, m| -(n+m) * (n <=> m) }.should == [6, 5, 4, 3, 2, 1]
-    EnumerableSpecs::Numerous.new.sort { |n, m|
-      EnumerableSpecs::ComparableWithFixnum.new(-(n+m) * (n <=> m))
-    }.should == [6, 5, 4, 3, 2, 1]
-    lambda {
-      EnumerableSpecs::Numerous.new.sort { |n, m| (n <=> m).to_s }
-    }.should raise_error(ArgumentError)
+  platform_is_not :enumerable_java do
+    it "compare values returned by block with 0" do
+      EnumerableSpecs::Numerous.new.sort { |n, m| -(n+m) * (n <=> m) }.should == [6, 5, 4, 3, 2, 1]
+      EnumerableSpecs::Numerous.new.sort { |n, m|
+        EnumerableSpecs::ComparableWithFixnum.new(-(n+m) * (n <=> m))
+      }.should == [6, 5, 4, 3, 2, 1]
+      lambda {
+        EnumerableSpecs::Numerous.new.sort { |n, m| (n <=> m).to_s }
+      }.should raise_error(ArgumentError)
+    end
   end
 
-  it "raises an error if objects can't be compared" do
-    a=EnumerableSpecs::Numerous.new(EnumerableSpecs::Uncomparable.new, EnumerableSpecs::Uncomparable.new)
-    lambda {a.sort}.should raise_error(ArgumentError)
+  platform_is_not :enumerable_java do
+    it "raises an error if objects can't be compared" do
+      a=EnumerableSpecs::Numerous.new(EnumerableSpecs::Uncomparable.new, EnumerableSpecs::Uncomparable.new)
+      lambda {a.sort}.should raise_error(ArgumentError)
+    end
   end
 end

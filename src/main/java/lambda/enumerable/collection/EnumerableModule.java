@@ -116,7 +116,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
 
     @SuppressWarnings("unchecked")
     public int count(Fn1<? super E, Boolean> block) {
-        if (!(block instanceof Fn1<?, ?>))
+        if (block == null)
             return count((E) block);
         return select(block).size();
     }
@@ -229,18 +229,10 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    @SuppressWarnings("serial")
-    public int findIndex(final E obj) {
-        return findIndex(new Fn1<E, Boolean>() {
-            public Boolean call(E a1) {
-                if (obj == null)
-                    return a1 == null;
-                return obj.equals(a1);
-            }
-        });
-    }
-
+    @SuppressWarnings("unchecked")
     public int findIndex(Fn1<? super E, Boolean> block) {
+        if (block == null)
+            return findIndex((E) block);
         int index = 0;
         for (E each : this)
             if (isNotFalseOrNull(block.call(each)))
@@ -248,6 +240,19 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
             else
                 index++;
         return -1;
+    }
+
+    @SuppressWarnings({ "serial", "unchecked" })
+    public int findIndex(final E obj) {
+        if (obj instanceof Fn1<?, ?>)
+            return findIndex((Fn1<E, Boolean>) obj);
+        return findIndex(new Fn1<E, Boolean>() {
+            public Boolean call(E a1) {
+                if (obj == null)
+                    return a1 == null;
+                return obj.equals(a1);
+            }
+        });
     }
 
     public E first() {
@@ -298,7 +303,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
                     return true;
         } else {
             for (E each : this)
-                if (each != null && each.equals(obj))
+                if (obj.equals(each))
                     return true;
         }
         return false;

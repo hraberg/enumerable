@@ -8,6 +8,10 @@ import 'lambda.enumerable.jruby.JRubyTestBase'
 # Redefines Enumerable in JRuby to use Enumerable.java.
 # It 'almost' works as long as there's not too much duck typing going on.
 #
+# This version is quite slack, uses method_missing and is primarily concerned with making
+# calls go through between Ruby and Enumerable.java, with limited concern on what happens
+# once it does. For a more strict version, see 'enumerable_java_rubyspec.rb'.
+#
 # require 'enumerable_java' will include EnumerableJava in anyone who includes Enumerable.
 # It also patches Array, Hash and Range when first loaded.
 #

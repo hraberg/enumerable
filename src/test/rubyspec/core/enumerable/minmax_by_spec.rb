@@ -30,9 +30,11 @@ describe "Enumerable#minmax_by" do
       EnumerableSpecs::Numerous.new(a, b, c).minmax_by {|obj| obj }.should == [c, a]
     end
 
-    it "is able to return the maximum for enums that contain nils" do
-      enum = EnumerableSpecs::Numerous.new(nil, nil, true)
-      enum.minmax_by {|o| o.nil? ? 0 : 1 }.should == [nil, true]
+    platform_is_not :enumerable_java do
+      it "is able to return the maximum for enums that contain nils" do
+        enum = EnumerableSpecs::Numerous.new(nil, nil, true)
+        enum.minmax_by {|o| o.nil? ? 0 : 1 }.should == [nil, true]
+      end
     end
   end
 end

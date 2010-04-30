@@ -5,22 +5,34 @@ import 'lambda.Fn1'
 import 'lambda.enumerable.collection.EnumerableModule'
 import 'lambda.enumerable.jruby.JRubyTestBase'
 
-# Redefines Enumerable in JRuby to use Enumerable.java.
-# It 'almost' works as long as there's not too much duck typing going on.
+# Redefines Enumerable in JRuby to use Enumerable.java for running with RubySpec.
 #
-# require 'enumerable_java' will include EnumerableJava in anyone who includes Enumerable.
+# This version is much stricter than the one in enumerable_java.rb, and goes to great lengths
+# trying to assure Ruby that this is the normal Enumerable, even falling back to the real
+# implementation in the case of 'grep'. All Enumerator handling is also managed here, as
+# Enumerable.java doesn't support Enumerators.
+#
+# require 'enumerable_java_rubyspec' will include EnumerableJava in anyone who includes Enumerable.
 # It also patches Array, Hash and Range when first loaded.
 #
-# This patch is mainly for running tests written in Ruby against Enumerable.java.
+# This patch is mainly for running the RubySpec for Enumerable against Enumerable.java.
+#
+# There are ~20 guards added to the RubySpec for Enumerable to skip certain tests Enumerable.java
+# doesn't handle. These are the only changes made to the specs.
+#
+# There's also a patch (not source level) to MSpec's EqualMatcher to use Object#equals() instead
+# of Ruby identity equal? as the objects really are the same in these cases, except that they 
+# have been converted back and forth between Java by JRuby instances.
+#
+# Note that MSpec iself is running with Enumerable patched as well. I assume that's in line with
+# RubySpec which is also running in the environment it is actually testing.
+
 
 JRubyTestBase.debug "Loading Enumerable.java MonkeyPatch, RubySpec version"
 
 module Enumerable
   def self.included(host)
     host.class_eval do
-      JRubyTestBase.debug "including Enumerable in #{host}"
-      include EnumerableJava unless host.include? EnumerableJava
-
       unless include? Java::JavaLang::Iterable
         JRubyTestBase.debug "including Iterable in #{host}"
         include Java::JavaLang::Iterable
@@ -28,9 +40,12 @@ module Enumerable
           EnumerableIterator.new(self)
         end
       end
+      JRubyTestBase.debug "including Enumerable in #{host}"
+      include EnumerableJava unless host.include? EnumerableJava
     end
   end
-  
+
+  # This is an iterator using blocking queues implemented in Java. Works similar to a Generator.  
   class EnumerableIterator < Java::LambdaEnumerableJruby::EnumerableQueueIterator::QueueIterator
     def initialize(enum)
       super()
@@ -173,13 +188,16 @@ module Enumerable
     end
   end
   
-  
-
   def each_with_index(*args, &block)
     begin
       JRubyTestBase.debug "calling each_with_index with #{args}, #{block_given? ? block : "<no block>"} on #{self.class}"
-      return to_enum(:each_with_index, args) unless block_given?
+      unless block_given?
+        a = []
+        to_java.each_with_index(to_fn2(lambda {|o, i| a << [o, i]}))
+        return a.to_enum
+      end
       to_java.each_with_index(to_fn2(block))
+      self
     rescue NativeException => e
       raise e.cause if e.cause.is_a? Java::OrgJrubyExceptions::JumpException
       raise
@@ -230,7 +248,8 @@ module Enumerable
       raise ArgumentError, e.message
     end
   end
-  
+
+# Real grep is used, as it relies on ducktyping for === and is not specific to regex.
 #  def grep(pattern, &block)
 #  end	
 
@@ -240,13 +259,12 @@ module Enumerable
     unnest_java_collections to_java.group_by(to_fn1 block)
   end
 
-#  def include?(obj)
-#    JRubyTestBase.debug "calling include? with #{obj} on #{self.class}"
-#    return to_enum(:group_by) unless block_given?
-#    unnest_java_collections to_java.include(obj)
-#  end
+  def include?(obj)
+    JRubyTestBase.debug "calling include? with #{obj} on #{self.class}"
+    to_java.include(obj)
+  end
   
-#  alias :member? :include? 
+  alias :member? :include?
 
   def inject(initial_or_symbol = NotSupplied, symbol = NotSupplied, &block)
     JRubyTestBase.debug "calling inject with #{initial_or_symbol}, #{symbol}, #{block_given? ? block : "<no block>"} on #{self.class}"
@@ -333,7 +351,8 @@ module Enumerable
   def reverse_each(&block)
     JRubyTestBase.debug "calling reverse_each with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:reverse_each) unless block_given?
-    unnest_java_collections to_java.reverse_each(to_fn1(block))
+    to_java.reverse_each(to_fn1(block))
+    self
   end
 
   def sort_by(&block)
@@ -345,7 +364,7 @@ module Enumerable
   def sort(&block)
     begin
       JRubyTestBase.debug "calling sort with #{block_given? ? block : "<no block>"} on #{self.class}"
-      return to_java.sort unless block_given?
+      return unnest_java_collections to_java.sort unless block_given?
       unnest_java_collections to_java.sort(to_fn2(block))
     rescue Java::JavaLang::ClassCastException, Java::JavaLang::NullPointerException => e
       raise ArgumentError, e.message
@@ -419,7 +438,8 @@ module EnumerableJava
   def to_a
     JRubyTestBase.debug "calling to_a on #{self.class}"
     return self if is_a? Array
-    to_java.to_list.to_a
+    internal_to_a
+#    to_java.to_list.to_a
   end
   
   private
@@ -477,4 +497,8 @@ end
 
 module java::util::List
   remove_method :sort
+end
+
+module java::lang::Iterable
+  remove_method :each_with_index
 end

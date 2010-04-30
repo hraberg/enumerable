@@ -13,7 +13,7 @@ import org.jruby.exceptions.RaiseException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Should move from method_missing to real code to make this pass cleanly")
+@Ignore("Passes now, but not without some issues. Clashes with the other Ruby tests")
 public class EnumerableRubySpecTest extends JRubyTestBase {
     public static boolean specdoc = true;
 
@@ -163,7 +163,6 @@ public class EnumerableRubySpecTest extends JRubyTestBase {
     }
 
     @Test
-    @Ignore("If you redefine this one and it doesn't work - trouble")
     public void member_spec() throws Exception {
         mspec("member_spec.rb");
     }
@@ -305,7 +304,7 @@ public class EnumerableRubySpecTest extends JRubyTestBase {
             throw uncheck(e);
         } finally {
             rb.getContext().setWriter(originalOut);
-            rb.getContext().setWriter(originalErr);
+            rb.getContext().setErrorWriter(originalErr);
             eval("MSpec.unregister :exception, formatter; MSpec.unregister :before, formatter; MSpec.unregister :after, formatter; MSpec.unregister :finish, formatter; MSpec.unregister :enter, formatter; "
                     + "MSpec.register_exit(nil); MSpec.clear_current; MSpec.clear_modes; MSpec.clear_expectations");
         }
