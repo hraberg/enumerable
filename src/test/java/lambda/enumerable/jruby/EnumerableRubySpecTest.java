@@ -13,7 +13,7 @@ import org.jruby.exceptions.RaiseException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Passes now, but not without some issues. Clashes with the other Ruby tests")
+//@Ignore("Passes now, but not without some issues. Clashes with the other Ruby tests")
 public class EnumerableRubySpecTest extends JRubyTestBase {
     public static boolean specdoc = true;
 

@@ -108,6 +108,7 @@
             <batchtest todir="target/junit">
                 <fileset dir="src/test/java">
                     <include name="**/*Test.java" />
+                    <exclude name="**/EnumerableRubySpecTest.java" />
                 </fileset>
             </batchtest>
             <formatter type="xml" />
@@ -242,7 +243,7 @@
     <target name="jars" depends="agent-jar, source-jar, test-source-jar, javadoc-jar" />
 
     <property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}" />
-    <target name="dist-no-test" depends="tests, jars">
+    <target name="dist-no-test" depends="tests, rubyspec, jars">
         <tar destfile="target/${enumerable.dist.name}.tgz" compression="gzip">
             <tarfileset dir="target" prefix="${enumerable.dist.name}">
                 <include name="enumerable-*-${enumerable.version}.jar" />
