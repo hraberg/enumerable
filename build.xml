@@ -116,6 +116,17 @@
         <fail if="tests.failed" message="unit tests failed" />
     </target>
 
+    <target name="rubyspec" depends="agent-jar">
+        <mkdir dir="target/rubyspec" />
+        <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="specs.failed">
+            <classpath refid="enumerable.test.classpath" />
+            <test name="lambda.enumerable.jruby.EnumerableRubySpecTest" todir="target/rubyspec"/>
+            <formatter type="xml" />
+            <formatter type="plain" />
+        </junit>
+        <fail if="specs.failed" message="RubySpecs failed" />
+    </target>
+
     <target name="test-jar" depends="build">
         <jar jarfile="target/enumerable-test-${enumerable.version}.jar" encoding="UTF-8" >
             <fileset dir="target/test-classes" />
