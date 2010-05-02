@@ -162,18 +162,22 @@ The default value expression is captured as the expression assigned to the stati
 
 ### Concurrency JSR-166 (for Java 6)
 
-The class [LamdaOps](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/extra166y/LambdaOps.java) allows you to create lambdas implementing interfaces from [extra166y.Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html) to be used with [extra166y.ParallelArray](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/ParallelArray.html).
+[LamdaOps](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/extra166y/LambdaOps.java) allows you to create lambdas implementing interfaces from [extra166y.Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html) to be used with [extra166y.ParallelArray](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/ParallelArray.html).
 You need to have `jsr166y.jar` and `extra166y.jar` on your class path. They can be downloaded from the [Concurrency JSR-166 Interest Site](http://gee.cs.oswego.edu/dl/concurrency-interest/index.html). They can also be found in this repository in [`lib`](http://github.com/hraberg/enumerable/tree/master/lib/).
 
 The *LambdaOps* class is an example of a collection of static factory methods marked with *@NewLambda* as mentioned above. You can create your own factory classes in a similar way, Enumerable.java has no special support for the interfaces in [Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html).
 
 ### Clojure Sequences and IFns
 
-The class [LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/richhickey/clojure/blob/1.1.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need clojure-1.1.0.jar or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
+[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/richhickey/clojure/blob/1.1.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need clojure-1.1.0.jar or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
 
 ### JRuby Blocks
 
-[LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java)  You need jruby-1.4.0.jar or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
+[LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java). You need jruby-1.4.0.jar or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
+
+### JavaScript (for Java 6)
+
+[LambdaJavaScript](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/javascript/LambdaJavaScript.java) allows you to create lambdas extending  [Function](http://mxr.mozilla.org/mozilla/source/js/rhino/src/org/mozilla/javascript/Function.java). Uses [Rhino 1.6r2](http://www.mozilla.org/rhino/) which comes with Java 6.
 
 ### Google Collections
 

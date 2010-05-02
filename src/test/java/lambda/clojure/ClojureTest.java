@@ -6,6 +6,7 @@ import static lambda.clojure.ClojureSeqs.*;
 import static lambda.clojure.ClojureSeqs.Vars.*;
 import static lambda.clojure.LambdaClojure.*;
 import static org.junit.Assert.*;
+import groovy.lang.Closure;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -13,6 +14,8 @@ import javax.script.ScriptException;
 
 import lambda.Lambda;
 import lambda.enumerable.Enumerable;
+import lambda.groovy.GroovyTest;
+import lambda.groovy.LambdaGroovy;
 import lambda.javascript.JavaScriptTest;
 import lambda.javascript.LambdaJavaScript;
 import lambda.jruby.JRubyTest;
@@ -218,6 +221,19 @@ public class ClojureTest {
 
         defn("times-js", times);
         assertEquals(120.0, clj.eval("(reduce times-js 1 [1, 2, 3, 4, 5])"));
+    }
+
+    @Test
+    public void interactingWithGroovy() throws Exception {
+        ScriptEngine groovy = GroovyTest.getGroovyEngine();
+
+        Closure closure = (Closure) groovy.eval("{ n, m -> n * m }");
+        IFn times = toIFn(LambdaGroovy.toFn2(closure));
+
+        assertEquals(6, times.invoke(2, 3));
+
+        defn("times-groovy", times);
+        assertEquals(120, clj.eval("(reduce times-groovy 1 [1, 2, 3, 4, 5])"));
     }
 
     @Before

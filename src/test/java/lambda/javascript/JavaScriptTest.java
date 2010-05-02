@@ -4,6 +4,7 @@ import static java.util.Arrays.*;
 import static lambda.Parameters.*;
 import static lambda.javascript.LambdaJavaScript.*;
 import static org.junit.Assert.*;
+import groovy.lang.Closure;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ import lambda.Lambda;
 import lambda.clojure.ClojureTest;
 import lambda.clojure.LambdaClojure;
 import lambda.enumerable.Enumerable;
+import lambda.groovy.GroovyTest;
+import lambda.groovy.LambdaGroovy;
 import lambda.javascript.LambdaJavaScript.FunctionFn2;
 import lambda.jruby.JRubyTest;
 import lambda.jruby.LambdaJRuby;
@@ -93,6 +96,17 @@ public class JavaScriptTest {
 
         RubyProc proc = (RubyProc) rb.eval(":*.to_proc");
         FunctionFn2 f = toFunction(LambdaJRuby.toFn2(proc));
+
+        js.put("f", f);
+        assertEquals(6.0, js.eval("f(2, 3)"));
+    }
+
+    @Test
+    public void interactingWithGroovy() throws Exception {
+        ScriptEngine groovy = GroovyTest.getGroovyEngine();
+
+        Closure closure = (Closure) groovy.eval("{ n, m -> n * m }");
+        FunctionFn2 f = toFunction(LambdaGroovy.toFn2(closure));
 
         js.put("f", f);
         assertEquals(6.0, js.eval("f(2, 3)"));

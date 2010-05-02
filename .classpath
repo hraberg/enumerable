@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="lib/jruby-complete-1.5.0.RC2.jar" sourcepath="lib/src/jruby-src-1.5.0.RC2.zip"/>
 	<classpathentry kind="lib" path="lib/google-collect-1.0.jar" sourcepath="lib/src/google-collect-src-1.0.zip"/>
 	<classpathentry kind="lib" path="lib/clojure-jsr223.jar" sourcepath="lib/src/clojure-jsr223-src.zip"/>
+	<classpathentry kind="lib" path="lib/groovy-all-1.7.2.jar" sourcepath="lib/src/groovy-src-1.7.2.zip"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

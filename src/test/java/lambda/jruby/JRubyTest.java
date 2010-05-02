@@ -4,6 +4,7 @@ import static java.util.Arrays.*;
 import static lambda.Parameters.*;
 import static lambda.jruby.LambdaJRuby.*;
 import static org.junit.Assert.*;
+import groovy.lang.Closure;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ import lambda.Lambda;
 import lambda.clojure.ClojureTest;
 import lambda.clojure.LambdaClojure;
 import lambda.enumerable.Enumerable;
+import lambda.groovy.GroovyTest;
+import lambda.groovy.LambdaGroovy;
 import lambda.javascript.JavaScriptTest;
 import lambda.javascript.LambdaJavaScript;
 
@@ -118,6 +121,21 @@ public class JRubyTest {
 
         rb.put("block", proc);
         assertEquals(120.0, rb.eval("[1, 2, 3, 4, 5].inject &block"));
+    }
+
+    @Test
+    public void interactingWithGroovy() throws Exception {
+        Ruby ruby = Ruby.getGlobalRuntime();
+        ScriptEngine groovy = GroovyTest.getGroovyEngine();
+
+        Closure closure = (Closure) groovy.eval("{ n, m -> n * m }");
+        RubyProc proc = toProc(LambdaGroovy.toFn2(closure));
+
+        assertEquals(ruby.newFixnum(6), proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
+                ruby.newFixnum(2), ruby.newFixnum(3) }));
+
+        rb.put("block", proc);
+        assertEquals(120L, rb.eval("[1, 2, 3, 4, 5].inject &block"));
     }
 
     @Before
