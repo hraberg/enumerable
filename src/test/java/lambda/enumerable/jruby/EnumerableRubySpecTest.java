@@ -273,7 +273,7 @@ public class EnumerableRubySpecTest extends JRubyTestBase {
         mspec(specs);
     }
 
-    public String enumerableJava() throws ScriptException {
+    public String enumerableJava() {
         return "enumerable_java_rubyspec";
     }
 
