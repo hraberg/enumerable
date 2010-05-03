@@ -154,7 +154,7 @@ Parameters to Fn1, Fn2 and Fn3 can have default values:
 
 The default value expression is captured as the expression assigned to the static field marked with *@LambdaParameter*, and can be more complex than just accessing a constant value like in this example.
 
-## External Library Support
+## External Library Closure Support
 
 ### Concurrency JSR-166 (for Java 6)
 
@@ -213,6 +213,10 @@ The first pass starts by looking for any static fields marked with the *@LambdaP
 The first pass also keeps track of any local variable that is accessed from within a block, so that it can be wrapped in an array when initialized. This allows the block to properly close over local variables.
 
 The Enumerable methods themselves are implemented using plain old Java. You can call them using normal anonymous inner classes (as seen in the beginning of this document).
+
+### RubySpecs
+
+Running `ant rubyspec` will run the RubySpecs for `core/enumerable`. Enumerable.java uses it's own "platform", `enumerable_java` to skip specifications for features that aren't supported.
 
 ## Notes on the Architecture
 
