@@ -42,12 +42,47 @@ public class JRubyTest {
     }
 
     @Test
+    public void defaultValuesForJRubyProcs() throws ScriptException {
+        rb.put("block", lambda(n = 2, n * 2));
+        assertEquals(4L, rb.eval("block.call"));
+        rb.put("block", lambda(n, m = 2, n * m));
+        assertEquals(8L, rb.eval("block.call 4"));
+        rb.put("block", lambda(n = 2, m = 2, n * m));
+        assertEquals(4L, rb.eval("block.call"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void defaultValuesThrowsExceptionIfOnlyProvidedForEarlierParameterForJRubyProcs() throws ScriptException {
+        rb.put("block", lambda(n = 2, m, n * m));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void defaultValuesThrowsExceptionIfOnlyProvidedForMiddleParameterForJRubyProcs() throws ScriptException {
+        rb.put("block", lambda(s, n = 2, m, n * m));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void defaultValuesThrowsExceptionIfOnlyProvidedForAllEarlierParametersForJRubyProcs()
+            throws ScriptException {
+        rb.put("block", lambda(s = "", n = 2, m, n * m));
+    }
+
+    @Test
     public void convertFnToRubyProc() throws ScriptException {
         Ruby ruby = Ruby.getGlobalRuntime();
 
         RubyProc proc = toProc(Lambda.λ(s, s.toUpperCase()));
         assertEquals(ruby.newString("HELLO"), proc.call(ruby.getThreadService().getCurrentContext(),
                 new IRubyObject[] { ruby.newString("hello") }));
+    }
+
+    @Test
+    public void convertFnToRubyProcKeepsDefaultValues() throws ScriptException {
+        Ruby ruby = Ruby.getGlobalRuntime();
+
+        RubyProc proc = toProc(Lambda.λ(s = "world", s.toUpperCase()));
+        assertEquals(ruby.newString("WORLD"), proc.call(ruby.getThreadService().getCurrentContext(),
+                new IRubyObject[] {}));
     }
 
     @Test(expected = RaiseException.class)
@@ -85,6 +120,12 @@ public class JRubyTest {
     public void convertRubyMethodProcToFn() throws ScriptException {
         RubyProc proc = (RubyProc) rb.eval("(\"hello\".method :upcase).to_proc");
         assertEquals("HELLO", toFn0(proc).call());
+    }
+
+    @Test
+    public void convertRubyMethodProcToFnKeepsDefaultValues() throws ScriptException {
+        RubyProc proc = (RubyProc) rb.eval("def my_upcase(s = 'world') s.upcase end; method(:my_upcase).to_proc");
+        assertEquals("WORLD", toFn1(proc).call());
     }
 
     @Test
