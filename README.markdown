@@ -1,4 +1,4 @@
-# Enumerable.java
+# Enumerable.java 0.2.2
 
 Copyright 2010 Håkan Råberg - Released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
@@ -82,12 +82,6 @@ See the targets `aot-compile-tests` and `aot-tests` in [build.xml](http://github
 The binary distribution, when downloaded as a .tgz archive, or built using `ant dist`, doubles as an example project which can be directly imported into Eclipse.
 Open *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder, which includes targets for AOT compilation.
 
-### Verifier
-
-*Disabled right now, use lambda.weaving.debug.dev instead*
-
-If you add [`asm-all-3.2.jar`](http://forge.ow2.org/project/download.php?group_id=23&file_id=12944) to your classpath, classes will be verified before loaded into the JVM and problems will be logged to the console.
-
 ### System Properties
 
 * `lambda.weaving.debug` - will log to System.out and write all generated classes to disk if set to true.
@@ -160,6 +154,8 @@ Parameters to Fn1, Fn2 and Fn3 can have default values:
 
 The default value expression is captured as the expression assigned to the static field marked with *@LambdaParameter*, and can be more complex than just accessing a constant value like in this example.
 
+## External Library Support
+
 ### Concurrency JSR-166 (for Java 6)
 
 [LamdaOps](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/extra166y/LambdaOps.java) allows you to create lambdas implementing interfaces from [extra166y.Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html) to be used with [extra166y.ParallelArray](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/ParallelArray.html).
@@ -177,7 +173,11 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### JavaScript (for Java 6)
 
-[LambdaJavaScript](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/javascript/LambdaJavaScript.java) allows you to create lambdas extending  [Function](http://mxr.mozilla.org/mozilla/source/js/rhino/src/org/mozilla/javascript/Function.java). Uses [Rhino 1.6r2](http://www.mozilla.org/rhino/) which comes with Java 6.
+[LambdaJavaScript](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/javascript/LambdaJavaScript.java) allows you to create lambdas extending  [Function](http://www.mozilla.org/rhino/apidocs/org/mozilla/javascript/Function.html). Uses [Rhino 1.6r2](http://www.mozilla.org/rhino/) which comes with Java 6.
+
+### Groovy Closures
+
+[LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). You need groovy-all-1.7.2.jar or later on your class path. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
 
 ### Google Collections
 
@@ -257,15 +257,17 @@ http://code.google.com/p/lambdaj/
 
 Enumerable.java is released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
-ASM 3.2 is Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](http://github.com/hraberg/enumerable/blob/master/lib/asm-3.2.license) or [ASM License](http://asm.ow2.org/license.html).
+ASM 3.2: Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](http://github.com/hraberg/enumerable/blob/master/lib/asm-3.2.license) or [ASM License](http://asm.ow2.org/license.html).
 
 jsr166y and extra166y:
 Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and released to the public domain, as explained at http://creativecommons.org/licenses/publicdomain
 
-Clojure, Copyright (c) Rich Hickey, released under the [EPL license](http://opensource.org/licenses/eclipse-1.0.php).
+Clojure: Copyright (c) Rich Hickey, released under the [EPL license](http://opensource.org/licenses/eclipse-1.0.php).
 
-JRuby is Copyright (c) 2007-2010 The JRuby project, and is released under a [tri CPL/GPL/LGPL license](http://github.com/jruby/jruby/blob/1.4.0/COPYING).
+JRuby: Copyright (c) 2007-2010 The JRuby project, and is released under a [tri CPL/GPL/LGPL license](http://github.com/jruby/jruby/blob/1.4.0/COPYING).
 
-Rhino is Copyright (C) 1997-1999 Norris Boyd/Netscape Communications Corporation. The majority of Rhino is MPL 1.1 / GPL 2.0 dual licensed.
+Groovy: Copyright 2003-2007 the original author or authors. Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-Google Collections, Copyright (C) 2008 Google Inc. Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+Rhino: Copyright (C) 1997-1999 Norris Boyd/Netscape Communications Corporation. The majority of Rhino is [MPL 1.1 / GPL 2.0 dual licensed](https://developer.mozilla.org/en/Rhino/License).
+
+Google Collections: Copyright (C) 2008 Google Inc. Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
