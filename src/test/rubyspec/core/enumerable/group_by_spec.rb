@@ -12,8 +12,10 @@ describe "Enumerable#group_by" do
       EnumerableSpecs::Empty.new.group_by { |x| x}.should == {}
     end
   
-    it "returns an Enumerator if called without a block" do
-      EnumerableSpecs::Numerous.new.group_by.should be_an_instance_of(enumerator_class)
+    platform_is_not :enumerable_java do
+      it "returns an Enumerator if called without a block" do
+        EnumerableSpecs::Numerous.new.group_by.should be_an_instance_of(enumerator_class)
+      end
     end
   end
 end

@@ -7,8 +7,10 @@ describe "Enumerable#drop_while" do
       @enum = EnumerableSpecs::Numerous.new(3, 2, 1, :go)
     end
 
-    it 'returns an Enumerator if no block given' do
-      @enum.drop_while.should be_an_instance_of(enumerator_class)
+    platform_is_not :enumerable_java do
+      it 'returns an Enumerator if no block given' do
+        @enum.drop_while.should be_an_instance_of(enumerator_class)
+      end
     end
 
     it "returns no/all elements for {true/false} block" do

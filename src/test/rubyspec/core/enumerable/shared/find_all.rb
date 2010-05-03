@@ -15,10 +15,13 @@ describe :enumerable_find_all, :shared => true do
       lambda { @numerous.send(@method) }.should raise_error(LocalJumpError)
     end
   end
-  ruby_version_is "1.8.7" do
-    it "returns an enumerator when no block given" do
-      @numerous.send(@method).should be_an_instance_of(enumerator_class)
+
+  platform_is_not :enumerable_java do
+    ruby_version_is "1.8.7" do
+      it "returns an enumerator when no block given" do
+        @numerous.send(@method).should be_an_instance_of(enumerator_class)
+      end
     end
   end
-  
+
 end

@@ -49,11 +49,13 @@ describe "Enumerable#each_slice" do
     end
   end
 
-  ruby_version_is '1.8.7' do
-    it "returns an enumerator if no block" do 
-      e = @enum.each_slice(3)
-      e.should be_an_instance_of(enumerator_class)
-      e.to_a.should == @sliced
+  platform_is_not :enumerable_java do
+    ruby_version_is '1.8.7' do
+      it "returns an enumerator if no block" do 
+        e = @enum.each_slice(3)
+        e.should be_an_instance_of(enumerator_class)
+        e.to_a.should == @sliced
+      end
     end
   end
 end

@@ -19,15 +19,17 @@ describe "Enumerable#each_with_object" do
       acc.should == @values
     end
 
-    it "returns an enumerator if no block" do
-      acc = []
-      e = @enum.each_with_object(@initial)
-      e.each do |elem, obj|
-        obj.should equal(@initial)
-        obj = 42
-        acc << elem
-      end.should equal(@initial)
-      acc.should == @values
+    platform_is_not :enumerable_java do
+      it "returns an enumerator if no block" do
+        acc = []
+        e = @enum.each_with_object(@initial)
+        e.each do |elem, obj|
+          obj.should equal(@initial)
+          obj = 42
+          acc << elem
+        end.should equal(@initial)
+        acc.should == @values
+      end
     end
   end  
 end
