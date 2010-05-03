@@ -1,5 +1,4 @@
 require 'java'
-require 'generator'
 
 import 'lambda.Fn1'
 import 'lambda.enumerable.collection.EnumerableModule'
