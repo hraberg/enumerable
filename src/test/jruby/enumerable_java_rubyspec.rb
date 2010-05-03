@@ -71,7 +71,7 @@ module Enumerable
   
   def all?(&block)
     java_debug "calling all? with #{block_given? ? block : "<no block>"} on #{self.class}"
-  	to_java.all(to_fn1 block)
+    to_java.all(to_fn1 block)
   end
   
   def any?(&block)
@@ -235,12 +235,12 @@ module Enumerable
   def find_index(obj = NotSupplied, &block)
     java_debug "calling find_index with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:find_index) if !block_given? && obj == NotSupplied
-	if obj == NotSupplied
-	  result = to_java.find_index(to_fn1(block))
-	else
+    if obj == NotSupplied
+      result = to_java.find_index(to_fn1(block))
+    else
       STDERR.puts "warning: given block not used" if block_given?
-	  result = to_java.find_index(obj) unless obj == NotSupplied
-	end
+      result = to_java.find_index(obj) unless obj == NotSupplied
+    end
     result == -1 ? nil : result
   end
 
@@ -257,7 +257,7 @@ module Enumerable
 
 # Real grep is used, as it relies on ducktyping for === and is not specific to regex.
 #  def grep(pattern, &block)
-#  end	
+#  end  
 
   def group_by(&block)
     java_debug "calling group_by with #{block_given? ? block : "<no block>"} on #{self.class}"
@@ -333,7 +333,7 @@ module Enumerable
 
   def none?(&block)
     java_debug "calling none? with #{block_given? ? block : "<no block>"} on #{self.class}"
-  	to_java.none(to_fn1 block)
+    to_java.none(to_fn1 block)
   end
   
   def one?(&block)
@@ -449,9 +449,9 @@ module EnumerableJava
   
   private
   def internal_to_a
-  	a = []
-  	each {|o| a << o }
-  	a
+    a = []
+    each {|o| a << o }
+    a
   end
 
   def to_java

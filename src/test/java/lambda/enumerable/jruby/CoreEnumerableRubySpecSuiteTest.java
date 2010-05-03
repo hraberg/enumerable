@@ -15,10 +15,9 @@ public class CoreEnumerableRubySpecSuiteTest extends RubySpecTestBase {
         // Have already wasted too much time trying to figure out why.
         // Someone is trying to call entrySet on 1..3:Range for god know what
         // reason.
-        for (StackTraceElement e : currentThread().getStackTrace()) {
+        for (StackTraceElement e : currentThread().getStackTrace())
             if (e.getClassName().startsWith("org.eclipse.jdt.internal."))
                 return;
-        }
 
         File specDir = new File(getClass().getResource("/core/enumerable").toURI());
         List<String> specs = new ArrayList<String>();
