@@ -17,10 +17,10 @@ import lambda.weaving.Debug;
 import org.jruby.threading.DaemonThreadFactory;
 
 public abstract class QueueIterator implements Iterator<Object>, Runnable {
-    public static boolean debug = Debug.debug;
+    static boolean debug = Debug.debug;
+    static final int LOST_INTEREST_TIME_OUT = 500;
 
     Executor e = Executors.newCachedThreadPool(new DaemonThreadFactory());
-    private static final int LOST_INTEREST_TIME_OUT = 500;
     Object endOfQueue = "<End of Queue>";
     Object noElement = "<No Element>";
     Object nullElement = "<Null>";
@@ -47,6 +47,7 @@ public abstract class QueueIterator implements Iterator<Object>, Runnable {
         } catch (InterruptedException e) {
             uncheck(e);
         } catch (LostInterestException e) {
+            current = endOfQueue;
             debug("client lost interest");
         } catch (RuntimeException e) {
             try {
@@ -72,8 +73,6 @@ public abstract class QueueIterator implements Iterator<Object>, Runnable {
             debug("requesting element");
             requestQueue.offer(nextElementRequest);
             current = yieldQueue.take();
-            if (current == exception)
-                throw exception[0];
             if (current == nullElement)
                 current = null;
             debug("got element");
@@ -86,6 +85,8 @@ public abstract class QueueIterator implements Iterator<Object>, Runnable {
     public Object next() {
         if (current == noElement)
             hasNext();
+        if (current == exception)
+            throw exception[0];
         if (current == endOfQueue)
             throw new NoSuchElementException();
         Object result = current;
