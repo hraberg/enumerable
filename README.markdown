@@ -165,11 +165,11 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Clojure Sequences and IFns
 
-[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/richhickey/clojure/blob/1.1.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need clojure-1.1.0.jar or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
+[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/richhickey/clojure/blob/1.1.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need `clojure-1.1.0.jar` or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
 
 ### JRuby Blocks
 
-[LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java). You need jruby-1.4.0.jar or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
+[LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java). You need `jruby-1.4.0.jar` or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
 
 ### JavaScript (for Java 6)
 
@@ -177,11 +177,11 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Groovy Closures
 
-[LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). You need groovy-all-1.7.2.jar or later on your class path. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
+[LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). You need `groovy-all-1.7.2.jar` or later on your class path. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
 
 ### Google Collections
 
-[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Google Collections](http://code.google.com/p/google-collections/). You need google-collect-1.0.jar on your class path. Download from [Google Collections](http://google-collections.googlecode.com/files/).
+[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Google Collections](http://code.google.com/p/google-collections/). You need `google-collect-1.0.jar` on your class path. Download from [Google Collections](http://google-collections.googlecode.com/files/).
 
 ## Implementation
 
