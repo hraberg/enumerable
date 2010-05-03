@@ -275,3 +275,5 @@ Groovy: Copyright 2003-2007 the original author or authors. Licensed under the [
 Rhino: Copyright (C) 1997-1999 Norris Boyd/Netscape Communications Corporation. The majority of Rhino is [MPL 1.1 / GPL 2.0 dual licensed](https://developer.mozilla.org/en/Rhino/License).
 
 Google Collections: Copyright (C) 2008 Google Inc. Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+RubySpec and MSpec: Copyright (c) 2008 Engine Yard, Inc. All rights reserved. [License](http://github.com/rubyspec/rubyspec/blob/master/LICENSE).
