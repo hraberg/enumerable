@@ -18,14 +18,14 @@ import 'lambda.enumerable.jruby.QueueIterator'
 #
 # This patch is mainly for running the RubySpec for Enumerable against Enumerable.java.
 #
-# There are ~20 guards added to the RubySpec for Enumerable to skip certain tests Enumerable.java
+# There are ~40 guards added to the RubySpec for Enumerable to skip certain tests Enumerable.java
 # doesn't handle. These are the only changes made to the specs.
 #
 # There's also a patch (not source level) to MSpec's EqualMatcher to use Object#equals() instead
 # of Ruby identity equal? as the objects really are the same in these cases, except that they 
 # have been converted back and forth between Java by JRuby instances.
 #
-# Note that MSpec iself is running with Enumerable patched as well. I assume that's in line with
+# Note that MSpec itself is running with Enumerable patched as well. I assume that's in line with
 # RubySpec which is also running in the environment it is actually testing.
 
 def java_debug(msg)
