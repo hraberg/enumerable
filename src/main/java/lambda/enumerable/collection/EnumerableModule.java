@@ -131,12 +131,14 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         if (times <= 0)
             return null;
         EList<E> list = new EList<E>();
-        for (E each : this)
+        for (E each : this) {
+            block.call(each);
             list.add(each);
+        }
         EList<E> result = new EList<E>();
         while (times-- > 0)
             result.addAll(list);
-        return result.each(block);
+        return result;
     }
 
     public E detect(Fn1<? super E, Boolean> block) {
@@ -177,22 +179,30 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
     public <R> Object eachCons(int n, Fn1<List<E>, R> block) {
         if (n <= 0)
             throw new IllegalArgumentException("invalid size");
-        List<E> list = asNewList();
-        for (int i = 0; i + n <= list.size(); i++)
-            if (n + i <= list.size())
-                block.call(list.subList(i, i + n));
+        List<E> list = new ArrayList<E>();
+        for (E each : this) {
+            list.add(each);
+            if (list.size() == n) {
+                block.call(list);
+                list = new ArrayList<E>(list.subList(1, list.size()));
+            }
+        }
         return null;
     }
 
     public <R> Object eachSlice(int n, Fn1<List<E>, R> block) {
         if (n <= 0)
             throw new IllegalArgumentException("invalid size");
-        List<E> list = asNewList();
-        for (int i = 0; i < list.size(); i += n)
-            if (i + n >= list.size())
-                block.call(list.subList(i, list.size()));
-            else
-                block.call(list.subList(i, i + n));
+        List<E> list = new ArrayList<E>();
+        for (E each : this) {
+            list.add(each);
+            if (list.size() == n) {
+                block.call(list);
+                list = new ArrayList<E>();
+            }
+        }
+        if (!list.isEmpty())
+            block.call(list);
         return null;
     }
 
@@ -474,11 +484,8 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         if (n < 0)
             throw new IllegalArgumentException("attempt to take negative size");
         EList<E> result = new EList<E>();
-        for (E each : this)
-            if (n-- > 0)
-                result.add(each);
-            else
-                return result;
+        for (Iterator<E> i = iterator(); n != 0 && i.hasNext(); n--)
+            result.add(i.next());
         return result;
     }
 

@@ -333,7 +333,7 @@ public class EnumerableOneEightTest extends TestBase {
 
     @Test
     public void eachSliceCallsBlockForEachSliceOfNElements() throws Exception {
-        List<List<Integer>> result = list();
+        final List<List<Integer>> result = list();
         eachSlice(oneToTen, 3, λ(list, result.add(list)));
         assertEquals(4, result.size());
         assertEquals(list(1, 2, 3), result.get(0));

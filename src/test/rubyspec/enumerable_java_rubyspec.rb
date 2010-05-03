@@ -5,6 +5,8 @@ import 'java.lang.Iterable'
 import 'lambda.Fn1'
 import 'lambda.enumerable.collection.EnumerableModule'
 import 'lambda.enumerable.collection.EIterable'
+import 'lambda.enumerable.collection.EList'
+import 'lambda.enumerable.collection.EMap'
 import 'lambda.enumerable.jruby.JRubyTestBase'
 import 'lambda.enumerable.jruby.QueueIterator'
 
@@ -421,9 +423,9 @@ module Enumerable
         h[e.key] = unnest_java_collections e.value 
       end
       h
-    elsif o == Java::LambdaEnumerableCollection::EList
+    elsif o == EList
       Array
-    elsif o == Java::LambdaEnumerableCollection::EMap
+    elsif o == EMap
       Hash
     else
       o
@@ -457,7 +459,9 @@ module EnumerableJava
   end
 
   def to_j
-    EnumerableModule.extend(self)
+    return EList.new(self) if is_a? Array
+    return EMap.new(self) if is_a? Hash
+    EIterable.new(self)
   end
 
   def to_fn0 proc
@@ -509,3 +513,4 @@ end
 module java::lang::Iterable
   remove_method :each_with_index
 end
+

@@ -37,12 +37,10 @@ describe "Enumerable#cycle" do
         enum.times_called.should == 1
       end
 
-      platform_is_not :enumerable_java do
-        it "yields only when necessary" do
-          enum = EnumerableSpecs::EachCounter.new(10, 20, 30)
-          enum.cycle(3){|x| break if x == 20}
-          enum.times_yielded.should == 2
-        end
+      it "yields only when necessary" do
+        enum = EnumerableSpecs::EachCounter.new(10, 20, 30)
+        enum.cycle(3){|x| break if x == 20}
+        enum.times_yielded.should == 2
       end
 
       it "tries to convert n to an Integer using #to_int" do

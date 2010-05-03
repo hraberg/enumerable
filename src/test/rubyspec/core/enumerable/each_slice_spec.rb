@@ -41,12 +41,10 @@ describe "Enumerable#each_slice" do
     acc.should == [full]
   end
 
-  platform_is_not :enumerable_java do
-    it "yields only as much as needed" do
-      cnt = EnumerableSpecs::EachCounter.new(1, 2, :stop, "I said stop!", :got_it)
-      cnt.each_slice(2) {|g| break 42 if g[0] == :stop }.should == 42
-      cnt.times_yielded.should == 4
-    end
+  it "yields only as much as needed" do
+    cnt = EnumerableSpecs::EachCounter.new(1, 2, :stop, "I said stop!", :got_it)
+    cnt.each_slice(2) {|g| break 42 if g[0] == :stop }.should == 42
+    cnt.times_yielded.should == 4
   end
 
   platform_is_not :enumerable_java do
