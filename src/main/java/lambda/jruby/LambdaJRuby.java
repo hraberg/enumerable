@@ -1,11 +1,6 @@
 package lambda.jruby;
 
 import static org.jruby.javasupport.JavaEmbedUtils.*;
-
-import java.lang.reflect.Method;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
@@ -66,35 +61,11 @@ public class LambdaJRuby {
         }
 
         Arity getArityFromInstance() {
-            return getArityFromClass(getClass());
+            return Arity.createArity(Fn0.getAndCheckArityForMethod(getImplementingClass(), "call"));
         }
 
-        Arity getArityFromClass(Class<?> aClass) {
-            int basicArity = 0;
-            for (Method method : aClass.getDeclaredMethods())
-                if (method.getName() == "call")
-                    basicArity = method.getParameterTypes().length;
-
-            SortedSet<Integer> defaultValues = new TreeSet<Integer>();
-            for (Method method : aClass.getDeclaredMethods()) {
-                if (method.getName().startsWith("default$")) {
-                    defaultValues.add(Integer.valueOf(method.getName().substring("default$".length())));
-                }
-            }
-
-            if (!defaultValues.isEmpty()) {
-                for (int index : defaultValues) {
-                    if (index >= defaultValues.size() && index < basicArity)
-                        throw new IllegalArgumentException(
-                                "parameter "
-                                        + index
-                                        + " cannot have a default value when there are parameters follwing without, arity is "
-                                        + basicArity);
-                }
-                return Arity.createArity(-(basicArity - defaultValues.size()));
-            }
-
-            return Arity.createArity(basicArity);
+        Class<?> getImplementingClass() {
+            return getClass();
         }
 
         protected Object call() {
@@ -123,10 +94,8 @@ public class LambdaJRuby {
     }
 
     public static abstract class RubyProcFn1 extends RubyProcFn0 {
-        protected Object default$1;
-
         public Object call() {
-            return call(default$1 == null ? default$1 = default$1() : default$1);
+            return call(default$1());
         }
 
         protected Object default$1() {
@@ -137,10 +106,8 @@ public class LambdaJRuby {
     }
 
     public static abstract class RubyProcFn2 extends RubyProcFn1 {
-        protected Object default$2;
-
         public Object call(Object a1) {
-            return call(a1, default$2 == null ? default$2 = default$2() : default$2);
+            return call(a1, default$2());
         }
 
         protected Object default$2() {
@@ -151,10 +118,8 @@ public class LambdaJRuby {
     }
 
     public static abstract class RubyProcFn3 extends RubyProcFn2 {
-        protected Object default$3;
-
         public Object call(Object a1, Object a2) {
-            return call(a1, a2, default$3 == null ? default$3 = default$3() : default$3);
+            return call(a1, a2, default$3());
         }
 
         protected Object default$3() {
@@ -306,8 +271,8 @@ public class LambdaJRuby {
                 return fn.call(a1);
             }
 
-            Arity getArityFromInstance() {
-                return getArityFromClass(fn.getClass());
+            Class<?> getImplementingClass() {
+                return fn.getClass();
             }
         };
     }
@@ -330,8 +295,8 @@ public class LambdaJRuby {
                 return fn.call(a1, a2);
             }
 
-            Arity getArityFromInstance() {
-                return getArityFromClass(fn.getClass());
+            Class<?> getImplementingClass() {
+                return fn.getClass();
             }
         };
     }
@@ -358,8 +323,8 @@ public class LambdaJRuby {
                 return fn.call(a1, a2, a3);
             }
 
-            Arity getArityFromInstance() {
-                return getArityFromClass(fn.getClass());
+            Class<?> getImplementingClass() {
+                return fn.getClass();
             }
         };
     }

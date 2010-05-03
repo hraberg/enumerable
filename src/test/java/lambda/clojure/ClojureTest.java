@@ -87,6 +87,18 @@ public class ClojureTest {
     }
 
     @Test
+    public void defaultValuesForIFns() throws ScriptException {
+        defn("f", fn(n = 2, n * 2));
+        assertEquals(4, eval("(f)"));
+        defn("f", fn(n, m = 2, n * m));
+        assertEquals(8, eval("(f 4)"));
+        defn("f", fn(n = 2, m = 2, n * m));
+        assertEquals(4, eval("(f)"));
+        defn("f", fn(s, n = 2, m = 2, s + n * m));
+        assertEquals("#: 4", eval("(f \"#: \")"));
+    }
+
+    @Test
     public void basicSequenceOperations() throws Exception {
         ISeq map = (map(fn(s, s.toUpperCase()), list("hello", "world")));
         assertEquals(list("HELLO", "WORLD"), map);
@@ -180,6 +192,24 @@ public class ClojureTest {
     public void convertFnToIFn() throws Exception {
         IFn fn = toIFn(Lambda.λ(s, s.toUpperCase()));
         assertEquals("HELLO", fn.invoke("hello"));
+    }
+
+    @Test
+    public void convertFnToIFnKeepsDefaultValues() throws Exception {
+        IFn fn = toIFn(Lambda.λ(s = "world", s.toUpperCase()));
+        assertEquals("WORLD", fn.invoke());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void convertedFnToIFnThrowsArityWhenCalledWithTooFewArguments() throws Exception {
+        IFn fn = toIFn(Lambda.λ(s, s.toUpperCase()));
+        fn.invoke();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void convertedFnToIFnThrowsArityWhenCalledWithTooManyArguments() throws Exception {
+        IFn fn = toIFn(Lambda.λ(s, s.toUpperCase()));
+        fn.invoke("hello", "world");
     }
 
     @Test

@@ -19,12 +19,15 @@ import sun.org.mozilla.javascript.internal.Scriptable;
 @SuppressWarnings("serial")
 public class LambdaJavaScript {
     public static abstract class BaseFunctionFn extends BaseFunction {
-        public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-            if (args.length != getArity())
-                throw new IllegalArgumentException(
-                        "Tried to call JavaScript BaseFunctionFn with wrong number of arguments, " + args.length
-                                + " for " + getArity());
+        public BaseFunctionFn() {
+            Fn0.getAndCheckArityForMethod(getImplementingClass(), "call");
+        }
 
+        Class<?> getImplementingClass() {
+            return getClass();
+        }
+
+        public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
             Object result = null;
             if (args.length == 0)
                 result = call();
@@ -63,34 +66,42 @@ public class LambdaJavaScript {
 
     public static abstract class FunctionFn0 extends BaseFunctionFn {
         public abstract Object call();
-
-        public int getArity() {
-            return 0;
-        }
     }
 
-    public static abstract class FunctionFn1 extends BaseFunctionFn {
+    public static abstract class FunctionFn1 extends FunctionFn0 {
+        public Object call() {
+            return call(default$1());
+        }
+
+        protected Object default$1() {
+            return null;
+        }
+
         public abstract Object call(Object a1);
-
-        public int getArity() {
-            return 1;
-        }
     }
 
-    public static abstract class FunctionFn2 extends BaseFunctionFn {
+    public static abstract class FunctionFn2 extends FunctionFn1 {
+        public Object call(Object a1) {
+            return call(a1, default$2());
+        }
+
+        protected Object default$2() {
+            return null;
+        }
+
         public abstract Object call(Object a1, Object a2);
-
-        public int getArity() {
-            return 2;
-        }
     }
 
-    public static abstract class FunctionFn3 extends BaseFunctionFn {
-        public abstract Object call(Object a1, Object a2, Object a3);
-
-        public int getArity() {
-            return 3;
+    public static abstract class FunctionFn3 extends FunctionFn2 {
+        public Object call(Object a1, Object a2) {
+            return call(a1, a2, default$3());
         }
+
+        protected Object default$3() {
+            return null;
+        }
+
+        public abstract Object call(Object a1, Object a2, Object a3);
     }
 
     /**
@@ -213,8 +224,16 @@ public class LambdaJavaScript {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static FunctionFn1 toFunction(final Fn1 fn) {
         return new FunctionFn1() {
+            public Object call() {
+                return fn.call();
+            }
+
             public Object call(Object a1) {
                 return fn.call(a1);
+            }
+
+            Class<?> getImplementingClass() {
+                return fn.getClass();
             }
         };
     }
@@ -225,8 +244,20 @@ public class LambdaJavaScript {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static FunctionFn2 toFunction(final Fn2 fn) {
         return new FunctionFn2() {
+            public Object call() {
+                return fn.call();
+            }
+
+            public Object call(Object a1) {
+                return fn.call(a1);
+            }
+
             public Object call(Object a1, Object a2) {
                 return fn.call(a1, a2);
+            }
+
+            Class<?> getImplementingClass() {
+                return fn.getClass();
             }
         };
     }
@@ -237,8 +268,24 @@ public class LambdaJavaScript {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static Function toFunction(final Fn3 fn) {
         return new FunctionFn3() {
+            public Object call() {
+                return fn.call();
+            }
+
+            public Object call(Object a1) {
+                return fn.call(a1);
+            }
+
+            public Object call(Object a1, Object a2) {
+                return fn.call(a1, a2);
+            }
+
             public Object call(Object a1, Object a2, Object a3) {
                 return fn.call(a1, a2, a3);
+            }
+
+            Class<?> getImplementingClass() {
+                return fn.getClass();
             }
         };
     }

@@ -51,21 +51,36 @@ public class JavaScriptTest {
     }
 
     @Test
+    public void defaultValuesForJavaScriptFunctions() throws ScriptException {
+        js.put("f", function(n = 2, n * 2));
+        assertEquals(4.0, js.eval("f()"));
+        js.put("f", function(n, m = 2, n * m));
+        assertEquals(8.0, js.eval("f(4)"));
+        js.put("f", function(n = 2, m = 2, n * m));
+        assertEquals(4.0, js.eval("f()"));
+    }
+
+    @Test
     public void convertFnToFunction() throws ScriptException {
         Function f = toFunction(Lambda.λ(s, s.toUpperCase()));
         assertEquals("HELLO", f.call(Context.getCurrentContext(), null, null, new Object[] { "hello" }));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void convertFnToFunctionKeepsDefaultValues() throws ScriptException {
+        Function f = toFunction(Lambda.λ(s = "world", s.toUpperCase()));
+        assertEquals("WORLD", f.call(Context.getCurrentContext(), null, null, new Object[0]));
+    }
+
+    @Test(expected = NullPointerException.class)
     public void convertedFunctionThrowsExceptionWhenCalledWithTooFewArguments() throws ScriptException {
         Function f = toFunction(Lambda.λ(s, s.toUpperCase()));
         f.call(Context.getCurrentContext(), null, null, new Object[0]);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void convertedFunctionThrowsExceptionWhenCalledWithTooManyArguments() throws ScriptException {
+    public void convertedFunctionIgnoresExtraArguments() throws ScriptException {
         Function f = toFunction(Lambda.λ(s, s.toUpperCase()));
-        f.call(Context.getCurrentContext(), null, null, new Object[] { "hello", "world" });
+        assertEquals("HELLO", f.call(Context.getCurrentContext(), null, null, new Object[] { "hello", "world" }));
     }
 
     @Test

@@ -24,6 +24,7 @@ import lambda.javascript.LambdaJavaScript;
 import lambda.jruby.JRubyTest;
 import lambda.jruby.LambdaJRuby;
 
+import org.codehaus.groovy.runtime.MethodClosure;
 import org.jruby.RubyProc;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,9 +51,25 @@ public class GroovyTest {
     }
 
     @Test
+    public void defaultValuesForJavaScriptFunctions() throws ScriptException {
+        groovy.put("c", closure(n = 2, n * 2));
+        assertEquals(4, groovy.eval("c()"));
+        groovy.put("c", closure(n, m = 2, n * m));
+        assertEquals(8, groovy.eval("c(4)"));
+        groovy.put("c", closure(n = 2, m = 2, n * m));
+        assertEquals(4, groovy.eval("c()"));
+    }
+
+    @Test
     public void convertFnToClosure() throws ScriptException {
         Closure closure = toClosure(Lambda.λ(s, s.toUpperCase()));
         assertEquals("HELLO", closure.call(new Object[] { "hello" }));
+    }
+
+    @Test
+    public void convertFnToClosureKeepsDefaultValues() throws ScriptException {
+        Closure closure = toClosure(Lambda.λ(s = "world", s.toUpperCase()));
+        assertEquals("WORLD", closure.call(new Object[0]));
     }
 
     @Test(expected = NullPointerException.class)
@@ -71,6 +88,12 @@ public class GroovyTest {
     public void convertClosureToFn() throws ScriptException {
         Closure closure = (Closure) groovy.eval("{ it -> it.toUpperCase() }");
         assertEquals("HELLO", toFn1(closure).call("hello"));
+    }
+
+    @Test
+    public void convertGroovyMethodToFn() throws ScriptException {
+        MethodClosure closure = (MethodClosure) groovy.eval("'hello'.&toUpperCase");
+        assertEquals("HELLO", toFn0(closure).call());
     }
 
     @Test

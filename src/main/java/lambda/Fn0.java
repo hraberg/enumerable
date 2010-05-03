@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import lambda.annotation.LambdaLocal;
@@ -35,6 +37,40 @@ public abstract class Fn0<R> implements Serializable {
 
     public static boolean isFalseOrNull(Object result) {
         return !isNotFalseOrNull(result);
+    }
+
+    public static int getAndCheckArityForMethod(Class<?> aClass, String methodName) {
+        int basicArity = 0;
+        for (Method method : aClass.getDeclaredMethods())
+            if (method.getName() == methodName)
+                basicArity = method.getParameterTypes().length;
+
+        SortedSet<Integer> defaultValues = new TreeSet<Integer>();
+        for (Method method : aClass.getDeclaredMethods())
+            if (method.getName().startsWith("default$"))
+                defaultValues.add(Integer.valueOf(method.getName().substring("default$".length())));
+
+        boolean consecutive = true;
+        if (!defaultValues.isEmpty()) {
+            int lastIndex = -1;
+            for (int index : defaultValues) {
+                if (lastIndex > 0)
+                    consecutive = index == lastIndex + 1;
+                lastIndex = index;
+            }
+            if (lastIndex != basicArity || !consecutive)
+                throw new IllegalArgumentException("parameter " + lastIndex
+                        + " cannot have a default value when there are parameters follwing without, arity is "
+                        + basicArity);
+
+            return -(basicArity - defaultValues.size() + 1);
+        }
+
+        return basicArity;
+    }
+
+    public Fn0() {
+        getAndCheckArityForMethod(getClass(), "call");
     }
 
     public final int arity = 0;

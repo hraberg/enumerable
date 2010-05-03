@@ -97,19 +97,62 @@ public class LambdaClojure {
         }
     }
 
-    public static abstract class AFn0 extends AFunction {
+    static abstract class AFnFnBase extends AFunction {
+        int arity;
+
+        public AFnFnBase() {
+            arity = Fn0.getAndCheckArityForMethod(getImplementingClass(), getMethod());
+        }
+
+        String getMethod() {
+            return "invoke";
+        }
+
+        Class<?> getImplementingClass() {
+            return getClass();
+        }
+    }
+
+    public static abstract class AFn0 extends AFnFnBase {
         public abstract Object invoke() throws Exception;
     }
 
-    public static abstract class AFn1 extends AFunction {
+    public static abstract class AFn1 extends AFn0 {
+        public Object invoke() throws Exception {
+            return invoke(default$1());
+        }
+
+        protected Object default$1() {
+            throwArity();
+            return null;
+        }
+
         public abstract Object invoke(Object arg1) throws Exception;
     }
 
-    public static abstract class AFn2 extends AFunction {
+    public static abstract class AFn2 extends AFn1 {
+        public Object invoke(Object arg1) throws Exception {
+            return invoke(arg1, default$2());
+        }
+
+        protected Object default$2() {
+            throwArity();
+            return null;
+        }
+
         public abstract Object invoke(Object arg1, Object arg2) throws Exception;
     }
 
-    public static abstract class AFn3 extends AFunction {
+    public static abstract class AFn3 extends AFn2 {
+        public Object invoke(Object arg1, Object arg2) throws Exception {
+            return invoke(arg1, arg2, default$3());
+        }
+
+        protected Object default$3() {
+            throwArity();
+            return null;
+        }
+
         public abstract Object invoke(Object arg1, Object arg2, Object arg3) throws Exception;
     }
 
@@ -165,6 +208,14 @@ public class LambdaClojure {
      */
     public static Fn1<Object, Object> toFn1(final IFn f) {
         return new Fn1<Object, Object>() {
+            public Object call() {
+                try {
+                    return f.invoke();
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+
             public Object call(Object a1) {
                 try {
                     return f.invoke(a1);
@@ -180,6 +231,22 @@ public class LambdaClojure {
      */
     public static Fn2<Object, Object, Object> toFn2(final IFn f) {
         return new Fn2<Object, Object, Object>() {
+            public Object call() {
+                try {
+                    return f.invoke();
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+
+            public Object call(Object a1) {
+                try {
+                    return f.invoke(a1);
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+
             public Object call(Object a1, Object a2) {
                 try {
                     return f.invoke(a1, a2);
@@ -195,6 +262,30 @@ public class LambdaClojure {
      */
     public static Fn3<Object, Object, Object, Object> toFn3(final IFn f) {
         return new Fn3<Object, Object, Object, Object>() {
+            public Object call() {
+                try {
+                    return f.invoke();
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+
+            public Object call(Object a1) {
+                try {
+                    return f.invoke(a1);
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+
+            public Object call(Object a1, Object a2) {
+                try {
+                    return f.invoke(a1, a2);
+                } catch (Exception e) {
+                    throw uncheck(e);
+                }
+            }
+
             public Object call(Object a1, Object a2, Object a3) {
                 try {
                     return f.invoke(a1, a2, a3);
@@ -223,8 +314,22 @@ public class LambdaClojure {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static IFn toIFn(final Fn1 f) {
         return new AFn1() {
+            public Object invoke() throws Exception {
+                if (arity > -1)
+                    throwArity();
+                return f.call();
+            }
+
             public Object invoke(Object arg1) throws Exception {
                 return f.call(arg1);
+            }
+
+            Class<?> getImplementingClass() {
+                return f.getClass();
+            }
+
+            String getMethod() {
+                return "call";
             }
         };
     }
@@ -235,8 +340,28 @@ public class LambdaClojure {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static IFn toIFn(final Fn2 f) {
         return new AFn2() {
+            public Object invoke() throws Exception {
+                if (arity > -1)
+                    throwArity();
+                return f.call();
+            }
+
+            public Object invoke(Object arg1) throws Exception {
+                if (arity > -2)
+                    throwArity();
+                return f.call(arg1);
+            }
+
             public Object invoke(Object arg1, Object arg2) throws Exception {
                 return f.call(arg1, arg2);
+            }
+
+            Class<?> getImplementingClass() {
+                return f.getClass();
+            }
+
+            String getMethod() {
+                return "call";
             }
         };
     }
@@ -247,8 +372,34 @@ public class LambdaClojure {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static IFn toIFn(final Fn3 f) {
         return new AFn3() {
+            public Object invoke() throws Exception {
+                if (arity > -1)
+                    throwArity();
+                return f.call();
+            }
+
+            public Object invoke(Object arg1) throws Exception {
+                if (arity > -2)
+                    throwArity();
+                return f.call(arg1);
+            }
+
+            public Object invoke(Object arg1, Object arg2) throws Exception {
+                if (arity > -3)
+                    throwArity();
+                return f.call(arg1, arg2);
+            }
+
             public Object invoke(Object arg1, Object arg2, Object arg3) throws Exception {
                 return f.call(arg1, arg2, arg3);
+            }
+
+            Class<?> getImplementingClass() {
+                return f.getClass();
+            }
+
+            String getMethod() {
+                return "call";
             }
         };
     }

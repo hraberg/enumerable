@@ -19,30 +19,51 @@ public class LambdaGroovy {
     public static abstract class ClosureFn0 extends Closure {
         public ClosureFn0() {
             super(LambdaGroovy.class);
+            Fn0.getAndCheckArityForMethod(getImplementingClass(), getMethod());
+        }
+
+        Class<?> getImplementingClass() {
+            return getClass();
+        }
+
+        String getMethod() {
+            return "doCall";
         }
 
         public abstract Object doCall();
     }
 
-    public static abstract class ClosureFn1 extends Closure {
-        public ClosureFn1() {
-            super(LambdaGroovy.class);
+    public static abstract class ClosureFn1 extends ClosureFn0 {
+        public Object doCall() {
+            return doCall(default$1());
+        }
+
+        protected Object default$1() {
+            return null;
         }
 
         public abstract Object doCall(Object a1);
     }
 
-    public static abstract class ClosureFn2 extends Closure {
-        public ClosureFn2() {
-            super(LambdaGroovy.class);
+    public static abstract class ClosureFn2 extends ClosureFn1 {
+        public Object doCall(Object a1) {
+            return doCall(a1, default$2());
+        }
+
+        protected Object default$2() {
+            return null;
         }
 
         public abstract Object doCall(Object a1, Object a2);
     }
 
-    public static abstract class ClosureFn3 extends Closure {
-        public ClosureFn3() {
-            super(LambdaGroovy.class);
+    public static abstract class ClosureFn3 extends ClosureFn2 {
+        public Object doCall(Object a1, Object a2) {
+            return doCall(a1, a2, default$3());
+        }
+
+        protected Object default$3() {
+            return null;
         }
 
         public abstract Object doCall(Object a1, Object a2, Object a3);
@@ -144,8 +165,20 @@ public class LambdaGroovy {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static ClosureFn1 toClosure(final Fn1 fn) {
         return new ClosureFn1() {
+            public Object doCall() {
+                return fn.call();
+            }
+
             public Object doCall(Object a1) {
                 return fn.call(a1);
+            }
+
+            Class<?> getImplementingClass() {
+                return fn.getClass();
+            }
+
+            String getMethod() {
+                return "call";
             }
         };
     }
@@ -156,8 +189,24 @@ public class LambdaGroovy {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static ClosureFn2 toClosure(final Fn2 fn) {
         return new ClosureFn2() {
+            public Object doCall() {
+                return fn.call();
+            }
+
+            public Object doCall(Object a1) {
+                return fn.call(a1);
+            }
+
             public Object doCall(Object a1, Object a2) {
                 return fn.call(a1, a2);
+            }
+
+            Class<?> getImplementingClass() {
+                return fn.getClass();
+            }
+
+            String getMethod() {
+                return "call";
             }
         };
     }
@@ -168,8 +217,28 @@ public class LambdaGroovy {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static ClosureFn3 toClosure(final Fn3 fn) {
         return new ClosureFn3() {
+            public Object doCall() {
+                return fn.call();
+            }
+
+            public Object doCall(Object a1) {
+                return fn.call(a1);
+            }
+
+            public Object doCall(Object a1, Object a2) {
+                return fn.call(a1, a2);
+            }
+
             public Object doCall(Object a1, Object a2, Object a3) {
                 return fn.call(a1, a2, a3);
+            }
+
+            Class<?> getImplementingClass() {
+                return fn.getClass();
+            }
+
+            String getMethod() {
+                return "call";
             }
         };
     }

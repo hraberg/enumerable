@@ -49,6 +49,8 @@ public class JRubyTest {
         assertEquals(8L, rb.eval("block.call 4"));
         rb.put("block", lambda(n = 2, m = 2, n * m));
         assertEquals(4L, rb.eval("block.call"));
+        rb.put("block", lambda(s, n = 2, m = 2, s + n * m));
+        assertEquals("#: 4", rb.eval("block.call '#: '"));
     }
 
     @Test(expected = IllegalArgumentException.class)
