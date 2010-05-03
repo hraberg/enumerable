@@ -109,7 +109,7 @@
             <batchtest todir="target/junit">
                 <fileset dir="src/test/java">
                     <include name="**/*Test.java" />
-                    <exclude name="**/EnumerableRubySpecTest.java" />
+                    <exclude name="**/CoreEnumerableRubySpecSuiteTest.java" />
                 </fileset>
             </batchtest>
             <formatter type="xml" />
@@ -122,7 +122,7 @@
         <mkdir dir="target/rubyspec" />
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="specs.failed">
             <classpath refid="enumerable.test.classpath" />
-            <test name="lambda.enumerable.jruby.EnumerableRubySpecTest" todir="target/rubyspec"/>
+            <test name="lambda.enumerable.jruby.CoreEnumerableRubySpecSuiteTest" todir="target/rubyspec"/>
             <formatter type="xml" />
             <formatter type="plain" />
         </junit>
@@ -163,7 +163,7 @@
                 <fileset dir="src/test/java">
                     <include name="**/*Test.java" />
                     <exclude name="**/weaving/tree/**/*Test.java" />
-                    <exclude name="**/EnumerableRubySpecTest.java" />
+                    <exclude name="**/CoreEnumerableRubySpecSuiteTest.java" />
                 </fileset>
             </batchtest>
             <formatter type="xml" />
@@ -272,7 +272,7 @@
         </tar>
     </target>
 
-    <target name="dist" depends="dist-no-test, example-with-loader, aot-tests, microbench">
+    <target name="dist" depends="dist-no-test, rubyspec, example-with-loader, aot-tests, microbench">
         <echo message="Ensuring that the example project in ${enumerable.dist.name}.tgz works" />
         <delete dir="target/${enumerable.dist.name}" />
         <untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />

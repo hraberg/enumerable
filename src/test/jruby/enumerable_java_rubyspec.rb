@@ -409,9 +409,9 @@ module Enumerable
   end
   
   def unnest_java_collections(o)
-    if (o.class.include? Java::JavaUtil::List) && (o.class != Array)
+    if (o.is_a? Java::JavaUtil::List) && (o.class != Array)
       o.to_a.collect! {|e| unnest_java_collections e}
-    elsif o.class.include? Java::JavaUtil::Map
+    elsif o.is_a? Java::JavaUtil::Map
       h = {}
       i = o.entry_set.iterator
       while i.has_next
@@ -445,7 +445,6 @@ module EnumerableJava
     java_debug "calling to_a on #{self.class}"
     return self if is_a? Array
     internal_to_a
-#    to_java.to_list.to_a
   end
   
   private
@@ -456,7 +455,6 @@ module EnumerableJava
   end
 
   def to_java
-#    EnumerableModule.extend(Array == self.class || Hash == self.class ? self : internal_to_a)
     EnumerableModule.extend(self)
   end
 
@@ -503,7 +501,7 @@ class Array
 end
 
 module java::util::List
-  remove_method :sort
+  remove_method :sort if instance_methods.include? "sort"
 end
 
 module java::lang::Iterable

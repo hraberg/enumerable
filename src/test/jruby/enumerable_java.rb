@@ -151,5 +151,5 @@ class Array
 end
 
 module java::util::List
-  remove_method :sort
+  remove_method :sort if instance_methods.include? "sort"
 end
