@@ -3,6 +3,7 @@ package lambda.enumerable;
 import static java.util.Arrays.*;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -527,17 +528,26 @@ public class EnumerableArrays {
     }
 
     /**
+     * Converts any arguments to iterators, then merges elements of collection
+     * with corresponding elements from each argument. This generates a sequence
+     * of collection#size n-element list, where n is one more that the count of
+     * arguments. If the size of any argument is less than collection#size, null
+     * values are supplied. The block is invoked for each output array. Returns
+     * null.
+     */
+    public static <E, R> Object zip(E[] array, Object[] args, Fn1<? super EList<?>, R> block) {
+        List<Iterable<?>> lists = new ArrayList<Iterable<?>>();
+        for (int i = 0; i < args.length; i++)
+            lists.add(asList(args[i]));
+        return Enumerable.zip(asList(array), lists, block);
+    }
+
+    /**
      * Converts any arguments to iterators, then merges elements of array with
      * corresponding elements from each argument. This generates a sequence of
      * array#size n-element list, where n is one more that the count of
      * arguments. If the size of any argument is less than array#length, null
      * values are supplied.
-     * 
-     * <p>
-     * Due to varargs this version doesn't support taking a block like in Ruby.
-     * Feed the result into {@link #collect(Object[], Fn1)} to achieve the same
-     * effect.
-     * </p>
      */
     public static <E> Object[][] zip(E[] array, Object[]... args) {
         Iterable<?>[] lists = new Iterable<?>[args.length];

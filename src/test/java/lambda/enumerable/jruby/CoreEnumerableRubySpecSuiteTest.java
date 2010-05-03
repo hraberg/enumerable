@@ -15,6 +15,9 @@ public class CoreEnumerableRubySpecSuiteTest extends RubySpecTestBase {
         // Have already wasted too much time trying to figure out why.
         // Someone is trying to call entrySet on 1..3:Range for god know what
         // reason.
+        // Could have something to do with how JDT builds, does work from Ant,
+        // assuming you do a clean build and don't keep anything Eclipse has
+        // done.
         for (StackTraceElement e : currentThread().getStackTrace())
             if (e.getClassName().startsWith("org.eclipse.jdt.internal."))
                 return;

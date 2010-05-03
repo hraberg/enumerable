@@ -1,5 +1,7 @@
 require 'java'
 
+import 'java.lang.Iterable'
+
 import 'lambda.Fn1'
 import 'lambda.enumerable.collection.EnumerableModule'
 import 'lambda.enumerable.collection.EIterable'
@@ -38,9 +40,9 @@ module Enumerable
   def self.included(host)
     host.class_eval do
       java_debug "included Enumerable in #{host}"
-      unless include? Java::JavaLang::Iterable
+      unless include? Iterable
         java_debug "including Iterable in #{host}"
-        include Java::JavaLang::Iterable
+        include Iterable
         def iterator
           EnumerableIterator.new(self)
         end
@@ -70,17 +72,17 @@ module Enumerable
   
   def all?(&block)
     java_debug "calling all? with #{block_given? ? block : "<no block>"} on #{self.class}"
-    to_java.all(to_fn1 block)
+    to_j.all(to_fn1 block)
   end
   
   def any?(&block)
     java_debug "calling any? with #{block_given? ? block : "<no block>"} on #{self.class}"
-    to_java.any(to_fn1 block)
+    to_j.any(to_fn1 block)
   end
 
   def collect(&block)
     java_debug "calling collect with #{block_given? ? block : "<no block>"} on #{self.class}"
-    unnest_java_collections to_java.collect(to_fn1 block)
+    unnest_java_collections to_j.collect(to_fn1 block)
   end
 
   alias :map :collect
@@ -89,11 +91,11 @@ module Enumerable
     java_debug "calling count with #{obj}, #{block_given? ? block : "<no block>"} on #{self.class}"
     if obj != NotSupplied
       STDERR.puts "warning: given block not used" if block_given?
-      to_java.count obj
+      to_j.count obj
     elsif block_given?
-      to_java.count to_fn1(block)
+      to_j.count to_fn1(block)
     else
-      to_java.count
+      to_j.count
     end
   end  
 
@@ -101,10 +103,10 @@ module Enumerable
     begin
       java_debug "calling cycle with #{times}, #{block_given? ? block : "<no block>"} on #{self.class}"
       if times.nil?
-        result = to_java.cycle to_fn1(block)
+        result = to_j.cycle to_fn1(block)
       else
         raise TypeError, "can't convert #{times.class} into Integer" unless times.respond_to? :to_int
-        result = to_java.cycle times.to_int, to_fn1(block)
+        result = to_j.cycle times.to_int, to_fn1(block)
       end
       return nil if result.nil? || block_given?
       result.to_a.to_enum
@@ -117,7 +119,7 @@ module Enumerable
   def detect(ifnone = nil, &block)
     java_debug "calling detect with #{ifnone}, #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:detect, ifnone) unless block_given?
-    unnest_java_collections to_java.detect to_fn0(ifnone), to_fn1(block)
+    unnest_java_collections to_j.detect to_fn0(ifnone), to_fn1(block)
   end
   
   alias :find :detect
@@ -126,7 +128,7 @@ module Enumerable
     begin
       java_debug "calling drop with #{n} on #{self.class}"
       raise TypeError, "can't convert #{n.class} into Integer" unless n.respond_to? :to_int
-      unnest_java_collections to_java.drop(n.to_int)
+      unnest_java_collections to_j.drop(n.to_int)
     rescue Java::JavaLang::IllegalArgumentException => e
       raise ArgumentError, e.message
     end
@@ -136,7 +138,7 @@ module Enumerable
     begin
       java_debug "calling drop_while with #{block_given? ? block : "<no block>"} on #{self.class}"
       return to_enum(:drop_while) unless block_given?
-      unnest_java_collections to_java.drop_while to_fn1(block)
+      unnest_java_collections to_j.drop_while to_fn1(block)
     rescue NativeException => e
       raise e.cause if e.cause.is_a? Java::OrgJrubyExceptions::JumpException
       raise
@@ -148,7 +150,7 @@ module Enumerable
       java_debug "calling each_cons with #{n}, #{block_given? ? block : "<no block>"} on #{self.class}"
       raise TypeError, "can't convert #{n.class} into Integer" unless n.respond_to? :to_int
       return to_enum(:each_cons, n.to_int) unless block_given?
-      to_java.each_cons(n.to_int, to_fn1(block))
+      to_j.each_cons(n.to_int, to_fn1(block))
     rescue Java::JavaLang::IllegalArgumentException => e
       raise ArgumentError, e.message
     rescue NativeException => e
@@ -162,7 +164,7 @@ module Enumerable
       java_debug "calling each_slice with #{n}, #{block_given? ? block : "<no block>"} on #{self.class}"
       raise TypeError, "can't convert #{n.class} into Integer" unless n.respond_to? :to_int
       return to_enum(:each_slice, n.to_int) unless block_given?
-      to_java.each_slice(n.to_int, to_fn1(block))
+      to_j.each_slice(n.to_int, to_fn1(block))
     rescue Java::JavaLang::IllegalArgumentException => e
       raise ArgumentError, e.message
     rescue NativeException => e
@@ -175,7 +177,7 @@ module Enumerable
     begin
       java_debug "calling drop with #{n} on #{self.class}"
       raise TypeError, "can't convert #{n.class} into Integer" unless n.respond_to? :to_int
-      unnest_java_collections to_java.drop(n.to_int)
+      unnest_java_collections to_j.drop(n.to_int)
     rescue Java::JavaLang::IllegalArgumentException => e
       raise ArgumentError, e.message
     end
@@ -185,7 +187,7 @@ module Enumerable
     begin
       java_debug "calling drop_while with #{block_given? ? block : "<no block>"} on #{self.class}"
       return to_enum(:drop_while) unless block_given?
-      unnest_java_collections to_java.drop_while to_fn1(block)
+      unnest_java_collections to_j.drop_while to_fn1(block)
     rescue NativeException => e
       raise e.cause if e.cause.is_a? Java::OrgJrubyExceptions::JumpException
       raise
@@ -197,10 +199,10 @@ module Enumerable
       java_debug "calling each_with_index with #{args}, #{block_given? ? block : "<no block>"} on #{self.class}"
       unless block_given?
         a = []
-        to_java.each_with_index(to_fn2(lambda {|o, i| a << [o, i]}))
+        to_j.each_with_index(to_fn2(lambda {|o, i| a << [o, i]}))
         return a.to_enum
       end
-      to_java.each_with_index(to_fn2(block))
+      to_j.each_with_index(to_fn2(block))
       self
     rescue NativeException => e
       raise e.cause if e.cause.is_a? Java::OrgJrubyExceptions::JumpException
@@ -212,7 +214,7 @@ module Enumerable
     begin
       java_debug "calling each_with_object with #{memo}, #{block_given? ? block : "<no block>"} on #{self.class}"
       return to_enum(:each_with_object, memo) unless block_given?
-      to_java.each_with_object(memo, to_fn2(block))
+      to_j.each_with_object(memo, to_fn2(block))
     rescue NativeException => e
       raise e.cause if e.cause.is_a? Java::OrgJrubyExceptions::JumpException
       raise
@@ -220,13 +222,13 @@ module Enumerable
   end
   
   def entries
-    unnest_java_collections to_java.entries
+    unnest_java_collections to_j.entries
   end
 
   def find_all(&block)
     java_debug "calling find_all with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:find_all) unless block_given?
-    unnest_java_collections to_java.find_all(to_fn1(block))
+    unnest_java_collections to_j.find_all(to_fn1(block))
   end
   
   alias :select :find_all
@@ -235,10 +237,10 @@ module Enumerable
     java_debug "calling find_index with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:find_index) if !block_given? && obj == NotSupplied
     if obj == NotSupplied
-      result = to_java.find_index(to_fn1(block))
+      result = to_j.find_index(to_fn1(block))
     else
       STDERR.puts "warning: given block not used" if block_given?
-      result = to_java.find_index(obj) unless obj == NotSupplied
+      result = to_j.find_index(obj) unless obj == NotSupplied
     end
     result == -1 ? nil : result
   end
@@ -246,9 +248,9 @@ module Enumerable
   def first(n = NotSupplied)
     begin
       java_debug "calling first with #{n} on #{self.class}"
-      return to_java.first if n == NotSupplied
+      return to_j.first if n == NotSupplied
       raise TypeError, "can't convert #{n.class} into Integer" unless n.respond_to? :to_int
-      unnest_java_collections to_java.first(n.to_int)
+      unnest_java_collections to_j.first(n.to_int)
     rescue Java::JavaLang::IllegalArgumentException => e
       raise ArgumentError, e.message
     end
@@ -261,23 +263,23 @@ module Enumerable
   def group_by(&block)
     java_debug "calling group_by with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:group_by) unless block_given?
-    unnest_java_collections to_java.group_by(to_fn1 block)
+    unnest_java_collections to_j.group_by(to_fn1 block)
   end
 
   def include?(obj)
     java_debug "calling include? with #{obj} on #{self.class}"
-    to_java.include(obj)
+    to_j.include(obj)
   end
   
   alias :member? :include?
 
   def inject(initial_or_symbol = NotSupplied, symbol = NotSupplied, &block)
     java_debug "calling inject with #{initial_or_symbol}, #{symbol}, #{block_given? ? block : "<no block>"} on #{self.class}"
-    return unnest_java_collections to_java.inject(to_fn2(block)) if ((initial_or_symbol == NotSupplied) && block_given?)
-    return unnest_java_collections to_java.inject(initial_or_symbol, to_fn2(block)) if ((symbol == NotSupplied) && block_given?)
-    return unnest_java_collections to_java.inject(to_fn2(initial_or_symbol.to_proc)) if (symbol == NotSupplied)
+    return unnest_java_collections to_j.inject(to_fn2(block)) if ((initial_or_symbol == NotSupplied) && block_given?)
+    return unnest_java_collections to_j.inject(initial_or_symbol, to_fn2(block)) if ((symbol == NotSupplied) && block_given?)
+    return unnest_java_collections to_j.inject(to_fn2(initial_or_symbol.to_proc)) if (symbol == NotSupplied)
     STDERR.puts "warning: given block not used" if block_given?
-    unnest_java_collections to_java.inject(initial_or_symbol, to_fn2(symbol.to_proc))
+    unnest_java_collections to_j.inject(initial_or_symbol, to_fn2(symbol.to_proc))
   end
   
   alias :reduce :inject
@@ -285,14 +287,14 @@ module Enumerable
   def max_by(&block)
     java_debug "calling max_by with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:max_by) unless block_given?
-    unnest_java_collections to_java.max_by(to_fn1(block))
+    unnest_java_collections to_j.max_by(to_fn1(block))
   end
 
   def max(&block)
     begin
       java_debug "calling max with #{block_given? ? block : "<no block>"} on #{self.class}"
-      return to_java.max unless block_given?
-      unnest_java_collections to_java.max(to_fn2(block))
+      return to_j.max unless block_given?
+      unnest_java_collections to_j.max(to_fn2(block))
     rescue Java::JavaLang::ClassCastException, Java::JavaLang::NullPointerException => e
       raise ArgumentError, e.message
     end
@@ -301,14 +303,14 @@ module Enumerable
   def min_by(&block)
     java_debug "calling min_by with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:min_by) unless block_given?
-    unnest_java_collections to_java.min_by(to_fn1(block))
+    unnest_java_collections to_j.min_by(to_fn1(block))
   end
 
   def min(&block)
     begin
       java_debug "calling min with #{block_given? ? block : "<no block>"} on #{self.class}"
-      return to_java.min unless block_given?
-      unnest_java_collections to_java.min(to_fn2(block))
+      return to_j.min unless block_given?
+      unnest_java_collections to_j.min(to_fn2(block))
     rescue Java::JavaLang::ClassCastException, Java::JavaLang::NullPointerException => e
       raise ArgumentError, e.message
     end
@@ -317,14 +319,14 @@ module Enumerable
   def minmax_by(&block)
     java_debug "calling minmax_by with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:minmax_by) unless block_given?
-    unnest_java_collections to_java.min_max_by(to_fn1(block))
+    unnest_java_collections to_j.min_max_by(to_fn1(block))
   end
 
   def minmax(&block)
     begin
       java_debug "calling minmax with #{block_given? ? block : "<no block>"} on #{self.class}"
-      return unnest_java_collections to_java.min_max unless block_given?
-      unnest_java_collections to_java.min_max(to_fn2(block))
+      return unnest_java_collections to_j.min_max unless block_given?
+      unnest_java_collections to_j.min_max(to_fn2(block))
     rescue Java::JavaLang::ClassCastException, Java::JavaLang::NullPointerException => e
       raise ArgumentError, e.message
     end
@@ -332,45 +334,45 @@ module Enumerable
 
   def none?(&block)
     java_debug "calling none? with #{block_given? ? block : "<no block>"} on #{self.class}"
-    to_java.none(to_fn1 block)
+    to_j.none(to_fn1 block)
   end
   
   def one?(&block)
     java_debug "calling one? with #{block_given? ? block : "<no block>"} on #{self.class}"
-    to_java.one(to_fn1 block)
+    to_j.one(to_fn1 block)
   end
 
   def partition(&block)
     java_debug "calling partition with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:partition) unless block_given?
-    unnest_java_collections to_java.partition(to_fn1(block))
+    unnest_java_collections to_j.partition(to_fn1(block))
   end
 
   def reject(&block)
     java_debug "calling reject with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:reject) unless block_given?
-    unnest_java_collections to_java.reject(to_fn1(block))
+    unnest_java_collections to_j.reject(to_fn1(block))
   end
 
 
   def reverse_each(&block)
     java_debug "calling reverse_each with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:reverse_each) unless block_given?
-    to_java.reverse_each(to_fn1(block))
+    to_j.reverse_each(to_fn1(block))
     self
   end
 
   def sort_by(&block)
     java_debug "calling sort_by with #{block_given? ? block : "<no block>"} on #{self.class}"
     return to_enum(:sort_by) unless block_given?
-    unnest_java_collections to_java.sort_by(to_fn1(block))
+    unnest_java_collections to_j.sort_by(to_fn1(block))
   end
 
   def sort(&block)
     begin
       java_debug "calling sort with #{block_given? ? block : "<no block>"} on #{self.class}"
-      return unnest_java_collections to_java.sort unless block_given?
-      unnest_java_collections to_java.sort(to_fn2(block))
+      return unnest_java_collections to_j.sort unless block_given?
+      unnest_java_collections to_j.sort(to_fn2(block))
     rescue Java::JavaLang::ClassCastException, Java::JavaLang::NullPointerException => e
       raise ArgumentError, e.message
     end
@@ -380,7 +382,7 @@ module Enumerable
     begin
       java_debug "calling take with #{n} on #{self.class}"
       raise TypeError, "can't convert #{n.class} into Integer" unless n.respond_to? :to_int
-      unnest_java_collections to_java.take(n.to_int)
+      unnest_java_collections to_j.take(n.to_int)
     rescue Java::JavaLang::IllegalArgumentException => e
       raise ArgumentError, e.message
     end
@@ -390,7 +392,7 @@ module Enumerable
     begin
       java_debug "calling take_while with #{block_given? ? block : "<no block>"} on #{self.class}"
       return to_enum(:take_while) unless block_given?
-      unnest_java_collections to_java.take_while to_fn1(block)
+      unnest_java_collections to_j.take_while to_fn1(block)
     rescue NativeException => e
       raise e.cause if e.cause.is_a? Java::OrgJrubyExceptions::JumpException
       raise
@@ -399,7 +401,8 @@ module Enumerable
   
   def zip(*arg, &block)
     java_debug "calling zip with #{arg}, #{block_given? ? block : "<no block>"} on #{self.class}"
-    a = EnumerableModule.extend(Array == self.class || Hash == self.class ? self : internal_to_a)
+    a = EnumerableModule.extend(Array == self.class || Hash == self.class ? self : internal_to_a)    
+    return unnest_java_collections a.zip(arg, to_fn1(block)) if block_given?
     unnest_java_collections a.zip(*arg)
   end
 
@@ -453,7 +456,7 @@ module EnumerableJava
     a
   end
 
-  def to_java
+  def to_j
     EnumerableModule.extend(self)
   end
 
@@ -477,7 +480,7 @@ class Range
   alias :original_include? :include?
   alias :original_first :first
   include EnumerableJava
-  include Java::JavaLang::Iterable
+  include Iterable
   def iterator
     EnumerableIterator.new(self)
   end

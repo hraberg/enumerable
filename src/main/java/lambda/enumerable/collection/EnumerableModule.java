@@ -508,6 +508,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return zip(new Iterable<?>[0]);
     }
 
+    public <R> Object zip(List<Iterable<?>> args, Fn1<? super EList<?>, R> block) {
+        zip(args.toArray(new Iterable<?>[0])).each(block);
+        return null;
+    }
+
     public EList<EList<?>> zip(Iterable<?>... args) {
         EList<EList<?>> allResults = new EList<EList<?>>();
 

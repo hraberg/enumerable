@@ -8,14 +8,12 @@ describe "Enumerable#zip" do
     EnumerableSpecs::Numerous.new(1,2,3).zip.should == [[1],[2],[3]]
   end
   
-  platform_is_not :enumerable_java do
-    it "passes each element of the result array to a block and return nil if a block is given" do
-      expected = [[1,4,7],[2,5,8],[3,6,9]]
-      EnumerableSpecs::Numerous.new(1,2,3).zip([4,5,6],[7,8,9]) do |result_component|
-        result_component.should == expected.shift
-      end.should == nil
-      expected.size.should == 0
-    end
+  it "passes each element of the result array to a block and return nil if a block is given" do
+    expected = [[1,4,7],[2,5,8],[3,6,9]]
+    EnumerableSpecs::Numerous.new(1,2,3).zip([4,5,6],[7,8,9]) do |result_component|
+      result_component.should == expected.shift
+    end.should == nil
+    expected.size.should == 0
   end
 
   it "fills resulting array with nils if an argument array is too short" do

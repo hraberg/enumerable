@@ -671,13 +671,19 @@ public class Enumerable {
      * with corresponding elements from each argument. This generates a sequence
      * of collection#size n-element list, where n is one more that the count of
      * arguments. If the size of any argument is less than collection#size, null
+     * values are supplied. The block is invoked for each output array. Returns
+     * null.
+     */
+    public static <E, R> Object zip(Iterable<E> collection, List<Iterable<?>> args, Fn1<? super EList<?>, R> block) {
+        return extend(collection).zip(args, block);
+    }
+
+    /**
+     * Converts any arguments to iterators, then merges elements of collection
+     * with corresponding elements from each argument. This generates a sequence
+     * of collection#size n-element list, where n is one more that the count of
+     * arguments. If the size of any argument is less than collection#size, null
      * values are supplied.
-     * 
-     * <p>
-     * Due to varargs this version doesn't support taking a block like in Ruby.
-     * Feed the result into {@link #collect(Iterable, Fn1)} to achieve the same
-     * effect.
-     * </p>
      */
     public static <E> EList<EList<?>> zip(Iterable<E> collection, Iterable<?>... args) {
         return extend(collection).zip(args);
