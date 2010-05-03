@@ -171,7 +171,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 [LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java). You need `jruby-1.4.0.jar` or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
 
-### JavaScript (for Java 6)
+### JavaScript Functions (for Java 6)
 
 [LambdaJavaScript](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/javascript/LambdaJavaScript.java) allows you to create lambdas extending  [Function](http://www.mozilla.org/rhino/apidocs/org/mozilla/javascript/Function.html). Uses [Rhino 1.6r2](http://www.mozilla.org/rhino/) which comes with Java 6.
 
