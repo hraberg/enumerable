@@ -1,8 +1,8 @@
-package lambda.googlecollect;
+package lambda.support.googlecollect;
 
 import static com.google.common.collect.Collections2.*;
 import static lambda.Parameters.*;
-import static lambda.googlecollect.LambdaGoogleCollections.*;
+import static lambda.support.googlecollect.LambdaGoogleCollections.*;
 import static org.junit.Assert.*;
 
 import java.util.Collection;

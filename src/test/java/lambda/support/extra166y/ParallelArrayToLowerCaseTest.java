@@ -1,8 +1,8 @@
-package lambda.extra166y;
+package lambda.support.extra166y;
 
 import static extra166y.ParallelLongArray.*;
 import static lambda.Parameters.*;
-import static lambda.extra166y.LambdaOps.*;
+import static lambda.support.extra166y.LambdaOps.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;

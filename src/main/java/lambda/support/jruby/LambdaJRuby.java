@@ -1,4 +1,4 @@
-package lambda.jruby;
+package lambda.support.jruby;
 
 import static org.jruby.javasupport.JavaEmbedUtils.*;
 import lambda.Fn0;

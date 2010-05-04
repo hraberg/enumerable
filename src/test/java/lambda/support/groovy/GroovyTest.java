@@ -1,8 +1,8 @@
-package lambda.groovy;
+package lambda.support.groovy;
 
 import static java.util.Arrays.*;
 import static lambda.Parameters.*;
-import static lambda.groovy.LambdaGroovy.*;
+import static lambda.support.groovy.LambdaGroovy.*;
 import static org.junit.Assert.*;
 import groovy.lang.Closure;
 import groovy.lang.MissingMethodException;
@@ -15,14 +15,14 @@ import javax.script.ScriptException;
 
 import lambda.Fn1;
 import lambda.Lambda;
-import lambda.clojure.ClojureTest;
-import lambda.clojure.LambdaClojure;
 import lambda.enumerable.Enumerable;
-import lambda.groovy.LambdaGroovy.ClosureFn2;
-import lambda.javascript.JavaScriptTest;
-import lambda.javascript.LambdaJavaScript;
-import lambda.jruby.JRubyTest;
-import lambda.jruby.LambdaJRuby;
+import lambda.support.clojure.ClojureTest;
+import lambda.support.clojure.LambdaClojure;
+import lambda.support.groovy.LambdaGroovy.ClosureFn2;
+import lambda.support.javascript.JavaScriptTest;
+import lambda.support.javascript.LambdaJavaScript;
+import lambda.support.jruby.JRubyTest;
+import lambda.support.jruby.LambdaJRuby;
 
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.jruby.RubyProc;

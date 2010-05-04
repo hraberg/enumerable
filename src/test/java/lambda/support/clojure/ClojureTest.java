@@ -1,10 +1,10 @@
-package lambda.clojure;
+package lambda.support.clojure;
 
 import static clojure.lang.RT.*;
 import static lambda.Parameters.*;
-import static lambda.clojure.ClojureSeqs.*;
-import static lambda.clojure.ClojureSeqs.Vars.*;
-import static lambda.clojure.LambdaClojure.*;
+import static lambda.support.clojure.ClojureSeqs.*;
+import static lambda.support.clojure.ClojureSeqs.Vars.*;
+import static lambda.support.clojure.LambdaClojure.*;
 import static org.junit.Assert.*;
 import groovy.lang.Closure;
 
@@ -14,12 +14,13 @@ import javax.script.ScriptException;
 
 import lambda.Lambda;
 import lambda.enumerable.Enumerable;
-import lambda.groovy.GroovyTest;
-import lambda.groovy.LambdaGroovy;
-import lambda.javascript.JavaScriptTest;
-import lambda.javascript.LambdaJavaScript;
-import lambda.jruby.JRubyTest;
-import lambda.jruby.LambdaJRuby;
+import lambda.support.clojure.LambdaClojure;
+import lambda.support.groovy.GroovyTest;
+import lambda.support.groovy.LambdaGroovy;
+import lambda.support.javascript.JavaScriptTest;
+import lambda.support.javascript.LambdaJavaScript;
+import lambda.support.jruby.JRubyTest;
+import lambda.support.jruby.LambdaJRuby;
 
 import org.jruby.RubyProc;
 import org.junit.Before;

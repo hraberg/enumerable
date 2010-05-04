@@ -1,8 +1,8 @@
-package lambda.clojure;
+package lambda.support.clojure;
 
 import static clojure.lang.RT.*;
-import static lambda.clojure.ClojureSeqs.Vars.*;
 import static lambda.exception.UncheckedException.*;
+import static lambda.support.clojure.ClojureSeqs.Vars.*;
 
 import java.util.Comparator;
 

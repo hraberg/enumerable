@@ -17,7 +17,7 @@ import javax.script.ScriptException;
 import lambda.Fn0;
 import lambda.Fn1;
 import lambda.Fn2;
-import lambda.jruby.JRubyTest;
+import lambda.support.jruby.JRubyTest;
 import lambda.weaving.Debug;
 
 import org.jruby.Ruby;

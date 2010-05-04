@@ -1,4 +1,4 @@
-package lambda.groovy;
+package lambda.support.groovy;
 
 import groovy.lang.Closure;
 import lambda.Fn0;

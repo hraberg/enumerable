@@ -1,4 +1,4 @@
-package lambda.extra166y;
+package lambda.support.extra166y;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;

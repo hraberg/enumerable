@@ -1,4 +1,4 @@
-package lambda.googlecollect;
+package lambda.support.googlecollect;
 
 import lambda.Fn0;
 import lambda.Fn1;

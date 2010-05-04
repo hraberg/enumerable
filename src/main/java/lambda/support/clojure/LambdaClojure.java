@@ -1,4 +1,4 @@
-package lambda.clojure;
+package lambda.support.clojure;
 
 import static clojure.lang.Compiler.*;
 import static clojure.lang.RT.*;

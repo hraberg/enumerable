@@ -1,4 +1,4 @@
-package lambda.javascript;
+package lambda.support.javascript;
 
 import lambda.Fn0;
 import lambda.Fn1;

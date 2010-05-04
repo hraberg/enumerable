@@ -1,8 +1,8 @@
-package lambda.javascript;
+package lambda.support.javascript;
 
 import static java.util.Arrays.*;
 import static lambda.Parameters.*;
-import static lambda.javascript.LambdaJavaScript.*;
+import static lambda.support.javascript.LambdaJavaScript.*;
 import static org.junit.Assert.*;
 import groovy.lang.Closure;
 
@@ -14,14 +14,14 @@ import javax.script.ScriptException;
 
 import lambda.Fn1;
 import lambda.Lambda;
-import lambda.clojure.ClojureTest;
-import lambda.clojure.LambdaClojure;
 import lambda.enumerable.Enumerable;
-import lambda.groovy.GroovyTest;
-import lambda.groovy.LambdaGroovy;
-import lambda.javascript.LambdaJavaScript.FunctionFn2;
-import lambda.jruby.JRubyTest;
-import lambda.jruby.LambdaJRuby;
+import lambda.support.clojure.ClojureTest;
+import lambda.support.clojure.LambdaClojure;
+import lambda.support.groovy.GroovyTest;
+import lambda.support.groovy.LambdaGroovy;
+import lambda.support.javascript.LambdaJavaScript.FunctionFn2;
+import lambda.support.jruby.JRubyTest;
+import lambda.support.jruby.LambdaJRuby;
 
 import org.jruby.RubyProc;
 import org.junit.Before;

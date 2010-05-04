@@ -2,8 +2,8 @@ require 'java'
 
 import 'lambda.Fn1'
 import 'lambda.enumerable.collection.EnumerableModule'
-import 'lambda.jruby.LambdaJRuby'
 import 'lambda.enumerable.jruby.JRubyTestBase'
+import 'lambda.support.jruby.LambdaJRuby'
 
 # Redefines Enumerable in JRuby to use Enumerable.java.
 # It 'almost' works as long as there's not too much duck typing going on.
