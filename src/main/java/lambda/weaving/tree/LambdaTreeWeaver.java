@@ -863,9 +863,20 @@ class LambdaTreeWeaver implements Opcodes {
             void createSAMethod() {
                 saMn = (MethodNode) lambda.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, sam.getName(), sam
                         .getDescriptor(), null, null);
+                addLambdaParameterAnnotations();
                 saMn.visitCode();
 
                 convertMethodArgumentsToLambdaParameterTypes();
+            }
+
+            void addLambdaParameterAnnotations() {
+                int i = 0;
+                for (String parameter : parameters.keySet()) {
+                    AnnotationVisitor annotation = saMn.visitParameterAnnotation(i++, getType(LambdaLocal.class)
+                            .getDescriptor(), true);
+                    annotation.visit("name", parameter);
+                    annotation.visitEnd();
+                }
             }
 
             void convertMethodArgumentsToLambdaParameterTypes() {

@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 
 import javax.swing.JButton;
 
+import lambda.annotation.LambdaLocal;
 import lambda.annotation.LambdaParameter;
 import lambda.annotation.NewLambda;
 import lambda.exception.LambdaWeavingNotEnabledException;
@@ -538,9 +539,12 @@ public class LambdaTest extends TestBase {
     public void reflectionOnLambda() throws Exception {
         int i = 0;
         Fn1<Integer, Integer> addToI = λ(n, i += n);
-        Method fn1Call = Fn1.class.getMethod("call", Object.class);
+        Method fn1Call = addToI.getClass().getMethod("call", int.class);
         assertEquals(1, fn1Call.invoke(addToI, 1));
         assertEquals(1, i);
+
+        LambdaLocal annotation = (LambdaLocal) fn1Call.getParameterAnnotations()[0][0];
+        assertEquals("n", annotation.name());
 
         Class<?> addToIClass = addToI.getClass();
         assertTrue(addToIClass.isSynthetic());

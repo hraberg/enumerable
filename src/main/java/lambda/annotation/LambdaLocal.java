@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * local variables.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ ElementType.FIELD, ElementType.PARAMETER })
 public @interface LambdaLocal {
     boolean isReadOnly();
 
