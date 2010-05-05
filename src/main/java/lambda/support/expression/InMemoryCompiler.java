@@ -1,5 +1,6 @@
 package lambda.support.expression;
 
+import static java.util.Arrays.*;
 import static lambda.exception.UncheckedException.*;
 
 import java.io.ByteArrayOutputStream;
@@ -42,7 +43,7 @@ public class InMemoryCompiler {
         };
 
         JavaFileObject file = new JavaSourceFromString(className, source);
-        CompilationTask task = compiler.getTask(null, manager, diagnostics, null, null,
+        CompilationTask task = compiler.getTask(null, manager, diagnostics, asList("-target", "1.5"), null,
                 (Iterable<? extends JavaFileObject>) Arrays.asList(file));
 
         boolean success = task.call();

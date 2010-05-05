@@ -9,6 +9,7 @@ import japa.parser.ast.expr.Expression;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ExpressionTreeTest {
@@ -69,6 +70,36 @@ public class ExpressionTreeTest {
         assertEquals(parseExpression("this"), parseExpressionViaASM("this", Object.class, param(int.class, "i")));
     }
 
+    @Test
+    public void parseIincUnaryExpressions() throws Exception {
+        assertEquals(parseExpression("i++"), parseExpressionViaASM("i++", int.class, param(int.class, "i")));
+        assertEquals(parseExpression("i--"), parseExpressionViaASM("i--", int.class, param(int.class, "i")));
+        assertEquals(parseExpression("++i"), parseExpressionViaASM("++i", int.class, param(int.class, "i")));
+        assertEquals(parseExpression("--i"), parseExpressionViaASM("--i", int.class, param(int.class, "i")));
+        assertEquals(parseExpression("++i"), parseExpressionViaASM("i += 1", int.class, param(int.class, "i")));
+        assertEquals(parseExpression("--i"), parseExpressionViaASM("i -= 1", int.class, param(int.class, "i")));
+        assertEquals(parseExpression("i += 2"), parseExpressionViaASM("i += 2", int.class, param(int.class, "i")));
+        assertEquals(parseExpression("i -= 2"), parseExpressionViaASM("i -= 2", int.class, param(int.class, "i")));
+    }
+
+    @Test
+    public void parseInncUnaryExpressionsWhichAreBinaryInSouurce() throws Exception {
+        assertEquals(parseExpression("i += 2"), parseExpressionViaASM("i += 2", int.class, param(int.class, "i")));
+        assertEquals(parseExpression("i -= 2"), parseExpressionViaASM("i -= 2", int.class, param(int.class, "i")));
+    }
+
+    @Test
+    @Ignore("This one includes a branch, but is in scope for 0.2.4")
+    public void parseNotUnaryExpression() throws Exception {
+        assertEquals(parseExpression("!b"), parseExpressionViaASM("!b", boolean.class, param(boolean.class, "b")));
+    }
+
+    @Test
+    @Ignore("Bitwise logic is OUT of scope for 0.2.4")
+    public void parseXorSourceCodeUnaryExpressionsWhichAreBinaryInBytecode() throws Exception {
+        assertEquals(parseExpression("~i"), parseExpressionViaASM("~i", int.class, param(int.class, "i")));
+    }
+
     static int expressionId = 1;
 
     Param param(Class<?> type, String name) {
@@ -108,7 +139,7 @@ public class ExpressionTreeTest {
 
         Expression result = parseExpressionFromMethod(method, parameterNames);
 
-        debug("decompiled: " + result + " // " + result.getClass());
+        debug("decompiled: " + result + (result == null ? "" : " // " + result.getClass()));
         debug("");
 
         return result;

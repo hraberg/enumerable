@@ -3,6 +3,7 @@ package lambda.support.expression;
 import static lambda.exception.UncheckedException.*;
 import static org.objectweb.asm.Type.*;
 import japa.parser.JavaParser;
+import japa.parser.ast.expr.AssignExpr;
 import japa.parser.ast.expr.BooleanLiteralExpr;
 import japa.parser.ast.expr.ClassExpr;
 import japa.parser.ast.expr.DoubleLiteralExpr;
@@ -33,6 +34,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LocalVariableNode;
@@ -40,10 +42,10 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
+import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.Interpreter;
 import org.objectweb.asm.tree.analysis.Value;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
@@ -63,6 +65,8 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
     static final PrimitiveType PRIMITIVE_DOUBLE = new PrimitiveType(Primitive.Double);
 
     LocalVariableNode[] parameters;
+    Frame currentFrame;
+    Analyzer analyzer;
 
     static class ExpressionValue implements Value {
         Expression expression;
@@ -111,6 +115,10 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                 return false;
             return true;
         }
+
+        public String toString() {
+            return expression + " (" + type + ")";
+        }
     }
 
     ExpressionInterpreter(LocalVariableNode... parameters) {
@@ -144,8 +152,17 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                 realIndex += argumentTypes[i].getSize();
             }
 
-            ExpressionInterpreter interpreter = new ExpressionInterpreter(parameterLocals);
-            new Analyzer(interpreter).analyze(getInternalName(method.getDeclaringClass()), mn);
+            final ExpressionInterpreter interpreter = new ExpressionInterpreter(parameterLocals);
+            Analyzer analyzer = new Analyzer(interpreter) {
+                protected Frame newFrame(Frame src) {
+                    Frame frame = super.newFrame(src);
+                    interpreter.setCurrentFrame(frame);
+                    return frame;
+                }
+
+            };
+            interpreter.analyzer = analyzer;
+            analyzer.analyze(getInternalName(method.getDeclaringClass()), mn);
             return interpreter.expression;
         } catch (Exception e) {
             throw uncheck(e);
@@ -188,29 +205,77 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
 
     Expression expression;
 
-    public Value newValue(final Type type) {
-        if (type == null) {
-            return new ExpressionValue(null, null);
+    int newValueCalls = -1;
+    UnaryExpr iinc;
+    AssignExpr iincAssign;
+
+    void setCurrentFrame(Frame frame) {
+        if (iinc != null) {
+            if (frame.getStackSize() > 0) {
+                ExpressionValue value = new ExpressionValue(PRIMITIVE_INT, iinc);
+                ExpressionValue previous = (ExpressionValue) frame.pop();
+                if (previous.type == PRIMITIVE_INT && previous.expression instanceof NameExpr) {
+                    frame.push(value);
+                    iinc = null;
+                } else {
+                    frame.push(previous);
+                }
+            } else {
+                if (iinc.getOperator() == UnaryExpr.Operator.posIncrement)
+                    iinc.setOperator(UnaryExpr.Operator.preIncrement);
+
+                else
+                    iinc.setOperator(UnaryExpr.Operator.preDecrement);
+            }
         }
+        if (iincAssign != null) {
+            if (frame.getStackSize() > 0) {
+                ExpressionValue value = new ExpressionValue(PRIMITIVE_INT, iincAssign);
+                ExpressionValue previous = (ExpressionValue) frame.pop();
+                if (previous.type == PRIMITIVE_INT && previous.expression instanceof NameExpr) {
+                    frame.push(value);
+                    iincAssign = null;
+                } else {
+                    frame.push(previous);
+                }
+            }
+        }
+    }
+
+    public Value newValue(final Type type) {
+        if (type == null)
+            return new ExpressionValue(null, null);
+
+        newValueCalls++;
+        Expression value = null;
+        if (newValueCalls == 0)
+            value = null; // returnValue;
+
+        if (newValueCalls == 1)
+            value = new ThisExpr();
+
+        if (newValueCalls > 1 && newValueCalls - 2 < parameters.length)
+            value = new NameExpr(parameters[newValueCalls - 2].name);
+
         switch (type.getSort()) {
         case Type.VOID:
             return null;
         case Type.BOOLEAN:
-            return new ExpressionValue(PRIMITIVE_BOOLEAN, null);
+            return new ExpressionValue(PRIMITIVE_BOOLEAN, value);
         case Type.CHAR:
         case Type.BYTE:
         case Type.SHORT:
         case Type.INT:
-            return new ExpressionValue(PRIMITIVE_INT, null);
+            return new ExpressionValue(PRIMITIVE_INT, value);
         case Type.FLOAT:
-            return new ExpressionValue(PRIMITIVE_FLOAT, null);
+            return new ExpressionValue(PRIMITIVE_FLOAT, value);
         case Type.LONG:
-            return new ExpressionValue(PRIMITIVE_LONG, null);
+            return new ExpressionValue(PRIMITIVE_LONG, value);
         case Type.DOUBLE:
-            return new ExpressionValue(PRIMITIVE_DOUBLE, null);
+            return new ExpressionValue(PRIMITIVE_DOUBLE, value);
         case Type.ARRAY:
         case Type.OBJECT:
-            return new ExpressionValue(createClassOrInterfaceType(Object.class.getName()), null);
+            return new ExpressionValue(createClassOrInterfaceType(Object.class.getName()), value);
         default:
             throw new Error("Internal error");
         }
@@ -314,19 +379,28 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
 
     public Value copyOperation(final AbstractInsnNode insn, final Value value) throws AnalyzerException {
         ExpressionValue expressionValue = (ExpressionValue) value;
-        if (insn instanceof VarInsnNode) {
-            int index = ((VarInsnNode) insn).var;
-            if (index == 0)
-                return new ExpressionValue(expressionValue.type, new ThisExpr());
-            return new ExpressionValue(expressionValue.type, new NameExpr(getLocalVariable(index).name));
-        }
-        return new ExpressionValue(expressionValue.type, parseExpression(expressionValue.toString()));
+        return new ExpressionValue(expressionValue.type, parseExpression(expressionValue.expression.toString()));
     }
 
     public Value unaryOperation(final AbstractInsnNode insn, final Value value) throws AnalyzerException {
+        ExpressionValue expressionValue = (ExpressionValue) value;
         switch (insn.getOpcode()) {
         case INEG:
         case IINC:
+            int incr = ((IincInsnNode) insn).incr;
+            if (incr == 1)
+                iinc = new UnaryExpr(expressionValue.expression, UnaryExpr.Operator.posIncrement);
+            if (incr == -1)
+                iinc = new UnaryExpr(expressionValue.expression, UnaryExpr.Operator.posDecrement);
+
+            if (incr > 1)
+                iincAssign = new AssignExpr(expressionValue.expression, new IntegerLiteralExpr(incr + ""),
+                        AssignExpr.Operator.plus);
+            if (incr < -1)
+                iincAssign = new AssignExpr(expressionValue.expression, new IntegerLiteralExpr(-incr + ""),
+                        AssignExpr.Operator.minus);
+
+            return value;
         case L2I:
         case F2I:
         case D2I:

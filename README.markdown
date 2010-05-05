@@ -277,3 +277,5 @@ Rhino: Copyright (C) 1997-1999 Norris Boyd/Netscape Communications Corporation. 
 Google Collections: Copyright (C) 2008 Google Inc. Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 RubySpec and MSpec: Copyright (c) 2008 Engine Yard, Inc. All rights reserved. [License](http://github.com/rubyspec/rubyspec/blob/master/LICENSE).
+
+JavaParser: Copyright (C) 2008 Júlio Vilmar Gesser. Released under the [LGPL](http://www.gnu.org/licenses/lgpl.html)
