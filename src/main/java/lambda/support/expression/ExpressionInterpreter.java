@@ -3,18 +3,8 @@ package lambda.support.expression;
 import static lambda.exception.UncheckedException.*;
 import static org.objectweb.asm.Type.*;
 import japa.parser.JavaParser;
-import japa.parser.ast.expr.AssignExpr;
-import japa.parser.ast.expr.BooleanLiteralExpr;
-import japa.parser.ast.expr.ClassExpr;
-import japa.parser.ast.expr.DoubleLiteralExpr;
-import japa.parser.ast.expr.Expression;
-import japa.parser.ast.expr.IntegerLiteralExpr;
-import japa.parser.ast.expr.LongLiteralExpr;
-import japa.parser.ast.expr.NameExpr;
-import japa.parser.ast.expr.NullLiteralExpr;
-import japa.parser.ast.expr.StringLiteralExpr;
-import japa.parser.ast.expr.ThisExpr;
-import japa.parser.ast.expr.UnaryExpr;
+import japa.parser.ast.expr.*;
+import japa.parser.ast.expr.AssignExpr.Operator;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.PrimitiveType;
 import japa.parser.ast.type.PrimitiveType.Primitive;
@@ -26,6 +16,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.asm.ClassReader;
@@ -42,6 +33,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
@@ -63,10 +55,14 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
     static final PrimitiveType PRIMITIVE_FLOAT = new PrimitiveType(Primitive.Float);
     static final PrimitiveType PRIMITIVE_LONG = new PrimitiveType(Primitive.Long);
     static final PrimitiveType PRIMITIVE_DOUBLE = new PrimitiveType(Primitive.Double);
+    static final PrimitiveType PRIMITIVE_CHAR = new PrimitiveType(Primitive.Char);
+    static final PrimitiveType PRIMITIVE_BYTE = new PrimitiveType(Primitive.Byte);
+    static final PrimitiveType PRIMITIVE_SHORT = new PrimitiveType(Primitive.Short);
 
     LocalVariableNode[] parameters;
     Frame currentFrame;
     Analyzer analyzer;
+    MethodNode mn;
 
     static class ExpressionValue implements Value {
         Expression expression;
@@ -121,7 +117,8 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         }
     }
 
-    ExpressionInterpreter(LocalVariableNode... parameters) {
+    ExpressionInterpreter(MethodNode mn, LocalVariableNode... parameters) {
+        this.mn = mn;
         this.parameters = parameters;
     }
 
@@ -152,7 +149,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                 realIndex += argumentTypes[i].getSize();
             }
 
-            final ExpressionInterpreter interpreter = new ExpressionInterpreter(parameterLocals);
+            final ExpressionInterpreter interpreter = new ExpressionInterpreter(mn, parameterLocals);
             Analyzer analyzer = new Analyzer(interpreter) {
                 protected Frame newFrame(Frame src) {
                     Frame frame = super.newFrame(src);
@@ -160,6 +157,9 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                     return frame;
                 }
 
+                protected void newControlFlowEdge(int insn, int successor) {
+                    interpreter.newControlFlowEdge(insn, successor);
+                }
             };
             interpreter.analyzer = analyzer;
             analyzer.analyze(getInternalName(method.getDeclaringClass()), mn);
@@ -205,11 +205,12 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
 
     Expression expression;
 
-    int newValueCalls = -1;
     UnaryExpr iinc;
     AssignExpr iincAssign;
+    ExpressionValue assign;
 
     void setCurrentFrame(Frame frame) {
+        currentFrame = frame;
         if (iinc != null) {
             if (frame.getStackSize() > 0) {
                 ExpressionValue value = new ExpressionValue(PRIMITIVE_INT, iinc);
@@ -240,22 +241,23 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                 }
             }
         }
+        if (assign != null) {
+            if (frame.getStackSize() > 0) {
+                frame.pop();
+                frame.push(assign);
+                assign = null;
+            }
+        }
+    }
+
+    void newControlFlowEdge(int insn, int successor) {
     }
 
     public Value newValue(final Type type) {
         if (type == null)
             return new ExpressionValue(null, null);
 
-        newValueCalls++;
         Expression value = null;
-        if (newValueCalls == 0)
-            value = null; // returnValue;
-
-        if (newValueCalls == 1)
-            value = new ThisExpr();
-
-        if (newValueCalls > 1 && newValueCalls - 2 < parameters.length)
-            value = new NameExpr(parameters[newValueCalls - 2].name);
 
         switch (type.getSort()) {
         case Type.VOID:
@@ -275,7 +277,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
             return new ExpressionValue(PRIMITIVE_DOUBLE, value);
         case Type.ARRAY:
         case Type.OBJECT:
-            return new ExpressionValue(createClassOrInterfaceType(Object.class.getName()), value);
+            return new ExpressionValue(createClassOrInterfaceType(removeJavaLang(type.getClassName())), value);
         default:
             throw new Error("Internal error");
         }
@@ -309,7 +311,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         case FCONST_1:
             return new ExpressionValue(PRIMITIVE_FLOAT, new DoubleLiteralExpr("1.0f"));
         case FCONST_2:
-            return new ExpressionValue(PRIMITIVE_FLOAT, new DoubleLiteralExpr("2.0"));
+            return new ExpressionValue(PRIMITIVE_FLOAT, new DoubleLiteralExpr("2.0f"));
         case DCONST_0:
             return new ExpressionValue(PRIMITIVE_DOUBLE, new DoubleLiteralExpr("0.0"));
         case DCONST_1:
@@ -353,7 +355,11 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         case JSR:
             return new ExpressionValue(null, null);
         case GETSTATIC:
-            return newValue(Type.getType(((FieldInsnNode) insn).desc));
+            FieldInsnNode fieldNode = (FieldInsnNode) insn;
+            ExpressionValue getField = (ExpressionValue) newValue(getType(fieldNode.desc));
+            getField.expression = new FieldAccessExpr(new NameExpr(removeJavaLang(getObjectType(fieldNode.owner)
+                    .getClassName())), fieldNode.name);
+            return getField;
         case NEW:
             return newValue(Type.getObjectType(((TypeInsnNode) insn).desc));
         default:
@@ -377,8 +383,66 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         return null;
     }
 
+    String removeJavaLang(String className) {
+        if (className.startsWith("java.lang."))
+            className = className.substring("java.lang.".length());
+        return className;
+    }
+
+    boolean isStoreInstruction(VarInsnNode vin) {
+        return vin.getOpcode() >= ISTORE && vin.getOpcode() <= ASTORE;
+    }
+
     public Value copyOperation(final AbstractInsnNode insn, final Value value) throws AnalyzerException {
         ExpressionValue expressionValue = (ExpressionValue) value;
+        if (insn instanceof VarInsnNode) {
+            VarInsnNode node = (VarInsnNode) insn;
+            if (isStoreInstruction(node)) {
+                Operator op = Operator.assign;
+                NameExpr target = new NameExpr(getLocalVariable(node.var).name);
+                Expression assignmentValue = expressionValue.expression;
+
+                if (expressionValue.expression instanceof BinaryExpr) {
+                    BinaryExpr binary = (BinaryExpr) expressionValue.expression;
+                    if (binary.getLeft().equals(target)) {
+                        if (binary.getOperator() == BinaryExpr.Operator.plus)
+                            op = AssignExpr.Operator.plus;
+                        if (binary.getOperator() == BinaryExpr.Operator.minus)
+                            op = AssignExpr.Operator.plus;
+                        if (binary.getOperator() == BinaryExpr.Operator.times)
+                            op = AssignExpr.Operator.star;
+                        if (binary.getOperator() == BinaryExpr.Operator.divide)
+                            op = AssignExpr.Operator.slash;
+                        if (binary.getOperator() == BinaryExpr.Operator.binAnd)
+                            op = AssignExpr.Operator.and;
+                        if (binary.getOperator() == BinaryExpr.Operator.binOr)
+                            op = AssignExpr.Operator.or;
+                        if (binary.getOperator() == BinaryExpr.Operator.xor)
+                            op = AssignExpr.Operator.xor;
+                        if (binary.getOperator() == BinaryExpr.Operator.remainder)
+                            op = AssignExpr.Operator.rem;
+                        if (binary.getOperator() == BinaryExpr.Operator.lShift)
+                            op = AssignExpr.Operator.lShift;
+                        if (binary.getOperator() == BinaryExpr.Operator.rSignedShift)
+                            op = AssignExpr.Operator.rSignedShift;
+                        if (binary.getOperator() == BinaryExpr.Operator.rUnsignedShift)
+                            op = AssignExpr.Operator.rUnsignedShift;
+
+                        if (op != AssignExpr.Operator.assign)
+                            assignmentValue = binary.getRight();
+                    }
+                }
+                assign = new ExpressionValue(expressionValue.type, new AssignExpr(target, assignmentValue, op));
+
+            } else {
+                if (node.var == 0)
+                    return new ExpressionValue(expressionValue.type, new ThisExpr());
+
+                return new ExpressionValue(expressionValue.type, new NameExpr(getLocalVariable(node.var).name));
+            }
+        }
+        if (expressionValue.expression == null)
+            return expressionValue;
         return new ExpressionValue(expressionValue.type, parseExpression(expressionValue.expression.toString()));
     }
 
@@ -386,44 +450,57 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         ExpressionValue expressionValue = (ExpressionValue) value;
         switch (insn.getOpcode()) {
         case INEG:
+            return new ExpressionValue(PRIMITIVE_INT, new UnaryExpr(expressionValue.expression,
+                    UnaryExpr.Operator.negative));
         case IINC:
-            int incr = ((IincInsnNode) insn).incr;
-            if (incr == 1)
-                iinc = new UnaryExpr(expressionValue.expression, UnaryExpr.Operator.posIncrement);
-            if (incr == -1)
-                iinc = new UnaryExpr(expressionValue.expression, UnaryExpr.Operator.posDecrement);
+            IincInsnNode node = (IincInsnNode) insn;
+            NameExpr nameExpr = new NameExpr(getLocalVariable(node.var).name);
+            if (node.incr == 1)
+                iinc = new UnaryExpr(nameExpr, UnaryExpr.Operator.posIncrement);
+            if (node.incr == -1)
+                iinc = new UnaryExpr(nameExpr, UnaryExpr.Operator.posDecrement);
 
-            if (incr > 1)
-                iincAssign = new AssignExpr(expressionValue.expression, new IntegerLiteralExpr(incr + ""),
+            if (node.incr > 1)
+                iincAssign = new AssignExpr(nameExpr, new IntegerLiteralExpr(node.incr + ""),
                         AssignExpr.Operator.plus);
-            if (incr < -1)
-                iincAssign = new AssignExpr(expressionValue.expression, new IntegerLiteralExpr(-incr + ""),
+            if (node.incr < -1)
+                iincAssign = new AssignExpr(nameExpr, new IntegerLiteralExpr(-node.incr + ""),
                         AssignExpr.Operator.minus);
 
             return value;
         case L2I:
         case F2I:
         case D2I:
+            return new ExpressionValue(PRIMITIVE_INT, new CastExpr(PRIMITIVE_INT, expressionValue.expression));
         case I2B:
+            return new ExpressionValue(PRIMITIVE_BYTE, new CastExpr(PRIMITIVE_BYTE, expressionValue.expression));
         case I2C:
+            return new ExpressionValue(PRIMITIVE_CHAR, new CastExpr(PRIMITIVE_CHAR, expressionValue.expression));
         case I2S:
-            return new ExpressionValue(PRIMITIVE_INT, null);
+            return new ExpressionValue(PRIMITIVE_SHORT, new CastExpr(PRIMITIVE_SHORT, expressionValue.expression));
         case FNEG:
+            return new ExpressionValue(PRIMITIVE_FLOAT, new UnaryExpr(expressionValue.expression,
+                    UnaryExpr.Operator.negative));
         case I2F:
         case L2F:
         case D2F:
-            return new ExpressionValue(PRIMITIVE_FLOAT, null);
+            return new ExpressionValue(PRIMITIVE_FLOAT, new CastExpr(PRIMITIVE_FLOAT, expressionValue.expression));
         case LNEG:
+            return new ExpressionValue(PRIMITIVE_LONG, new UnaryExpr(expressionValue.expression,
+                    UnaryExpr.Operator.negative));
         case I2L:
         case F2L:
         case D2L:
-            return new ExpressionValue(PRIMITIVE_LONG, null);
+            return new ExpressionValue(PRIMITIVE_LONG, new CastExpr(PRIMITIVE_LONG, expressionValue.expression));
         case DNEG:
+            return new ExpressionValue(PRIMITIVE_DOUBLE, new UnaryExpr(expressionValue.expression,
+                    UnaryExpr.Operator.negative));
         case I2D:
         case L2D:
         case F2D:
-            return new ExpressionValue(PRIMITIVE_DOUBLE, null);
+            return new ExpressionValue(PRIMITIVE_DOUBLE, new CastExpr(PRIMITIVE_DOUBLE, expressionValue.expression));
         case IFEQ:
+            return null;
         case IFNE:
         case IFLT:
         case IFGE:
@@ -436,41 +513,68 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         case FRETURN:
         case DRETURN:
         case ARETURN:
+            return null;
         case PUTSTATIC:
+            FieldInsnNode fieldNode = (FieldInsnNode) insn;
+            ExpressionValue putField = (ExpressionValue) newValue(getType(fieldNode.desc));
+            putField.expression = new AssignExpr(new FieldAccessExpr(new NameExpr(removeJavaLang(getObjectType(
+                    fieldNode.owner).getClassName())), fieldNode.name), expressionValue.expression, Operator.assign);
+            assign = putField;
             return null;
         case GETFIELD:
-            return newValue(Type.getType(((FieldInsnNode) insn).desc));
+            fieldNode = (FieldInsnNode) insn;
+            ExpressionValue getField = (ExpressionValue) newValue(Type.getType(fieldNode.desc));
+            getField.expression = new FieldAccessExpr(expressionValue.expression, fieldNode.name);
+            return getField;
         case NEWARRAY:
+            PrimitiveType type;
             switch (((IntInsnNode) insn).operand) {
             case T_BOOLEAN:
-                return newValue(Type.getType("[Z"));
+                type = PRIMITIVE_BOOLEAN;
+                break;
             case T_CHAR:
-                return newValue(Type.getType("[C"));
+                type = PRIMITIVE_CHAR;
+                break;
             case T_BYTE:
-                return newValue(Type.getType("[B"));
+                type = PRIMITIVE_BYTE;
+                break;
             case T_SHORT:
-                return newValue(Type.getType("[S"));
+                type = PRIMITIVE_SHORT;
+                break;
             case T_INT:
-                return newValue(Type.getType("[I"));
+                type = PRIMITIVE_INT;
+                break;
             case T_FLOAT:
-                return newValue(Type.getType("[F"));
+                type = PRIMITIVE_FLOAT;
+                break;
             case T_DOUBLE:
-                return newValue(Type.getType("[D"));
+                type = PRIMITIVE_DOUBLE;
+                break;
             case T_LONG:
-                return newValue(Type.getType("[J"));
+                type = PRIMITIVE_LONG;
+                break;
             default:
                 throw new AnalyzerException("Invalid array type");
             }
+            ArrayList<Expression> dimensions = new ArrayList<Expression>();
+            dimensions.add(expressionValue.expression);
+            return new ExpressionValue(new ReferenceType(type, 1), new ArrayCreationExpr(type, dimensions, 0));
+
         case ANEWARRAY:
-            String desc = ((TypeInsnNode) insn).desc;
-            return newValue(Type.getType("[" + Type.getObjectType(desc)));
+            ExpressionValue newArray = (ExpressionValue) newValue(Type.getObjectType(((TypeInsnNode) insn).desc));
+            dimensions = new ArrayList<Expression>();
+            dimensions.add(expressionValue.expression);
+            newArray.expression = new ArrayCreationExpr(newArray.type, dimensions, 0);
+            return newArray;
+
         case ARRAYLENGTH:
-            return new ExpressionValue(PRIMITIVE_INT, null);
+            return new ExpressionValue(PRIMITIVE_INT, new FieldAccessExpr(expressionValue.expression, "length"));
         case ATHROW:
             return null;
         case CHECKCAST:
-            desc = ((TypeInsnNode) insn).desc;
-            return newValue(Type.getObjectType(desc));
+            ExpressionValue cast = (ExpressionValue) newValue(Type.getObjectType(((TypeInsnNode) insn).desc));
+            cast.expression = new CastExpr(new ReferenceType(cast.type), expressionValue.expression);
+            return cast;
         case INSTANCEOF:
             return new ExpressionValue(PRIMITIVE_INT, null);
         case MONITORENTER:
@@ -485,52 +589,133 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
 
     public Value binaryOperation(final AbstractInsnNode insn, final Value value1, final Value value2)
             throws AnalyzerException {
+        ExpressionValue expressionValue1 = (ExpressionValue) value1;
+        ExpressionValue expressionValue2 = (ExpressionValue) value2;
         switch (insn.getOpcode()) {
         case IALOAD:
         case BALOAD:
+            return new ExpressionValue(PRIMITIVE_BYTE, new ArrayAccessExpr(expressionValue1.expression,
+                    expressionValue2.expression));
         case CALOAD:
+            return new ExpressionValue(PRIMITIVE_CHAR, new ArrayAccessExpr(expressionValue1.expression,
+                    expressionValue2.expression));
         case SALOAD:
+            return new ExpressionValue(PRIMITIVE_SHORT, new ArrayAccessExpr(expressionValue1.expression,
+                    expressionValue2.expression));
         case IADD:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.plus));
         case ISUB:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.minus));
         case IMUL:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.times));
         case IDIV:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.divide));
         case IREM:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.remainder));
         case ISHL:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.lShift));
         case ISHR:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.rSignedShift));
         case IUSHR:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.rUnsignedShift));
         case IAND:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.binAnd));
         case IOR:
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.binOr));
         case IXOR:
-            return new ExpressionValue(PRIMITIVE_INT, null);
+            if (expressionValue2.expression.toString().equals("-1"))
+                return new ExpressionValue(PRIMITIVE_INT, new UnaryExpr(expressionValue1.expression,
+                        UnaryExpr.Operator.inverse));
+            return new ExpressionValue(PRIMITIVE_INT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.xor));
         case FALOAD:
+            return new ExpressionValue(PRIMITIVE_FLOAT, new ArrayAccessExpr(expressionValue1.expression,
+                    expressionValue2.expression));
         case FADD:
+            return new ExpressionValue(PRIMITIVE_FLOAT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.plus));
         case FSUB:
+            return new ExpressionValue(PRIMITIVE_FLOAT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.minus));
         case FMUL:
+            return new ExpressionValue(PRIMITIVE_FLOAT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.times));
         case FDIV:
+            return new ExpressionValue(PRIMITIVE_FLOAT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.divide));
         case FREM:
-            return new ExpressionValue(PRIMITIVE_FLOAT, null);
+            return new ExpressionValue(PRIMITIVE_FLOAT, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.remainder));
         case LALOAD:
+            return new ExpressionValue(PRIMITIVE_LONG, new ArrayAccessExpr(expressionValue1.expression,
+                    expressionValue2.expression));
         case LADD:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.plus));
         case LSUB:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.minus));
         case LMUL:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.times));
         case LDIV:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.divide));
         case LREM:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.remainder));
         case LSHL:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.lShift));
         case LSHR:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.rSignedShift));
         case LUSHR:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.rUnsignedShift));
         case LAND:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.binAnd));
         case LOR:
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.binOr));
         case LXOR:
-            return new ExpressionValue(PRIMITIVE_LONG, null);
+            if (expressionValue2.expression.toString().equals("-1L"))
+                return new ExpressionValue(PRIMITIVE_LONG, new UnaryExpr(expressionValue1.expression,
+                        UnaryExpr.Operator.inverse));
+            return new ExpressionValue(PRIMITIVE_LONG, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.xor));
         case DALOAD:
+            return new ExpressionValue(PRIMITIVE_DOUBLE, new ArrayAccessExpr(expressionValue1.expression,
+                    expressionValue2.expression));
         case DADD:
+            return new ExpressionValue(PRIMITIVE_DOUBLE, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.plus));
         case DSUB:
+            return new ExpressionValue(PRIMITIVE_DOUBLE, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.minus));
         case DMUL:
+            return new ExpressionValue(PRIMITIVE_DOUBLE, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.times));
         case DDIV:
+            return new ExpressionValue(PRIMITIVE_DOUBLE, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.divide));
         case DREM:
-            return new ExpressionValue(PRIMITIVE_DOUBLE, null);
+            return new ExpressionValue(PRIMITIVE_DOUBLE, new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.remainder));
         case AALOAD:
-            return new ExpressionValue(createClassOrInterfaceType(Object.class.getName()), null);
+            return new ExpressionValue(expressionValue1.type, new ArrayAccessExpr(expressionValue1.expression,
+                    expressionValue2.expression));
         case LCMP:
         case FCMPL:
         case FCMPG:
@@ -545,7 +730,13 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         case IF_ICMPLE:
         case IF_ACMPEQ:
         case IF_ACMPNE:
+            return null;
         case PUTFIELD:
+            FieldInsnNode fieldNode = (FieldInsnNode) insn;
+            ExpressionValue putField = (ExpressionValue) newValue(Type.getType(fieldNode.desc));
+            putField.expression = new AssignExpr(new FieldAccessExpr(expressionValue1.expression, fieldNode.name),
+                    expressionValue2.expression, Operator.assign);
+            assign = putField;
             return null;
         default:
             throw new Error("Internal error.");
@@ -554,15 +745,83 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
 
     public Value ternaryOperation(final AbstractInsnNode insn, final Value value1, final Value value2,
             final Value value3) throws AnalyzerException {
-        return null;
+        ExpressionValue expressionValue1 = (ExpressionValue) value1;
+        ExpressionValue expressionValue2 = (ExpressionValue) value2;
+        ExpressionValue expressionValue3 = (ExpressionValue) value3;
+        switch (insn.getOpcode()) {
+        case IASTORE:
+        case BASTORE:
+        case CASTORE:
+        case SASTORE:
+        case FASTORE:
+        case DASTORE:
+        case LASTORE:
+        case AASTORE:
+            if (expressionValue1.expression instanceof ArrayCreationExpr) {
+                ArrayCreationExpr arrayCreationExpression = (ArrayCreationExpr) expressionValue1.expression;
+                ArrayInitializerExpr initializer = arrayCreationExpression.getInitializer();
+                if (initializer == null)
+                    initializer = new ArrayInitializerExpr();
+
+                List<Expression> values = initializer.getValues();
+                if (values == null)
+                    values = new ArrayList<Expression>();
+                values.add(expressionValue3.expression);
+
+                initializer.setValues(values);
+                arrayCreationExpression.setInitializer(initializer);
+                arrayCreationExpression.setDimensions(null);
+                arrayCreationExpression.setArrayCount(1);
+
+                assign = expressionValue1;
+
+            } else {
+                assign = new ExpressionValue(expressionValue1.type, new AssignExpr(new ArrayAccessExpr(
+                        expressionValue1.expression, expressionValue2.expression), expressionValue3.expression,
+                        AssignExpr.Operator.assign));
+            }
+            return null;
+        default:
+            throw new Error("Internal error.");
+        }
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Value naryOperation(final AbstractInsnNode insn, final List values) throws AnalyzerException {
         if (insn.getOpcode() == MULTIANEWARRAY) {
             return newValue(Type.getType(((MultiANewArrayInsnNode) insn).desc));
+
         } else {
-            return newValue(Type.getReturnType(((MethodInsnNode) insn).desc));
+            MethodInsnNode node = (MethodInsnNode) insn;
+            ClassOrInterfaceType returnType = createClassOrInterfaceType(getReturnType(node.desc).getClassName());
+            Expression scope = null;
+            boolean isConstructor = node.getOpcode() == INVOKESPECIAL && "<init>".equals(node.name);
+
+            if (node.getOpcode() == INVOKESTATIC) {
+                String className = getObjectType(node.owner).getClassName();
+                scope = new NameExpr(removeJavaLang(className));
+            } else if (!isConstructor) {
+                ExpressionValue target = (ExpressionValue) values.remove(0);
+                if (!(target.expression instanceof ThisExpr))
+                    scope = target.expression;
+            }
+
+            List<Expression> arguments = values.isEmpty() ? null : new ArrayList<Expression>();
+            for (ExpressionValue value : (List<ExpressionValue>) values)
+                arguments.add(value.expression);
+
+            if (isConstructor) {
+                arguments.remove(0);
+                ExpressionValue newExpressionValue = (ExpressionValue) values.remove(0);
+                ClassOrInterfaceType type = (ClassOrInterfaceType) newExpressionValue.type;
+
+                newExpressionValue.expression = new ObjectCreationExpr(scope, type, arguments.isEmpty() ? null
+                        : arguments);
+
+                return new ExpressionValue(returnType, newExpressionValue.expression);
+            }
+
+            return new ExpressionValue(returnType, new MethodCallExpr(scope, node.name, arguments));
         }
     }
 
