@@ -136,6 +136,13 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         }
     }
 
+    public static Expression parseExpressionFromSingleMethodClass(Class<?> aClass, String... parameters) {
+        Method[] methods = aClass.getDeclaredMethods();
+        if (methods.length != 1)
+            throw new IllegalArgumentException(aClass.getName() + " has more than one declared method");
+        return parseExpressionFromMethod(methods[0], parameters);
+    }
+
     public static Expression parseExpressionFromMethod(Method method, String... parameters) {
         try {
             MethodNode mn = findMethodNode(method);

@@ -339,7 +339,7 @@ public class ExpressionTreeTest {
         if (debug)
             printASMifiedMethod(method);
 
-        Expression result = parseExpressionFromMethod(method, parameterNames);
+        Expression result = parseExpressionFromSingleMethodClass(c, parameterNames);
 
         debug("decompiled: " + result + (result == null ? "" : " // " + result.getClass()));
         debug("");
