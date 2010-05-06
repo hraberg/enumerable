@@ -101,6 +101,12 @@ public class ExpressionTreeTest {
     public void parseInncUnaryExpressionsWhichAreBinaryInSouuce() throws Exception {
         assertEquals(parseExpression("i += 2"), parseViaASM("i += 2", int.class, param(int.class, "i")));
         assertEquals(parseExpression("i -= 2"), parseViaASM("i -= 2", int.class, param(int.class, "i")));
+        assertEquals(parseExpression("d += 2.0"), parseViaASM("d += 2.0", double.class, param(double.class, "d")));
+        assertEquals(parseExpression("d -= 2.0"), parseViaASM("d -= 2.0", double.class, param(double.class, "d")));
+        assertEquals(parseExpression("f += 2.0f"), parseViaASM("f += 2.0f", float.class, param(float.class, "f")));
+        assertEquals(parseExpression("f -= 2.0f"), parseViaASM("f -= 2.0f", float.class, param(float.class, "f")));
+        assertEquals(parseExpression("l += 2L"), parseViaASM("l += 2L", long.class, param(long.class, "l")));
+        assertEquals(parseExpression("l -= 2L"), parseViaASM("l -= 2L", long.class, param(long.class, "l")));
     }
 
     @Test
@@ -350,7 +356,7 @@ public class ExpressionTreeTest {
     Class<?> compileExpression(String expression, Class<?> returnValue, Param... parameters) throws IOException {
         String className = "Expression" + expressionId++;
         String parametersString = asList(parameters).toString();
-        parametersString = "(" + parametersString.substring(1);
+        parametersString = "(" + parametersString.substring(1, parametersString.length() - 1) + ")";
         parametersString = parametersString.substring(0, parametersString.length() - 1) + ")";
         String returnType = returnValue.isArray() ? returnValue.getComponentType().getName() + "[]" : returnValue
                 .getName();

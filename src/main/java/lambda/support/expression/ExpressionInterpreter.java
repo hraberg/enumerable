@@ -415,7 +415,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                         if (binary.getOperator() == BinaryExpr.Operator.plus)
                             op = AssignExpr.Operator.plus;
                         if (binary.getOperator() == BinaryExpr.Operator.minus)
-                            op = AssignExpr.Operator.plus;
+                            op = AssignExpr.Operator.minus;
                         if (binary.getOperator() == BinaryExpr.Operator.times)
                             op = AssignExpr.Operator.star;
                         if (binary.getOperator() == BinaryExpr.Operator.divide)
@@ -438,8 +438,13 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                         if (op != AssignExpr.Operator.assign)
                             assignmentValue = binary.getRight();
                     }
+
                 }
-                assign = new ExpressionValue(expressionValue.type, new AssignExpr(target, assignmentValue, op));
+                if (expressionValue.expression instanceof UnaryExpr)
+                    assign = expressionValue;
+
+                else
+                    assign = new ExpressionValue(expressionValue.type, new AssignExpr(target, assignmentValue, op));
 
             } else {
                 if (node.var == 0)
