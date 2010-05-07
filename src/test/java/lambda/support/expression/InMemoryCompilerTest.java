@@ -21,10 +21,11 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-public class JavaParserTest {
+public class InMemoryCompilerTest {
     InMemoryCompiler compiler = new InMemoryCompiler();
 
     @Test
@@ -40,7 +41,7 @@ public class JavaParserTest {
 
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
-        out.println("public class " + className + " {");
+        out.println("class " + className + " {");
         out.println("  public static void main(String args[]) {");
         out.println("    System.out.println(\"Hello World from String\");");
         out.println("  }");
@@ -54,7 +55,7 @@ public class JavaParserTest {
     public void inMemoryCompilationFromPlainStringViaJavaParserAST() throws Exception {
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
-        out.println("public class HelloWorldAST {");
+        out.println("class HelloWorldAST {");
         out.println("  public static void main(String args[]) {");
         out.println("    System.out.println(\"Hello World from JavaParser\");");
         out.println("  }");
@@ -68,12 +69,12 @@ public class JavaParserTest {
 
     @Test
     public void inMemoryCompilationSharesClassPath() throws Exception {
-        String className = "HelloWorldSharedClassPaht";
+        String className = "HelloWorldSharedClassPath";
 
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
         out.println("import japa.parser.*;");
-        out.println("public class " + className + " {");
+        out.println("class " + className + " {");
         out.println("  public static void main(String args[]) {");
         out.println("    System.out.println(JavaParser.class.getName());");
         out.println("  }");
@@ -88,8 +89,7 @@ public class JavaParserTest {
         CompilationUnit cu = new CompilationUnit();
         cu.setPackage(new PackageDeclaration(ASTHelper.createNameExpr("parser.test")));
 
-        ClassOrInterfaceDeclaration type = new ClassOrInterfaceDeclaration(ModifierSet.PUBLIC, false,
-                "GeneratedClass");
+        ClassOrInterfaceDeclaration type = new ClassOrInterfaceDeclaration(0, false, "GeneratedClass");
         ASTHelper.addTypeDeclaration(cu, type);
 
         MethodDeclaration method = new MethodDeclaration(ModifierSet.PUBLIC, ASTHelper.VOID_TYPE, "main");
@@ -118,7 +118,9 @@ public class JavaParserTest {
         PrintStream realOut = System.out;
         try {
             System.setOut(new PrintStream(out));
-            aClass.getDeclaredMethod("main", new Class[] { String[].class }).invoke(null, (Object) new String[0]);
+            Method main = aClass.getDeclaredMethod("main", new Class[] { String[].class });
+            main.setAccessible(true);
+            main.invoke(null, (Object) new String[0]);
             return out.toString();
         } finally {
             System.setOut(realOut);

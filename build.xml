@@ -20,6 +20,7 @@
         <pathelement location="lib/sun.org.mozilla.javascript.internal.jar" />
         <pathelement location="lib/groovy-all-1.7.2.jar" />
         <pathelement location="lib/javaparser-1.0.8.jar" />
+        <pathelement location="lib/ecj-3.5.2.jar" />
     </path>
     <path id="enumerable.example.classpath">
         <pathelement location="target/example-classes" />

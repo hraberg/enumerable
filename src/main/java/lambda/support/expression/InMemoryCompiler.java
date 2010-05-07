@@ -1,5 +1,6 @@
 package lambda.support.expression;
 
+import static java.lang.System.*;
 import static java.util.Arrays.*;
 import static lambda.exception.UncheckedException.*;
 
@@ -7,8 +8,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.tools.Diagnostic;
@@ -27,9 +30,21 @@ import javax.tools.ToolProvider;
 import lambda.weaving.ClassInjector;
 
 public class InMemoryCompiler {
+    static boolean useECJ = Boolean.valueOf(getProperty("lambda.support.expression.useECJ"));
+    static JavaCompiler compiler = createCompiler();
+
     static Map<String, byte[]> bytesByClassName = new HashMap<String, byte[]>();
 
-    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    static JavaCompiler createCompiler() {
+        try {
+            if (useECJ)
+                return (JavaCompiler) Class.forName("org.eclipse.jdt.internal.compiler.tool.EclipseCompiler")
+                        .newInstance();
+            return ToolProvider.getSystemJavaCompiler();
+        } catch (Exception e) {
+            throw uncheck(e);
+        }
+    }
 
     public Class<?> compile(String className, String source) throws IOException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
@@ -38,12 +53,16 @@ public class InMemoryCompiler {
                 .getStandardFileManager(null, null, null)) {
             public JavaFileObject getJavaFileForOutput(Location location, String className, Kind kind,
                     FileObject sibling) throws IOException {
-                return new ByteArrayFileObject(className);
+                return new ByteArrayFileObject(className.replace('/', '.'));
             }
         };
 
         JavaFileObject file = new JavaSourceFromString(className, source);
-        CompilationTask task = compiler.getTask(null, manager, diagnostics, asList("-target", "1.5"), null,
+        List<String> options = new ArrayList<String>(asList("-source", "1.5", "-target", "1.5"));
+        if (useECJ)
+            options.add("-warn:-raw");
+
+        CompilationTask task = compiler.getTask(null, manager, diagnostics, options, null,
                 (Iterable<? extends JavaFileObject>) Arrays.asList(file));
 
         boolean success = task.call();
@@ -72,7 +91,7 @@ public class InMemoryCompiler {
         String className;
 
         ByteArrayFileObject(String className) {
-            super(URI.create("bytes://" + className.replace('.', '/') + Kind.CLASS.extension), Kind.CLASS);
+            super(URI.create("file://" + className.replace('.', '/') + "." + Kind.CLASS.extension), Kind.CLASS);
             this.className = className;
         }
 
@@ -91,7 +110,7 @@ public class InMemoryCompiler {
         String code;
 
         JavaSourceFromString(String name, String code) {
-            super(URI.create("string:///" + name.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
+            super(URI.create("file:///" + name.replace('.', '/') + "." + Kind.SOURCE.extension), Kind.SOURCE);
             this.code = code;
         }
 
