@@ -101,6 +101,10 @@ public class ExpressionTreeTest {
     public void parseInncUnaryExpressionsWhichAreBinaryInSouuce() throws Exception {
         assertEquals(parseExpression("i += 2"), parseViaASM("i += 2", int.class, param(int.class, "i")));
         assertEquals(parseExpression("i -= 2"), parseViaASM("i -= 2", int.class, param(int.class, "i")));
+    }
+
+    @Test
+    public void parseIncrementAssignUnaryExpressionsWhichAreBinaryInSouuce() throws Exception {
         assertEquals(parseExpression("d += 2.0"), parseViaASM("d += 2.0", double.class, param(double.class, "d")));
         assertEquals(parseExpression("d -= 2.0"), parseViaASM("d -= 2.0", double.class, param(double.class, "d")));
         assertEquals(parseExpression("f += 2.0f"), parseViaASM("f += 2.0f", float.class, param(float.class, "f")));
