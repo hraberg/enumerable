@@ -183,6 +183,10 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 [LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Google Collections](http://code.google.com/p/google-collections/). You need `google-collect-1.0.jar` on your class path. Download from [Google Collections](http://google-collections.googlecode.com/files/).
 
+### Expression Trees (using JavaParser)
+
+[ExpressionInterpreter](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/expression/ExpressionInterpreter.java) is a simple decompiler that turns lambdas (or other single expression methods) into Expression Trees represented by {JavaParser's](http://code.google.com/p/javaparser/) AST. You need `javaparser-1.0.8.jar` on your class path. Download from [javaparser](http://code.google.com/p/javaparser/).
+
 ## Implementation
 
 [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java) and [EnumerableArrays](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/EnumerableArrays.java) act as a facades for the implementation in [EnumerableModule](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/collection/EnumerableModule.java) and [EMap](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/collection/EMap.java).

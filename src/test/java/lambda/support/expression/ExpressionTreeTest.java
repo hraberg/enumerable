@@ -310,6 +310,13 @@ public class ExpressionTreeTest {
         assertEquals(parseExpression("!b"), parseViaASM("!b", boolean.class, param(boolean.class, "b")));
     }
 
+    @Test
+    @Ignore("This one includes a branch, but is in scope for 0.2.4")
+    public void parseConditionalTernaryExpression() throws Exception {
+        assertEquals(parseExpression("b ? \"Hello\" : \"World\""), parseViaASM("b ? \"Hello\" : \"World\"",
+                String.class, param(boolean.class, "b")));
+    }
+
     static int expressionId = 1;
 
     Param param(Class<?> type, String name) {
