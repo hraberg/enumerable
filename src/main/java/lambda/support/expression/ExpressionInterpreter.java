@@ -3,14 +3,15 @@ package lambda.support.expression;
 import static org.objectweb.asm.Type.*;
 import japa.parser.JavaParser;
 import japa.parser.ast.expr.*;
-import japa.parser.ast.expr.AssignExpr.Operator;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.PrimitiveType;
 import japa.parser.ast.type.PrimitiveType.Primitive;
 import japa.parser.ast.type.ReferenceType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -35,6 +36,9 @@ import org.objectweb.asm.util.AbstractVisitor;
 /**
  * This interpreter is a simple decompiler for methods with a single expression.
  * It uses {@link JavaParser} as its target AST.
+ * <p>
+ * It is fully TDD in both good and bad ways, meaning that most things are here
+ * just to make the tests pass, and no deep analysis has gone into it.
  * <p>
  * This Interpreter started as a copy of {@link BasicInterpreter} by Eric
  * Bruneton and Bing Ran.
@@ -119,6 +123,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
     ExpressionValue assign;
     ConditionalExpr conditional;
     boolean cmpConditional;
+    Set<Integer> returns = new HashSet<Integer>();
 
     void setCurrentFrame(Frame frame) {
         currentFrame = frame;
@@ -309,7 +314,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         if (insn instanceof VarInsnNode) {
             VarInsnNode node = (VarInsnNode) insn;
             if (isStoreInstruction(node)) {
-                AssignExpr.Operator op = Operator.assign;
+                AssignExpr.Operator op = AssignExpr.Operator.assign;
                 NameExpr target = new NameExpr(getLocalVariable(node.var).name);
                 Expression assignmentValue = expressionValue.expression;
 
@@ -422,14 +427,9 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                     ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.notEquals);
                     cmpConditional = false;
 
-                } else if (conditional.getCondition() instanceof UnaryExpr
-                        && ((UnaryExpr) conditional.getCondition()).getOperator() == UnaryExpr.Operator.not)
-                    conditional.setCondition(new BinaryExpr(((UnaryExpr) conditional.getCondition()).getExpr(),
-                            expressionValue.expression, BinaryExpr.Operator.or));
-
-                else
-                    conditional.setCondition(new BinaryExpr(conditional.getCondition(), expressionValue.expression,
-                            BinaryExpr.Operator.and));
+                } else {
+                    handleNestedConditional(expressionValue.expression);
+                }
 
             } else {
                 conditional = new ConditionalExpr(expressionValue.expression, null, null);
@@ -441,10 +441,9 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                     ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.equals);
                     cmpConditional = false;
 
-                } else if (conditional.getCondition() instanceof UnaryExpr
-                        && ((UnaryExpr) conditional.getCondition()).getOperator() == UnaryExpr.Operator.not)
-                    conditional.setCondition(new BinaryExpr(((UnaryExpr) conditional.getCondition()).getExpr(),
-                            expressionValue.expression, BinaryExpr.Operator.or));
+                } else {
+                    handleNestedConditional(new UnaryExpr(expressionValue.expression, UnaryExpr.Operator.not));
+                }
 
             } else {
                 conditional = new ConditionalExpr(
@@ -453,15 +452,19 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
             return null;
         case IFGT:
             ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.lessEquals);
+            cmpConditional = false;
             return null;
         case IFLE:
             ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.greater);
+            cmpConditional = false;
             return null;
         case IFLT:
             ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.greaterEquals);
+            cmpConditional = false;
             return null;
         case IFGE:
             ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.less);
+            cmpConditional = false;
             return null;
         case TABLESWITCH:
         case LOOKUPSWITCH:
@@ -476,7 +479,8 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
             FieldInsnNode fieldNode = (FieldInsnNode) insn;
             ExpressionValue putField = (ExpressionValue) newValue(getType(fieldNode.desc));
             putField.expression = new AssignExpr(new FieldAccessExpr(new NameExpr(removeJavaLang(getObjectType(
-                    fieldNode.owner).getClassName())), fieldNode.name), expressionValue.expression, Operator.assign);
+                    fieldNode.owner).getClassName())), fieldNode.name), expressionValue.expression,
+                    AssignExpr.Operator.assign);
             assign = putField;
             return null;
         case GETFIELD:
@@ -539,7 +543,12 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         case MONITOREXIT:
             throw new UnsupportedOperationException(AbstractVisitor.OPCODES[insn.getOpcode()]);
         case IFNULL:
+            handleNestedConditional(new BinaryExpr(expressionValue.expression, new NullLiteralExpr(),
+                    BinaryExpr.Operator.notEquals));
+            return null;
         case IFNONNULL:
+            handleNestedConditional(new BinaryExpr(expressionValue.expression, new NullLiteralExpr(),
+                    BinaryExpr.Operator.equals));
             return null;
         default:
             throw new Error("Internal error.");
@@ -687,71 +696,90 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                     expressionValue2.expression, BinaryExpr.Operator.notEquals), null, null);
             return new ExpressionValue(PRIMITIVE_INT, null);
         case IF_ICMPEQ:
+            Expression condition = null;
             if (booleanValue(expressionValue2.expression, expressionValue1).toString().equals("true"))
-                conditional = new ConditionalExpr(
-                        new UnaryExpr(expressionValue1.expression, UnaryExpr.Operator.not), null, null);
+                condition = new UnaryExpr(expressionValue1.expression, UnaryExpr.Operator.not);
 
             else if (booleanValue(expressionValue1.expression, expressionValue2).toString().equals("true"))
-                conditional = new ConditionalExpr(
-                        new UnaryExpr(expressionValue2.expression, UnaryExpr.Operator.not), null, null);
+                condition = new UnaryExpr(expressionValue2.expression, UnaryExpr.Operator.not);
 
             else if (booleanValue(expressionValue1.expression, expressionValue2).toString().equals("false"))
-                conditional = new ConditionalExpr(expressionValue2.expression, null, null);
+                condition = expressionValue2.expression;
 
             else
-                conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
-                        expressionValue2.expression, BinaryExpr.Operator.notEquals), null, null);
+                condition = new BinaryExpr(expressionValue1.expression, expressionValue2.expression,
+                        BinaryExpr.Operator.notEquals);
+
+            handleNestedConditional(condition);
 
             return null;
         case IF_ICMPNE:
+            condition = null;
             if (booleanValue(expressionValue2.expression, expressionValue1).toString().equals("true"))
-                conditional = new ConditionalExpr(expressionValue1.expression, null, null);
+                condition = expressionValue1.expression;
 
             else if (booleanValue(expressionValue1.expression, expressionValue2).toString().equals("true"))
-                conditional = new ConditionalExpr(expressionValue2.expression, null, null);
+                condition = expressionValue2.expression;
 
             else if (booleanValue(expressionValue1.expression, expressionValue2).toString().equals("false"))
-                conditional = new ConditionalExpr(
-                        new UnaryExpr(expressionValue2.expression, UnaryExpr.Operator.not), null, null);
+                condition = new UnaryExpr(expressionValue2.expression, UnaryExpr.Operator.not);
 
             else
-                conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
-                        expressionValue2.expression, BinaryExpr.Operator.equals), null, null);
+                condition = new BinaryExpr(expressionValue1.expression, expressionValue2.expression,
+                        BinaryExpr.Operator.equals);
+
+            handleNestedConditional(condition);
 
             return null;
         case IF_ICMPLT:
-            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
-                    expressionValue2.expression, BinaryExpr.Operator.greaterEquals), null, null);
+            handleNestedConditional(new BinaryExpr(expressionValue1.expression, expressionValue2.expression,
+                    BinaryExpr.Operator.greaterEquals));
             return null;
         case IF_ICMPGE:
-            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
-                    expressionValue2.expression, BinaryExpr.Operator.less), null, null);
+            handleNestedConditional(new BinaryExpr(expressionValue1.expression, expressionValue2.expression,
+                    BinaryExpr.Operator.less));
             return null;
         case IF_ICMPGT:
-            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
-                    expressionValue2.expression, BinaryExpr.Operator.lessEquals), null, null);
+            handleNestedConditional(new BinaryExpr(expressionValue1.expression, expressionValue2.expression,
+                    BinaryExpr.Operator.lessEquals));
             return null;
         case IF_ICMPLE:
-            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
-                    expressionValue2.expression, BinaryExpr.Operator.greater), null, null);
+            handleNestedConditional(new BinaryExpr(expressionValue1.expression, expressionValue2.expression,
+                    BinaryExpr.Operator.greater));
             return null;
         case IF_ACMPEQ:
-            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
-                    expressionValue2.expression, BinaryExpr.Operator.notEquals), null, null);
+            handleNestedConditional(new BinaryExpr(expressionValue1.expression, expressionValue2.expression,
+                    BinaryExpr.Operator.notEquals));
             return null;
         case IF_ACMPNE:
-            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
-                    expressionValue2.expression, BinaryExpr.Operator.equals), null, null);
+            handleNestedConditional(new BinaryExpr(expressionValue1.expression, expressionValue2.expression,
+                    BinaryExpr.Operator.equals));
             return null;
         case PUTFIELD:
             FieldInsnNode fieldNode = (FieldInsnNode) insn;
             ExpressionValue putField = (ExpressionValue) newValue(Type.getType(fieldNode.desc));
             putField.expression = new AssignExpr(new FieldAccessExpr(expressionValue1.expression, fieldNode.name),
-                    expressionValue2.expression, Operator.assign);
+                    expressionValue2.expression, AssignExpr.Operator.assign);
             assign = putField;
             return null;
         default:
             throw new Error("Internal error.");
+        }
+    }
+
+    void handleNestedConditional(Expression condition) {
+        if (conditional == null)
+            conditional = new ConditionalExpr(condition, null, null);
+        else {
+            Expression currentCondition = conditional.getCondition();
+            if (currentCondition instanceof UnaryExpr
+                    && ((UnaryExpr) currentCondition).getOperator() == UnaryExpr.Operator.not) {
+                conditional.setCondition(new BinaryExpr(((UnaryExpr) currentCondition).getExpr(), condition,
+                        BinaryExpr.Operator.or));
+
+            } else {
+                conditional.setCondition(new BinaryExpr(currentCondition, condition, BinaryExpr.Operator.and));
+            }
         }
     }
 
@@ -839,14 +867,15 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
 
     public void returnOperation(final AbstractInsnNode insn, final Value value, final Value expected)
             throws AnalyzerException {
+        returns.add(mn.instructions.indexOf(insn));
         expression = ((ExpressionValue) value).expression;
-
         expression = booleanValue(expression, expected);
 
         if (conditional != null) {
             Expression elseExpr = conditional.getElseExpr();
             if (elseExpr == null)
-                conditional.setElseExpr(booleanValue(expression, expected));
+                conditional.setElseExpr(expression);
+
             else {
                 Expression condition = conditional.getCondition();
                 if (currentFrame.getStackSize() > 0) {
@@ -855,19 +884,50 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                     conditional.setThenExpr(booleanValue(((ExpressionValue) then).expression, expected));
 
                 } else {
-                    conditional.setThenExpr(new BooleanLiteralExpr(false));
+                    Expression thenExpr = conditional.getThenExpr();
+
+                    if (thenExpr == null && expression != null)
+                        conditional.setThenExpr(expression);
+
+                    else
+                        conditional.setThenExpr(new BooleanLiteralExpr(false));
                 }
 
                 Expression thenExpr = conditional.getThenExpr();
                 if (thenExpr instanceof BooleanLiteralExpr && elseExpr instanceof BooleanLiteralExpr) {
                     if (thenExpr.toString().equals("true") && elseExpr.toString().equals("false")) {
                         expression = condition;
-                    } else if (thenExpr.toString().equals("false") && elseExpr.toString().equals("true")) {
-                        if (condition instanceof BinaryExpr
-                                && ((BinaryExpr) condition).getOperator() == BinaryExpr.Operator.or)
-                            expression = condition;
 
-                        else
+                    } else if (thenExpr.toString().equals("false") && elseExpr.toString().equals("true")) {
+
+                        if (condition instanceof BinaryExpr) {
+                            BinaryExpr binaryExpr = (BinaryExpr) condition;
+
+                            expression = condition;
+                            if (binaryExpr.getLeft() instanceof BinaryExpr) {
+                                BinaryExpr left = (BinaryExpr) binaryExpr.getLeft();
+
+                                if (binaryExpr.getOperator() == BinaryExpr.Operator.and) {
+                                    binaryExpr.setOperator(BinaryExpr.Operator.or);
+                                    flipOperator(left);
+                                }
+                            }
+                            if (couldBeECJ()) {
+                                if (binaryExpr.getRight() instanceof BinaryExpr) {
+                                    BinaryExpr right = (BinaryExpr) binaryExpr.getRight();
+
+                                    if (binaryExpr.getOperator() == BinaryExpr.Operator.or)
+                                        flipOperator(right);
+                                }
+                                if (binaryExpr.getRight() instanceof UnaryExpr) {
+                                    UnaryExpr right = (UnaryExpr) binaryExpr.getRight();
+
+                                    if (right.getOperator() == UnaryExpr.Operator.not)
+                                        binaryExpr.setRight(right.getExpr());
+                                }
+                            }
+
+                        } else
                             expression = new UnaryExpr(condition, UnaryExpr.Operator.not);
 
                     }
@@ -878,6 +938,28 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                 conditional = null;
             }
         }
+    }
+
+    boolean couldBeECJ() {
+        return returns.size() > 1;
+    }
+
+    BinaryExpr flipOperator(BinaryExpr binaryExpr) {
+        BinaryExpr.Operator op = binaryExpr.getOperator();
+        if (op == BinaryExpr.Operator.notEquals) {
+            binaryExpr.setOperator(BinaryExpr.Operator.equals);
+        } else if (op == BinaryExpr.Operator.equals) {
+            binaryExpr.setOperator(BinaryExpr.Operator.notEquals);
+        } else if (op == BinaryExpr.Operator.greater) {
+            binaryExpr.setOperator(BinaryExpr.Operator.lessEquals);
+        } else if (op == BinaryExpr.Operator.less) {
+            binaryExpr.setOperator(BinaryExpr.Operator.greaterEquals);
+        } else if (op == BinaryExpr.Operator.greaterEquals) {
+            binaryExpr.setOperator(BinaryExpr.Operator.less);
+        } else if (op == BinaryExpr.Operator.lessEquals) {
+            binaryExpr.setOperator(BinaryExpr.Operator.greater);
+        }
+        return binaryExpr;
     }
 
     Expression booleanValue(Expression expression, Value expected) {

@@ -12,7 +12,6 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ExpressionTreeTest {
@@ -328,6 +327,25 @@ public class ExpressionTreeTest {
     }
 
     @Test
+    public void parseReferenceComparsionWithNullBinaryExpression() throws Exception {
+        assertEquals(parseExpression("o == null"),
+                parseViaASM("o == null", boolean.class, param(Object.class, "o")));
+        assertEquals(parseExpression("o != null"),
+                parseViaASM("o != null", boolean.class, param(Object.class, "o")));
+        if (InMemoryCompiler.useECJ) {
+            assertEquals(parseExpression("o == null"), parseViaASM("null == o", boolean.class, param(Object.class,
+                    "o")));
+            assertEquals(parseExpression("o != null"), parseViaASM("null != o", boolean.class, param(Object.class,
+                    "o")));
+        } else {
+            assertEquals(parseExpression("null == o"), parseViaASM("null == o", boolean.class, param(Object.class,
+                    "o")));
+            assertEquals(parseExpression("null != o"), parseViaASM("null != o", boolean.class, param(Object.class,
+                    "o")));
+        }
+    }
+
+    @Test
     public void parseLongComparsionBinaryExpression() throws Exception {
         assertEquals(parseExpression("l == 1L"), parseViaASM("l == 1L", boolean.class, param(long.class, "l")));
         assertEquals(parseExpression("l != 1L"), parseViaASM("l != 1L", boolean.class, param(long.class, "l")));
@@ -390,8 +408,7 @@ public class ExpressionTreeTest {
     }
 
     @Test
-    @Ignore("Needs more work")
-    public void parseBooleanNestedLogicalBinaryExpression() throws Exception {
+    public void parseBooleanNestedLogicalBinaryExpressions() throws Exception {
         assertEquals(parseExpression("i == 1 && b"), parseViaASM("i == 1 && b", boolean.class, param(boolean.class,
                 "b"), param(int.class, "i")));
         assertEquals(parseExpression("i == 1 || b"), parseViaASM("i == 1 || b", boolean.class, param(boolean.class,
@@ -400,6 +417,92 @@ public class ExpressionTreeTest {
                 "b"), param(int.class, "i")));
         assertEquals(parseExpression("b || i == 1"), parseViaASM("b || i == 1", boolean.class, param(boolean.class,
                 "b"), param(int.class, "i")));
+
+        assertEquals(parseExpression("i != 1 && b"), parseViaASM("i != 1 && b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("i != 1 || b"), parseViaASM("i != 1 || b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b && i != 1"), parseViaASM("b && i != 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b || i != 1"), parseViaASM("b || i != 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+
+        assertEquals(parseExpression("i > 1 && b"), parseViaASM("i > 1 && b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b && i > 1"), parseViaASM("b && i > 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("i > 1 || b"), parseViaASM("i > 1 || b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b || i > 1"), parseViaASM("b || i > 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+
+        assertEquals(parseExpression("i < 1 && b"), parseViaASM("i < 1 && b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b && i < 1"), parseViaASM("b && i < 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("i < 1 || b"), parseViaASM("i < 1 || b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b || i < 1"), parseViaASM("b || i < 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+
+        assertEquals(parseExpression("i <= 1 && b"), parseViaASM("i <= 1 && b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b && i <= 1"), parseViaASM("b && i <= 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("i <= 1 || b"), parseViaASM("i <= 1 || b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b || i <= 1"), parseViaASM("b || i <= 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+
+        assertEquals(parseExpression("i >= 1 && b"), parseViaASM("i >= 1 && b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b && i >= 1"), parseViaASM("b && i >= 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("i >= 1 || b"), parseViaASM("i >= 1 || b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b || i >= 1"), parseViaASM("b || i >= 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+
+        assertEquals(parseExpression("o == null && b"), parseViaASM("o == null && b", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o")));
+        assertEquals(parseExpression("o == null || b"), parseViaASM("o == null || b", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o")));
+        assertEquals(parseExpression("b && o == null"), parseViaASM("b && o == null", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o")));
+        assertEquals(parseExpression("b || o == null"), parseViaASM("b || o == null", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o")));
+
+        assertEquals(parseExpression("o != null && b"), parseViaASM("o != null && b", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o")));
+        assertEquals(parseExpression("o != null || b"), parseViaASM("o != null || b", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o")));
+        assertEquals(parseExpression("b && o != null"), parseViaASM("b && o != null", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o")));
+        assertEquals(parseExpression("b || o != null"), parseViaASM("b || o != null", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o")));
+
+        assertEquals(parseExpression("o1 == o2 && b"), parseViaASM("o1 == o2 && b", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o1"), param(Object.class, "o2")));
+        assertEquals(parseExpression("o1 == o2 || b"), parseViaASM("o1 == o2 || b", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o1"), param(Object.class, "o2")));
+        assertEquals(parseExpression("b && o1 == o2"), parseViaASM("b && o1 == o2", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o1"), param(Object.class, "o2")));
+        assertEquals(parseExpression("b || o1 == o2"), parseViaASM("b || o1 == o2", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o1"), param(Object.class, "o2")));
+
+        assertEquals(parseExpression("o1 != o2 && b"), parseViaASM("o1 != o2 && b", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o1"), param(Object.class, "o2")));
+        assertEquals(parseExpression("o1 != o2 || b"), parseViaASM("o1 != o2 || b", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o1"), param(Object.class, "o2")));
+        assertEquals(parseExpression("b && o1 != o2"), parseViaASM("b && o1 != o2", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o1"), param(Object.class, "o2")));
+        assertEquals(parseExpression("b || o1 != o2"), parseViaASM("b || o1 != o2", boolean.class, param(
+                boolean.class, "b"), param(Object.class, "o1"), param(Object.class, "o2")));
+
+        assertEquals(parseExpression("i1 > 1 && i2 < 1"), parseViaASM("i1 > 1 && i2 < 1", boolean.class, param(
+                int.class, "i1"), param(int.class, "i2")));
+        assertEquals(parseExpression("i1 > 1 || i2 < 1"), parseViaASM("i1 > 1 || i2 < 1", boolean.class, param(
+                int.class, "i1"), param(int.class, "i2")));
     }
 
     @Test

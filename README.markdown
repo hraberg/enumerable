@@ -1,4 +1,4 @@
-# Enumerable.java
+# Enumerable.java 0.2.4
 
 Copyright 2010 Håkan Råberg - Released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
@@ -187,7 +187,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 [LambdaExpressionTrees](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/expression/LambdaExpressionTrees.java) is a facade for a simple decompiler that turns lambdas into Expression Trees represented by [JavaParser's](http://code.google.com/p/javaparser/) [AST](http://code.google.com/p/javaparser/source/browse/#svn/trunk/JavaParser/src/japa/parser/ast/expr). You need `javaparser-1.0.8.jar` on your class path. Download from [javaparser](http://code.google.com/p/javaparser/).
 
-*Note: The decompiler has several limitations, for example, it doesn't support nested ternary operators, and doesn't handle nested boolean logic well. It also doesn't support decompiling lambdas which are closures.*
+*Note: The decompiler has several limitations, for example, it doesn't support nested ternary operators. It also doesn't support decompiling lambdas which are closures.*
 
 Modified trees can also be compiled using [InMemoryCompiler](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/expression/InMemoryCompiler.java) in Java 6 (in Java 5 you can use [Janino](http://docs.codehaus.org/display/JANINO/Home)). The in-memory compiler defaults to using `ToolProvider.getSystemJavaCompiler()` (which is `javac` when using Sun's JDK). 
 
