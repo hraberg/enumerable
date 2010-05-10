@@ -12,7 +12,6 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ExpressionTreeTest {
@@ -305,13 +304,59 @@ public class ExpressionTreeTest {
     }
 
     @Test
-    @Ignore("This one includes a branch, but is in scope for 0.2.4")
     public void parseNotUnaryExpression() throws Exception {
         assertEquals(parseExpression("!b"), parseViaASM("!b", boolean.class, param(boolean.class, "b")));
     }
 
     @Test
-    @Ignore("This one includes a branch, but is in scope for 0.2.4")
+    public void parseIntComparsionBinaryExpression() throws Exception {
+        assertEquals(parseExpression("i == 1"), parseViaASM("i == 1", boolean.class, param(int.class, "i")));
+        assertEquals(parseExpression("i != 1"), parseViaASM("i != 1", boolean.class, param(int.class, "i")));
+        assertEquals(parseExpression("i < 1"), parseViaASM("i < 1", boolean.class, param(int.class, "i")));
+        assertEquals(parseExpression("i > 1"), parseViaASM("i > 1", boolean.class, param(int.class, "i")));
+        assertEquals(parseExpression("i <= 1"), parseViaASM("i <= 1", boolean.class, param(int.class, "i")));
+        assertEquals(parseExpression("i >= 1"), parseViaASM("i >= 1", boolean.class, param(int.class, "i")));
+    }
+
+    @Test
+    public void parseReferenceComparsionBinaryExpression() throws Exception {
+        assertEquals(parseExpression("o1 == o2"), parseViaASM("o1 == o2", boolean.class, param(Object.class, "o1"),
+                param(Object.class, "o2")));
+        assertEquals(parseExpression("o1 != o2"), parseViaASM("o1 != o2", boolean.class, param(Object.class, "o1"),
+                param(Object.class, "o2")));
+    }
+
+    @Test
+    public void parseLongComparsionBinaryExpression() throws Exception {
+        assertEquals(parseExpression("l == 1L"), parseViaASM("l == 1L", boolean.class, param(long.class, "l")));
+        assertEquals(parseExpression("l != 1L"), parseViaASM("l != 1L", boolean.class, param(long.class, "l")));
+        assertEquals(parseExpression("l < 1L"), parseViaASM("l < 1L", boolean.class, param(long.class, "l")));
+        assertEquals(parseExpression("l > 1L"), parseViaASM("l > 1L", boolean.class, param(long.class, "l")));
+        assertEquals(parseExpression("l <= 1L"), parseViaASM("l <= 1L", boolean.class, param(long.class, "l")));
+        assertEquals(parseExpression("l >= 1L"), parseViaASM("l >= 1L", boolean.class, param(long.class, "l")));
+    }
+
+    @Test
+    public void parseFloatComparsionBinaryExpression() throws Exception {
+        assertEquals(parseExpression("f == 1.0f"), parseViaASM("f == 1.0f", boolean.class, param(float.class, "f")));
+        assertEquals(parseExpression("f != 1.0f"), parseViaASM("f != 1.0f", boolean.class, param(float.class, "f")));
+        assertEquals(parseExpression("f < 1.0f"), parseViaASM("f < 1.0f", boolean.class, param(float.class, "f")));
+        assertEquals(parseExpression("f > 1.0f"), parseViaASM("f > 1.0f", boolean.class, param(float.class, "f")));
+        assertEquals(parseExpression("f <= 1.0f"), parseViaASM("f <= 1.0f", boolean.class, param(float.class, "f")));
+        assertEquals(parseExpression("f >= 1.0f"), parseViaASM("f >= 1.0f", boolean.class, param(float.class, "f")));
+    }
+
+    @Test
+    public void parseDoubleComparsionBinaryExpression() throws Exception {
+        assertEquals(parseExpression("d == 1.0"), parseViaASM("d == 1.0", boolean.class, param(double.class, "d")));
+        assertEquals(parseExpression("d != 1.0"), parseViaASM("d != 1.0", boolean.class, param(double.class, "d")));
+        assertEquals(parseExpression("d < 1.0"), parseViaASM("d < 1.0", boolean.class, param(double.class, "d")));
+        assertEquals(parseExpression("d > 1.0"), parseViaASM("d > 1.0", boolean.class, param(double.class, "d")));
+        assertEquals(parseExpression("d <= 1.0"), parseViaASM("d <= 1.0", boolean.class, param(double.class, "d")));
+        assertEquals(parseExpression("d >= 1.0"), parseViaASM("d >= 1.0", boolean.class, param(double.class, "d")));
+    }
+
+    @Test
     public void parseConditionalTernaryExpression() throws Exception {
         assertEquals(parseExpression("b ? \"Hello\" : \"World\""), parseViaASM("b ? \"Hello\" : \"World\"",
                 String.class, param(boolean.class, "b")));

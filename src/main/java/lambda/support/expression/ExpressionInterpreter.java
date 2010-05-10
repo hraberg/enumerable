@@ -31,7 +31,6 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
@@ -41,6 +40,7 @@ import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.Interpreter;
 import org.objectweb.asm.tree.analysis.Value;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
+import org.objectweb.asm.util.AbstractVisitor;
 
 /**
  * This interpreter is a simple decompiler for methods with a single expression.
@@ -215,6 +215,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
     UnaryExpr iinc;
     AssignExpr iincAssign;
     ExpressionValue assign;
+    ConditionalExpr conditional;
 
     void setCurrentFrame(Frame frame) {
         currentFrame = frame;
@@ -360,7 +361,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                         new StringLiteralExpr(cst.toString()));
             }
         case JSR:
-            return new ExpressionValue(null, null);
+            throw new UnsupportedOperationException(AbstractVisitor.OPCODES[insn.getOpcode()]);
         case GETSTATIC:
             FieldInsnNode fieldNode = (FieldInsnNode) insn;
             ExpressionValue getField = (ExpressionValue) newValue(getType(fieldNode.desc));
@@ -512,14 +513,35 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         case F2D:
             return new ExpressionValue(PRIMITIVE_DOUBLE, new CastExpr(PRIMITIVE_DOUBLE, expressionValue.expression));
         case IFEQ:
+            if (conditional != null) {
+                ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.notEquals);
+            } else {
+                conditional = new ConditionalExpr(expressionValue.expression, null, null);
+            }
             return null;
         case IFNE:
-        case IFLT:
-        case IFGE:
+            if (conditional != null) {
+                ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.equals);
+            } else {
+                conditional = new ConditionalExpr(
+                        new UnaryExpr(expressionValue.expression, UnaryExpr.Operator.not), null, null);
+            }
+            return null;
         case IFGT:
+            ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.lessEquals);
+            return null;
         case IFLE:
+            ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.greater);
+            return null;
+        case IFLT:
+            ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.greaterEquals);
+            return null;
+        case IFGE:
+            ((BinaryExpr) conditional.getCondition()).setOperator(BinaryExpr.Operator.less);
+            return null;
         case TABLESWITCH:
         case LOOKUPSWITCH:
+            throw new UnsupportedOperationException(AbstractVisitor.OPCODES[insn.getOpcode()]);
         case IRETURN:
         case LRETURN:
         case FRETURN:
@@ -582,15 +604,16 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         case ARRAYLENGTH:
             return new ExpressionValue(PRIMITIVE_INT, new FieldAccessExpr(expressionValue.expression, "length"));
         case ATHROW:
-            return null;
+            throw new UnsupportedOperationException(AbstractVisitor.OPCODES[insn.getOpcode()]);
         case CHECKCAST:
             ExpressionValue cast = (ExpressionValue) newValue(Type.getObjectType(((TypeInsnNode) insn).desc));
             cast.expression = new CastExpr(new ReferenceType(cast.type), expressionValue.expression);
             return cast;
         case INSTANCEOF:
-            return new ExpressionValue(PRIMITIVE_INT, null);
+            return null;
         case MONITORENTER:
         case MONITOREXIT:
+            throw new UnsupportedOperationException(AbstractVisitor.OPCODES[insn.getOpcode()]);
         case IFNULL:
         case IFNONNULL:
             return null;
@@ -605,6 +628,8 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         ExpressionValue expressionValue2 = (ExpressionValue) value2;
         switch (insn.getOpcode()) {
         case IALOAD:
+            return new ExpressionValue(PRIMITIVE_INT, new ArrayAccessExpr(expressionValue1.expression,
+                    expressionValue2.expression));
         case BALOAD:
             return new ExpressionValue(PRIMITIVE_BYTE, new ArrayAccessExpr(expressionValue1.expression,
                     expressionValue2.expression));
@@ -733,15 +758,40 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
         case FCMPG:
         case DCMPL:
         case DCMPG:
+            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.notEquals), null, null);
             return new ExpressionValue(PRIMITIVE_INT, null);
         case IF_ICMPEQ:
+            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.notEquals), null, null);
+            return null;
         case IF_ICMPNE:
+            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.equals), null, null);
+            return null;
         case IF_ICMPLT:
+            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.greaterEquals), null, null);
+            return null;
         case IF_ICMPGE:
+            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.less), null, null);
+            return null;
         case IF_ICMPGT:
+            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.lessEquals), null, null);
+            return null;
         case IF_ICMPLE:
+            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.greater), null, null);
+            return null;
         case IF_ACMPEQ:
+            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.notEquals), null, null);
+            return null;
         case IF_ACMPNE:
+            conditional = new ConditionalExpr(new BinaryExpr(expressionValue1.expression,
+                    expressionValue2.expression, BinaryExpr.Operator.equals), null, null);
             return null;
         case PUTFIELD:
             FieldInsnNode fieldNode = (FieldInsnNode) insn;
@@ -801,7 +851,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Value naryOperation(final AbstractInsnNode insn, final List values) throws AnalyzerException {
         if (insn.getOpcode() == MULTIANEWARRAY) {
-            return newValue(Type.getType(((MultiANewArrayInsnNode) insn).desc));
+            throw new UnsupportedOperationException(AbstractVisitor.OPCODES[insn.getOpcode()]);
 
         } else {
             MethodInsnNode node = (MethodInsnNode) insn;
@@ -841,11 +891,40 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
             throws AnalyzerException {
         expression = ((ExpressionValue) value).expression;
 
+        expression = booleanValue(expression, expected);
+
+        if (conditional != null) {
+            Expression elseExpr = conditional.getElseExpr();
+            if (elseExpr == null)
+                conditional.setElseExpr(expression);
+            else {
+                Value then = currentFrame.pop();
+                currentFrame.push(then);
+                conditional.setThenExpr(booleanValue(((ExpressionValue) then).expression, expected));
+
+                Expression thenExpr = conditional.getThenExpr();
+                if (thenExpr instanceof BooleanLiteralExpr && elseExpr instanceof BooleanLiteralExpr) {
+                    if (thenExpr.toString().equals("true") && elseExpr.toString().equals("false")) {
+                        expression = conditional.getCondition();
+                    } else if (thenExpr.toString().equals("false") && elseExpr.toString().equals("true")) {
+                        expression = new UnaryExpr(conditional.getCondition(), UnaryExpr.Operator.not);
+                    }
+                } else {
+                    expression = conditional;
+                }
+
+                conditional = null;
+            }
+        }
+    }
+
+    Expression booleanValue(Expression expression, Value expected) {
         if (((ExpressionValue) expected).type == PRIMITIVE_BOOLEAN && expression instanceof IntegerLiteralExpr)
             if ("1".equals(expression.toString()))
                 expression = new BooleanLiteralExpr(true);
             else if ("0".equals(expression.toString()))
                 expression = new BooleanLiteralExpr(false);
+        return expression;
     }
 
     public Value merge(final Value v, final Value w) {

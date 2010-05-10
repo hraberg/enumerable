@@ -187,7 +187,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 [ExpressionInterpreter](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/expression/ExpressionInterpreter.java) is a simple decompiler that turns lambdas (or other single expression methods) into Expression Trees represented by [JavaParser's](http://code.google.com/p/javaparser/) [AST](http://code.google.com/p/javaparser/source/browse/#svn/trunk/JavaParser/src/japa/parser/ast/expr). You need `javaparser-1.0.8.jar` on your class path. Download from [javaparser](http://code.google.com/p/javaparser/). 
 
-Modified trees can be compiled using [InMemoryCompiler](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/expression/InMemoryCompiler.java) in Java 6 (in Java 5 you can use [Janino](http://docs.codehaus.org/display/JANINO/Home)). The in-memory compiler defaults to using `ToolProvider.getSystemJavaCompiler` (which is `javac` when using Sun's JDK). By setting `lambda.support.expression.useECJ` to true and adding `ecj-3.5.2.jar` on your class path, you can use the Eclipse batch compiler instead.
+Modified trees can be compiled using [InMemoryCompiler](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/expression/InMemoryCompiler.java) in Java 6 (in Java 5 you can use [Janino](http://docs.codehaus.org/display/JANINO/Home)). The in-memory compiler defaults to using `ToolProvider.getSystemJavaCompiler()` (which is `javac` when using Sun's JDK). By setting the system property `lambda.support.expression.useECJ` to true and adding `ecj-3.5.2.jar` on your class path, you can use the Eclipse batch compiler instead.
 
 ## Implementation
 
