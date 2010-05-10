@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import lambda.support.expression.InMemoryCompiler;
 import lambda.weaving.ClassInjector;
 import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 
@@ -63,6 +64,7 @@ public class LambdaTreeTransformer implements Opcodes {
 
     void newLambdaClass(String name, byte[] bs) {
         lambdasByClassName.put(name, bs);
+        InMemoryCompiler.registerLambda(name, bs);
 
         injector.dump(name, bs);
         injector.verifyIfAsmUtilIsAvailable(bs);

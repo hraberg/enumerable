@@ -2,7 +2,7 @@ package lambda.support.expression;
 
 import static java.lang.System.*;
 import static java.util.Arrays.*;
-import static lambda.support.expression.ExpressionInterpreter.*;
+import static lambda.support.expression.LambdaExpressionTrees.*;
 import static org.junit.Assert.*;
 import japa.parser.ast.expr.Expression;
 
@@ -12,6 +12,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ExpressionTreeTest {
@@ -357,9 +358,60 @@ public class ExpressionTreeTest {
     }
 
     @Test
+    public void parseBooleanUnaryExpressionWhichAreBinaryInBytecode() throws Exception {
+        assertEquals(parseExpression("b"), parseViaASM("b == true", boolean.class, param(boolean.class, "b")));
+        assertEquals(parseExpression("!b"), parseViaASM("b == false", boolean.class, param(boolean.class, "b")));
+        assertEquals(parseExpression("b"), parseViaASM("true == b", boolean.class, param(boolean.class, "b")));
+        assertEquals(parseExpression("!b"), parseViaASM("false == b", boolean.class, param(boolean.class, "b")));
+        assertEquals(parseExpression("!b"), parseViaASM("b != true", boolean.class, param(boolean.class, "b")));
+        assertEquals(parseExpression("b"), parseViaASM("b != false", boolean.class, param(boolean.class, "b")));
+        assertEquals(parseExpression("!b"), parseViaASM("true != b", boolean.class, param(boolean.class, "b")));
+        assertEquals(parseExpression("b"), parseViaASM("false != b", boolean.class, param(boolean.class, "b")));
+    }
+
+    @Test
+    public void parseBooleanLogicalBinaryExpressionWhichArUnaryInByteCode() throws Exception {
+        assertEquals(parseExpression("false"), parseViaASM("true && false", boolean.class));
+        assertEquals(parseExpression("false"), parseViaASM("false && true", boolean.class));
+        assertEquals(parseExpression("false"), parseViaASM("false && false", boolean.class));
+        assertEquals(parseExpression("true"), parseViaASM("true && true", boolean.class));
+        assertEquals(parseExpression("true"), parseViaASM("true || false", boolean.class));
+        assertEquals(parseExpression("true"), parseViaASM("false || true", boolean.class));
+        assertEquals(parseExpression("true"), parseViaASM("true || true", boolean.class));
+        assertEquals(parseExpression("false"), parseViaASM("false || false", boolean.class));
+    }
+
+    @Test
+    public void parseBooleanLogicalBinaryExpression() throws Exception {
+        assertEquals(parseExpression("b1 && b2"), parseViaASM("b1 && b2", boolean.class,
+                param(boolean.class, "b1"), param(boolean.class, "b2")));
+        assertEquals(parseExpression("b1 || b2"), parseViaASM("b1 || b2", boolean.class,
+                param(boolean.class, "b1"), param(boolean.class, "b2")));
+    }
+
+    @Test
+    @Ignore("Needs more work")
+    public void parseBooleanNestedLogicalBinaryExpression() throws Exception {
+        assertEquals(parseExpression("i == 1 && b"), parseViaASM("i == 1 && b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("i == 1 || b"), parseViaASM("i == 1 || b", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b && i == 1"), parseViaASM("b && i == 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+        assertEquals(parseExpression("b || i == 1"), parseViaASM("b || i == 1", boolean.class, param(boolean.class,
+                "b"), param(int.class, "i")));
+    }
+
+    @Test
     public void parseConditionalTernaryExpression() throws Exception {
         assertEquals(parseExpression("b ? \"Hello\" : \"World\""), parseViaASM("b ? \"Hello\" : \"World\"",
                 String.class, param(boolean.class, "b")));
+    }
+
+    @Test
+    public void parseConditionalTernaryExpressionsWhichAreInlinedInBytecode() throws Exception {
+        assertEquals(parseExpression("\"Hello\""), parseViaASM("true ? \"Hello\" : \"World\"", String.class));
+        assertEquals(parseExpression("\"World\""), parseViaASM("false ? \"Hello\" : \"World\"", String.class));
     }
 
     static int expressionId = 1;

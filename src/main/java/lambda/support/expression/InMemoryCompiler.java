@@ -31,9 +31,25 @@ import lambda.weaving.ClassInjector;
 
 public class InMemoryCompiler {
     static boolean useECJ = Boolean.valueOf(getProperty("lambda.support.expression.useECJ"));
-    static JavaCompiler compiler = createCompiler();
+    static JavaCompiler compiler;
 
-    static Map<String, byte[]> bytesByClassName = new HashMap<String, byte[]>();
+    static boolean expressionSupportEnabled;
+
+    static {
+        try {
+            Class.forName("japa.parser.JavaParser");
+            expressionSupportEnabled = true;
+            compiler = createCompiler();
+        } catch (ClassNotFoundException experssionSupportNotEnabled) {
+        }
+    }
+
+    public static Map<String, byte[]> bytesByClassName = new HashMap<String, byte[]>();
+
+    public static void registerLambda(String name, byte[] bs) {
+        if (expressionSupportEnabled)
+            bytesByClassName.put(name, bs);
+    }
 
     static JavaCompiler createCompiler() {
         try {
@@ -59,8 +75,10 @@ public class InMemoryCompiler {
 
         JavaFileObject file = new JavaSourceFromString(className, source);
         List<String> options = new ArrayList<String>(asList("-source", "1.5", "-target", "1.5"));
-        if (useECJ)
+        if (useECJ) {
             options.add("-warn:-raw");
+            options.add("-warn:-deadCode");
+        }
 
         CompilationTask task = compiler.getTask(null, manager, diagnostics, options, null,
                 (Iterable<? extends JavaFileObject>) Arrays.asList(file));
@@ -91,7 +109,7 @@ public class InMemoryCompiler {
         String className;
 
         ByteArrayFileObject(String className) {
-            super(URI.create("file://" + className.replace('.', '/') + "." + Kind.CLASS.extension), Kind.CLASS);
+            super(URI.create("file://" + className.replace('.', '/') + Kind.CLASS.extension), Kind.CLASS);
             this.className = className;
         }
 
@@ -110,7 +128,7 @@ public class InMemoryCompiler {
         String code;
 
         JavaSourceFromString(String name, String code) {
-            super(URI.create("file:///" + name.replace('.', '/') + "." + Kind.SOURCE.extension), Kind.SOURCE);
+            super(URI.create("file:///" + name.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
             this.code = code;
         }
 
