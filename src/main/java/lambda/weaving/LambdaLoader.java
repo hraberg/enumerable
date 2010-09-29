@@ -15,8 +15,6 @@ import java.lang.instrument.Instrumentation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
-import java.util.HashSet;
-import java.util.Set;
 
 import lambda.exception.LambdaWeavingNotEnabledException;
 import lambda.weaving.tree.LambdaTreeTransformer;
@@ -26,9 +24,16 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     private static boolean tranformationFailed;
     static String weavingNotEnabledMessage = "Please start the JVM with -javaagent:enumerable-"
             + Version.getVersion() + "-agent.jar";;
+    private ClassFilter filter;
 
     static {
         isEnabled = LambdaLoader.class.getClassLoader().getResource(LambdaCompiler.AOT_COMPILED_MARKER) != null;
+    }
+
+    public LambdaLoader(ClassFilter filter){
+
+
+        this.filter = filter;
     }
 
     /**
@@ -95,9 +100,14 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
             NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         debug("[main] " + getVersionString());
         isEnabled = true;
-        addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
-        Class<?> c = new LambdaLoader().loadClass(className);
-        Method m = c.getMethod("main", String[].class);
+
+        Class<?> c = new LambdaLoader(
+                new ClassFilter(getProperty("lambda.weaving.skipped.packages", ""),
+                                getProperty("lambda.weaving.included.packages", ""),
+                                getProperty("lambda.weaving.exclude.pattern", ""))
+                ).loadClass(className);
+
+        Method m = c.getMethod("main", String[].class);        
         return m.invoke(null, new Object[] { args });
     }
 
@@ -105,24 +115,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         return weavingNotEnabledMessage;
     }
 
-    static Set<String> packagesToSkip = new HashSet<String>();
-    static {
-        packagesToSkip.add("java.");
-        packagesToSkip.add("javax.");
-        packagesToSkip.add("sun.");
-        packagesToSkip.add("$Proxy");
-        packagesToSkip.add("org.eclipse.jdt.internal.");
-        packagesToSkip.add("org.junit.");
-        packagesToSkip.add("junit.");
-        packagesToSkip.add("com.sun.");
-        packagesToSkip.add("clojure.");
-        packagesToSkip.add("org.jruby.");
-        packagesToSkip.add("org.codehaus.groovy.");
-        packagesToSkip.add("groovy.");
-        packagesToSkip.add("Script");
-        packagesToSkip.add("lambda.enumerable.jruby.");
-        packagesToSkip.add("Enumerable");
-    }
+
 
     LambdaTreeTransformer transformer = new LambdaTreeTransformer();
 
@@ -156,7 +149,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
     byte[] transformClass(String name, InputStream in) {
         try {
-            if (isNotToBeInstrumented(name) || tranformationFailed)
+            if (!filter.isToBeInstrumented(name) || tranformationFailed)
                 return null;
             return transformer.transform(name, in);
         } catch (Throwable t) {
@@ -169,26 +162,17 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         }
     }
 
-    boolean isNotToBeInstrumented(String name) {
-        for (String prefix : packagesToSkip)
-            if (name.startsWith(prefix))
-                return true;
-        return false;
-    }
 
-    static void addSkippedPackages(String agentArgs) {
-        for (String prefix : agentArgs.split(",")) {
-            String trim = prefix.trim();
-            if (trim.length() > 0)
-                packagesToSkip.add(trim);
-        }
-    }
 
     public static void premain(String agentArgs, Instrumentation instrumentation) {
         debug("[premain] " + getVersionString());
         isEnabled = true;
-        addSkippedPackages(System.getProperty("lambda.weaving.skipped.packages", ""));
-        instrumentation.addTransformer(new LambdaLoader());
+
+        instrumentation.addTransformer(new LambdaLoader(
+                new ClassFilter(getProperty("lambda.weaving.skipped.packages", ""),
+                                getProperty("lambda.weaving.included.packages", ""),
+                                getProperty("lambda.weaving.exclude.pattern", "")
+                )));
     }
 
     public static void main(String[] args) throws Throwable {
