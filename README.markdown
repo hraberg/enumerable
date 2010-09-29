@@ -88,6 +88,8 @@ Open *lambda.enumerable.EnumerableExample* to get started. The example bootstrap
 * `lambda.weaving.debug.classes.dir` - where to write the classes. Defaults to `target/generated-classes`.
 * `lambda.weaving.debug.dev` - will log lots of ASMified information about the transfromation to System.out if set to true.
 * `lambda.weaving.skipped.packages` - is a comma separated list of package prefixes to skip.
+* `lambda.weaving.included.packages` - is a comma separated list of packages to include. This overrides the skipped packages defined above, i.e. any package that is not included will be skipped.
+* `lambda.weaving.exclude.pattern` - is regexp to prevent transformation of classes based on the complete class name rather than by package prefix. This is applied after the package level filtering.
 
 ### LambdaParameter
 

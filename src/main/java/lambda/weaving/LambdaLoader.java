@@ -31,8 +31,6 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     }
 
     public LambdaLoader(ClassFilter filter){
-
-
         this.filter = filter;
     }
 

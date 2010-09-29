@@ -5,9 +5,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * User: developer
- * Date: Sep 29, 2010
- * Time: 1:54:12 PM
+   Filters the classes to be instrumented, based on a blacklist or a white list and a regexp pattern.
  */
 public class ClassFilter {
 
