@@ -538,7 +538,9 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
             cast.expression = new CastExpr(new ReferenceType(cast.type), expressionValue.expression);
             return cast;
         case INSTANCEOF:
-            return null;
+            ExpressionValue instanceOf = (ExpressionValue) newValue(Type.getObjectType(((TypeInsnNode) insn).desc));
+            instanceOf.expression = new InstanceOfExpr(expressionValue.expression, new ReferenceType(instanceOf.type));
+            return instanceOf;
         case MONITORENTER:
         case MONITOREXIT:
             throw new UnsupportedOperationException(AbstractVisitor.OPCODES[insn.getOpcode()]);

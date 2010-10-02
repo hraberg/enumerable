@@ -139,6 +139,12 @@ public class ExpressionTreeTest {
     }
 
     @Test
+    public void parseInstanceOfExpressions() throws Exception {
+        assertEquals(parseExpression("o instanceof java.util.List"), parseViaASM("o instanceof java.util.List", boolean.class, param(
+                Object.class, "o")));
+    }
+
+    @Test
     public void parseCastUnaryExpressions() throws Exception {
         assertEquals(parseExpression("(String) o"), parseViaASM("(String) o", String.class,
                 param(Object.class, "o")));
