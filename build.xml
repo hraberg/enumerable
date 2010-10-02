@@ -16,9 +16,9 @@
         <pathelement location="lib/clojure-1.2.0.jar" />
         <pathelement location="lib/clojure-jsr223.jar" />
         <pathelement location="lib/jruby-complete-1.5.0.RC2.jar" />
-        <pathelement location="lib/google-collect-1.0.jar" />
+        <pathelement location="lib/guava-r07.jar" />
         <pathelement location="lib/sun.org.mozilla.javascript.internal.jar" />
-        <pathelement location="lib/groovy-all-1.7.2.jar" />
+        <pathelement location="lib/groovy-all-1.7.5.jar" />
         <pathelement location="lib/javaparser-1.0.8.jar" />
         <pathelement location="lib/ecj-3.5.2.jar" />
     </path>
