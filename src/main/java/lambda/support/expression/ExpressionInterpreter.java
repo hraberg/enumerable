@@ -516,7 +516,7 @@ public class ExpressionInterpreter implements Opcodes, Interpreter {
                 type = PRIMITIVE_LONG;
                 break;
             default:
-                throw new AnalyzerException("Invalid array type");
+                throw new AnalyzerException(insn, "Invalid array type");
             }
             ArrayList<Expression> dimensions = new ArrayList<Expression>();
             dimensions.add(expressionValue.expression);

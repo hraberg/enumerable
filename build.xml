@@ -10,7 +10,7 @@
     
     <path id="enumerable.classpath">
         <pathelement location="target/classes" />
-        <pathelement location="lib/asm-all-3.2.jar" />
+        <pathelement location="lib/asm-all-3.3.jar" />
         <pathelement location="lib/jsr166y.jar" />
         <pathelement location="lib/extra166y.jar" />
         <pathelement location="lib/clojure-1.2.0.jar" />
