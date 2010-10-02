@@ -167,7 +167,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Clojure Sequences and IFns
 
-[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/richhickey/clojure/blob/1.1.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need `clojure-1.1.0.jar` or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
+[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/richhickey/clojure/blob/1.1.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need `clojure-1.2.0.jar` or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
 
 ### JRuby Blocks
 
@@ -179,7 +179,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Groovy Closures
 
-[LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). You need `groovy-all-1.7.2.jar` or later on your class path. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
+[LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). You need `groovy-all-1.7.5.jar` or later on your class path. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
 
 ### Google Collections
 
