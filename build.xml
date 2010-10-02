@@ -5,12 +5,13 @@
 	</description>
 
     <property name="enumerable.version" value="0.2.5" />
+	<property name="asm.version" value="3.3" />
     <property file="lambda.weaving.properties" />
     <tstamp />
     
     <path id="enumerable.classpath">
         <pathelement location="target/classes" />
-        <pathelement location="lib/asm-all-3.3.jar" />
+        <pathelement location="lib/asm-all-${asm.version}.jar" />
         <pathelement location="lib/jsr166y.jar" />
         <pathelement location="lib/extra166y.jar" />
         <pathelement location="lib/clojure-1.2.0.jar" />
@@ -89,7 +90,7 @@
     <target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
         <jarjar jarfile="target/enumerable-agent-${enumerable.version}.jar">
             <fileset dir="target/classes" />
-            <zipfileset src="lib/asm-all-3.2.jar" />
+            <zipfileset src="lib/asm-all-${asm.version}.jar" />
             <rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
             <manifest>
                 <attribute name="Main-Class" value="lambda.weaving.LambdaLoader" />
@@ -196,7 +197,7 @@
             <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
             <classpath location="target/example-classes" />
             <classpath>
-                <pathelement location="lib/asm-all-3.2.jar" />
+                <pathelement location="lib/asm-all-${asm.version}.jar" />
             </classpath>
         </java>
     </target>
@@ -265,7 +266,7 @@
             </tarfileset>
             
             <tarfileset dir="lib" prefix="${enumerable.dist.name}">
-                <include name="asm-3.2.license" />
+                <include name="asm-${asm.version}.license" />
             </tarfileset>
             <tarfileset dir="." prefix="${enumerable.dist.name}">
                 <include name="README.markdown" />
