@@ -21,7 +21,7 @@ import lambda.weaving.tree.LambdaTreeTransformer;
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     private static boolean isEnabled;
-    private static boolean tranformationFailed;
+    private static boolean transformationFailed;
     static String weavingNotEnabledMessage = "Please start the JVM with -javaagent:enumerable-"
             + Version.getVersion() + "-agent.jar";;
     private ClassFilter filter;
@@ -38,7 +38,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
      * Allows you to query the Lambda weaver at runtime to see if it's enabled.
      */
     public static boolean isEnabled() {
-        return isEnabled && !tranformationFailed;
+        return isEnabled && !transformationFailed;
     }
 
     /**
@@ -147,11 +147,11 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
 
     byte[] transformClass(String name, InputStream in) {
         try {
-            if (!filter.isToBeInstrumented(name) || tranformationFailed)
+            if (!filter.isToBeInstrumented(name) || transformationFailed)
                 return null;
             return transformer.transform(name, in);
         } catch (Throwable t) {
-            tranformationFailed = true;
+            transformationFailed = true;
             weavingNotEnabledMessage = t.getMessage();
 
             err.println(getVersionString());

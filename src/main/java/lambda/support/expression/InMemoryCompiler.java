@@ -74,7 +74,7 @@ public class InMemoryCompiler {
         };
 
         JavaFileObject file = new JavaSourceFromString(className, source);
-        List<String> options = new ArrayList<String>(asList("-source", "1.5", "-target", "1.5"));
+        List<String> options = new ArrayList<String>(asList("-source", "1.5", "-target", "1.5", "-g"));
         if (useECJ) {
             options.add("-warn:-raw");
             options.add("-warn:-deadCode");

@@ -5,9 +5,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
-
 public class ClassFilterTest {
-
     @Test
     public void testExcludedPackages(){
          ClassFilter filter = new ClassFilter("packagetoingnore", "", "");
@@ -31,6 +29,4 @@ public class ClassFilterTest {
         assertFalse(filter.isToBeInstrumented("mypackage.AnotherUUAARGHClass"));
         assertFalse(filter.isToBeInstrumented("packagetoingnore.MyClass"));
      }
-
-
 }

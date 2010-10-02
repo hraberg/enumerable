@@ -165,7 +165,7 @@
             <batchtest todir="target/junit-aot">
                 <fileset dir="src/test/java">
                     <include name="**/*Test.java" />
-                    <exclude name="**/weaving/tree/**/*Test.java" />
+                    <exclude name="**/weaving/**/*Test.java" />
                     <exclude name="**/CoreEnumerableRubySpecSuiteTest.java" />
                 </fileset>
             </batchtest>

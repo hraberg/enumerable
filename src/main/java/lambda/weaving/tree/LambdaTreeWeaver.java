@@ -141,6 +141,7 @@ class LambdaTreeWeaver implements Opcodes {
         List<LambdaAnalyzer> lambdas = new ArrayList<LambdaAnalyzer>();
         Map<String, LocalVariableNode> methodLocals = new LinkedHashMap<String, LocalVariableNode>();
         Map<String, LocalVariableNode> methodMutableLocals = new LinkedHashMap<String, LocalVariableNode>();
+        int line;
 
         MethodAnalyzer(MethodNode m) {
             this.m = m;
@@ -229,7 +230,7 @@ class LambdaTreeWeaver implements Opcodes {
         void analyze() throws Exception {
             frames = new Analyzer(new BasicInterpreter()).analyze(c.name, m);
 
-            int line = 0;
+            line = 0;
             for (int i = 0; i < m.instructions.size(); i++) {
                 AbstractInsnNode n = m.instructions.get(i);
 
@@ -303,7 +304,7 @@ class LambdaTreeWeaver implements Opcodes {
                     return i;
                 }
             }
-            throw new IllegalStateException("Could not find previous stack depth of " + depth);
+            throw new IllegalStateException("Could not find previous stack depth of " + depth + " at line " + line);
         }
 
         int resolveBranches(int end, LabelNode label) {
@@ -1223,10 +1224,17 @@ class LambdaTreeWeaver implements Opcodes {
 
                 devDebug("end =================== " + getStart() + " -> " + getEnd());
                 int i = 0;
-                for (int[] range : argumentRanges)
+                for (int[] range : argumentRanges) {
+                    i++;
+                    String parameter;
+                    if (i >= parameters.keySet().size())
+                        parameter = "<missing>";
+                    else
+                        parameter = getParameter(i);
                     devDebug("    "
-                            + (i == argumentRanges.size() - 1 ? "body: " : "argument " + getParameter(i++) + ": ")
-                            + range[0] + " -> " + range[1]);
+                            + (i == argumentRanges.size() - 1 ? "body: " : "argument " + parameter + ": ")
+                            + range[0] + " -> " + range[1]);                    
+                }
                 devDebug("    type: " + lambdaType);
                 devDebug("    class: " + lambdaClass());
 
@@ -1235,7 +1243,7 @@ class LambdaTreeWeaver implements Opcodes {
                 if (sam != null)
                     devDebug("    SAM is: " + sam);
                 else
-                    throw new IllegalStateException("Found no potential abstract method to override");
+                    throw new IllegalStateException("Found no potential abstract method to override" + " at line " + line);
 
                 devDebug("    parameters: " + parameters.keySet());
                 devDebug("    method parameter types: " + newLambdaParameterTypes);
@@ -1248,7 +1256,7 @@ class LambdaTreeWeaver implements Opcodes {
 
                 if (newLambdaParameterTypes.size() != parameters.size())
                     throw new IllegalStateException("Got " + parameters.keySet() + " as parameters need exactly "
-                            + newLambdaParameterTypes.size());
+                            + newLambdaParameterTypes.size()  + " at line " + line);
             }
 
             void devDebugPrintInstructionHeader() {
@@ -1299,7 +1307,7 @@ class LambdaTreeWeaver implements Opcodes {
                         if (!resolveParameter(fin))
                             throw new IllegalStateException("Tried to define extra parameter, " + f.name
                                     + ", arity is " + newLambdaParameterTypes.size() + ", defined parameters are "
-                                    + parameters.keySet());
+                                    + parameters.keySet() + " at line " + line);
                         return;
                     }
 
@@ -1448,6 +1456,32 @@ class LambdaTreeWeaver implements Opcodes {
         boolean isMethodParameter(LocalVariableNode local) {
             return local.index != 0 && local.index < method.getArgumentTypes().length;
         }
+
+        boolean isNewLambdaMethod(MethodInsnNode mi) throws IOException {
+            MethodNode m = findMethod(mi);
+            if (m == null)
+                return false;
+            boolean hasAnnotation = hasAnnotation(m, NewLambda.class);
+            if (hasAnnotation) {
+                if (hasAccess(m, ACC_STATIC))
+                    return true;
+                throw new IllegalStateException("Tried to call non static new lambda method " + m.name  + " at line " + line);
+            }
+            return false;
+        }
+
+        boolean isLambdaParameterField(FieldInsnNode fi) throws IOException {
+            FieldNode f = findField(fi);
+            if (f == null)
+                return false;
+            boolean hasAnnotation = hasAnnotation(f, LambdaParameter.class);
+            if (hasAnnotation) {
+                if (hasAccess(f, ACC_STATIC))
+                    return true;
+                throw new IllegalStateException("Tried to define non static lambda parameter " + f.name  + " at line " + line);
+            }
+            return false;
+        }
     }
 
     Type toArrayType(Type type) {
@@ -1460,20 +1494,6 @@ class LambdaTreeWeaver implements Opcodes {
 
     boolean isPrimitive(Type type) {
         return !isReference(type);
-    }
-
-    boolean isNewLambdaMethod(MethodInsnNode mi) throws IOException {
-        MethodNode m = findMethod(mi);
-        if (m == null)
-            return false;
-        return hasAnnotation(m, NewLambda.class) && hasAccess(m, ACC_STATIC);
-    }
-
-    boolean isLambdaParameterField(FieldInsnNode fi) throws IOException {
-        FieldNode f = findField(fi);
-        if (f == null)
-            return false;
-        return hasAnnotation(f, LambdaParameter.class) && hasAccess(f, ACC_STATIC);
     }
 
     boolean hasAccess(ClassNode c, int acc) {
