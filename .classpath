@@ -10,7 +10,7 @@
 	<classpathentry kind="lib" path="lib/extra166y.jar" sourcepath="lib/src/extra166y.zip"/>
 	<classpathentry kind="lib" path="lib/jsr166y.jar" sourcepath="lib/src/jsr166y.zip"/>
 	<classpathentry kind="lib" path="lib/asm-debug-all-3.2.jar" sourcepath="lib/src/asm-all-3.2-sources.jar"/>
-	<classpathentry kind="lib" path="lib/clojure-1.1.0.jar" sourcepath="lib/src/clojure-1.1.0-src.zip"/>
+	<classpathentry kind="lib" path="lib/clojure-1.2.0.jar" sourcepath="lib/src/clojure-1.2.0-src.zip"/>
 	<classpathentry kind="lib" path="lib/jruby-complete-1.5.0.RC2.jar" sourcepath="lib/src/jruby-src-1.5.0.RC2.zip"/>
 	<classpathentry kind="lib" path="lib/google-collect-1.0.jar" sourcepath="lib/src/google-collect-src-1.0.zip"/>
 	<classpathentry kind="lib" path="lib/clojure-jsr223.jar" sourcepath="lib/src/clojure-jsr223-src.zip"/>

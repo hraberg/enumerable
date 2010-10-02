@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 public class ClassFilter {
 
 
+    @SuppressWarnings("serial")
     private Set<String> packagesToSkip = new HashSet<String>()
     {{
         add("java.");

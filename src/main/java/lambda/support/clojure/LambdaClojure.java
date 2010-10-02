@@ -15,6 +15,8 @@ import lambda.annotation.NewLambda;
 import lambda.exception.LambdaWeavingNotEnabledException;
 import clojure.lang.AFunction;
 import clojure.lang.IFn;
+import clojure.lang.IObj;
+import clojure.lang.IPersistentMap;
 import clojure.lang.LispReader;
 import clojure.lang.Namespace;
 import clojure.lang.PersistentList;
@@ -100,6 +102,12 @@ public class LambdaClojure {
     static abstract class AFnFnBase extends AFunction {
         int arity;
 
+        IPersistentMap meta;
+
+        public IPersistentMap meta() {
+            return meta;
+        }
+
         public AFnFnBase() {
             arity = Fn0.getAndCheckArityForMethod(getImplementingClass(), getMethod());
         }
@@ -123,7 +131,7 @@ public class LambdaClojure {
         }
 
         protected Object default$1() {
-            throwArity();
+            throwArity(0);
             return null;
         }
 
@@ -136,7 +144,7 @@ public class LambdaClojure {
         }
 
         protected Object default$2() {
-            throwArity();
+            throwArity(1);
             return null;
         }
 
@@ -149,7 +157,7 @@ public class LambdaClojure {
         }
 
         protected Object default$3() {
-            throwArity();
+            throwArity(2);
             return null;
         }
 
@@ -302,6 +310,12 @@ public class LambdaClojure {
     @SuppressWarnings("rawtypes")
     public static IFn toIFn(final Fn0 f) {
         return new AFn0() {
+            public IObj withMeta(IPersistentMap meta) {
+                AFn0 aFn = (AFn0) toIFn(f);
+                aFn.meta = meta;
+                return aFn;
+            }
+
             public Object invoke() throws Exception {
                 return f.call();
             }
@@ -314,9 +328,15 @@ public class LambdaClojure {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static IFn toIFn(final Fn1 f) {
         return new AFn1() {
+            public IObj withMeta(IPersistentMap meta) {
+                AFn1 aFn = (AFn1) toIFn(f);
+                aFn.meta = meta;
+                return aFn;
+            }
+
             public Object invoke() throws Exception {
                 if (arity > -1)
-                    throwArity();
+                    throwArity(0);
                 return f.call();
             }
 
@@ -340,15 +360,21 @@ public class LambdaClojure {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static IFn toIFn(final Fn2 f) {
         return new AFn2() {
+            public IObj withMeta(IPersistentMap meta) {
+                AFn2 aFn = (AFn2) toIFn(f);
+                aFn.meta = meta;
+                return aFn;
+            }
+
             public Object invoke() throws Exception {
                 if (arity > -1)
-                    throwArity();
+                    throwArity(0);
                 return f.call();
             }
 
             public Object invoke(Object arg1) throws Exception {
                 if (arity > -2)
-                    throwArity();
+                    throwArity(1);
                 return f.call(arg1);
             }
 
@@ -372,21 +398,27 @@ public class LambdaClojure {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static IFn toIFn(final Fn3 f) {
         return new AFn3() {
+            public IObj withMeta(IPersistentMap meta) {
+                AFn3 aFn = (AFn3) toIFn(f);
+                aFn.meta = meta;
+                return aFn;
+            }
+
             public Object invoke() throws Exception {
                 if (arity > -1)
-                    throwArity();
+                    throwArity(0);
                 return f.call();
             }
 
             public Object invoke(Object arg1) throws Exception {
                 if (arity > -2)
-                    throwArity();
+                    throwArity(1);
                 return f.call(arg1);
             }
 
             public Object invoke(Object arg1, Object arg2) throws Exception {
                 if (arity > -3)
-                    throwArity();
+                    throwArity(2);
                 return f.call(arg1, arg2);
             }
 

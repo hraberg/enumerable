@@ -14,7 +14,6 @@ import javax.script.ScriptException;
 
 import lambda.Lambda;
 import lambda.enumerable.Enumerable;
-import lambda.support.clojure.LambdaClojure;
 import lambda.support.groovy.GroovyTest;
 import lambda.support.groovy.LambdaGroovy;
 import lambda.support.javascript.JavaScriptTest;
@@ -31,6 +30,7 @@ import clojure.lang.APersistentMap;
 import clojure.lang.APersistentSet;
 import clojure.lang.APersistentVector;
 import clojure.lang.IFn;
+import clojure.lang.IPersistentMap;
 import clojure.lang.IPersistentVector;
 import clojure.lang.ISeq;
 import clojure.lang.Namespace;
@@ -212,6 +212,23 @@ public class ClojureTest {
         IFn fn = toIFn(Lambda.λ(s, s.toUpperCase()));
         fn.invoke("hello", "world");
     }
+
+    @Test
+    public void convertFnToIFnHandlesWithMeta() throws Exception {
+        IFn fn = (IFn) toIFn(Lambda.λ(s = "world", s.toUpperCase()));
+        defn("to-upper-case", fn);
+
+        IFn fnWithMeta = (IFn) clj.eval("(with-meta to-upper-case {:hello \"world\"})");
+        assertNotSame(fn, fnWithMeta);
+
+        defn("to-upper-case-with-meta", fnWithMeta);
+        IPersistentMap meta = (IPersistentMap) clj.eval("(meta to-upper-case-with-meta)");
+        assertEquals(1, meta.count());
+        assertEquals("world", meta.valAt(clj.eval(":hello")));
+
+        assertEquals("HELLO", fnWithMeta.invoke("hello"));
+        assertEquals("WORLD", fnWithMeta.invoke());
+   }
 
     @Test
     public void convertIFnToFn() throws ScriptException {
