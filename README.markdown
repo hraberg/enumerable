@@ -273,14 +273,14 @@ http://code.google.com/p/lambdaj/
 
 Enumerable.java is released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
-ASM 3.2: Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](http://github.com/hraberg/enumerable/blob/master/lib/asm-3.2.license) or [ASM License](http://asm.ow2.org/license.html).
+ASM 3.2: Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](http://github.com/hraberg/enumerable/blob/master/lib/asm-3.3.license) or [ASM License](http://asm.ow2.org/license.html).
 
 jsr166y and extra166y:
 Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and released to the public domain, as explained at http://creativecommons.org/licenses/publicdomain
 
 Clojure: Copyright (c) Rich Hickey, released under the [EPL license](http://opensource.org/licenses/eclipse-1.0.php).
 
-JRuby: Copyright (c) 2007-2010 The JRuby project, and is released under a [tri CPL/GPL/LGPL license](http://github.com/jruby/jruby/blob/1.4.0/COPYING).
+JRuby: Copyright (c) 2007-2010 The JRuby project, and is released under a [tri CPL/GPL/LGPL license](http://github.com/jruby/jruby/blob/1.5.3/COPYING).
 
 Groovy: Copyright 2003-2007 the original author or authors. Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
