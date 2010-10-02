@@ -5,7 +5,7 @@
 	</description>
 
     <property name="enumerable.version" value="0.2.5" />
-	<property name="asm.version" value="3.3" />
+    <property name="asm.version" value="3.3" />
     <property file="lambda.weaving.properties" />
     <tstamp />
     
