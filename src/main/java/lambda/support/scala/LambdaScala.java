@@ -84,21 +84,4 @@ public class LambdaScala {
             }
         };
     }
-
-//    static Object eval(String expression) {
-//        PrintStream realOut = System.out;
-//        ByteArrayOutputStream out = new ByteArrayOutputStream();
-//        try {
-//            System.setOut(new PrintStream(out));
-//            Object[] _result = new Object[1];
-//            interpreter.bind("_result", "Array[Any]", _result);
-//            interpreter.interpret("_result(0) = " + expression);
-//            return _result[0];
-//        } catch (RuntimeException e) {
-//            realOut.println(out);
-//            throw e;
-//        } finally {
-//            System.setOut(realOut);
-//        }
-//    }
 }
