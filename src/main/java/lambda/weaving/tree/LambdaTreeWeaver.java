@@ -1531,7 +1531,10 @@ class LambdaTreeWeaver implements Opcodes {
         String className = getObjectType(in).getClassName();
         if (isEnum(className))
             return cn;
-        new ClassReader(className).accept(cn, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+        try {            
+            new ClassReader(className).accept(cn, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+        } catch (IOException ignore) {
+        }
         return cn;
     }
 

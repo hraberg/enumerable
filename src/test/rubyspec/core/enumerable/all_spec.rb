@@ -2,6 +2,7 @@ require File.expand_path('../../../spec_helper', __FILE__)
 require File.expand_path('../fixtures/classes', __FILE__)
 
 describe "Enumerable#all?" do
+
   before :each do
     @enum = EnumerableSpecs::Numerous.new
     @empty = EnumerableSpecs::Empty.new()

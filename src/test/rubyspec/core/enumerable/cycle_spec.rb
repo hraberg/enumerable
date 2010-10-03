@@ -33,7 +33,6 @@ describe "Enumerable#cycle" do
       it "calls each at most once" do
         enum = EnumerableSpecs::EachCounter.new(1, 2)
         enum.cycle(3).to_a.should == [1,2,1,2,1,2]
-        puts "times called #{enum.times_called}"
         enum.times_called.should == 1
       end
 

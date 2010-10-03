@@ -17,5 +17,8 @@
 	<classpathentry kind="lib" path="lib/groovy-all-1.7.5.jar" sourcepath="lib/src/groovy-src-1.7.5.zip"/>
 	<classpathentry kind="lib" path="lib/javaparser-1.0.8.jar" sourcepath="lib/src/javaparser-1.0.8-src.zip"/>
 	<classpathentry kind="lib" path="lib/ecj-3.5.2.jar" sourcepath="lib/src/ecjsrc-3.5.2.zip"/>
+	<classpathentry kind="lib" path="lib/scala-compiler-2.8.0.final.jar"/>
+	<classpathentry kind="lib" path="lib/scala-library-2.8.0.final.jar"/>
+	<classpathentry kind="lib" path="target/scala-classes"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

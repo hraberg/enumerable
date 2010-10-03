@@ -3,6 +3,7 @@ describe :enumerable_find, :shared => true do
   before :each do
     @elements = [2, 4, 6, 8, 10]
     @numerous = EnumerableSpecs::Numerous.new(*@elements)
+    @empty = []
   end
   
   it "passes each entry in enum to block while block when block is false" do
@@ -40,12 +41,16 @@ describe :enumerable_find, :shared => true do
     @numerous.send(@method, fail_proc) {|e| false }.should == "cheeseburgers"
   end
   
+  it "calls the ifnone proc when there are no elements" do
+    fail_proc = lambda { "yay" }
+    @empty.send(@method, fail_proc) {|e| true}.should == "yay"
+  end
+  
   ruby_version_is "" ... "1.8.7" do
     it "raises a LocalJumpError if no block given" do
       lambda { @numerous.send(@method) }.should raise_error(LocalJumpError)
     end
   end
-
   ruby_version_is "1.8.7" do
     platform_is_not :enumerable_java do
       it "returns an enumerator when no block given" do
@@ -61,4 +66,5 @@ describe :enumerable_find, :shared => true do
       end
     end
   end
+
 end

@@ -181,6 +181,10 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 [LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). You need `groovy-all-1.7.5.jar` or later on your class path. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
 
+### Scala Functions
+
+[LambdaScala](http://github.com/hraberg/enumerable/blob/master/src/main/scala/lambda/support/groovy/LambdaScala.scala) allows you to create lambdas extending [Scala's Function](http://lampsvn.epfl.ch/trac/scala/browser/scala/tags/R_2_8_0_final/src/library/scala/Function.scala) and also convert them to [Fn0](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Fn0.java). You need `scala-library.jar` from Scala 2.8.0 or later on your class path. Download from [scala-lang.org](http://www.scala-lang,org).
+
 ### Google Collections
 
 [LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Guava (a superset of Google Collections)](http://code.google.com/p/guava-libraries/). You need `guava-r07.jar` on your class path. Download from [Guava](http://code.google.com/p/guava-libraries/downloads/list).
@@ -273,7 +277,7 @@ http://code.google.com/p/lambdaj/
 
 Enumerable.java is released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
-ASM 3.2: Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](http://github.com/hraberg/enumerable/blob/master/lib/asm-3.3.license) or [ASM License](http://asm.ow2.org/license.html).
+ASM 3.3: Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](http://github.com/hraberg/enumerable/blob/master/lib/asm-3.3.license) or [ASM License](http://asm.ow2.org/license.html).
 
 jsr166y and extra166y:
 Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and released to the public domain, as explained at http://creativecommons.org/licenses/publicdomain
@@ -291,3 +295,5 @@ Google Collections: Copyright (C) 2008 Google Inc. Licensed under the [Apache Li
 RubySpec and MSpec: Copyright (c) 2008 Engine Yard, Inc. All rights reserved. [License](http://github.com/rubyspec/rubyspec/blob/master/LICENSE).
 
 JavaParser: Copyright (C) 2008 Júlio Vilmar Gesser. Released under the [LGPL](http://www.gnu.org/licenses/lgpl.html)
+
+Scala: Copyright (c) 2002-2010 EPFL, Lausanne, unless otherwise specified. Released under the [SCALA LICENSE](http://www.scala-lang.org/node/146)

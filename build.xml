@@ -6,11 +6,13 @@
 
     <property name="enumerable.version" value="0.2.5" />
     <property name="asm.version" value="3.3" />
+    <property name="scala.version" value="2.8.0.final" />
     <property file="lambda.weaving.properties" />
     <tstamp />
     
     <path id="enumerable.classpath">
         <pathelement location="target/classes" />
+        <pathelement location="target/scala-classes" />
         <pathelement location="lib/asm-all-${asm.version}.jar" />
         <pathelement location="lib/jsr166y.jar" />
         <pathelement location="lib/extra166y.jar" />
@@ -22,6 +24,7 @@
         <pathelement location="lib/groovy-all-1.7.5.jar" />
         <pathelement location="lib/javaparser-1.0.8.jar" />
         <pathelement location="lib/ecj-3.5.2.jar" />
+        <pathelement location="lib/scala-library-${scala.version}.jar" />
     </path>
     <path id="enumerable.example.classpath">
         <pathelement location="target/example-classes" />
@@ -30,12 +33,19 @@
     <path id="enumerable.test.classpath">
         <pathelement location="target/test-classes" />
         <pathelement location="lib/junit-4.7.jar" />
+        <pathelement location="lib/scala-compiler-${scala.version}.jar" />
         <path refid="enumerable.example.classpath" />
     </path>
 
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-0.6.jar" />
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="lib/scala-compiler-${scala.version}.jar"/>
+        <pathelement location="lib/scala-library-${scala.version}.jar"/>
+      </classpath>
+    </taskdef>
 
-    <target name="clean">
+	<target name="clean">
         <delete dir="target" />
     </target>
     
@@ -49,7 +59,16 @@
     
     <target name="build" depends="read-git-commit">
         <mkdir dir="target/classes" />
-        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
+        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8" excludes="lambda/support/scala/**/*">
+            <src path="src/main/java"/>
+            <classpath refid="enumerable.classpath" />
+        </javac>
+        <mkdir dir="target/scala-classes" />
+        <scalac destdir="target/scala-classes" target="jvm-1.5" encoding="UTF-8">
+             <src path="src/main/scala" />
+             <classpath refid="enumerable.classpath" />
+    	</scalac>
+        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8" includes="lambda/support/scala/**/*">
             <src path="src/main/java"/>
             <classpath refid="enumerable.classpath" />
         </javac>
@@ -84,6 +103,7 @@
     <target name="agent-jar-uptodate">
         <uptodate property="jarjar.notRequired" targetfile="target/enumerable-agent-${enumerable.version}.jar">
             <srcfiles dir="src/main/java" includes="**/*" />
+            <srcfiles dir="src/main/scala" includes="**/*" />
         </uptodate>
     </target>
 
@@ -98,6 +118,9 @@
                 <attribute name="Can-Retransform-Classes" value="true" />
             </manifest>
         </jarjar>
+    	<jar jarfile="target/enumerable-agent-${enumerable.version}.jar" update="true" encoding="UTF-8">
+            <fileset dir="target/scala-classes" />
+    	</jar>
     </target>
     
     <target name="tests" depends="agent-jar">
@@ -133,7 +156,7 @@
     </target>
 
     <target name="test-jar" depends="build">
-        <jar jarfile="target/enumerable-test-${enumerable.version}.jar" encoding="UTF-8" >
+        <jar jarfile="target/enumerable-test-${enumerable.version}.jar" encoding="UTF-8">
             <fileset dir="target/test-classes" />
             <fileset dir="target/example-classes">
                 <include name="**/EnumerableExample.class" />
@@ -162,6 +185,7 @@
             <classpath refid="enumerable.classpath" />
             <classpath location="target/enumerable-test-${enumerable.version}.jar" />
             <classpath location="lib/junit-4.7.jar" />
+            <classpath location="lib/scala-compiler-${scala.version}.jar" />
             <batchtest todir="target/junit-aot">
                 <fileset dir="src/test/java">
                     <include name="**/*Test.java" />
@@ -227,6 +251,7 @@
     <target name="source-jar">
         <jar jarfile="target/enumerable-sources-${enumerable.version}.jar" encoding="UTF-8" >
             <fileset dir="src/main/java" />
+            <fileset dir="src/main/scala" />
         </jar>
     </target>
 

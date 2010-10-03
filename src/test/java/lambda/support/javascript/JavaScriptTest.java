@@ -22,11 +22,15 @@ import lambda.support.groovy.LambdaGroovy;
 import lambda.support.javascript.LambdaJavaScript.FunctionFn2;
 import lambda.support.jruby.JRubyTest;
 import lambda.support.jruby.LambdaJRuby;
+import lambda.support.scala.LambdaScala;
+import lambda.support.scala.ScalaTest;
+import lambda.support.scala.ScalaTest.ScalaInterpreter;
 
 import org.jruby.RubyProc;
 import org.junit.Before;
 import org.junit.Test;
 
+import scala.Function2;
 import sun.org.mozilla.javascript.internal.Context;
 import sun.org.mozilla.javascript.internal.Function;
 import clojure.lang.IFn;
@@ -127,6 +131,16 @@ public class JavaScriptTest {
         assertEquals(6.0, js.eval("f(2, 3)"));
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void interactingWithScala() throws Exception {
+        ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
+
+        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Double, m: Double) => { n * m }");
+
+        js.put("f", toFunction(LambdaScala.toFn2(f)));
+        assertEquals(6.0, js.eval("f(2, 3)"));
+    }
     @Before
     public void initEngine() {
         js = getJavaScriptEngine();

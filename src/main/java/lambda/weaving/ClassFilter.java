@@ -5,47 +5,45 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
-   Filters the classes to be instrumented, based on a blacklist or a white list and a regexp pattern.
+ * Filters the classes to be instrumented, based on a blacklist or a white list
+ * and a regexp pattern.
  */
 public class ClassFilter {
-
-
     @SuppressWarnings("serial")
-    private Set<String> packagesToSkip = new HashSet<String>()
-    {{
-        add("java.");
-        add("javax.");
-        add("sun.");
-        add("$Proxy");
-        add("org.eclipse.jdt.internal.");
-        add("org.junit.");
-        add("junit.");
-        add("com.sun.");
-        add("clojure.");
-        add("org.jruby.");
-        add("org.codehaus.groovy.");
-        add("groovy.");
-        add("Script");
-        add("lambda.enumerable.jruby.");
-        add("Enumerable");
-    }};
+    private Set<String> packagesToSkip = new HashSet<String>() {
+        {
+            add("java.");
+            add("javax.");
+            add("sun.");
+            add("$Proxy");
+            add("org.eclipse.jdt.internal.");
+            add("org.junit.");
+            add("junit.");
+            add("com.sun.");
+            add("clojure.");
+            add("org.jruby.");
+            add("org.codehaus.groovy.");
+            add("groovy.");
+            add("scala.");
+            add("Script");
+            add("lambda.enumerable.jruby.");
+            add("Enumerable");
+        }
+    };
 
     private Set<String> packagesToInclude = new HashSet<String>();
     private Pattern excludePattern;
 
-
     public ClassFilter(String skippedPackages, String includedPackages, String excludePatternString) {
         addSkippedPackages(skippedPackages);
         addIncludedPackages(includedPackages);
-        if (!"".equals(excludePatternString.trim())){
+        if (!"".equals(excludePatternString.trim())) {
             this.excludePattern = Pattern.compile(excludePatternString);
         }
-
-
     }
 
     private void addIncludedPackages(String agentArgs) {
-         for (String prefix : agentArgs.split(",")) {
+        for (String prefix : agentArgs.split(",")) {
             String trim = prefix.trim();
             if (trim.length() > 0)
                 packagesToInclude.add(trim);
@@ -59,13 +57,13 @@ public class ClassFilter {
                 packagesToSkip.add(trim);
         }
     }
-    
+
     public boolean isToBeInstrumented(String name) {
         return packageIncluded(name) && (excludePattern == null || !excludePattern.matcher(name).find());
     }
 
     private boolean packageIncluded(String name) {
-        if (packagesToInclude.size() > 0 ){
+        if (packagesToInclude.size() > 0) {
             for (String prefix : packagesToInclude)
                 if (name.startsWith(prefix))
                     return true;

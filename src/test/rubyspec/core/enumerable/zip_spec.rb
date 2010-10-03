@@ -15,7 +15,7 @@ describe "Enumerable#zip" do
     end.should == nil
     expected.size.should == 0
   end
-
+  
   it "fills resulting array with nils if an argument array is too short" do
     EnumerableSpecs::Numerous.new(1,2,3).zip([4,5,6], [7,8]).should == [[1,4,7],[2,5,8],[3,6,nil]]
   end
@@ -29,7 +29,7 @@ describe "Enumerable#zip" do
       end
     end
   end
-
+  
   ruby_version_is '1.9' do
     it "converts arguments to arrays using #to_ary" do
       convertable = EnumerableSpecs::ArrayConvertable.new(4,5,6)

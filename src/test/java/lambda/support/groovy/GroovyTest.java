@@ -23,12 +23,16 @@ import lambda.support.javascript.JavaScriptTest;
 import lambda.support.javascript.LambdaJavaScript;
 import lambda.support.jruby.JRubyTest;
 import lambda.support.jruby.LambdaJRuby;
+import lambda.support.scala.LambdaScala;
+import lambda.support.scala.ScalaTest;
+import lambda.support.scala.ScalaTest.ScalaInterpreter;
 
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.jruby.RubyProc;
 import org.junit.Before;
 import org.junit.Test;
 
+import scala.Function2;
 import sun.org.mozilla.javascript.internal.Function;
 import clojure.lang.IFn;
 
@@ -134,6 +138,18 @@ public class GroovyTest {
 
         groovy.put("closure", closure);
         assertEquals(120.0, groovy.eval("[1, 2, 3, 4, 5].inject(1, closure)"));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void interactingWithScala() throws Exception {
+        ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
+
+        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Int, m: Int) => { n * m }");
+        Closure closure = toClosure(LambdaScala.toFn2(f));
+
+        groovy.put("closure", closure);
+        assertEquals(120, groovy.eval("[1, 2, 3, 4, 5].inject(1, closure)"));
     }
 
     @Before

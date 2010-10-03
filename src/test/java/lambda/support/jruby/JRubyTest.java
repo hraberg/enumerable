@@ -21,6 +21,9 @@ import lambda.support.groovy.GroovyTest;
 import lambda.support.groovy.LambdaGroovy;
 import lambda.support.javascript.JavaScriptTest;
 import lambda.support.javascript.LambdaJavaScript;
+import lambda.support.scala.LambdaScala;
+import lambda.support.scala.ScalaTest;
+import lambda.support.scala.ScalaTest.ScalaInterpreter;
 
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
@@ -29,6 +32,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import scala.Function2;
 import sun.org.mozilla.javascript.internal.Function;
 import clojure.lang.IFn;
 
@@ -173,6 +177,22 @@ public class JRubyTest {
 
         Closure closure = (Closure) groovy.eval("{ n, m -> n * m }");
         RubyProc proc = toProc(LambdaGroovy.toFn2(closure));
+
+        assertEquals(ruby.newFixnum(6), proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
+                ruby.newFixnum(2), ruby.newFixnum(3) }));
+
+        rb.put("block", proc);
+        assertEquals(120L, rb.eval("[1, 2, 3, 4, 5].inject &block"));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void interactingWithScala() throws Exception {
+        Ruby ruby = Ruby.getGlobalRuntime();
+        ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
+
+        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Long, m: Long) => { n * m }");
+        RubyProc proc = toProc(LambdaScala.toFn2(f));
 
         assertEquals(ruby.newFixnum(6), proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
                 ruby.newFixnum(2), ruby.newFixnum(3) }));

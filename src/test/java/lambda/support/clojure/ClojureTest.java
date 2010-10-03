@@ -20,11 +20,15 @@ import lambda.support.javascript.JavaScriptTest;
 import lambda.support.javascript.LambdaJavaScript;
 import lambda.support.jruby.JRubyTest;
 import lambda.support.jruby.LambdaJRuby;
+import lambda.support.scala.LambdaScala;
+import lambda.support.scala.ScalaTest;
+import lambda.support.scala.ScalaTest.ScalaInterpreter;
 
 import org.jruby.RubyProc;
 import org.junit.Before;
 import org.junit.Test;
 
+import scala.Function2;
 import sun.org.mozilla.javascript.internal.Function;
 import clojure.lang.APersistentMap;
 import clojure.lang.APersistentSet;
@@ -282,6 +286,20 @@ public class ClojureTest {
 
         defn("times-groovy", times);
         assertEquals(120, clj.eval("(reduce times-groovy 1 [1, 2, 3, 4, 5])"));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void interactingWithScala() throws Exception {
+        ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
+
+        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Int, m: Int) => { n * m }");
+        IFn times = toIFn(LambdaScala.toFn2(f));
+
+        assertEquals(6, times.invoke(2, 3));
+
+        defn("times-scala", times);
+        assertEquals(120, clj.eval("(reduce times-scala 1 [1, 2, 3, 4, 5])"));
     }
 
     @Before
