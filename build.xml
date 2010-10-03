@@ -58,17 +58,14 @@
     </target>
     
     <target name="build" depends="read-git-commit">
-        <mkdir dir="target/classes" />
-        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8" excludes="lambda/support/scala/**/*">
-            <src path="src/main/java"/>
-            <classpath refid="enumerable.classpath" />
-        </javac>
+        <mkdir dir="target/classes"/>
         <mkdir dir="target/scala-classes" />
-        <scalac destdir="target/scala-classes" target="jvm-1.5" encoding="UTF-8">
-             <src path="src/main/scala" />
-             <classpath refid="enumerable.classpath" />
+        <scalac srcdir="src/main" destdir="target/scala-classes" target="jvm-1.5" encoding="UTF-8">
+            <include name="scala/**/*.scala"/>
+            <include name="java/**/*.java"/>
+            <classpath refid="enumerable.classpath" />
     	</scalac>
-        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8" includes="lambda/support/scala/**/*">
+        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
             <src path="src/main/java"/>
             <classpath refid="enumerable.classpath" />
         </javac>
