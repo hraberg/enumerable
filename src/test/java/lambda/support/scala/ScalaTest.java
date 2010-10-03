@@ -57,6 +57,13 @@ public class ScalaTest {
     }
 
     @Test
+    public void fullScalaFunctionTypesAreCreatedWithNoAbstractMethods() {
+        FunctionFn1<Integer, Integer> function = function(n, n * 2);
+        Function1<Integer, Integer> composed = function.compose(function);
+        assertEquals(8, (int) composed.apply(2));
+    }
+
+    @Test
     public void convertFnToFunction() throws ScriptException {
         Function1<String, String> f = toFunction(Lambda.λ(s, s.toUpperCase()));
         scala.bind("f", "Function1[String, String]", f);
