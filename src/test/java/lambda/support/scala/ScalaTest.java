@@ -72,14 +72,14 @@ public class ScalaTest {
 
     @Test
     public void convertFunctionToFn() throws ScriptException {
-        Function1<String, String> f = (Function1<String, String>) scala.eval("(s: String) => { s.toUpperCase }");
+        Function1<String, String> f = (Function1<String, String>) scala.eval("(s: String) => s.toUpperCase");
         assertEquals("HELLO", toFn1(f).call("hello"));
     }
 
     @Test
     public void interactingWithEnumerableJava() throws Exception {
         List<Integer> list = asList(1, 2, 3);
-        Fn1<Integer, Integer> block = toFn1((Function1<Integer, Integer>) scala.eval("(n: Int) => { n * 2 }"));
+        Fn1<Integer, Integer> block = toFn1((Function1<Integer, Integer>) scala.eval("(n: Int) => n * 2"));
         assertEquals(asList(2, 4, 6), Enumerable.collect(list, block));
     }
 
@@ -130,6 +130,15 @@ public class ScalaTest {
         scala.bind("timesGroovy", "Function2[Any, Any, Any]", times);
         assertEquals(120, scala.eval("List(1, 2, 3, 4, 5).reduceLeft(timesGroovy)"));
     }
+    
+    @Test
+    public void enumerableJavaLambdasCanBeEmbeddedInScala() throws Exception {
+        //    def toUpperCase() = {
+        //        λ(s, s.toUpperCase)
+        //    }
+        assertEquals("HELLO", EnumerableJavaScalaTest.toUpperCase().call("hello"));
+    }
+    
 
     public static class ScalaInterpreter {
         static Interpreter interpreter;
@@ -146,6 +155,7 @@ public class ScalaTest {
             PrintStream realOut = System.out;
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             try {
+                System.setOut(new PrintStream(out));
                 interpreter.bind(name, scalaType, value);
             } catch (RuntimeException e) {
                 realOut.println(out);

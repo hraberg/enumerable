@@ -136,7 +136,7 @@ public class JavaScriptTest {
     public void interactingWithScala() throws Exception {
         ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
 
-        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Double, m: Double) => { n * m }");
+        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Double, m: Double) => n * m");
 
         js.put("f", toFunction(LambdaScala.toFn2(f)));
         assertEquals(6.0, js.eval("f(2, 3)"));

@@ -32,6 +32,7 @@
     </path>
     <path id="enumerable.test.classpath">
         <pathelement location="target/test-classes" />
+        <pathelement location="target/scala-test-classes" />
         <pathelement location="lib/junit-4.7.jar" />
         <pathelement location="lib/scala-compiler-${scala.version}.jar" />
         <path refid="enumerable.example.classpath" />
@@ -80,6 +81,12 @@
         </copy>
 
         <mkdir dir="target/test-classes" />
+        <mkdir dir="target/scala-test-classes" />
+        <scalac srcdir="src/test" destdir="target/scala-test-classes" target="jvm-1.5" encoding="UTF-8">
+            <include name="scala/**/*.scala"/>
+            <include name="java/**/*.java"/>
+            <classpath refid="enumerable.test.classpath" />
+    	</scalac>
         <javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8">
             <src path="src/test/java" />
             <classpath refid="enumerable.test.classpath" />
@@ -155,6 +162,7 @@
     <target name="test-jar" depends="build">
         <jar jarfile="target/enumerable-test-${enumerable.version}.jar" encoding="UTF-8">
             <fileset dir="target/test-classes" />
+            <fileset dir="target/scala-test-classes" />
             <fileset dir="target/example-classes">
                 <include name="**/EnumerableExample.class" />
             </fileset>

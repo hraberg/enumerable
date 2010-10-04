@@ -191,7 +191,7 @@ public class JRubyTest {
         Ruby ruby = Ruby.getGlobalRuntime();
         ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
 
-        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Long, m: Long) => { n * m }");
+        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Long, m: Long) => n * m");
         RubyProc proc = toProc(LambdaScala.toFn2(f));
 
         assertEquals(ruby.newFixnum(6), proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {

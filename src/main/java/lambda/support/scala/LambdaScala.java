@@ -42,15 +42,15 @@ public class LambdaScala {
     }
 
     public static <A1, R> Function1<A1, R> toFunction(final Fn1<A1, R> block) {
-        return LambdaScalaFactory.toFunction(block);
+        return ScalaLambdaFactory.toFunction(block);
     }
 
     public static <A1, A2, R> Function2<A1, A2, R> toFunction(final Fn2<A1, A2, R> block) {
-        return LambdaScalaFactory.toFunction(block);
+        return ScalaLambdaFactory.toFunction(block);
     }
 
     public static <A1, A2, A3, R> Function3<A1, A2, A3, R> toFunction(final Fn3<A1, A2, A3, R> block) {
-        return LambdaScalaFactory.toFunction(block);
+        return ScalaLambdaFactory.toFunction(block);
     }
 
     public static <R> Fn0<R> toFn0(final Function0<R> f) {

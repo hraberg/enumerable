@@ -145,7 +145,7 @@ public class GroovyTest {
     public void interactingWithScala() throws Exception {
         ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
 
-        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Int, m: Int) => { n * m }");
+        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Int, m: Int) => n * m");
         Closure closure = toClosure(LambdaScala.toFn2(f));
 
         groovy.put("closure", closure);

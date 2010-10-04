@@ -293,7 +293,7 @@ public class ClojureTest {
     public void interactingWithScala() throws Exception {
         ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
 
-        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Int, m: Int) => { n * m }");
+        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Int, m: Int) => n * m");
         IFn times = toIFn(LambdaScala.toFn2(f));
 
         assertEquals(6, times.invoke(2, 3));

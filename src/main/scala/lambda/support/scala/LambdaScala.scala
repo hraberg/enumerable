@@ -18,7 +18,7 @@ abstract class FunctionFn3[A1, A2, A3, R] extends Function3[A1, A2, A3, R] {
 	def apply(a1: A1, a2: A2, a3: A3):R
 }
 
-object LambdaScalaFactory {
+object ScalaLambdaFactory {
 	def toFunction[R](fn: Fn0[R]) = {
 		() => { fn.call() }
 	}
