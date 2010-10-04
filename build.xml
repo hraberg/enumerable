@@ -265,6 +265,7 @@
             <fileset dir="src/test/java" />
             <fileset dir="src/test/jruby" />
             <fileset dir="src/test/rubyspec" />
+            <fileset dir="src/test/scala" />
         </jar>
     </target>
 
