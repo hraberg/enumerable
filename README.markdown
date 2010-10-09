@@ -1,4 +1,4 @@
-# Enumerable.java
+# Enumerable.java 0.3.0
 
 Copyright 2010 Håkan Råberg - Released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
