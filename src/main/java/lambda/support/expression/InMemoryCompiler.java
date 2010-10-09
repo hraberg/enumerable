@@ -34,7 +34,7 @@ public class InMemoryCompiler {
     static JavaCompiler compiler;
 
     static boolean expressionSupportEnabled;
-
+    
     static {
         try {
             Class.forName("japa.parser.JavaParser");
@@ -62,6 +62,13 @@ public class InMemoryCompiler {
         }
     }
 
+    private boolean debugInfo = true;
+    
+    public InMemoryCompiler debugInfo(boolean debugInfo){
+        this.debugInfo = debugInfo;
+        return this;
+    }
+    
     public Class<?> compile(String className, String source) throws IOException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 
@@ -74,7 +81,12 @@ public class InMemoryCompiler {
         };
 
         JavaFileObject file = new JavaSourceFromString(className, source);
-        List<String> options = new ArrayList<String>(asList("-source", "1.5", "-target", "1.5", "-g"));
+        List<String> options = new ArrayList<String>(asList("-source", "1.5", "-target", "1.5"));
+        
+        if (debugInfo){
+            options.add("-g");
+        }
+        
         if (useECJ) {
             options.add("-warn:-raw");
             options.add("-warn:-deadCode");

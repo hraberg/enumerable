@@ -347,6 +347,7 @@ class LambdaTreeWeaver implements Opcodes {
             LocalVariableNode local = getLocalVariable(vin.var);
             if (local == null)
                 return null;
+           
 
             if (isStoreInstruction(vin) && methodLocals.containsKey(local.name))
                 methodMutableLocals.put(local.name, local);
@@ -1351,6 +1352,9 @@ class LambdaTreeWeaver implements Opcodes {
 
             void methodLocalVariable(VarInsnNode vin) {
                 LocalVariableNode local = localVariable(vin);
+                if (local == null)
+                    throw new IllegalStateException("Debug information is needed to close over local variables or parameters, please recompile with -g.");
+                
                 locals.put(local.name, local);
 
                 devDebug("  --  accessed var " + local.index + " " + local.name + " "

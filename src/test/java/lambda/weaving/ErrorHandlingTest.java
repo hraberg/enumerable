@@ -123,11 +123,31 @@ public class ErrorHandlingTest {
         assertNotNull((Class<?>) compiler.compile(className, writer.toString()));
         assertErrContains("IllegalStateException: Tried to call non static new lambda method instance at line ");
     }
+    
+    @Test
+    public void givesExceptionForMissingDebugInfo() throws Exception {
+        String className = "CloseOverParameter";
 
+        StringWriter writer = new StringWriter();
+        PrintWriter out = new PrintWriter(writer);
+        out.println("import static lambda.Lambda.*;");
+        out.println("import lambda.annotation.NewLambda;");
+        out.println("class " + className + " {");
+        out.println("  public void method(String param) {");
+        out.println("    λ(param);");
+        out.println("  }");
+        out.println("}");
+        out.close();
+
+        compiler.debugInfo(false);
+        assertNotNull((Class<?>) compiler.compile(className, writer.toString()));
+        assertErrContains("IllegalStateException: Debug information is needed to close over local variables or parameters, please recompile with -g.");
+    }
+    
     void assertErrContains(String message) {
         if (!err.toString().contains(message)) {
             restoreStdErr();
-            System.err.println(err);
+            System.err.println(err.toString());
             fail();
         }
     }
