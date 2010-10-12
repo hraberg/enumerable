@@ -4,7 +4,7 @@
 		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
 	</description>
 
-    <property name="enumerable.version" value="0.3.0" />
+    <property name="enumerable.version" value="0.3.1" />
     <property name="asm.version" value="3.3" />
     <property name="scala.version" value="2.8.0.final" />
     <property file="lambda.weaving.properties" />
@@ -25,6 +25,7 @@
         <pathelement location="lib/javaparser-1.0.8.jar" />
         <pathelement location="lib/ecj-3.5.2.jar" />
         <pathelement location="lib/scala-library-${scala.version}.jar" />
+        <pathelement location="lib/totallylazy-78.jar" />
     </path>
     <path id="enumerable.example.classpath">
         <pathelement location="target/example-classes" />
