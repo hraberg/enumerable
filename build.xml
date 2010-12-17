@@ -25,7 +25,6 @@
         <pathelement location="lib/javaparser-1.0.8.jar" />
         <pathelement location="lib/ecj-3.5.2.jar" />
         <pathelement location="lib/scala-library-${scala.version}.jar" />
-        <pathelement location="lib/totallylazy-78.jar" />
     </path>
     <path id="enumerable.example.classpath">
         <pathelement location="target/example-classes" />
