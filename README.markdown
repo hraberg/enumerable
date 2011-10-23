@@ -1,6 +1,6 @@
-# Enumerable.java 0.3.0
+# Enumerable.java 0.3.1
 
-Copyright 2010 Håkan Råberg - Released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
+Copyright 2010-2011 Håkan Råberg - Released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
 
 Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.

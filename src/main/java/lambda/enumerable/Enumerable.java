@@ -80,7 +80,7 @@ public class Enumerable {
      * Returns a new list with the results of running block once for every
      * element in collection.
      */
-    public static <E, R> EList<R> collect(Iterable<E> collection, Fn1<? super E, R> block) {
+    public static <E, R> EList<R> collect(Iterable<E> collection, Fn1<? super E, ? extends R> block) {
         return extend(collection).collect(block);
     }
 
@@ -360,7 +360,7 @@ public class Enumerable {
      * of the collection as a the initial value (and skips that element while
      * iterating).
      */
-    public static <E> E inject(Iterable<E> collection, Fn2<E, E, E> block) {
+    public static <E> E inject(Iterable<E> collection, Fn2<? super E, ? super E, ? extends E> block) {
         return extend(collection).inject(block);
     }
 
@@ -370,14 +370,14 @@ public class Enumerable {
      * set to the value returned by the block. This form lets you supply an
      * initial value for memo.
      */
-    public static <E, R> R inject(Iterable<E> collection, R initial, Fn2<R, E, R> block) {
+    public static <E, R> R inject(Iterable<E> collection, R initial, Fn2<? super R, ? super E, ? extends R> block) {
         return extend(collection).inject(initial, block);
     }
 
     /**
      * @see #collect(Iterable, Fn1)
      */
-    public static <E, R> EList<R> map(Iterable<E> collection, Fn1<? super E, R> block) {
+    public static <E, R> EList<R> map(Iterable<E> collection, Fn1<? super E, ? extends R> block) {
         return extend(collection).map(block);
     }
 
@@ -526,14 +526,14 @@ public class Enumerable {
     /**
      * @see #inject(Iterable, Fn2)
      */
-    public static <E> E reduce(Iterable<E> collection, Fn2<E, E, E> block) {
+    public static <E> E reduce(Iterable<E> collection, Fn2<? super E, ? super E, ? extends E> block) {
         return extend(collection).reduce(block);
     }
 
     /**
      * @see #inject(Iterable, Object, Fn2)
      */
-    public static <E, R> R reduce(Iterable<E> collection, R initial, Fn2<R, E, R> block) {
+    public static <E, R> R reduce(Iterable<E> collection, R initial, Fn2<? super R, ? super E, ? extends R> block) {
         return extend(collection).reduce(initial, block);
     }
 

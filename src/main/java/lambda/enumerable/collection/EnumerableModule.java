@@ -80,7 +80,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return any(Fn1.identity());
     }
 
-    public <R> EList<R> collect(Fn1<? super E, R> block) {
+    public <R> EList<R> collect(Fn1<? super E, ? extends R> block) {
         EList<R> result = new EList<R>();
         for (E each : this)
             result.add(block.call(each));
@@ -319,7 +319,7 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return false;
     }
 
-    public E inject(Fn2<E, E, E> block) {
+    public E inject(Fn2<? super E, ? super E, ? extends E> block) {
         Iterator<E> i = this.iterator();
         if (!i.hasNext())
             return null;
@@ -329,13 +329,13 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return initial;
     }
 
-    public <R> R inject(R initial, Fn2<R, E, R> block) {
+    public <R> R inject(R initial, Fn2<? super R, ? super E, ? extends R> block) {
         for (E each : this)
             initial = block.call(initial, each);
         return initial;
     }
 
-    public <R> EList<R> map(Fn1<? super E, R> block) {
+    public <R> EList<R> map(Fn1<? super E, ? extends R> block) {
         return collect(block);
     }
 
@@ -437,11 +437,11 @@ public abstract class EnumerableModule<E> implements IEnumerable<E> {
         return result;
     }
 
-    public E reduce(Fn2<E, E, E> block) {
+    public E reduce(Fn2<? super E, ? super E, ? extends E> block) {
         return inject(block);
     }
 
-    public <R> R reduce(R initial, Fn2<R, E, R> block) {
+    public <R> R reduce(R initial, Fn2<? super R, ? super E, ? extends R> block) {
         return inject(initial, block);
     }
 

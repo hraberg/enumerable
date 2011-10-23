@@ -49,7 +49,7 @@ public interface IEnumerable<E> extends Iterable<E> {
      * Returns a new list with the results of running block once for every
      * element in collection.
      */
-    <R> EList<R> collect(Fn1<? super E, R> block);
+    <R> EList<R> collect(Fn1<? super E, ? extends R> block);
 
     /**
      * Returns the count of all elements in collection.
@@ -204,7 +204,7 @@ public interface IEnumerable<E> extends Iterable<E> {
      * of the collection as a the initial value (and skips that element while
      * iterating).
      */
-    E inject(Fn2<E, E, E> block);
+     E inject(Fn2<? super E, ? super E, ? extends E> block);
 
     /**
      * Combines the elements of collection by applying the block to an
@@ -212,12 +212,12 @@ public interface IEnumerable<E> extends Iterable<E> {
      * set to the value returned by the block. This form lets you supply an
      * initial value for memo.
      */
-    <R> R inject(R initial, Fn2<R, E, R> block);
+    <R> R inject(R initial, Fn2<? super R, ? super E, ? extends R> block);
 
     /**
      * @see #collect(Fn1)
      */
-    <R> EList<R> map(Fn1<? super E, R> block);
+    <R> EList<R> map(Fn1<? super E, ? extends R> block);
 
     /**
      * Returns the object in collection with the maximum value. This form
@@ -314,12 +314,12 @@ public interface IEnumerable<E> extends Iterable<E> {
     /**
      * @see #inject(Fn2)
      */
-    E reduce(Fn2<E, E, E> block);
+    E reduce(Fn2<? super E, ? super E, ? extends E> block);
 
     /**
      * @see #inject(Object, Fn2)
      */
-    <R> R reduce(R initial, Fn2<R, E, R> block);
+    <R> R reduce(R initial, Fn2<? super R, ? super E, ? extends R> block);
 
     /**
      * Returns a list containing all elements of collection for which block is

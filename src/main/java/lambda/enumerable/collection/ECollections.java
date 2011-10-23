@@ -126,7 +126,7 @@ public class ECollections {
     }
 
     /**
-     * @see #pair(first, second)
+     * @see #pair(A first, B second)
      */
     public static <A, B> Pair<A, B> cons(A first, B second) {
         return pair(first, second);
