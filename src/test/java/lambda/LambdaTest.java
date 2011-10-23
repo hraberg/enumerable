@@ -124,6 +124,14 @@ public class LambdaTest extends TestBase {
         assertEquals(8, eight);
     }
 
+    @LambdaParameter
+    static String a1, a2;
+
+    @Test
+    public void nestedLambdasClosingOverObjectLambdaParameters() throws Exception {
+        assertEquals("helloworld", λ(a1, λ(a2, a1 + a2).call("world")).call("hello"));
+    }
+
     @Test
     public void applyWithOneArgument() throws Exception {
         Fn1<Integer, Integer> nTimesTwo = λ(n, n * 2);

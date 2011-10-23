@@ -1053,10 +1053,12 @@ class LambdaTreeWeaver implements Opcodes {
                     if (parametersMutableFromChildLambdas.contains(f.name))
                         type = toArrayType(type);
 
-                    if (parentLambda.parameters.containsKey(f.name))
+                    if (parentLambda.parameters.containsKey(f.name)) {
                         mv.visitVarInsn(type.getOpcode(ILOAD), parentLambda.getParameterRealLocalIndex(f.name));
+                        if (isReference(type))
+                            mv.visitTypeInsn(CHECKCAST, type.getInternalName());
 
-                    else {
+                    } else {
                         mv.visitVarInsn(ALOAD, 0);
                         mv.visitFieldInsn(GETFIELD, parentLambda.lambda.name, getParentParameterName(f.name), type
                                 .getDescriptor());

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import lambda.annotation.LambdaParameter;
+
 import org.junit.Test;
 
 @SuppressWarnings("serial")
@@ -341,6 +343,28 @@ public class ClosureTest extends TestBase implements Serializable {
         return "hello";
     }
 
+    @Test
+    public void callStaticMethodReturningClosure() throws Exception {
+        assertEquals("helloworld", OtherClass.helloStatic().call("world"));
+    }
+    
+    @Test
+    public void callClosureCreatedInStaticInit() throws Exception {
+        assertEquals("!", OtherClass.staticClosure.call());
+    }
+
+    public static class OtherClass {
+        @LambdaParameter
+        static String string;
+        
+        static Fn0<String> staticClosure = λ("!");
+        
+        public static Fn1<String, String> helloStatic() {
+            return λ(string, "hello" + string);
+        }
+        
+    }
+    
     @Test
     public void callInstanceMethodOnArgument() throws Exception {
         assertEquals("HELLO", λ(s, s.toUpperCase()).call(hello()));
