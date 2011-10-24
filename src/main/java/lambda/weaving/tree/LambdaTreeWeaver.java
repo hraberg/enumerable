@@ -10,7 +10,6 @@ import static org.objectweb.asm.tree.AbstractInsnNode.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,6 +56,9 @@ import org.objectweb.asm.util.ASMifierClassVisitor;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
 
 class LambdaTreeWeaver implements Opcodes {
+    static Type newLambdaAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.newlambda", NewLambda.class.getName());
+    static Type lambdaParameterAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdaparameter", LambdaParameter.class.getName());
+
     ClassNode c;
     int currentLambdaId = 1;
     List<MethodAnalyzer> methods = new ArrayList<MethodAnalyzer>();
@@ -1467,7 +1469,7 @@ class LambdaTreeWeaver implements Opcodes {
             MethodNode m = findMethod(mi);
             if (m == null)
                 return false;
-            boolean hasAnnotation = hasAnnotation(m, NewLambda.class);
+            boolean hasAnnotation = hasAnnotation(m, newLambdaAnnotation);
             if (hasAnnotation) {
                 if (hasAccess(m, ACC_STATIC))
                     return true;
@@ -1480,7 +1482,7 @@ class LambdaTreeWeaver implements Opcodes {
             FieldNode f = findField(fi);
             if (f == null)
                 return false;
-            boolean hasAnnotation = hasAnnotation(f, LambdaParameter.class);
+            boolean hasAnnotation = hasAnnotation(f, lambdaParameterAnnotation);
             if (hasAnnotation) {
                 if (hasAccess(f, ACC_STATIC))
                     return true;
@@ -1549,11 +1551,11 @@ class LambdaTreeWeaver implements Opcodes {
     }
 
     @SuppressWarnings("unchecked")
-    boolean hasAnnotation(MemberNode mn, Class<? extends Annotation> a) {
+    boolean hasAnnotation(MemberNode mn, Type a) {
         if (mn.invisibleAnnotations == null)
             return false;
         for (AnnotationNode an : (List<AnnotationNode>) mn.invisibleAnnotations)
-            if (getType(an.desc).equals(getType(a)))
+            if (getType(an.desc).equals(a))
                 return true;
         return false;
     }
@@ -1573,5 +1575,9 @@ class LambdaTreeWeaver implements Opcodes {
         PrintWriter pw = new PrintWriter(out);
         asm.print(pw);
         pw.flush();
+    }
+
+    static Type getConfigurableAnnotationType(String property, String name) {
+        return getType("L" + getProperty(property, name).replace('.', '/') + ";");
     }
 }
