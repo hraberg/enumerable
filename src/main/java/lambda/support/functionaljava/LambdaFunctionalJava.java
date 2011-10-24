@@ -8,6 +8,7 @@ import lambda.exception.LambdaWeavingNotEnabledException;
 import fj.F;
 import fj.F2;
 import fj.F3;
+import fj.P1;
 
 /**
  * This is class is similar {@link lambda.Lambda}, but instead of creating
@@ -15,6 +16,13 @@ import fj.F3;
  * the {@link F}, {@link F2} and {@link F3 }from FunctionalJava.
  */
 public class LambdaFunctionalJava {
+    @NewLambda
+    public static <A> P1<A> p1(A a) {
+        throw new LambdaWeavingNotEnabledException();
+    }
+
+    
+    
     @NewLambda
     public static <A, B> F<A, B> f(A a, B b) {
         throw new LambdaWeavingNotEnabledException();
