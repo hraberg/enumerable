@@ -298,5 +298,5 @@ JavaParser: Copyright (C) 2008 Júlio Vilmar Gesser. Released under the [LGPL](h
 
 Scala: Copyright (c) 2002-2010 EPFL, Lausanne, unless otherwise specified. Released under the [SCALA LICENSE](http://www.scala-lang.org/node/146)
 
-Copyright (c) 2008-2011, Tony Morris, Runar Bjarnason, Tom Adams, Brad Clow, Ricky Clarkson, Jason Zaugg
+Functional Java: Copyright (c) 2008-2011, Tony Morris, Runar Bjarnason, Tom Adams, Brad Clow, Ricky Clarkson, Jason Zaugg
 All rights reserved. Released under an open source [BSD license](https://github.com/functionaljava/functionaljava/blob/master/etc/LICENCE)
