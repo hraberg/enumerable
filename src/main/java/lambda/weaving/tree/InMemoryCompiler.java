@@ -1,4 +1,4 @@
-package lambda.support.expression;
+package lambda.weaving.tree;
 
 import static java.lang.System.*;
 import static java.util.Arrays.*;
@@ -30,7 +30,7 @@ import javax.tools.ToolProvider;
 import lambda.weaving.ClassInjector;
 
 public class InMemoryCompiler {
-    static boolean useECJ = Boolean.valueOf(getProperty("lambda.support.expression.useECJ"));
+    public static boolean useECJ = Boolean.valueOf(getProperty("lambda.support.expression.useECJ"));
     static JavaCompiler compiler;
 
     static boolean expressionSupportEnabled;

@@ -18,6 +18,7 @@ import lambda.Fn1;
 import lambda.Fn2;
 import lambda.Fn3;
 import lambda.annotation.LambdaLocal;
+import lambda.weaving.tree.InMemoryCompiler;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Type;

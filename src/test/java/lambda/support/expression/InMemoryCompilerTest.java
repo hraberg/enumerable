@@ -23,6 +23,8 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import lambda.weaving.tree.InMemoryCompiler;
+
 import org.junit.Test;
 
 public class InMemoryCompilerTest {
