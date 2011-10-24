@@ -20,8 +20,6 @@ public class LambdaFunctionalJava {
     public static <A> P1<A> p1(A a) {
         throw new LambdaWeavingNotEnabledException();
     }
-
-    
     
     @NewLambda
     public static <A, B> F<A, B> f(A a, B b) {
