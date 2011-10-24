@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import lambda.enumerable.Enumerable;
-
 public class Version {
     public static Properties buildProperties = new Properties();
     static {
-        ClassLoader loader = Enumerable.class.getClassLoader();
+        ClassLoader loader = Version.class.getClassLoader();
         InputStream in = loader.getResourceAsStream(Version.class.getName().toLowerCase().replace('.', '/')
                 + ".properties");
         try {
