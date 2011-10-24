@@ -191,7 +191,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Functional Java
 
-[LambdaFunctionalJava](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/functionaljava/LambdaFunctionalJava.java) allows you to create lambdas implementing [F](http://functionaljava.googlecode.com/svn/artifacts/2.22/javadoc/fj/F.html) etc. [from Functional Java](http://www.functionaljava.org/). You need `functionaljava-0.3.0.jar` on your class path. Download from [Functional Java](http://functionaljava.org/download/).
+[LambdaFunctionalJava](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/functionaljava/LambdaFunctionalJava.java) allows you to create lambdas implementing [F](http://functionaljava.googlecode.com/svn/artifacts/2.22/javadoc/fj/F.html) etc. from [Functional Java](http://www.functionaljava.org/). You need `functionaljava-0.3.0.jar` on your class path. Download from [Functional Java](http://functionaljava.org/download/).
 
 ### Expression Trees (using JavaParser)
 
