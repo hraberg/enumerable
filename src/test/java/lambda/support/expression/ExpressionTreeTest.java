@@ -12,7 +12,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import lambda.weaving.tree.InMemoryCompiler;
+import lambda.weaving.InMemoryCompiler;
 
 import org.junit.Test;
 

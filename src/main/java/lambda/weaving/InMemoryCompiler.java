@@ -1,4 +1,4 @@
-package lambda.weaving.tree;
+package lambda.weaving;
 
 import static java.lang.System.*;
 import static java.util.Arrays.*;
@@ -27,7 +27,6 @@ import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-import lambda.weaving.ClassInjector;
 
 public class InMemoryCompiler {
     public static boolean useECJ = Boolean.valueOf(getProperty("lambda.support.expression.useECJ"));

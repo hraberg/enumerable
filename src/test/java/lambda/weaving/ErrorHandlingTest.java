@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 
-import lambda.weaving.tree.InMemoryCompiler;
 
 import org.junit.After;
 import org.junit.Before;

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lambda.weaving.ClassInjector;
+import lambda.weaving.InMemoryCompiler;
 import lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 
 import org.objectweb.asm.ClassReader;
