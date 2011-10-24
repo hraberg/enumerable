@@ -189,6 +189,10 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 [LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Guava (a superset of Google Collections)](http://code.google.com/p/guava-libraries/). You need `guava-r07.jar` on your class path. Download from [Guava](http://code.google.com/p/guava-libraries/downloads/list).
 
+### Functional Java
+
+[LambdaFunctionalJava](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/functionaljava/LambdaFunctionalJava.java) allows you to create lambdas implementing [F](http://functionaljava.googlecode.com/svn/artifacts/2.22/javadoc/fj/F.html) etc. You need `functionaljava-0.3.0.jar` on your class path. Download from [Functional Java](http://functionaljava.org/download/).
+
 ### Expression Trees (using JavaParser)
 
 [LambdaExpressionTrees](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/expression/LambdaExpressionTrees.java) is a facade for a simple decompiler that turns lambdas into Expression Trees represented by [JavaParser's](http://code.google.com/p/javaparser/) [AST](http://code.google.com/p/javaparser/source/browse/#svn/trunk/JavaParser/src/japa/parser/ast/expr). You need `javaparser-1.0.8.jar` on your class path. Download from [javaparser](http://code.google.com/p/javaparser/).
