@@ -1,10 +1,13 @@
-package lambda.functionaljava;
+package lambda.support.functionaljava;
 
 import static fj.data.Array.*;
 import static fj.data.List.*;
+import static junit.framework.Assert.*;
 import static lambda.support.functionaljava.LambdaFunctionalJava.*;
 import lambda.annotation.LambdaParameter;
-import lambda.weaving.LambdaLoader;
+
+import org.junit.Test;
+
 import fj.data.Array;
 
 public final class Array_exists {
@@ -13,12 +16,12 @@ public final class Array_exists {
     @LambdaParameter
     static Character ch;
 
-    public static void main(final String[] args) {
-        LambdaLoader.bootstrapMainIfNotEnabledAndExitUponItsReturn(args);
-
+    @Test
+    public void test() {
         final Array<String> a = array("Hello", "There", "what", "DAY", "iS", "iT");
         final boolean b = a.exists(λ(s, fromString(s).forall(λ(ch, Character.isLowerCase(ch)))));
-        System.out.println(b); // true ("what" provides the only example; try
+        
+        assertTrue(b); // true ("what" provides the only example; try
                                // removing it)
     }
 }

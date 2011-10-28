@@ -1,20 +1,22 @@
-package lambda.functionaljava;
+package lambda.support.functionaljava;
 
 import static fj.Show.*;
 import static fj.data.Option.*;
-import static lambda.functionaljava.Array_bind.*;
+import static lambda.support.functionaljava.Array_bind.*;
 import static lambda.support.functionaljava.LambdaFunctionalJava.*;
+import static org.junit.Assert.*;
 import lambda.annotation.LambdaParameter;
-import lambda.weaving.LambdaLoader;
+
+import org.junit.Test;
+
 import fj.data.Option;
 
 public final class Option_filter {
     @LambdaParameter
     static Integer i;
 
-    public static void main(final String[] args) {
-        LambdaLoader.bootstrapMainIfNotEnabledAndExitUponItsReturn(args);
-
+    @Test
+    public void test() {
         final Option<Integer> o1 = some(7);
         final Option<Integer> o2 = none();
         final Option<Integer> o3 = some(8);
@@ -23,8 +25,8 @@ public final class Option_filter {
         final Option<Integer> p2 = o2.filter(λ(i, i % 2 == 0));
         final Option<Integer> p3 = o3.filter(λ(i, i % 2 == 0));
 
-        optionShow(intShow()).println(p1); // None
-        optionShow(intShow()).println(p2); // None
-        optionShow(intShow()).println(p3); // Some(8)
+        assertEquals("None", optionShow(intShow()).showS(p1)); // None
+        assertEquals("None", optionShow(intShow()).showS(p2)); // None
+        assertEquals("Some(8)", optionShow(intShow()).showS(p3)); // Some(8)
     }
 }

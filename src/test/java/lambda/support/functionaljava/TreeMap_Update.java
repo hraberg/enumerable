@@ -1,10 +1,13 @@
-package lambda.functionaljava;
+package lambda.support.functionaljava;
 
 import static fj.Ord.*;
 import static fj.data.TreeMap.*;
 import static lambda.support.functionaljava.LambdaFunctionalJava.*;
+import static org.junit.Assert.*;
 import lambda.annotation.LambdaParameter;
-import lambda.weaving.LambdaLoader;
+
+import org.junit.Test;
+
 import fj.Ord;
 import fj.Ordering;
 import fj.data.TreeMap;
@@ -19,13 +22,12 @@ public class TreeMap_Update {
     @LambdaParameter
     static String a1, a2;
 
-    public static void main(final String[] args) {
-        LambdaLoader.bootstrapMainIfNotEnabledAndExitUponItsReturn(args);
-
+    @Test
+    public void test() {
         TreeMap<String, Integer> map = empty(stringOrd());
         map = map.set("foo", 2);
         map = map.update("foo", λ(i, i + 3))._2();
-        System.out.println(map.get("foo").some()); // 5
+        assertEquals(5, (int) (map.get("foo").some())); // 5
     }
 
     public static Ord<String> stringOrd() {

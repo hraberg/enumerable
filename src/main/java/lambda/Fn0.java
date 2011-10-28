@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -182,6 +184,14 @@ public abstract class Fn0<R> implements Serializable {
             }
             return null;
         }
+
+        public List<LambdaLocal> locals() {
+            List<LambdaLocal> result = new ArrayList<LambdaLocal>();
+            for (Field field : Fn0.this.getClass().getDeclaredFields())
+                if (field.isAnnotationPresent(LambdaLocal.class))
+                    result.add(field.getAnnotation(LambdaLocal.class));
+            return result;
+        }
     }
 
     /**
@@ -262,5 +272,21 @@ public abstract class Fn0<R> implements Serializable {
      */
     public <B> boolean or(Fn0<B> block) {
         return isNotFalseOrNull(call()) || isNotFalseOrNull(block.call());
+    }
+
+    public static Method getLambdaMethod(Class<?> aClass) {
+        Method[] methods = aClass.getDeclaredMethods();
+        if (methods.length != 1)
+            throw new IllegalArgumentException(aClass.getName() + " has more than one declared method");
+        return methods[0];
+    }
+
+    public LambdaLocal[] getParameters() {
+        Method lambdaMethod = Fn0.getLambdaMethod(getClass());
+    
+        LambdaLocal[] parameters = new LambdaLocal[lambdaMethod.getParameterTypes().length];
+        for (int i = 0; i < parameters.length; i++)
+            parameters[i] = ((LambdaLocal) lambdaMethod.getParameterAnnotations()[i][0]);
+        return parameters;
     }
 }

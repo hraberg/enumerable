@@ -106,14 +106,14 @@
 	</target>
 
 	<target name="agent-jar-uptodate">
-		<uptodate property="jarjar.notRequired" targetfile="target/enumerable-agent-${enumerable.version}.jar">
+		<uptodate property="jarjar.notRequired" targetfile="target/enumerable-java-${enumerable.version}.jar">
 			<srcfiles dir="src/main/java" includes="**/*" />
 			<srcfiles dir="src/main/scala" includes="**/*" />
 		</uptodate>
 	</target>
 
 	<target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
-		<jarjar jarfile="target/enumerable-agent-${enumerable.version}.jar">
+		<jarjar jarfile="target/enumerable-java-${enumerable.version}.jar">
 			<fileset dir="target/classes" />
 			<zipfileset src="lib/asm-all-${asm.version}.jar" />
 			<rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
@@ -123,13 +123,13 @@
 				<attribute name="Can-Retransform-Classes" value="true" />
 			</manifest>
 		</jarjar>
-		<jar jarfile="target/enumerable-agent-${enumerable.version}.jar" update="true" encoding="UTF-8">
+		<jar jarfile="target/enumerable-java-${enumerable.version}.jar" update="true" encoding="UTF-8">
 			<fileset dir="target/scala-classes" />
 		</jar>
 	</target>
 
 	<target name="agent-jar-slim" unless="jarjar.notRequired" depends="agent-jar">
-		<jarjar jarfile="target/enumerable-agent-slim-${enumerable.version}.jar">
+		<jarjar jarfile="target/enumerable-java-slim-${enumerable.version}.jar">
 			<fileset dir="target/classes">
 				<exclude name="lambda/*.class" />
 				<exclude name="lambda/support/**/*.class" />
@@ -144,7 +144,7 @@
 				<attribute name="Can-Retransform-Classes" value="true" />
 			</manifest>
 		</jarjar>
-		<jar jarfile="target/enumerable-agent-slim-${enumerable.version}.jar" update="true" encoding="UTF-8">
+		<jar jarfile="target/enumerable-java-slim-${enumerable.version}.jar" update="true" encoding="UTF-8">
 			<fileset dir="target/scala-classes" />
 		</jar>
 	</target>
@@ -153,7 +153,7 @@
 	<target name="tests" depends="agent-jar">
 		<mkdir dir="target/junit" />
 		<junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
-			<jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
+			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
 			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
 			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
@@ -162,6 +162,7 @@
 			<batchtest todir="target/junit">
 				<fileset dir="src/test/java">
 					<include name="**/*Test.java" />
+					<include name="**/functionaljava/*_*.java" />
 					<exclude name="**/CoreEnumerableRubySpecSuiteTest.java" />
 				</fileset>
 			</batchtest>
@@ -183,7 +184,7 @@
 	</target>
 
 	<target name="test-jar" depends="build">
-		<jar jarfile="target/enumerable-test-${enumerable.version}.jar" encoding="UTF-8">
+		<jar jarfile="target/enumerable-java-${enumerable.version}-test.jar" encoding="UTF-8">
 			<fileset dir="target/test-classes" />
 			<fileset dir="target/scala-test-classes" />
 			<fileset dir="target/example-classes">
@@ -194,7 +195,7 @@
 
 	<target name="aot-compile-tests" depends="test-jar">
 		<java fork="yes" classname="lambda.weaving.LambdaCompiler" failonerror="yes">
-			<arg value="target/enumerable-test-${enumerable.version}.jar" />
+			<arg value="target/enumerable-java-${enumerable.version}-test.jar" />
 			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
 			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
@@ -211,12 +212,13 @@
 			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
 			<sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
 			<classpath refid="enumerable.classpath" />
-			<classpath location="target/enumerable-test-${enumerable.version}.jar" />
+			<classpath location="target/enumerable-java-${enumerable.version}-test.jar" />
 			<classpath location="lib/junit-4.7.jar" />
 			<classpath location="lib/scala-compiler-${scala.version}.jar" />
 			<batchtest todir="target/junit-aot">
 				<fileset dir="src/test/java">
 					<include name="**/*Test.java" />
+					<include name="**/functionaljava/*_*.java" />
 					<exclude name="**/weaving/**/*Test.java" />
 					<exclude name="**/CoreEnumerableRubySpecSuiteTest.java" />
 				</fileset>
@@ -231,7 +233,7 @@
 
 	<target name="example-with-agent" depends="agent-jar">
 		<java fork="yes" classname="lambda.enumerable.EnumerableExample" failonerror="yes">
-			<jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
+			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
 			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
 			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
@@ -242,7 +244,7 @@
 
 	<target name="example-with-verifier" depends="agent-jar">
 		<java fork="yes" classname="lambda.enumerable.EnumerableExample" failonerror="yes">
-			<jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
+			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
 			<sysproperty key="lambda.weaving.debug" value="true" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
 			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
@@ -267,7 +269,7 @@
 
 	<target name="microbench" depends="agent-jar">
 		<java fork="yes" classname="lambda.MicroBench" failonerror="yes">
-			<jvmarg value="-javaagent:target/enumerable-agent-${enumerable.version}.jar" />
+			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
 			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
 			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
@@ -277,14 +279,14 @@
 	</target>
 
 	<target name="source-jar">
-		<jar jarfile="target/enumerable-sources-${enumerable.version}.jar" encoding="UTF-8">
+		<jar jarfile="target/enumerable-java-${enumerable.version}-sources.jar" encoding="UTF-8">
 			<fileset dir="src/main/java" />
 			<fileset dir="src/main/scala" />
 		</jar>
 	</target>
 
 	<target name="test-source-jar">
-		<jar jarfile="target/enumerable-test-sources-${enumerable.version}.jar" encoding="UTF-8">
+		<jar jarfile="target/enumerable-java-${enumerable.version}-test-sources.jar" encoding="UTF-8">
 			<fileset dir="src/test/java" />
 			<fileset dir="src/test/jruby" />
 			<fileset dir="src/test/rubyspec" />
@@ -293,7 +295,7 @@
 	</target>
 
 	<target name="javadoc-jar" depends="javadoc">
-		<jar jarfile="target/enumerable-javadoc-${enumerable.version}.jar" encoding="UTF-8">
+		<jar jarfile="target/enumerable-java-${enumerable.version}-javadoc.jar" encoding="UTF-8">
 			<fileset dir="target/apidocs" />
 		</jar>
 	</target>

@@ -15,4 +15,6 @@ public @interface LambdaLocal {
     boolean isReadOnly();
 
     String name();
+
+    String parameterClass();
 }

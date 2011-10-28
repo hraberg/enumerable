@@ -52,7 +52,7 @@ Block parameters are defined using annotated static fields. For more examples se
 
 Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (lambda.asm).
 
-    java -javaagent:enumerable-agent-<version>.jar [...]
+    java -javaagent:enumerable-java-<version>.jar [...]
 
 
 Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/weaving/LambdaLoader.java) if you have different class loading needs.
@@ -71,13 +71,13 @@ To avoid the use of the agent, or any other non standard class loading, you can 
 
     java -cp <project class path> lambda.weaving.LambdaCompiler project.jar
 
-The jar will be compiled and rebuilt in place. The runtime dependency on `enumerable-agent-<version>.jar` as a library remains after AOT compilation.
+The jar will be compiled and rebuilt in place. The runtime dependency on `enumerable-java-<version>.jar` as a library remains after AOT compilation.
 
 See the targets `aot-compile-tests` and `aot-tests` in [build.xml](http://github.com/hraberg/enumerable/blob/master/build.xml) for an example.
 
 ### Binary Distribution
 
-`enumerable-agent-<version>.jar` is both the actual library, and the java agent enabling load time weaving of lambdas.
+`enumerable-java-<version>.jar` is both the actual library, and the java agent enabling load time weaving of lambdas.
 
 The binary distribution, when downloaded as a .tgz archive, or built using `ant dist`, doubles as an example project which can be directly imported into Eclipse.
 Open *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder, which includes targets for AOT compilation.

@@ -48,16 +48,9 @@ public class LambdaExpressionTrees {
     }
 
     static Expression parseExpressionFromSingleMethodClass(Class<?> aClass, String... parameters) {
-        return parseExpressionFromMethod(getLambdaMethod(aClass), parameters);
+        return parseExpressionFromMethod(Fn0.getLambdaMethod(aClass), parameters);
     }
-
-    private static Method getLambdaMethod(Class<?> aClass) {
-        Method[] methods = aClass.getDeclaredMethods();
-        if (methods.length != 1)
-            throw new IllegalArgumentException(aClass.getName() + " has more than one declared method");
-        return methods[0];
-    }
-
+ 
     public static Expression parseExpressionFromMethod(Method method, String... parameters) {
         try {
             MethodNode mn = findMethodNode(method);
@@ -130,13 +123,12 @@ public class LambdaExpressionTrees {
         if (fn.getClass().getDeclaredFields().length > 0)
             throw new IllegalArgumentException("Turning Closures into Expressions isn't supported");
 
-        Method lambdaMethod = getLambdaMethod(fn.getClass());
-
-        String[] parameters = new String[lambdaMethod.getParameterTypes().length];
+        LambdaLocal[] parameters = fn.getParameters();
+        String[] parameterNames = new String[parameters.length];
         for (int i = 0; i < parameters.length; i++)
-            parameters[i] = ((LambdaLocal) lambdaMethod.getParameterAnnotations()[i][0]).name();
+            parameterNames[i] = parameters[i].name();
 
-        return (R) parseExpressionFromSingleMethodClass(fn.getClass(), parameters);
+        return (R) parseExpressionFromSingleMethodClass(fn.getClass(), parameterNames);
     }
 
     public static <R> Fn0<R> toFn0(Class<R> returnType, Expression expression) {

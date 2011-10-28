@@ -1,10 +1,13 @@
-package lambda.functionaljava;
+package lambda.support.functionaljava;
 
 import static fj.data.Array.*;
 import static fj.data.List.*;
 import static lambda.support.functionaljava.LambdaFunctionalJava.*;
+import static org.junit.Assert.*;
 import lambda.annotation.LambdaParameter;
-import lambda.weaving.LambdaLoader;
+
+import org.junit.Test;
+
 import fj.data.Array;
 
 public final class Array_forall {
@@ -13,12 +16,11 @@ public final class Array_forall {
     @LambdaParameter
     static Character ch;
 
-    public static void main(final String[] args) {
-        LambdaLoader.bootstrapMainIfNotEnabledAndExitUponItsReturn(args);
-
+    @Test
+    public void test() {
         final Array<String> a = array("hello", "There", "what", "day", "is", "it");
         final boolean b = a.forall(λ(s, fromString(s).forall(λ(ch, Character.isLowerCase(ch)))));
-        System.out.println(b); // false ("There" is a counter-example; try
+        assertFalse(b); // false ("There" is a counter-example; try
                                // removing it)
     }
 }

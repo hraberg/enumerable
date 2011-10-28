@@ -100,6 +100,7 @@ public class EnumerableCollectionsTest extends TestBase {
         assertEquals(2, collection.size());
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void sortByExpensiveBlock() throws Exception {
         File windows = new File("C:\\Windows");

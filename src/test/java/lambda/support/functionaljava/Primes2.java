@@ -1,4 +1,4 @@
-package lambda.functionaljava;
+package lambda.support.functionaljava;
 
 import static fj.Ord.*;
 import static fj.P.*;
@@ -7,11 +7,14 @@ import static fj.data.Enumerator.*;
 import static fj.data.Natural.*;
 import static fj.data.Stream.*;
 import static lambda.support.functionaljava.LambdaFunctionalJava.*;
+import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 
 import lambda.annotation.LambdaParameter;
-import lambda.weaving.LambdaLoader;
+
+import org.junit.Test;
+
 import fj.Show;
 import fj.data.Natural;
 import fj.data.Stream;
@@ -37,13 +40,12 @@ public class Primes2 {
         return sieve(forever(naturalEnumerator, natural(2).some())).takeWhile(naturalOrd.isLessThan(n));
     }
 
-    public static void main(final String[] args) {
-        LambdaLoader.bootstrapMainIfNotEnabledAndExitUponItsReturn(args);
-
-        final Natural n = natural(new BigInteger(args.length == 0 ? "100" : args[0])).some();
+    @Test
+    public void test() {
+        final Natural n = natural(new BigInteger("42")).some();
         final Show<Stream<Natural>> s = streamShow(naturalShow());
 
-        s.println(primes(n));
+        assertEquals("<2,3,5,7,11,13,17,19,23,29,31,37,41>", s.showS(primes(n)));
     }
 
     public static Show<Natural> naturalShow() {

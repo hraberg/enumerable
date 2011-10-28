@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="example/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="enumerable-agent-@enumerable.version@.jar" sourcepath="enumerable-sources-@enumerable.version@.jar">
+	<classpathentry kind="lib" path="enumerable-java-@enumerable.version@.jar" sourcepath="enumerable-@enumerable.version@-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location"  value="jar:platform:/resource/enumerable-java-example/enumerable-javadoc-@enumerable.version@.jar!/"/>
+			<attribute name="javadoc_location"  value="jar:platform:/resource/enumerable-java-example/enumerable-@enumerable.version@-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="example/target/classes"/>

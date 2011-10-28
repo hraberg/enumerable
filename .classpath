@@ -5,6 +5,9 @@
 	<classpathentry kind="src" output="target/example-classes" path="src/example/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/jruby"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/rubyspec"/>
+	<classpathentry kind="src" output="target/scala-classes" path="src/main/scala"/>
+	<classpathentry kind="src" output="target/scala-test-classes" path="src/test/scala"/>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/junit-4.7.jar" sourcepath="lib/src/junit-4.7-sources.jar"/>
 	<classpathentry kind="lib" path="lib/extra166y.jar" sourcepath="lib/src/extra166y.zip"/>
@@ -19,8 +22,6 @@
 	<classpathentry kind="lib" path="lib/ecj-3.5.2.jar" sourcepath="lib/src/ecjsrc-3.5.2.zip"/>
 	<classpathentry kind="lib" path="lib/scala-compiler-2.8.0.final.jar"/>
 	<classpathentry kind="lib" path="lib/scala-library-2.8.0.final.jar"/>
-	<classpathentry kind="lib" path="target/scala-classes"/>
-	<classpathentry kind="lib" path="target/scala-test-classes"/>
 	<classpathentry kind="lib" path="lib/functionaljava-3.0.jar" sourcepath="lib/src/functionaljava-3.0-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

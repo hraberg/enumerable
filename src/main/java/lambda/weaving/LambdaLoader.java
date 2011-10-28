@@ -22,8 +22,8 @@ import lambda.weaving.tree.LambdaTreeTransformer;
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     private static boolean isEnabled;
     private static boolean transformationFailed;
-    static String weavingNotEnabledMessage = "Please start the JVM with -javaagent:enumerable-"
-            + Version.getVersion() + "-agent.jar";;
+    static String weavingNotEnabledMessage = "Please start the JVM with -javaagent:enumerable-java-"
+            + Version.getVersion() + ".jar";;
     private ClassFilter filter;
 
     static {

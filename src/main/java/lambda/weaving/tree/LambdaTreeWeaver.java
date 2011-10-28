@@ -504,6 +504,7 @@ class LambdaTreeWeaver implements Opcodes {
             Set<String> parametersWithDefaultValue = new HashSet<String>();
             Set<String> parametersMutableFromChildLambdas = new HashSet<String>();
             Map<String, FieldNode> parameters = new LinkedHashMap<String, FieldNode>();
+            Map<String, String> parameterOwners = new LinkedHashMap<String, String>();
             Map<String, FieldNode> parentParameters = new LinkedHashMap<String, FieldNode>();
 
             Map<String, LocalVariableNode> locals = new LinkedHashMap<String, LocalVariableNode>();
@@ -879,6 +880,7 @@ class LambdaTreeWeaver implements Opcodes {
                     AnnotationVisitor annotation = saMn.visitParameterAnnotation(i++, getType(LambdaLocal.class)
                             .getDescriptor(), true);
                     annotation.visit("name", parameter);
+                    annotation.visit("parameterClass", getObjectType(parameterOwners.get(parameter)).getClassName());
                     annotation.visitEnd();
                 }
             }
@@ -1319,6 +1321,7 @@ class LambdaTreeWeaver implements Opcodes {
                     Type argumentType = getType(fin.desc);
 
                     parameters.put(f.name, f);
+                    parameterOwners.put(f.name, fin.owner);
                     boolean hasDefaultValue = fin.getOpcode() == PUTSTATIC;
                     if (hasDefaultValue)
                         parametersWithDefaultValue.add(f.name);

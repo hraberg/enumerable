@@ -553,6 +553,7 @@ public class LambdaTest extends TestBase {
 
         LambdaLocal annotation = (LambdaLocal) fn1Call.getParameterAnnotations()[0][0];
         assertEquals("n", annotation.name());
+        assertEquals(Parameters.class.getName(), annotation.parameterClass());
 
         Class<?> addToIClass = addToI.getClass();
         assertTrue(addToIClass.isSynthetic());
