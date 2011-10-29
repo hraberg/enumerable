@@ -1,9 +1,9 @@
 require 'java'
 
-import 'lambda.Fn1'
-import 'lambda.enumerable.collection.EnumerableModule'
-import 'lambda.enumerable.jruby.JRubyTestBase'
-import 'lambda.support.jruby.LambdaJRuby'
+import 'org.enumerable.lambda.Fn1'
+import 'org.enumerable.lambda.enumerable.collection.EnumerableModule'
+import 'org.enumerable.lambda.enumerable.jruby.JRubyTestBase'
+import 'org.enumerable.lambda.support.jruby.LambdaJRuby'
 
 # Redefines Enumerable in JRuby to use Enumerable.java.
 # It 'almost' works as long as there's not too much duck typing going on.
@@ -84,9 +84,9 @@ module Enumerable
       h = {}
       h.put_all o
       h.each {|kv| h[kv[0]] = unnest_java_collections kv[1]}
-    elsif o == Java::LambdaEnumerableCollection::EList
+    elsif o == Java::OrgEnumerableLambdaEnumerableCollection::EList
       Array
-    elsif o == Java::LambdaEnumerableCollection::EMap
+    elsif o == Java::OrgEnumerableLambdaEnumerableCollection::EMap
       Hash
     else
       o
@@ -133,7 +133,7 @@ module EnumerableJava
     if LambdaJRuby.respond_to? to_fnx
       LambdaJRuby.send to_fnx, proc
     else
-      raise ArgumentError, "Cannot convert #{proc} into a lambda.Fn0", caller
+      raise ArgumentError, "Cannot convert #{proc} into a org.enumerable.lambda.Fn0", caller
     end
   end
 end

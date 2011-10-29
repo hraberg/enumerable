@@ -98,7 +98,7 @@
 		</copy>
 
 		<property name="enumerable.git.commit" value="&lt;git commit info not available&gt;" />
-		<echo file="target/classes/lambda/weaving/version.properties">
+		<echo file="target/classes/org/enumerable/lambda/weaving/version.properties">
         	enumerable.version=${enumerable.version}
         	enumerable.build.date=${DSTAMP}
         	enumerable.git.commit=${enumerable.git.commit}
@@ -116,10 +116,10 @@
 		<jarjar jarfile="target/enumerable-java-${enumerable.version}.jar">
 			<fileset dir="target/classes" />
 			<zipfileset src="lib/asm-all-${asm.version}.jar" />
-			<rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
+			<rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.asm.@1" />
 			<manifest>
-				<attribute name="Main-Class" value="lambda.weaving.LambdaLoader" />
-				<attribute name="Premain-Class" value="lambda.weaving.LambdaLoader" />
+				<attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
+				<attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
 				<attribute name="Can-Retransform-Classes" value="true" />
 			</manifest>
 		</jarjar>
@@ -131,16 +131,16 @@
 	<target name="agent-jar-slim" unless="jarjar.notRequired" depends="agent-jar">
 		<jarjar jarfile="target/enumerable-java-slim-${enumerable.version}.jar">
 			<fileset dir="target/classes">
-				<exclude name="lambda/*.class" />
-				<exclude name="lambda/support/**/*.class" />
-				<exclude name="lambda/enumerable/**/*.class" />
-				<exclude name="lambda/primitives/**/*.class" />
+				<exclude name="org.enumerable.lambda/*.class" />
+				<exclude name="org.enumerable.lambda/support/**/*.class" />
+				<exclude name="org.enumerable.lambda/enumerable/**/*.class" />
+				<exclude name="org.enumerable.lambda/primitives/**/*.class" />
 			</fileset>
 			<zipfileset src="lib/asm-all-${asm.version}.jar" />
-			<rule pattern="org.objectweb.asm.**" result="lambda.asm.@1" />
+			<rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.asm.@1" />
 			<manifest>
-				<attribute name="Main-Class" value="lambda.weaving.LambdaLoader" />
-				<attribute name="Premain-Class" value="lambda.weaving.LambdaLoader" />
+				<attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
+				<attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
 				<attribute name="Can-Retransform-Classes" value="true" />
 			</manifest>
 		</jarjar>
@@ -176,7 +176,7 @@
 		<mkdir dir="target/rubyspec" />
 		<junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="specs.failed">
 			<classpath refid="enumerable.test.classpath" />
-			<test name="lambda.enumerable.jruby.CoreEnumerableRubySpecSuiteTest" todir="target/rubyspec" />
+			<test name="org.enumerable.lambda.enumerable.jruby.CoreEnumerableRubySpecSuiteTest" todir="target/rubyspec" />
 			<formatter type="xml" />
 			<formatter type="plain" />
 		</junit>
@@ -194,7 +194,7 @@
 	</target>
 
 	<target name="aot-compile-tests" depends="test-jar">
-		<java fork="yes" classname="lambda.weaving.LambdaCompiler" failonerror="yes">
+		<java fork="yes" classname="org.enumerable.lambda.weaving.LambdaCompiler" failonerror="yes">
 			<arg value="target/enumerable-java-${enumerable.version}-test.jar" />
 			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
@@ -232,7 +232,7 @@
 	<target name="example" depends="example-with-agent" />
 
 	<target name="example-with-agent" depends="agent-jar">
-		<java fork="yes" classname="lambda.enumerable.EnumerableExample" failonerror="yes">
+		<java fork="yes" classname="org.enumerable.lambda.enumerable.EnumerableExample" failonerror="yes">
 			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
 			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
@@ -243,7 +243,7 @@
 	</target>
 
 	<target name="example-with-verifier" depends="agent-jar">
-		<java fork="yes" classname="lambda.enumerable.EnumerableExample" failonerror="yes">
+		<java fork="yes" classname="org.enumerable.lambda.enumerable.EnumerableExample" failonerror="yes">
 			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
 			<sysproperty key="lambda.weaving.debug" value="true" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
@@ -257,8 +257,8 @@
 	</target>
 
 	<target name="example-with-loader" depends="agent-jar">
-		<java fork="yes" classname="lambda.weaving.LambdaLoader" failonerror="yes">
-			<arg value="lambda.enumerable.EnumerableExample" />
+		<java fork="yes" classname="org.enumerable.lambda.weaving.LambdaLoader" failonerror="yes">
+			<arg value="org.enumerable.lambda.enumerable.EnumerableExample" />
 			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
 			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
@@ -268,7 +268,7 @@
 	</target>
 
 	<target name="microbench" depends="agent-jar">
-		<java fork="yes" classname="lambda.MicroBench" failonerror="yes">
+		<java fork="yes" classname="org.enumerable.lambda.MicroBench" failonerror="yes">
 			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
 			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
 			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />

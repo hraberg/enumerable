@@ -20,7 +20,7 @@
     </target>
     
     <target name="aot-compile" depends="build">
-        <java fork="yes" classname="lambda.weaving.LambdaCompiler" failonerror="yes">
+        <java fork="yes" classname="org.enumerable.lambda.weaving.LambdaCompiler" failonerror="yes">
             <arg value="target/classes" />
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
@@ -32,7 +32,7 @@
     </target>
     
     <target name="aot-example" depends="aot-compile">
-        <java fork="yes" classname="lambda.enumerable.EnumerableExample" failonerror="yes">
+        <java fork="yes" classname="org.enumerable.lambda.enumerable.EnumerableExample" failonerror="yes">
             <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
             <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
             <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
@@ -43,11 +43,11 @@
     </target>
 
     <target name="example" depends="build">
-        <enumerable-java classname="lambda.enumerable.EnumerableExample" />
+        <enumerable-java classname="org.enumerable.lambda.enumerable.EnumerableExample" />
     </target>
 
     <target name="microbench" depends="build">
-        <enumerable-java classname="lambda.MicroBench" />
+        <enumerable-java classname="org.enumerable.lambda.MicroBench" />
     </target>
 
     <macrodef name="enumerable-java">

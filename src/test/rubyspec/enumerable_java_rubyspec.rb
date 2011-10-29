@@ -2,13 +2,13 @@ require 'java'
 
 import 'java.lang.Iterable'
 
-import 'lambda.Fn1'
-import 'lambda.enumerable.collection.EnumerableModule'
-import 'lambda.enumerable.collection.EIterable'
-import 'lambda.enumerable.collection.EList'
-import 'lambda.enumerable.collection.EMap'
-import 'lambda.enumerable.jruby.JRubyTestBase'
-import 'lambda.enumerable.jruby.QueueIterator'
+import 'org.enumerable.lambda.Fn1'
+import 'org.enumerable.lambda.enumerable.collection.EnumerableModule'
+import 'org.enumerable.lambda.enumerable.collection.EIterable'
+import 'org.enumerable.lambda.enumerable.collection.EList'
+import 'org.enumerable.lambda.enumerable.collection.EMap'
+import 'org.enumerable.lambda.enumerable.jruby.JRubyTestBase'
+import 'org.enumerable.lambda.enumerable.jruby.QueueIterator'
 
 # Redefines Enumerable in JRuby to use Enumerable.java for running with RubySpec.
 #
