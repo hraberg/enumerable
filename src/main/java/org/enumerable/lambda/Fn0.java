@@ -94,8 +94,8 @@ public abstract class Fn0<R> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public <I> I as(Class<I> anInterface) {
-        return (I) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { anInterface },
-                new ApplyMethodInvocationHandler(".*", new Class[0]));
+        return (I) Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[] { anInterface },
+                new ApplyMethodInvocationHandler(".*", new Class<?>[0]));
     }
 
     /**
@@ -105,7 +105,7 @@ public abstract class Fn0<R> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public <I> I as(Class<I> anInterface, String regex, Class<?>... parameterTypes) {
-        return (I) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { anInterface },
+        return (I) Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[] { anInterface },
                 new ApplyMethodInvocationHandler(regex, parameterTypes));
     }
 

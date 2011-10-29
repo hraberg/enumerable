@@ -432,7 +432,7 @@ public class EnumerableInts {
         }
 
         public int compare(int a, int b) {
-            return (int) block.call(a, b);
+            return block.call(a, b);
         }
     }
 

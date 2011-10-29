@@ -550,7 +550,7 @@ public class ExpressionTreeTest {
     Expression parseViaASM(String expression, Class<?> returnValue, Param... parameters) throws Exception {
         Class<?> c = compileExpression(expression, returnValue, parameters);
 
-        Class<?>[] parameterTypes = new Class[parameters.length];
+        Class<?>[] parameterTypes = new Class<?>[parameters.length];
         String[] parameterNames = new String[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
             parameterNames[i] = parameters[i].name;

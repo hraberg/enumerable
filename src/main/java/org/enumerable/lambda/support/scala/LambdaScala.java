@@ -40,11 +40,7 @@ public class LambdaScala {
     }
 
     public static <R> Function0<R> toFunction(final Fn0<R> block) {
-        return new FunctionFn0<R>() {
-            public R apply() {
-                return block.call();
-            }
-        };
+        return ScalaLambdaFactory.toFunction(block);
     }
 
     public static <A1, R> Function1<A1, R> toFunction(final Fn1<A1, R> block) {

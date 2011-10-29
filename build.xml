@@ -12,7 +12,6 @@
 
 	<path id="enumerable.classpath">
 		<pathelement location="target/classes" />
-		<pathelement location="target/scala-classes" />
 		<pathelement location="lib/asm-all-${asm.version}.jar" />
 		<pathelement location="lib/jsr166y.jar" />
 		<pathelement location="lib/extra166y.jar" />
@@ -33,7 +32,6 @@
 	</path>
 	<path id="enumerable.test.classpath">
 		<pathelement location="target/test-classes" />
-		<pathelement location="target/scala-test-classes" />
 		<pathelement location="lib/junit-4.7.jar" />
 		<pathelement location="lib/scala-compiler-${scala.version}.jar" />
 		<path refid="enumerable.example.classpath" />
@@ -65,18 +63,19 @@
 
 	<target name="build" depends="read-git-commit">
 		<mkdir dir="target/classes" />
-		<mkdir dir="target/scala-classes" />
-		<scalac srcdir="src/main" destdir="target/scala-classes" target="jvm-1.5" encoding="UTF-8">
+		<scalac srcdir="src/main" destdir="target/classes" target="jvm-1.5" encoding="UTF-8">
 			<include name="scala/**/*.scala" />
 			<include name="java/**/*.java" />
 			<classpath refid="enumerable.classpath" />
 		</scalac>
-		<javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
+		<javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
+			<compilerarg value="-Xlint:-options"/>
 			<src path="src/main/java" />
 			<classpath refid="enumerable.classpath" />
 		</javac>
 		<mkdir dir="target/example-classes" />
-		<javac debug="true" destdir="target/example-classes" source="1.5" target="1.5" encoding="UTF-8">
+		<javac debug="true" destdir="target/example-classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
+			<compilerarg value="-Xlint:-options"/>
 			<src path="src/example/java" />
 			<classpath refid="enumerable.example.classpath" />
 		</javac>
@@ -86,13 +85,13 @@
 		</copy>
 
 		<mkdir dir="target/test-classes" />
-		<mkdir dir="target/scala-test-classes" />
-		<scalac srcdir="src/test" destdir="target/scala-test-classes" target="jvm-1.5" encoding="UTF-8">
+		<scalac srcdir="src/test" destdir="target/test-classes" target="jvm-1.5" encoding="UTF-8">
 			<include name="scala/**/*.scala" />
 			<include name="java/**/*.java" />
 			<classpath refid="enumerable.test.classpath" />
 		</scalac>
-		<javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8">
+		<javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
+			<compilerarg value="-Xlint:-options"/>
 			<src path="src/test/java" />
 			<classpath refid="enumerable.test.classpath" />
 		</javac>
@@ -118,27 +117,8 @@
 
 	<target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
 		<jarjar jarfile="target/enumerable-java-${enumerable.version}.jar">
-			<fileset dir="target/classes" />
-			<zipfileset src="lib/asm-all-${asm.version}.jar" />
-			<rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.asm.@1" />
-			<manifest>
-				<attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
-				<attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
-				<attribute name="Can-Retransform-Classes" value="true" />
-			</manifest>
-		</jarjar>
-		<jar jarfile="target/enumerable-java-${enumerable.version}.jar" update="true" encoding="UTF-8">
-			<fileset dir="target/scala-classes" />
-		</jar>
-	</target>
-
-	<target name="agent-jar-slim" unless="jarjar.notRequired" depends="agent-jar">
-		<jarjar jarfile="target/enumerable-java-slim-${enumerable.version}.jar">
 			<fileset dir="target/classes">
-				<exclude name="org.enumerable.lambda/*.class" />
-				<exclude name="org.enumerable.lambda/support/**/*.class" />
-				<exclude name="org.enumerable.lambda/enumerable/**/*.class" />
-				<exclude name="org.enumerable.lambda/primitives/**/*.class" />
+				<exclude name="org/enumerable/lambda/support/scala/**/*.class" />
 			</fileset>
 			<zipfileset src="lib/asm-all-${asm.version}.jar" />
 			<rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.asm.@1" />
@@ -148,9 +128,29 @@
 				<attribute name="Can-Retransform-Classes" value="true" />
 			</manifest>
 		</jarjar>
-		<jar jarfile="target/enumerable-java-slim-${enumerable.version}.jar" update="true" encoding="UTF-8">
-			<fileset dir="target/scala-classes" />
+		<jar jarfile="target/enumerable-java-${enumerable.version}.jar" update="true" encoding="UTF-8">
+			<fileset dir="target/classes">
+				<include name="org/enumerable/lambda/support/scala/**/*.class" />
+			</fileset>
 		</jar>
+	</target>
+
+	<target name="agent-jar-slim" unless="jarjar.notRequired" depends="agent-jar">
+		<jarjar jarfile="target/enumerable-java-slim-${enumerable.version}.jar">
+			<fileset dir="target/classes">
+				<exclude name="org/enumerable/lambda/*.class" />
+				<exclude name="org/enumerable/lambda/support/**/*.class" />
+				<exclude name="org/enumerable/lambda/enumerable/**/*.class" />
+				<exclude name="org/enumerable/lambda/primitives/**/*.class" />
+			</fileset>
+			<zipfileset src="lib/asm-all-${asm.version}.jar" />
+			<rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.asm.@1" />
+			<manifest>
+				<attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
+				<attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
+				<attribute name="Can-Retransform-Classes" value="true" />
+			</manifest>
+		</jarjar>
 	</target>
 
 
@@ -190,7 +190,6 @@
 	<target name="test-jar" depends="build">
 		<jar jarfile="target/enumerable-java-${enumerable.version}-test.jar" encoding="UTF-8">
 			<fileset dir="target/test-classes" />
-			<fileset dir="target/scala-test-classes" />
 			<fileset dir="target/example-classes">
 				<include name="**/EnumerableExample.class" />
 			</fileset>
@@ -373,7 +372,7 @@
 		<artifact:writepom pomRefId="enumerable-pom" file="target/pom.xml"/>
 	</target>
 
-	<target name="install" depends="pom">
+	<target name="install" depends="dist-no-test, pom">
 		<artifact:install file="target/enumerable-java-${enumerable.version}.jar">
 			<pom refid="enumerable-pom" file="target/pom.xml"/>
 			<attach file="${basedir}/target/enumerable-java-${enumerable.version}-sources.jar" type="jar" classifier="sources" />
@@ -386,7 +385,8 @@
 	<property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
 	<property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
 
-	<target name="stage" depends="install">
+	 <!-- before this, update project version (both build.xml and pom.xml) from SNAPSHOT to RELEASE -->
+	<target name="stage" depends="dist, install">
 		<artifact:mvn>
 			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
 			<arg value="-Durl=${maven-staging-repository-url}" />

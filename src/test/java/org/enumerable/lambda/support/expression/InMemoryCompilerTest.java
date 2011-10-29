@@ -120,7 +120,7 @@ public class InMemoryCompilerTest {
         PrintStream realOut = System.out;
         try {
             System.setOut(new PrintStream(out));
-            Method main = aClass.getDeclaredMethod("main", new Class[] { String[].class });
+            Method main = aClass.getDeclaredMethod("main", new Class<?>[] { String[].class });
             main.setAccessible(true);
             main.invoke(null, (Object) new String[0]);
             return out.toString();
