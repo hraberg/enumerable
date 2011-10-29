@@ -179,7 +179,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Groovy Closures
 
-[LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). You need `groovy-all-1.7.5.jar` or later on your class path. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
+[LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). The tests run against `groovy-all-1.8.3.jar`. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
 
 ### Scala Functions
 
