@@ -44,24 +44,24 @@ Becomes:
     assert i[0] == 10;
 
 
-Block parameters are defined using annotated static fields. For more examples see [EnumerableExample](http://github.com/hraberg/enumerable/blob/master/src/example/java/lambda/enumerable/EnumerableExample.java) which has plenty of comments.
+Block parameters are defined using annotated static fields. For more examples see [EnumerableExample](http://github.com/hraberg/enumerable/blob/master/src/example/java/org/enumerable/lambda/enumerable/EnumerableExample.java) which has plenty of comments.
 
 **Note: The actual blocks are limited to one expression.** 
 
 ## Usage
 
-Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (lambda.asm).
+Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (org.enumerable.lambda.asm).
 
     java -javaagent:enumerable-java-<version>.jar [...]
 
 
-Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/weaving/LambdaLoader.java) if you have different class loading needs.
+Look at [LamdaLoader](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/weaving/org/enumerable/lambdaLoader.java) if you have different class loading needs.
 
 This file is also the actual Enumerable.java library itself, and is needed as a compile time dependency.
 
-The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/core/classes/Enumerable.html). You will be mainly importing static methods and fields from [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java), [Lambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Lambda.java) and [Parameters](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Parameters.java)
+The API is very similar to the [Enumerabe module in Ruby](http://ruby-doc.org/core/classes/Enumerable.html). You will be mainly importing static methods and fields from [Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/enumerable/Enumerable.java), [Lambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/Lambda.java) and [Parameters](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/Parameters.java)
 
-If you're using Eclipse, you can add the agent as a default VM argument under Installed JREs. You can also add Lambda, Paramters and Enumerable as Favorites in the Java Content Assist settings. Finally, you can create a Java Editor Template to easier insert closures in your code, see *lambda.Lambda* for an example.
+If you're using Eclipse, you can add the agent as a default VM argument under Installed JREs. You can also add Lambda, Paramters and Enumerable as Favorites in the Java Content Assist settings. Finally, you can create a Java Editor Template to easier insert closures in your code, see *org.enumerable.lambda.Lambda* for an example.
 
 Enumerable.java requires your classes to have local variable debugging info (-g:vars or -g in javac).
 
@@ -69,7 +69,7 @@ Enumerable.java requires your classes to have local variable debugging info (-g:
 
 To avoid the use of the agent, or any other non standard class loading, you can compile your lambdas ahead of time like this:
 
-    java -cp <project class path> lambda.weaving.LambdaCompiler project.jar
+    java -cp <project class path> org.enumerable.lambda.weaving.LambdaCompiler project.jar
 
 The jar will be compiled and rebuilt in place. The runtime dependency on `enumerable-java-<version>.jar` as a library remains after AOT compilation.
 
@@ -80,7 +80,7 @@ See the targets `aot-compile-tests` and `aot-tests` in [build.xml](http://github
 `enumerable-java-<version>.jar` is both the actual library, and the java agent enabling load time weaving of lambdas.
 
 The binary distribution, when downloaded as a .tgz archive, or built using `ant dist`, doubles as an example project which can be directly imported into Eclipse.
-Open *lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder, which includes targets for AOT compilation.
+Open *org.enumerable.lambda.enumerable.EnumerableExample* to get started. The example bootstraps itself if needed, so you don't need to configure the javaagent. There's also a `build.xml` in the `example` folder, which includes targets for AOT compilation.
 
 ### System Properties
 
@@ -93,7 +93,7 @@ Open *lambda.enumerable.EnumerableExample* to get started. The example bootstrap
 
 ### LambdaParameter
 
-You probably want to use the [@LambdaParameter](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/LambdaParameter.java) annotation to mark fields of your own types to be used in blocks via static imports:
+You probably want to use the [@LambdaParameter](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/annotation/LambdaParameter.java) annotation to mark fields of your own types to be used in blocks via static imports:
 
     public class MyDomainLambdaParameters {
         @LambdaParameter
@@ -104,7 +104,7 @@ Accessing a static field marked with *@LambdaParameter* outside of a block will 
 
 ### NewLambda
 
-Enumerable.java is not tied to the [Fn0](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Fn0.java) hierarchy or function classes. Any single abstract method interface or class can be implemented as a Lambda using *@NewLambda*:
+Enumerable.java is not tied to the [Fn0](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/Fn0.java) hierarchy or function classes. Any single abstract method interface or class can be implemented as a Lambda using *@NewLambda*:
 
     public class MyDomainLambdas {
         @NewLambda
@@ -117,7 +117,7 @@ This allows you to create a new anonymous instance of a *Callable* like this:
 
     Callable<String> c = callable("you called?");
 
-The call to the method marked with [@NewLambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/annotation/NewLambda.java) will be replaced with the creation of a new anonymous instance at runtime, as seen in the beginning of this document.
+The call to the method marked with [@NewLambda](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/annotation/NewLambda.java) will be replaced with the creation of a new anonymous instance at runtime, as seen in the beginning of this document.
 
 Alternatively, you can create an instance of any single abstract method interface or class like this:
 
@@ -160,52 +160,52 @@ The default value expression is captured as the expression assigned to the stati
 
 ### Concurrency JSR-166 (for Java 6)
 
-[LamdaOps](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/extra166y/LambdaOps.java) allows you to create lambdas implementing interfaces from [extra166y.Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html) to be used with [extra166y.ParallelArray](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/ParallelArray.html).
+[LamdaOps](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/extra166y/LambdaOps.java) allows you to create lambdas implementing interfaces from [extra166y.Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html) to be used with [extra166y.ParallelArray](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/ParallelArray.html).
 You need to have `jsr166y.jar` and `extra166y.jar` on your class path. They can be downloaded from the [Concurrency JSR-166 Interest Site](http://gee.cs.oswego.edu/dl/concurrency-interest/index.html). They can also be found in this repository in [`lib`](http://github.com/hraberg/enumerable/tree/master/lib/).
 
 The *LambdaOps* class is an example of a collection of static factory methods marked with *@NewLambda* as mentioned above. You can create your own factory classes in a similar way, Enumerable.java has no special support for the interfaces in [Ops](http://gee.cs.oswego.edu/dl/jsr166/dist/extra166ydocs/extra166y/Ops.html).
 
 ### Clojure Sequences and IFns
 
-[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/clojure/clojure/blob/1.2.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need `clojure-1.2.0.jar` or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
+[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/clojure/clojure/blob/1.2.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need `clojure-1.2.0.jar` or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
 
 ### JRuby Blocks
 
-[LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java). You need `jruby-1.5.3.jar` or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
+[LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java). You need `jruby-1.5.3.jar` or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
 
 ### JavaScript Functions (for Java 6)
 
-[LambdaJavaScript](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/javascript/LambdaJavaScript.java) allows you to create lambdas extending  [Function](http://www.mozilla.org/rhino/apidocs/org/mozilla/javascript/Function.html). Uses [Rhino 1.6r2](http://www.mozilla.org/rhino/) which comes with Java 6.
+[LambdaJavaScript](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/javascript/LambdaJavaScript.java) allows you to create lambdas extending  [Function](http://www.mozilla.org/rhino/apidocs/org/mozilla/javascript/Function.html). Uses [Rhino 1.6r2](http://www.mozilla.org/rhino/) which comes with Java 6.
 
 ### Groovy Closures
 
-[LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). You need `groovy-all-1.7.5.jar` or later on your class path. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
+[LambdaGroovy](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/groovy/LambdaGroovy.java) allows you to create lambdas extending [Closure](http://groovy.codehaus.org/gapi/groovy/lang/Closure.html). You need `groovy-all-1.7.5.jar` or later on your class path. Download from [groovy.codehays.org](http://groovy.codehaus.org/Download).
 
 ### Scala Functions
 
-[LambdaScala](http://github.com/hraberg/enumerable/blob/master/src/main/scala/lambda/support/groovy/LambdaScala.scala) allows you to create lambdas extending [Scala's Function](http://lampsvn.epfl.ch/trac/scala/browser/scala/tags/R_2_8_0_final/src/library/scala/Function.scala) and also convert them to [Fn0](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/Fn0.java). You need `scala-library.jar` from Scala 2.8.0 or later on your class path. Download from [scala-lang.org](http://www.scala-lang,org).
+[LambdaScala](http://github.com/hraberg/enumerable/blob/master/src/main/scala/org/enumerable/lambda/support/groovy/LambdaScala.scala) allows you to create lambdas extending [Scala's Function](http://lampsvn.epfl.ch/trac/scala/browser/scala/tags/R_2_8_0_final/src/library/scala/Function.scala) and also convert them to [Fn0](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/Fn0.java). You need `scala-library.jar` from Scala 2.8.0 or later on your class path. Download from [scala-lang.org](http://www.scala-lang,org).
 
 ### Google Collections
 
-[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Guava (a superset of Google Collections)](http://code.google.com/p/guava-libraries/). You need `guava-r07.jar` on your class path. Download from [Guava](http://code.google.com/p/guava-libraries/downloads/list).
+[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Guava (a superset of Google Collections)](http://code.google.com/p/guava-libraries/). You need `guava-r07.jar` on your class path. Download from [Guava](http://code.google.com/p/guava-libraries/downloads/list).
 
 ### Functional Java
 
-[LambdaFunctionalJava](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/functionaljava/LambdaFunctionalJava.java) allows you to create lambdas implementing [F](http://functionaljava.googlecode.com/svn/artifacts/2.22/javadoc/fj/F.html) etc. from [Functional Java](http://www.functionaljava.org/). You need `functionaljava-0.3.0.jar` on your class path. Download from [Functional Java](http://functionaljava.org/download/).
+[LambdaFunctionalJava](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/functionaljava/LambdaFunctionalJava.java) allows you to create lambdas implementing [F](http://functionaljava.googlecode.com/svn/artifacts/2.22/javadoc/fj/F.html) etc. from [Functional Java](http://www.functionaljava.org/). You need `functionaljava-0.3.0.jar` on your class path. Download from [Functional Java](http://functionaljava.org/download/).
 
 ### Expression Trees (using JavaParser)
 
-[LambdaExpressionTrees](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/expression/LambdaExpressionTrees.java) is a facade for a simple decompiler that turns lambdas into Expression Trees represented by [JavaParser's](http://code.google.com/p/javaparser/) [AST](http://code.google.com/p/javaparser/source/browse/#svn/trunk/JavaParser/src/japa/parser/ast/expr). You need `javaparser-1.0.8.jar` on your class path. Download from [javaparser](http://code.google.com/p/javaparser/).
+[LambdaExpressionTrees](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/expression/LambdaExpressionTrees.java) is a facade for a simple decompiler that turns lambdas into Expression Trees represented by [JavaParser's](http://code.google.com/p/javaparser/) [AST](http://code.google.com/p/javaparser/source/browse/#svn/trunk/JavaParser/src/japa/parser/ast/expr). You need `javaparser-1.0.8.jar` on your class path. Download from [javaparser](http://code.google.com/p/javaparser/).
 
 *Note: The decompiler has several limitations, for example, it doesn't support nested ternary operators. It also doesn't support decompiling lambdas which are closures.*
 
-Modified trees can also be compiled using [InMemoryCompiler](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/support/expression/InMemoryCompiler.java) in Java 6 (in Java 5 you can use [Janino](http://docs.codehaus.org/display/JANINO/Home)). The in-memory compiler defaults to using `ToolProvider.getSystemJavaCompiler()` (which is `javac` when using Sun's JDK). 
+Modified trees can also be compiled using [InMemoryCompiler](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/expression/InMemoryCompiler.java) in Java 6 (in Java 5 you can use [Janino](http://docs.codehaus.org/display/JANINO/Home)). The in-memory compiler defaults to using `ToolProvider.getSystemJavaCompiler()` (which is `javac` when using Sun's JDK). 
 
 By setting the system property `lambda.support.expression.useECJ` to true and adding `ecj-3.5.2.jar` on your class path, you can use the Eclipse batch compiler instead.
 
 ## Implementation
 
-[Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/Enumerable.java) and [EnumerableArrays](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/EnumerableArrays.java) act as a facades for the implementation in [EnumerableModule](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/collection/EnumerableModule.java) and [EMap](http://github.com/hraberg/enumerable/blob/master/src/main/java/lambda/enumerable/collection/EMap.java).
+[Enumerable](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/enumerable/Enumerable.java) and [EnumerableArrays](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/enumerable/EnumerableArrays.java) act as a facades for the implementation in [EnumerableModule](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/enumerable/collection/EnumerableModule.java) and [EMap](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/enumerable/collection/EMap.java).
 
 Enumerable.java uses Ant to build. Run `ant tests`, `ant example` or `ant agent-jar`.
 
@@ -221,8 +221,8 @@ To understand the transformation better, a good point to start is running `ant e
 
 Take this block:
 
-    import static lambda.enumerable.Enumerable.*;
-    import static lambda.Lambda.*;
+    import static org.enumerable.lambda.enumerable.Enumerable.*;
+    import static org.enumerable.lambda.Lambda.*;
 
     // ...
 
@@ -242,17 +242,17 @@ Running `ant rubyspec` will run the RubySpecs for `core/enumerable`. Enumerable.
 
 Enumerable.java has 3 layers:
 
-#### lambda.weaving - transforms expressions into anonymous inner classes
+#### org.enumerable.lambda.weaving - transforms expressions into anonymous inner classes
 
 This layer uses ASM, and is directed by the annotations *@LambdaParameter* and *@NewLambda*. It's not coupled to the layer above, and you can build your own bridge layer by using these annotations.
 
-#### lambda - simple functional programming constructs
+#### org.enumerable.lambda - simple functional programming constructs
 
-This layer is normal Java and can be used on it's own. It also uses the annotated class *lambda.Lambda* to direct the weaving process, if enabled.
+This layer is normal Java and can be used on it's own. It also uses the annotated class *org.enumerable.lambda.Lambda* to direct the weaving process, if enabled.
 
 This layer mainly exists to simplify implemention of bridges from the user facing closures to an actual Java API. If you want to use Enumerable.java closures for another library, you can wrap or implement its API using this layer as a starting point.
 
-#### lambda.enumerable - a port of Ruby's Enumerable module
+#### org.enumerable.lambda.enumerable - a port of Ruby's Enumerable module
 
 This layer is also normal Java and has no knowledge of the bytecode weaving.
 
