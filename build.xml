@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="build" name="enumerable">
+<project basedir="." default="build" name="enumerable" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 	<description>
 		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
 	</description>
@@ -46,6 +46,11 @@
 			<pathelement location="lib/scala-library-${scala.version}.jar" />
 		</classpath>
 	</taskdef>
+	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-0.6.jar" />
+	<path id="maven-ant-tasks.classpath" path="lib/maven-ant-tasks-2.1.3.jar" />
+	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+	           uri="antlib:org.apache.maven.artifact.ant"
+	           classpathref="maven-ant-tasks.classpath" />
 
 	<target name="clean">
 		<delete dir="target" />
@@ -303,11 +308,12 @@
 	<target name="jars" depends="agent-jar, agent-jar-slim, source-jar, test-source-jar, javadoc-jar" />
 
 	<property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}" />
-	<target name="dist-no-test" depends="tests, rubyspec, jars">
+
+	<target name="dist-no-test" depends="jars">
 		<tar destfile="target/${enumerable.dist.name}.tgz" compression="gzip">
 			<tarfileset dir="target" prefix="${enumerable.dist.name}">
-				<include name="enumerable-*-${enumerable.version}.jar" />
-				<exclude name="enumerable-test-sources-${enumerable.version}.jar" />
+				<include name="enumerable-java-${enumerable.version}*.jar" />
+				<exclude name="enumerable-java-${enumerable.version}-test-sources.jar" />
 			</tarfileset>
 
 			<tarfileset dir="src/example/java" prefix="${enumerable.dist.name}/example/src">
@@ -331,7 +337,7 @@
 		</tar>
 	</target>
 
-	<target name="dist" depends="dist-no-test, rubyspec, example-with-loader, aot-tests, microbench">
+	<target name="dist" depends="dist-no-test, tests, rubyspec, example-with-loader, aot-tests, microbench, install">
 		<echo message="Ensuring that the example project in ${enumerable.dist.name}.tgz works" />
 		<delete dir="target/${enumerable.dist.name}" />
 		<untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />
@@ -351,9 +357,28 @@
 			<doctitle>
 				<![CDATA[<h1>Enumerable.java API ${enumerable.version}</h1>]]>
             </doctitle>
-		<bottom>
-			<![CDATA[<i>Copyright &#169; 2010-2011 Håkan Råberg</i>]]>
-            </bottom>
-</javadoc>
-</target>
+			<bottom>
+				<![CDATA[<i>Copyright &#169; 2010-2011 Håkan Råberg</i>]]>
+	        </bottom>
+		</javadoc>
+	</target>
+
+	<target name="pom">
+		<artifact:pom id="enumerable-pom" groupId="org.enumerable" artifactId="enumerable-java" version="${enumerable.version}" name="Enumerable.java"
+				url="http://www.enumerable.org" description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.">
+			<scm url="git@github.com:hraberg/enumerable.git"/>
+			<developer name="Håkan Råberg" email="hakan.raberg@gmail.com" timezone="0"/>
+			<dependency groupId="asm" artifactId="asm-all" version="${asm.version}" scope="provided"/>
+			<license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php" distribution="repo"/>	  	
+		</artifact:pom>
+		<artifact:writepom pomRefId="enumerable-pom" file="target/pom.xml"/>
+	</target>
+
+	<target name="install" depends="pom">
+		<artifact:install file="target/enumerable-java-${enumerable.version}.jar">
+			<pom refid="enumerable-pom" file="target/pom.xml"/>
+			<attach file="${basedir}/target/enumerable-java-${enumerable.version}-sources.jar" type="jar" classifier="sources" />
+			<attach file="${basedir}/target/enumerable-java-${enumerable.version}-javadoc.jar" type="jar" classifier="javadoc" />
+		</artifact:install>
+	</target>
 </project>
