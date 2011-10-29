@@ -183,7 +183,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Scala Functions
 
-[LambdaScala](http://github.com/hraberg/enumerable/blob/master/src/main/scala/org/enumerable/lambda/support/groovy/LambdaScala.scala) allows you to create lambdas extending [Scala's Function](http://lampsvn.epfl.ch/trac/scala/browser/scala/tags/R_2_8_0_final/src/library/scala/Function.scala) and also convert them to [Fn0](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/Fn0.java). You need `scala-library.jar` from Scala 2.8.0 or later on your class path. Download from [scala-lang.org](http://www.scala-lang,org).
+[LambdaScala](http://github.com/hraberg/enumerable/blob/master/src/main/scala/org/enumerable/lambda/support/groovy/LambdaScala.scala) allows you to create lambdas extending [Scala's Function](http://lampsvn.epfl.ch/trac/scala/browser/scala/tags/R_2_9_1_final/src/library/scala/Function.scala) and also convert them to [Fn0](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/Fn0.java). Tested against `scala-library.jar` from Scala 2.9.1. Download from [scala-lang.org](http://www.scala-lang,org).
 
 ### Google Collections
 
@@ -191,7 +191,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Functional Java
 
-[LambdaFunctionalJava](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/functionaljava/LambdaFunctionalJava.java) allows you to create lambdas implementing [F](http://functionaljava.googlecode.com/svn/artifacts/2.22/javadoc/fj/F.html) etc. from [Functional Java](http://www.functionaljava.org/). You need `functionaljava-0.3.0.jar` on your class path. Download from [Functional Java](http://functionaljava.org/download/).
+[LambdaFunctionalJava](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/functionaljava/LambdaFunctionalJava.java) allows you to create lambdas implementing [F](http://functionaljava.googlecode.com/svn/artifacts/3.0/javadoc/fj/F.html) etc. from [Functional Java](http://www.functionaljava.org/). You need `functionaljava-0.3.0.jar` on your class path. Download from [Functional Java](http://functionaljava.org/download/).
 
 ### Expression Trees (using JavaParser)
 

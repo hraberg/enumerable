@@ -26,7 +26,7 @@ public class ClassFilter {
             add("groovy.");
             add("scala.");
             add("Script");
-            add("lambda.enumerable.jruby.");
+            add("org.enumerable.lambda.enumerable.jruby.");
             add("Enumerable");
         }
     };

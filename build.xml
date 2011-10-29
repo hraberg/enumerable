@@ -6,7 +6,7 @@
 
 	<property name="enumerable.version" value="0.3.1-SNAPSHOT" />
 	<property name="asm.version" value="3.3" />
-	<property name="scala.version" value="2.8.0" />
+	<property name="scala.version" value="2.9.1" />
 	<property file="lambda.weaving.properties" />
 	<tstamp />
 
@@ -387,8 +387,8 @@
 			<dependency groupId="com.google.guava" artifactId="guava" version="10.0.1" scope="compile" optional="true"/>
 			<dependency groupId="com.google.code.javaparser" artifactId="javaparser" version="1.0.8" scope="compile" optional="true"/>
 			<dependency groupId="org.jruby" artifactId="jruby-complete" version="1.6.5" scope="compile" optional="true"/>
-			<dependency groupId="org.scala-lang" artifactId="scala-library" version="2.8.0" scope="compile" optional="true"/>
-			<dependency groupId="org.scala-lang" artifactId="scala-compiler" version="2.8.0" scope="compile" optional="true"/>
+			<dependency groupId="org.scala-lang" artifactId="scala-library" version="${scala.version}" scope="compile" optional="true"/>
+			<dependency groupId="org.scala-lang" artifactId="scala-compiler" version="${scala.version}" scope="compile" optional="true"/>
 		</artifact:pom>
 		<artifact:writepom pomRefId="enumerable-java-pom" file="target/pom.xml"/>
 	</target>

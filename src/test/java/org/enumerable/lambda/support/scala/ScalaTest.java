@@ -39,7 +39,7 @@ import scala.tools.nsc.Settings;
 import sun.org.mozilla.javascript.internal.Function;
 import clojure.lang.IFn;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "deprecation" })
 public class ScalaTest {
     static ScalaInterpreter scala = new ScalaInterpreter();
 
@@ -140,16 +140,14 @@ public class ScalaTest {
         //    }
         assertEquals("HELLO", EnumerableJavaScalaTest.toUpperCase().call("hello"));
     }
-    
 
     public static class ScalaInterpreter {
         static Interpreter interpreter;
 
         static {
             Settings settings = new Settings();
-            settings.classpath()
-                    .v_$eq("lib/scala-library-2.8.0.jar" + File.pathSeparator
-                            + "lib/scala-compiler-2.8.0.jar");
+            settings.bootclasspath().tryToSetFromPropertyValue("lib/scala-library-2.9.1.jar" + File.pathSeparator
+                            + "lib/scala-compiler-2.9.1.jar");
             interpreter = new Interpreter(settings);
         }
 
