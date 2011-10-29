@@ -1,22 +1,21 @@
 package org.enumerable.lambda;
 
-import static java.lang.System.*;
-import static org.enumerable.lambda.Lambda.*;
-import static org.enumerable.lambda.Parameters.*;
-import static org.enumerable.lambda.enumerable.Enumerable.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import org.enumerable.lambda.Fn0;
-import org.enumerable.lambda.Fn1;
-import org.enumerable.lambda.Lambda;
 import org.enumerable.lambda.enumerable.primitives.EnumerableInts;
 import org.enumerable.lambda.primitives.Fn1ItoI;
 import org.enumerable.lambda.primitives.LambdaPrimitives;
 import org.enumerable.lambda.weaving.LambdaLoader;
 import org.enumerable.lambda.weaving.Version;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.out;
+import static org.enumerable.lambda.Lambda.λ;
+import static org.enumerable.lambda.Parameters.m;
+import static org.enumerable.lambda.Parameters.n;
+import static org.enumerable.lambda.enumerable.Enumerable.*;
 
 
 public class MicroBench {

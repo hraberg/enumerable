@@ -1,24 +1,19 @@
 package org.enumerable.lambda.weaving;
 
-import static java.lang.System.*;
-import static org.enumerable.lambda.exception.UncheckedException.*;
-import static org.enumerable.lambda.weaving.Debug.*;
-import static org.enumerable.lambda.weaving.Version.*;
+import org.enumerable.lambda.weaving.tree.LambdaTreeTransformer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 
-import org.enumerable.lambda.weaving.tree.LambdaTreeTransformer;
+import static java.lang.System.exit;
+import static java.lang.System.out;
+import static org.enumerable.lambda.exception.UncheckedException.uncheck;
+import static org.enumerable.lambda.weaving.Debug.debug;
+import static org.enumerable.lambda.weaving.Version.getVersionString;
 
 
 /**
@@ -32,6 +27,7 @@ import org.enumerable.lambda.weaving.tree.LambdaTreeTransformer;
  * The enumerable-agent-<version>.jar will still be as a normal runtime
  * dependency after compilation.
  */
+@SuppressWarnings({"ResultOfMethodCallIgnored"})
 public class LambdaCompiler {
     static final String AOT_COMPILED_MARKER = "META-INF/lambda.aot.compiled";
 
@@ -68,7 +64,7 @@ public class LambdaCompiler {
         }
     }
 
-    private void compileClassesDirectory(File file) throws IOException, Exception, FileNotFoundException {
+    private void compileClassesDirectory(File file) throws Exception {
         File aotCompiledMarker = new File(file, AOT_COMPILED_MARKER);
         if (aotCompiledMarker.exists()) {
             out.println(file + " is already compiled, skipping.");
@@ -152,7 +148,7 @@ public class LambdaCompiler {
         file.delete();
     }
 
-    void writeGeneratedLambdas(File tempDir) throws FileNotFoundException, IOException {
+    void writeGeneratedLambdas(File tempDir) throws IOException {
         for (Map.Entry<String, byte[]> lambdaClass : transformer.getLambdasByClassName().entrySet()) {
             File lambdaFile = new File(tempDir, lambdaClass.getKey().replace('.', '/'));
             FileOutputStream out = null;
@@ -180,7 +176,7 @@ public class LambdaCompiler {
         return newJar;
     }
 
-    void addDirToJar(File baseDir, File tempDir, JarOutputStream out) throws IOException, FileNotFoundException {
+    void addDirToJar(File baseDir, File tempDir, JarOutputStream out) throws IOException {
         for (File file : tempDir.listFiles()) {
             String nameInJar = file.getPath().substring(baseDir.getPath().length() + 1).replace(File.separatorChar,
                     '/');
@@ -200,7 +196,7 @@ public class LambdaCompiler {
                 InputStream in = null;
                 try {
                     in = new FileInputStream(file);
-                    int read = -1;
+                    int read;
                     while ((read = in.read(buffer)) != -1)
                         out.write(buffer, 0, read);
                     out.closeEntry();
@@ -212,7 +208,7 @@ public class LambdaCompiler {
         }
     }
 
-    File unjar(JarFile jarFile) throws IOException, FileNotFoundException {
+    File unjar(JarFile jarFile) throws IOException {
         InputStream in = null;
         OutputStream out = null;
 
@@ -234,7 +230,7 @@ public class LambdaCompiler {
 
                     in = jarFile.getInputStream(jarEntry);
                     out = new FileOutputStream(file);
-                    int read = -1;
+                    int read;
                     while ((read = in.read(buffer)) != -1)
                         out.write(buffer, 0, read);
                     out.flush();

@@ -1,17 +1,5 @@
 package org.enumerable.lambda.enumerable;
 
-import static java.lang.Math.*;
-import static java.util.Arrays.*;
-import static org.enumerable.lambda.Lambda.*;
-import static org.enumerable.lambda.Parameters.*;
-import static org.enumerable.lambda.enumerable.Enumerable.*;
-import static org.enumerable.lambda.primitives.LambdaPrimitives.*;
-
-import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.enumerable.lambda.Fn1;
 import org.enumerable.lambda.Lambda;
 import org.enumerable.lambda.enumerable.collection.EList;
@@ -19,6 +7,19 @@ import org.enumerable.lambda.primitives.Fn1ItoI;
 import org.enumerable.lambda.primitives.Fn2DDtoD;
 import org.enumerable.lambda.weaving.LambdaLoader;
 import org.enumerable.lambda.weaving.Version;
+
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.Math.*;
+import static java.util.Arrays.asList;
+import static org.enumerable.lambda.Lambda.λ;
+import static org.enumerable.lambda.Parameters.*;
+import static org.enumerable.lambda.enumerable.Enumerable.*;
+import static org.enumerable.lambda.primitives.LambdaPrimitives.fn;
+import static org.enumerable.lambda.primitives.LambdaPrimitives.λ;
 
 
 public class EnumerableExample {

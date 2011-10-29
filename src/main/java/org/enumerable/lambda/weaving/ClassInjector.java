@@ -1,15 +1,11 @@
 package org.enumerable.lambda.weaving;
 
-import static org.enumerable.lambda.exception.UncheckedException.*;
-import static org.enumerable.lambda.weaving.Debug.*;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+
+import static org.enumerable.lambda.exception.UncheckedException.uncheck;
+import static org.enumerable.lambda.weaving.Debug.debug;
 
 public class ClassInjector {
     static File classDir;
@@ -71,9 +67,10 @@ public class ClassInjector {
 
         FileOutputStream out = null;
         try {
-            file.getParentFile().mkdirs();
-            out = new FileOutputStream(file);
-            out.write(b);
+            if (file.getParentFile().isDirectory() || file.getParentFile().mkdirs()) {
+                out = new FileOutputStream(file);
+                out.write(b);
+            }
 
         } catch (Exception e) {
             throw uncheck(e);
@@ -88,18 +85,19 @@ public class ClassInjector {
     }
 
     // Disabled for now, printing loads of stuff anyway
+    @SuppressWarnings("unused")
     public void verifyIfAsmUtilIsAvailable(byte[] b) {
-        try {
-            // if (verify == null || !debug)
-            // return;
-            //
-            // Object cr = classReaderConstructor.newInstance(new
-            // ByteArrayInputStream(b));
-            // PrintWriter pw = new PrintWriter(System.out);
-            // verify.invoke(null, cr, false, pw);
-
-        } catch (Exception e) {
-            throw uncheck(e);
-        }
+//        try {
+//            if (verify == null || !debug)
+//            return;
+//
+//            Object cr = classReaderConstructor.newInstance(new
+//                    ByteArrayInputStream(b));
+//            PrintWriter pw = new PrintWriter(System.out);
+//            verify.invoke(null, cr, false, pw);
+//
+//        } catch (Exception e) {
+//            throw uncheck(e);
+//        }
     }
 }

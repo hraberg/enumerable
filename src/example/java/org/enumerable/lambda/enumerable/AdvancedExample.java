@@ -1,27 +1,25 @@
 package org.enumerable.lambda.enumerable;
 
-import java.util.Map;
-
 import org.enumerable.lambda.annotation.LambdaParameter;
 import org.enumerable.lambda.enumerable.collection.EList;
 import org.enumerable.lambda.weaving.LambdaLoader;
 import org.enumerable.lambda.weaving.Version;
 
-import static org.enumerable.lambda.Lambda.*;
-import static org.enumerable.lambda.Parameters.*;
-import static org.enumerable.lambda.enumerable.collection.ECollections.*;
+import java.util.Map;
 
+import static org.enumerable.lambda.Lambda.λ;
+import static org.enumerable.lambda.Parameters.s;
+import static org.enumerable.lambda.Parameters.t;
+import static org.enumerable.lambda.enumerable.collection.ECollections.list;
+import static org.enumerable.lambda.enumerable.collection.ECollections.pair;
 
 public class AdvancedExample {
-
     public static void main(String[] args) {
         LambdaLoader.bootstrapMainIfNotEnabledAndExitUponItsReturn(args);
         System.out.println("[example] " + Version.getVersionString());
 
         new AdvancedExample().run();
     }
-
-
 
     @LambdaParameter
     static Map.Entry<String, EList<String>> e;
@@ -50,6 +48,4 @@ public class AdvancedExample {
             f => 1
          */
     }
-
-
 }

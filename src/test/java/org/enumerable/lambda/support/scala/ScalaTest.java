@@ -61,7 +61,7 @@ public class ScalaTest {
     @Test
     public void fullScalaFunctionTypesAreCreatedWithNoAbstractMethods() {
         FunctionFn1<Integer, Integer> function = function(n, n * 2);
-        Function1<Integer, Integer> composed = function.compose(function);
+        Function1<Integer, Integer> composed = (Function1<Integer, Integer>) function.compose(function);
         assertEquals(8, (int) composed.apply(2));
     }
 

@@ -1,10 +1,10 @@
 package org.enumerable.lambda.weaving;
 
-import static org.enumerable.lambda.exception.UncheckedException.*;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
+import static org.enumerable.lambda.exception.UncheckedException.uncheck;
 
 public class Version {
     public static Properties buildProperties = new Properties();
@@ -21,7 +21,7 @@ public class Version {
             try {
                 if (in != null)
                     in.close();
-            } catch (IOException slient) {
+            } catch (IOException silent) {
             }
         }
     }

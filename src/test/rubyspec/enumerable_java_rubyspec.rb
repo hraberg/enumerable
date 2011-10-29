@@ -17,7 +17,7 @@ import 'org.enumerable.lambda.enumerable.jruby.QueueIterator'
 # implementation in the case of 'grep'. All Enumerator handling is also managed here, as
 # Enumerable.java doesn't support Enumerators.
 #
-# require 'enumerable_java_rubyspec' will include EnumerableJava in anyone who includes Enumerable.
+# require 'enumerable_java_rubyspec' will include EnumerableJava  ainnyone who includes Enumerable.
 # It also patches Array, Hash and Range when first loaded.
 #
 # This patch is mainly for running the RubySpec for Enumerable against Enumerable.java.

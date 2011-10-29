@@ -2,19 +2,19 @@ package org.enumerable.lambda.support.scala
 
 import org.enumerable.lambda.{Fn0, Fn1, Fn2, Fn3}
 
-abstract class FunctionFn0[R] extends Function0[R] {
+abstract class FunctionFn0[R] extends (() => R) {
 	def apply():R
 }
 
-abstract class FunctionFn1[A1, R] extends Function1[A1, R] {
+abstract class FunctionFn1[A1, R] extends ((A1) => R) {
 	def apply(a1: A1):R
 }
 
-abstract class FunctionFn2[A1, A2, R] extends Function2[A1, A2, R] {
+abstract class FunctionFn2[A1, A2, R] extends ((A1, A2) => R) {
 	def apply(a1: A1, a2: A2):R
 }
 
-abstract class FunctionFn3[A1, A2, A3, R] extends Function3[A1, A2, A3, R] {
+abstract class FunctionFn3[A1, A2, A3, R] extends ((A1, A2, A3) => R) {
 	def apply(a1: A1, a2: A2, a3: A3):R
 }
 

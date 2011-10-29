@@ -16,6 +16,7 @@ import org.enumerable.lambda.exception.LambdaWeavingNotEnabledException;
  * λ(${impst:importStatic('lambda.Lambda.*')}${cursor})
  * </pre>
  */
+@SuppressWarnings("unused")
 public class Lambda {
     /**
      * Creates a new lambda implementing single abstract method interface or

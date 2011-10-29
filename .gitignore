@@ -1,3 +1,4 @@
 target/
 .cache
 src/java-spikes
+.idea/

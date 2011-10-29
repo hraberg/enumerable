@@ -1,10 +1,7 @@
 package org.enumerable.lambda.weaving;
 
-import static java.lang.System.*;
-import static java.lang.Thread.*;
-import static org.enumerable.lambda.exception.UncheckedException.*;
-import static org.enumerable.lambda.weaving.Debug.*;
-import static org.enumerable.lambda.weaving.Version.*;
+import org.enumerable.lambda.exception.LambdaWeavingNotEnabledException;
+import org.enumerable.lambda.weaving.tree.LambdaTreeTransformer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,15 +13,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
 
-import org.enumerable.lambda.exception.LambdaWeavingNotEnabledException;
-import org.enumerable.lambda.weaving.tree.LambdaTreeTransformer;
+import static java.lang.System.*;
+import static java.lang.Thread.currentThread;
+import static org.enumerable.lambda.exception.UncheckedException.uncheck;
+import static org.enumerable.lambda.weaving.Debug.debug;
+import static org.enumerable.lambda.weaving.Version.getVersionString;
 
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     private static boolean isEnabled;
     private static boolean transformationFailed;
     static String weavingNotEnabledMessage = "Please start the JVM with -javaagent:enumerable-java-"
-            + Version.getVersion() + ".jar";;
+            + Version.getVersion() + ".jar";
     private ClassFilter filter;
 
     static {
@@ -46,6 +46,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
      * This method can be used as a guard clause in your code, potentially
      * throwing a {@link LambdaWeavingNotEnabledException}.
      */
+    @SuppressWarnings("unused")
     public static void ensureIsEnabled() {
         if (!isEnabled())
             throw new LambdaWeavingNotEnabledException();
@@ -55,6 +56,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
      * This method can be used as a guard clause in your code, exiting the VM if
      * weaving isn't enabled.
      */
+    @SuppressWarnings("unused")
     public static void ensureIsEnabledOrExit() {
         if (!isEnabled()) {
             err.println(LambdaLoader.getNotEnabledMessage());

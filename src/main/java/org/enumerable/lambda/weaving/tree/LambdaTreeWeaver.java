@@ -1,59 +1,30 @@
 package org.enumerable.lambda.weaving.tree;
 
-import static java.lang.System.*;
-import static java.util.Arrays.*;
-import static org.enumerable.lambda.exception.UncheckedException.*;
-import static org.enumerable.lambda.weaving.Debug.*;
-import static org.objectweb.asm.ClassReader.*;
-import static org.objectweb.asm.Type.*;
-import static org.objectweb.asm.tree.AbstractInsnNode.*;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-
 import org.enumerable.lambda.annotation.LambdaLocal;
 import org.enumerable.lambda.annotation.LambdaParameter;
 import org.enumerable.lambda.annotation.NewLambda;
 import org.enumerable.lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Method;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.IincInsnNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LineNumberNode;
-import org.objectweb.asm.tree.LocalVariableNode;
-import org.objectweb.asm.tree.MemberNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TypeInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.tree.*;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.util.ASMifierClassVisitor;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
+
+import static java.lang.System.getProperty;
+import static java.lang.System.out;
+import static java.util.Arrays.asList;
+import static org.enumerable.lambda.exception.UncheckedException.uncheck;
+import static org.enumerable.lambda.weaving.Debug.*;
+import static org.objectweb.asm.ClassReader.*;
+import static org.objectweb.asm.Type.*;
+import static org.objectweb.asm.tree.AbstractInsnNode.*;
 
 class LambdaTreeWeaver implements Opcodes {
     static Type newLambdaAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.newlambda", NewLambda.class.getName());
@@ -680,7 +651,7 @@ class LambdaTreeWeaver implements Opcodes {
                     argumentTypes.add(getType(fn.desc));
 
                 Type returnType = getType(fn.desc);
-                MethodNode am = createAccessMethodAndLoadArguments("field$" + fn.name, fn.owner, argumentTypes,
+                MethodNode am = createAccessMethodAndLoadArguments("field$" + fn.name, argumentTypes,
                         returnType);
 
                 fn.accept(am);
@@ -725,10 +696,9 @@ class LambdaTreeWeaver implements Opcodes {
                 if (opcode != INVOKESTATIC)
                     argumentTypes.add(getObjectType(mn.owner));
 
-                for (Type type : getArgumentTypes(mn.desc))
-                    argumentTypes.add(type);
+                Collections.addAll(argumentTypes, getArgumentTypes(mn.desc));
 
-                MethodNode am = createAccessMethodAndLoadArguments("method$" + mn.name, mn.owner, argumentTypes,
+                MethodNode am = createAccessMethodAndLoadArguments("method$" + mn.name, argumentTypes,
                         getReturnType(mn.desc));
 
                 mn.accept(am);
@@ -742,8 +712,8 @@ class LambdaTreeWeaver implements Opcodes {
                 return am;
             }
 
-            MethodNode createAccessMethodAndLoadArguments(String name, String owner, List<Type> argumentTypes,
-                    Type returnType) {
+            MethodNode createAccessMethodAndLoadArguments(String name, List<Type> argumentTypes,
+                                                          Type returnType) {
                 String accessMethodDescriptor = getMethodDescriptor(returnType, argumentTypes.toArray(new Type[0]));
                 String accessMethodName = "access$lambda$" + name;
 
@@ -1161,7 +1131,7 @@ class LambdaTreeWeaver implements Opcodes {
             }
 
             String toParameterString(Collection<?> parameters) {
-                StringBuffer sb = new StringBuffer(parameters.toString());
+                StringBuilder sb = new StringBuilder(parameters.toString());
                 sb.setCharAt(0, '(');
                 sb.setCharAt(sb.length() - 1, ')');
                 return sb.toString();
@@ -1219,7 +1189,7 @@ class LambdaTreeWeaver implements Opcodes {
                         FieldInsnNode fin = (FieldInsnNode) n;
 
                         if (isLambdaParameterField(fin) && !inChildLambda) {
-                            lambdaParameter(i, fin);
+                            lambdaParameter(fin);
 
                         } else if (fin.owner.equals(c.name)) {
                             FieldNode f = findField(fin);
@@ -1284,9 +1254,9 @@ class LambdaTreeWeaver implements Opcodes {
             }
 
             void resolveParentLambda() {
-                for (int i = 0; i < lambdas.size(); i++)
-                    if (lambdas.get(i).getEnd() > getEnd() && lambdas.get(i).getStart() < getStart())
-                        parent = lambdas.get(i);
+                for (LambdaAnalyzer lambda : lambdas)
+                    if (lambda.getEnd() > getEnd() && lambda.getStart() < getStart())
+                        parent = lambda;
             }
 
             @SuppressWarnings("unchecked")
@@ -1297,8 +1267,11 @@ class LambdaTreeWeaver implements Opcodes {
                             && getArgumentTypes(mn.desc).length == newLambdaParameterTypes.size())
                         return new Method(mn.name, mn.desc);
 
-                for (String anInterface : (List<String>) cn.interfaces)
-                    return findSAM(getObjectType(anInterface));
+                for (String anInterface : (List<String>) cn.interfaces) {
+                    Method foundSam = findSAM(getObjectType(anInterface));
+                    if (foundSam != null)
+                        return foundSam;
+                }
 
                 if (cn.superName != null)
                     return findSAM(getObjectType(cn.superName));
@@ -1306,7 +1279,7 @@ class LambdaTreeWeaver implements Opcodes {
                 return null;
             }
 
-            void lambdaParameter(int i, FieldInsnNode fin) throws IOException {
+            void lambdaParameter(FieldInsnNode fin) throws IOException {
                 FieldNode f = findField(fin);
 
                 if (!parameters.containsKey(f.name)) {

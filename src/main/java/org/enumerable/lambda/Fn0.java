@@ -1,21 +1,15 @@
 package org.enumerable.lambda;
 
-import static java.lang.Boolean.*;
-import static org.enumerable.lambda.exception.UncheckedException.*;
+import org.enumerable.lambda.annotation.LambdaLocal;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.*;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.enumerable.lambda.annotation.LambdaLocal;
+import static java.lang.Boolean.FALSE;
+import static org.enumerable.lambda.exception.UncheckedException.uncheck;
 
 
 /**
@@ -45,7 +39,7 @@ public abstract class Fn0<R> implements Serializable {
     public static int getAndCheckArityForMethod(Class<?> aClass, String methodName) {
         int basicArity = 0;
         for (Method method : aClass.getDeclaredMethods())
-            if (method.getName() == methodName)
+            if (method.getName().equals(methodName))
                 basicArity = method.getParameterTypes().length;
 
         SortedSet<Integer> defaultValues = new TreeSet<Integer>();
@@ -184,14 +178,6 @@ public abstract class Fn0<R> implements Serializable {
                 }
             }
             return null;
-        }
-
-        public List<LambdaLocal> locals() {
-            List<LambdaLocal> result = new ArrayList<LambdaLocal>();
-            for (Field field : Fn0.this.getClass().getDeclaredFields())
-                if (field.isAnnotationPresent(LambdaLocal.class))
-                    result.add(field.getAnnotation(LambdaLocal.class));
-            return result;
         }
     }
 
