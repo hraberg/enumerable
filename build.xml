@@ -6,7 +6,7 @@
 
 	<property name="enumerable.version" value="0.3.1-SNAPSHOT" />
 	<property name="asm.version" value="3.3" />
-	<property name="scala.version" value="2.8.0.final" />
+	<property name="scala.version" value="2.8.0" />
 	<property file="lambda.weaving.properties" />
 	<tstamp />
 
@@ -350,20 +350,50 @@
 		</javadoc>
 	</target>
 	
+	<target name="download-dependencies" depends="pom">
+		<artifact:dependencies filesetId="dependency.fileset" sourcesFilesetId="sources.dependency.fileset" pomrefid="enumerable-java-pom" />
+
+		<mkdir dir="lib/src" />
+		<copy todir="lib" flatten="true">
+		  <fileset refid="dependency.fileset" />
+		</copy>
+		<copy todir="lib/src" flatten="true">
+		  <fileset refid="sources.dependency.fileset" />
+		</copy>
+	</target>
+
 	<target name="pom">
-		<artifact:pom id="enumerable-pom" groupId="org.enumerable" artifactId="enumerable-java" version="${enumerable.version}" name="Enumerable.java"
+		<artifact:pom id="enumerable-java-pom" groupId="org.enumerable" artifactId="enumerable-java" version="${enumerable.version}" name="Enumerable.java"
 				url="http://www.enumerable.org" description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.">
 			<scm url="https://github.com/hraberg/enumerable" connection="scm:git@github.com:hraberg/enumerable.git" developerConnection="scm:git@github.com:hraberg/enumerable.git"/>
 			<developer name="Håkan Råberg" email="hakan.raberg@gmail.com" timezone="0"/>
-			<dependency groupId="asm" artifactId="asm-all" version="${asm.version}" scope="provided"/>
-			<license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php" distribution="repo"/>	  	
+			<license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php" distribution="repo"/>
+
+			<remoterepository id="clojars" url="http://clojars.org/repo"/>
+			<remoterepository id="javaparser-release" url="https://javaparser.googlecode.com/svn/maven2"/>		
+
+			<dependency groupId="asm" artifactId="asm-all" version="3.3" scope="provided"/>
+			<dependency groupId="asm" artifactId="asm-debug-all" version="3.3" scope="test"/>
+			<dependency groupId="junit" artifactId="junit" version="4.7" scope="test"/>
+			<dependency groupId="org.clojure" artifactId="clojure" version="1.2.0" scope="compile" optional="true"/>
+			<dependency groupId="clojure-jsr223" artifactId="clojure-jsr223" version="1.0" scope="compile" optional="true"/>
+			<dependency groupId="org.eclipse.jdt.core.compiler" artifactId="ecj" version="3.5.1" scope="compile" optional="true"/>
+			<dependency groupId="org.codehaus.jsr166-mirror" artifactId="extra166y" version="1.7.0" scope="compile" optional="true"/>
+			<dependency groupId="org.codehaus.jsr166-mirror" artifactId="jsr166y" version="1.7.0" scope="compile" optional="true"/>
+			<dependency groupId="org.functionaljava" artifactId="functionaljava" version="3.0" scope="compile" optional="true"/>
+			<dependency groupId="org.codehaus.groovy" artifactId="groovy-all" version="1.7.5" scope="compile" optional="true"/>
+			<dependency groupId="com.google.guava" artifactId="guava" version="r07" scope="compile" optional="true"/>
+			<dependency groupId="com.google.code.javaparser" artifactId="javaparser" version="1.0.8" scope="compile" optional="true"/>
+			<dependency groupId="org.jruby" artifactId="jruby-complete" version="1.5.3" scope="compile" optional="true"/>
+			<dependency groupId="org.scala-lang" artifactId="scala-library" version="2.8.0" scope="compile" optional="true"/>
+			<dependency groupId="org.scala-lang" artifactId="scala-compiler" version="2.8.0" scope="compile" optional="true"/>
 		</artifact:pom>
-		<artifact:writepom pomRefId="enumerable-pom" file="target/pom.xml"/>
+		<artifact:writepom pomRefId="enumerable-java-pom" file="target/pom.xml"/>
 	</target>
 
 	<target name="install" depends="dist-no-test, pom">
 		<artifact:install file="target/enumerable-java-${enumerable.version}.jar">
-			<pom refid="enumerable-pom" file="target/pom.xml"/>
+			<pom refid="enumerable-java-pom" file="target/pom.xml"/>
 			<attach file="${basedir}/target/enumerable-java-${enumerable.version}-sources.jar" type="jar" classifier="sources" />
 			<attach file="${basedir}/target/enumerable-java-${enumerable.version}-javadoc.jar" type="jar" classifier="javadoc" />
 		</artifact:install>
@@ -374,7 +404,6 @@
 	<property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
 	<property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
 
-	 <!-- before this, update project version (both build.xml and pom.xml) from SNAPSHOT to RELEASE -->
 	<target name="stage" depends="dist, install">
 		<artifact:mvn>
 			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />

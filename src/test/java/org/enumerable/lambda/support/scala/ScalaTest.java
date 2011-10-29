@@ -148,8 +148,8 @@ public class ScalaTest {
         static {
             Settings settings = new Settings();
             settings.classpath()
-                    .v_$eq("lib/scala-library-2.8.0.final.jar" + File.pathSeparator
-                            + "lib/scala-compiler-2.8.0.final.jar");
+                    .v_$eq("lib/scala-library-2.8.0.jar" + File.pathSeparator
+                            + "lib/scala-compiler-2.8.0.jar");
             interpreter = new Interpreter(settings);
         }
 
