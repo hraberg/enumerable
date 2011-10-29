@@ -12,7 +12,7 @@
 
     <target name="build">
         <mkdir dir="target/classes" />
-        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8">
+        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
             <compilerarg value="-Xlint:-options"/>  
             <src path="src" />
 			<exclude name="**/functionaljava/**/*.java" />

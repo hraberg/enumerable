@@ -55,6 +55,7 @@
 		</scalac>
 		<javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
 			<compilerarg value="-Xlint:-options"/>
+			<compilerarg value="-XDignore.symbol.file"/>			
 			<src path="src/main/java" />
 			<classpath refid="enumerable.classpath" />
 		</javac>
@@ -76,6 +77,7 @@
 			<classpath refid="enumerable.test.classpath" />
 		</scalac>
 		<javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
+			<compilerarg value="-XDignore.symbol.file"/>			
 			<compilerarg value="-Xlint:-options"/>
 			<src path="src/test/java" />
 			<classpath refid="enumerable.test.classpath" />
@@ -92,6 +94,7 @@
         	enumerable.git.commit=${enumerable.git.commit}
     	</echo>
 	</target>
+	<target name="compile" depends="build" />
 
 	<target name="agent-jar-uptodate">
 		<uptodate property="jarjar.notRequired" targetfile="target/enumerable-java-${enumerable.version}.jar">
@@ -337,6 +340,7 @@
 
 	<target name="javadoc" unless="javadoc.notRequired" depends="javadoc-uptodate">
 		<javadoc sourcepath="src/main/java" destdir="target/apidocs" charset="UTF-8" Encoding="UTF-8" classpathref="enumerable.classpath" source="1.5" windowtitle="Enumerable.java API ${enumerable.version}">
+			<arg value="-XDignore.symbol.file"/>			
 			<doctitle>
 				<![CDATA[<h1>Enumerable.java API ${enumerable.version}</h1>]]>
             </doctitle>
@@ -345,7 +349,7 @@
 	        </bottom>
 		</javadoc>
 	</target>
-
+	
 	<target name="pom">
 		<artifact:pom id="enumerable-pom" groupId="org.enumerable" artifactId="enumerable-java" version="${enumerable.version}" name="Enumerable.java"
 				url="http://www.enumerable.org" description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.">
