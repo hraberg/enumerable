@@ -379,7 +379,7 @@
 			<dependency groupId="junit" artifactId="junit" version="4.7" scope="test"/>
 			<dependency groupId="org.clojure" artifactId="clojure" version="1.3.0" scope="compile" optional="true"/>
 			<dependency groupId="clojure-jsr223" artifactId="clojure-jsr223" version="1.0" scope="compile" optional="true"/>
-			<dependency groupId="org.eclipse.jdt.core.compiler" artifactId="ecj" version="3.5.1" scope="compile" optional="true"/>
+			<dependency groupId="org.eclipse.jdt.core.compiler" artifactId="ecj" version="3.7.1" scope="compile" optional="true"/>
 			<dependency groupId="org.codehaus.jsr166-mirror" artifactId="extra166y" version="1.7.0" scope="compile" optional="true"/>
 			<dependency groupId="org.codehaus.jsr166-mirror" artifactId="jsr166y" version="1.7.0" scope="compile" optional="true"/>
 			<dependency groupId="org.functionaljava" artifactId="functionaljava" version="3.0" scope="compile" optional="true"/>

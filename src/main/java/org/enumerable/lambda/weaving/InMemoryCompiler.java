@@ -89,6 +89,7 @@ public class InMemoryCompiler {
         if (useECJ) {
             options.add("-warn:-raw");
             options.add("-warn:-deadCode");
+            options.add("-warn:-serial");
         }
 
         CompilationTask task = compiler.getTask(null, manager, diagnostics, options, null,
