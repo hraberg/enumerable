@@ -90,10 +90,10 @@ public class ScalaTest {
         IFn star = (IFn) ClojureTest.getClojureEngine().eval("*");
         Function2<Object, Object, Object> times = toFunction(LambdaClojure.toFn2(star));
 
-        assertEquals(6, times.apply(2, 3));
+        assertEquals(6L, times.apply(2, 3));
 
         scala.bind("timesClojure", "Function2[Any, Any, Any]", times);
-        assertEquals(120, scala.eval("List(1, 2, 3, 4, 5).reduceLeft(timesClojure)"));
+        assertEquals(120L, scala.eval("List(1, 2, 3, 4, 5).reduceLeft(timesClojure)"));
     }
 
     @Test

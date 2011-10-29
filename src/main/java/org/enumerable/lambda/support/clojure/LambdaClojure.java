@@ -123,11 +123,11 @@ public class LambdaClojure {
     }
 
     public static abstract class AFn0 extends AFnFnBase {
-        public abstract Object invoke() throws Exception;
+        public abstract Object invoke();
     }
 
     public static abstract class AFn1 extends AFn0 {
-        public Object invoke() throws Exception {
+        public Object invoke() {
             return invoke(default$1());
         }
 
@@ -136,11 +136,11 @@ public class LambdaClojure {
             return null;
         }
 
-        public abstract Object invoke(Object arg1) throws Exception;
+        public abstract Object invoke(Object arg1);
     }
 
     public static abstract class AFn2 extends AFn1 {
-        public Object invoke(Object arg1) throws Exception {
+        public Object invoke(Object arg1) {
             return invoke(arg1, default$2());
         }
 
@@ -149,11 +149,11 @@ public class LambdaClojure {
             return null;
         }
 
-        public abstract Object invoke(Object arg1, Object arg2) throws Exception;
+        public abstract Object invoke(Object arg1, Object arg2);
     }
 
     public static abstract class AFn3 extends AFn2 {
-        public Object invoke(Object arg1, Object arg2) throws Exception {
+        public Object invoke(Object arg1, Object arg2) {
             return invoke(arg1, arg2, default$3());
         }
 
@@ -162,7 +162,7 @@ public class LambdaClojure {
             return null;
         }
 
-        public abstract Object invoke(Object arg1, Object arg2, Object arg3) throws Exception;
+        public abstract Object invoke(Object arg1, Object arg2, Object arg3);
     }
 
     /**
@@ -317,7 +317,7 @@ public class LambdaClojure {
                 return aFn;
             }
 
-            public Object invoke() throws Exception {
+            public Object invoke() {
                 return f.call();
             }
         };
@@ -335,13 +335,13 @@ public class LambdaClojure {
                 return aFn;
             }
 
-            public Object invoke() throws Exception {
+            public Object invoke() {
                 if (arity > -1)
                     throwArity(0);
                 return f.call();
             }
 
-            public Object invoke(Object arg1) throws Exception {
+            public Object invoke(Object arg1) {
                 return f.call(arg1);
             }
 
@@ -367,19 +367,19 @@ public class LambdaClojure {
                 return aFn;
             }
 
-            public Object invoke() throws Exception {
+            public Object invoke() {
                 if (arity > -1)
                     throwArity(0);
                 return f.call();
             }
 
-            public Object invoke(Object arg1) throws Exception {
+            public Object invoke(Object arg1) {
                 if (arity > -2)
                     throwArity(1);
                 return f.call(arg1);
             }
 
-            public Object invoke(Object arg1, Object arg2) throws Exception {
+            public Object invoke(Object arg1, Object arg2) {
                 return f.call(arg1, arg2);
             }
 
@@ -405,25 +405,25 @@ public class LambdaClojure {
                 return aFn;
             }
 
-            public Object invoke() throws Exception {
+            public Object invoke() {
                 if (arity > -1)
                     throwArity(0);
                 return f.call();
             }
 
-            public Object invoke(Object arg1) throws Exception {
+            public Object invoke(Object arg1) {
                 if (arity > -2)
                     throwArity(1);
                 return f.call(arg1);
             }
 
-            public Object invoke(Object arg1, Object arg2) throws Exception {
+            public Object invoke(Object arg1, Object arg2) {
                 if (arity > -3)
                     throwArity(2);
                 return f.call(arg1, arg2);
             }
 
-            public Object invoke(Object arg1, Object arg2, Object arg3) throws Exception {
+            public Object invoke(Object arg1, Object arg2, Object arg3) {
                 return f.call(arg1, arg2, arg3);
             }
 

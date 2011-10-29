@@ -113,7 +113,7 @@ public class GroovyTest {
         Closure closure = toClosure(LambdaClojure.toFn2(star));
 
         groovy.put("f", closure);
-        assertEquals(6, groovy.eval("f(2, 3)"));
+        assertEquals(6L, groovy.eval("f(2, 3)"));
     }
 
     @Test

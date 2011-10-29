@@ -353,6 +353,7 @@
 	<target name="download-dependencies" depends="pom">
 		<artifact:dependencies filesetId="dependency.fileset" sourcesFilesetId="sources.dependency.fileset" pomrefid="enumerable-java-pom" />
 
+		<delete dir="lib" />
 		<mkdir dir="lib/src" />
 		<copy todir="lib" flatten="true">
 		  <fileset refid="dependency.fileset" />
@@ -363,6 +364,7 @@
 	</target>
 
 	<target name="pom">
+		<mkdir dir="target" />
 		<artifact:pom id="enumerable-java-pom" groupId="org.enumerable" artifactId="enumerable-java" version="${enumerable.version}" name="Enumerable.java"
 				url="http://www.enumerable.org" description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.">
 			<scm url="https://github.com/hraberg/enumerable" connection="scm:git@github.com:hraberg/enumerable.git" developerConnection="scm:git@github.com:hraberg/enumerable.git"/>
@@ -375,7 +377,7 @@
 			<dependency groupId="asm" artifactId="asm-all" version="3.3" scope="provided"/>
 			<dependency groupId="asm" artifactId="asm-debug-all" version="3.3" scope="test"/>
 			<dependency groupId="junit" artifactId="junit" version="4.7" scope="test"/>
-			<dependency groupId="org.clojure" artifactId="clojure" version="1.2.0" scope="compile" optional="true"/>
+			<dependency groupId="org.clojure" artifactId="clojure" version="1.3.0" scope="compile" optional="true"/>
 			<dependency groupId="clojure-jsr223" artifactId="clojure-jsr223" version="1.0" scope="compile" optional="true"/>
 			<dependency groupId="org.eclipse.jdt.core.compiler" artifactId="ecj" version="3.5.1" scope="compile" optional="true"/>
 			<dependency groupId="org.codehaus.jsr166-mirror" artifactId="extra166y" version="1.7.0" scope="compile" optional="true"/>
@@ -409,7 +411,7 @@
 			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
 			<arg value="-Durl=${maven-staging-repository-url}" />
 			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
-			<arg value="-DpomFile=pom.xml" />
+			<arg value="-DpomFile=target/pom.xml" />
 			<arg value="-Dfile=enumerable-java-${enumerable.version}.jar" />
             <arg value="-Pgpg" />
 		</artifact:mvn>
@@ -418,7 +420,7 @@
 			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
 			<arg value="-Durl=${maven-staging-repository-url}" />
 			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
-			<arg value="-DpomFile=pom.xml" />
+			<arg value="-DpomFile=target/pom.xml" />
 			<arg value="-Dfile=enumerable-java-${enumerable.version}-sources.jar" />
 			<arg value="-Dclassifier=sources" />
             <arg value="-Pgpg" />
@@ -428,7 +430,7 @@
 			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
 			<arg value="-Durl=${maven-staging-repository-url}" />
 			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
-			<arg value="-DpomFile=pom.xml" />
+			<arg value="-DpomFile=target/pom.xml" />
 			<arg value="-Dfile=enumerable-java-${enumerable.version}-javadoc.jar" />
 			<arg value="-Dclassifier=javadoc" />
             <arg value="-Pgpg" />
@@ -440,7 +442,7 @@
 			<arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
 			<arg value="-Durl=${maven-snapshots-repository-url}" />
 			<arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
-			<arg value="-DpomFile=pom.xml" />
+			<arg value="-DpomFile=target/pom.xml" />
 			<arg value="-Dfile==enumerable-java-${enumerable.version}.jar" />
 		</artifact:mvn>
      </target>

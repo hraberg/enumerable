@@ -163,14 +163,14 @@ public class ClojureTest {
 
         IFn isOdd = eval("odd?");
 
-        ISeq odd = list(1, 3, 5);
+        ISeq odd = list(1L, 3L, 5L);
         assertEquals(odd, (filter(isOdd, v)));
         assertEquals(odd, eval(filter, isOdd, v));
         assertEquals(odd, eval("(filter odd? v)"));
 
         IFn isEven = defn("is-even?", toIFn(Lambda.λ(n, n % 2 == 0)));
 
-        ISeq even = list(2, 4);
+        ISeq even = list(2L, 4L);
         assertEquals(even, (filter(isEven, v)));
         assertEquals(even, eval(filter, isEven, v));
         assertEquals(even, eval("(filter is-even? v)"));
@@ -185,12 +185,12 @@ public class ClojureTest {
         Integer factorial = 120;
         assertEquals(factorial, clj.eval("(reduce times 1 v)"));
 
-        ISeq odd = list(1, 3, 5);
+        ISeq odd = list(1L, 3L, 5L);
         assertEquals(odd, clj.eval("(filter odd? v)"));
 
         defn("is-even?", toIFn(Lambda.λ(n, n % 2 == 0)));
 
-        ISeq even = list(2, 4);
+        ISeq even = list(2L, 4L);
         assertEquals(even, clj.eval("(filter is-even? v)"));
     }
 
@@ -238,7 +238,7 @@ public class ClojureTest {
     @Test
     public void convertIFnToFn() throws ScriptException {
         IFn star = eval("*");
-        assertEquals(6, toFn2(star).call(2, 3));
+        assertEquals(6L, toFn2(star).call(2, 3));
     }
 
     @SuppressWarnings("unchecked")
@@ -247,7 +247,7 @@ public class ClojureTest {
         APersistentVector v = (APersistentVector) clj.eval("[1 2 3 4 5]");
         IFn star = (IFn) clj.eval("*");
 
-        assertEquals(120, Enumerable.inject(v, 1, toFn2(star)));
+        assertEquals(120L, Enumerable.inject(v, 1, toFn2(star)));
     }
 
     @Test
@@ -286,7 +286,7 @@ public class ClojureTest {
         assertEquals(6, times.invoke(2, 3));
 
         defn("times-groovy", times);
-        assertEquals(120, clj.eval("(reduce times-groovy 1 [1, 2, 3, 4, 5])"));
+        assertEquals(120L, clj.eval("(reduce times-groovy 1 [1, 2, 3, 4, 5])"));
     }
 
     @SuppressWarnings("unchecked")
@@ -294,13 +294,13 @@ public class ClojureTest {
     public void interactingWithScala() throws Exception {
         ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
 
-        Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Int, m: Int) => n * m");
+        Function2<Long, Long, Long> f = (Function2<Long, Long, Long>) scala.eval("(n: Long, m: Long) => n * m");
         IFn times = toIFn(LambdaScala.toFn2(f));
 
-        assertEquals(6, times.invoke(2, 3));
+        assertEquals(6L, times.invoke(2L, 3L));
 
         defn("times-scala", times);
-        assertEquals(120, clj.eval("(reduce times-scala 1 [1, 2, 3, 4, 5])"));
+        assertEquals(120L, clj.eval("(reduce times-scala 1 [1, 2, 3, 4, 5])"));
     }
 
     @Before
