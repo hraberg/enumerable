@@ -12,19 +12,7 @@
 
 	<path id="enumerable.classpath">
 		<pathelement location="target/classes" />
-		<pathelement location="lib/asm-all-${asm.version}.jar" />
-		<pathelement location="lib/jsr166y.jar" />
-		<pathelement location="lib/extra166y.jar" />
-		<pathelement location="lib/clojure-1.2.0.jar" />
-		<pathelement location="lib/clojure-jsr223.jar" />
-		<pathelement location="lib/jruby-complete-1.5.3.jar" />
-		<pathelement location="lib/guava-r07.jar" />
-		<pathelement location="lib/sun.org.mozilla.javascript.internal.jar" />
-		<pathelement location="lib/groovy-all-1.7.5.jar" />
-		<pathelement location="lib/javaparser-1.0.8.jar" />
-		<pathelement location="lib/ecj-3.5.2.jar" />
-		<pathelement location="lib/scala-library-${scala.version}.jar" />
-		<pathelement location="lib/functionaljava-3.0.jar" />
+		<fileset dir="lib" includes="*.jar" />
 	</path>
 	<path id="enumerable.example.classpath">
 		<pathelement location="target/example-classes" />
@@ -32,22 +20,19 @@
 	</path>
 	<path id="enumerable.test.classpath">
 		<pathelement location="target/test-classes" />
-		<pathelement location="lib/junit-4.7.jar" />
-		<pathelement location="lib/scala-compiler-${scala.version}.jar" />
 		<path refid="enumerable.example.classpath" />
 	</path>
 
-	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-0.6.jar" />
+	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/build/jarjar-0.6.jar" />
 	<taskdef resource="scala/tools/ant/antlib.xml">
 		<classpath>
 			<pathelement location="lib/scala-compiler-${scala.version}.jar" />
 			<pathelement location="lib/scala-library-${scala.version}.jar" />
 		</classpath>
 	</taskdef>
-	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar-0.6.jar" />
 	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
 	           uri="antlib:org.apache.maven.artifact.ant"
-	           classpath="lib/maven-ant-tasks-2.1.3.jar" />
+	           classpath="lib/build/maven-ant-tasks-2.1.3.jar" />
 
 	<target name="clean">
 		<delete dir="target" />
