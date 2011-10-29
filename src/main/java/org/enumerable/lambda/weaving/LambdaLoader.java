@@ -114,8 +114,6 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         return weavingNotEnabledMessage;
     }
 
-
-
     LambdaTreeTransformer transformer = new LambdaTreeTransformer();
 
     protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {

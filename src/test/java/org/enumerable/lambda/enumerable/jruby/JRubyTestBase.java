@@ -14,7 +14,6 @@ import java.util.Map;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
-
 import org.enumerable.lambda.Fn0;
 import org.enumerable.lambda.Fn1;
 import org.enumerable.lambda.Fn2;
