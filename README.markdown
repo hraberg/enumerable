@@ -167,7 +167,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Clojure Sequences and IFns
 
-[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/clojure/clojure/blob/1.2.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). You need `clojure-1.2.0.jar` or later on your class path. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
+[LambdaClojure](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/clojure/LambdaClojure.java) allows you to create lambdas implementing the interface [clojure.lang.IFn](http://github.com/clojure/clojure/blob/1.2.0/src/jvm/clojure/lang/IFn.java) to be used directly with Clojure or via [ClojureSeqs](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/clojure/ClojureSeqs.java) which acts as a facade for the [Clojure Seq library](http://clojure.org/sequences). The tests run against `clojure-1.3.0.jar`. Download from [clojure.org](http://code.google.com/p/clojure/downloads/list).
 
 ### JRuby Blocks
 
@@ -187,7 +187,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Google Collections
 
-[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Guava (a superset of Google Collections)](http://code.google.com/p/guava-libraries/). You need `guava-r07.jar` on your class path. Download from [Guava](http://code.google.com/p/guava-libraries/downloads/list).
+[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Guava (a superset of Google Collections)](http://code.google.com/p/guava-libraries/). The tests run against `guava-10.0.1.jar` on your class path. Download from [Guava](http://code.google.com/p/guava-libraries/downloads/list).
 
 ### Functional Java
 
