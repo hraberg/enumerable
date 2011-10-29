@@ -5,7 +5,7 @@
 	</description>
 
 	<property name="enumerable.version" value="0.3.1-SNAPSHOT" />
-	<property name="asm.version" value="3.3" />
+	<property name="asm.version" value="3.3.1" />
 	<property name="scala.version" value="2.9.1" />
 	<property file="lambda.weaving.properties" />
 	<tstamp />
@@ -374,8 +374,8 @@
 			<remoterepository id="clojars" url="http://clojars.org/repo"/>
 			<remoterepository id="javaparser-release" url="https://javaparser.googlecode.com/svn/maven2"/>		
 
-			<dependency groupId="asm" artifactId="asm-all" version="3.3" scope="provided"/>
-			<dependency groupId="asm" artifactId="asm-debug-all" version="3.3" scope="test"/>
+			<dependency groupId="asm" artifactId="asm-all" version="${asm.version}" scope="provided"/>
+			<dependency groupId="asm" artifactId="asm-debug-all" version="${asm.version}" scope="test"/>
 			<dependency groupId="junit" artifactId="junit" version="4.7" scope="test"/>
 			<dependency groupId="org.clojure" artifactId="clojure" version="1.3.0" scope="compile" optional="true"/>
 			<dependency groupId="clojure-jsr223" artifactId="clojure-jsr223" version="1.0" scope="compile" optional="true"/>
