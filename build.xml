@@ -23,7 +23,7 @@
 		<path refid="enumerable.example.classpath" />
 	</path>
 
-	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/build/jarjar-0.6.jar" />
+	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="build/jarjar-0.6.jar" />
 	<taskdef resource="scala/tools/ant/antlib.xml">
 		<classpath>
 			<pathelement location="lib/scala-compiler-${scala.version}.jar" />
@@ -32,7 +32,7 @@
 	</taskdef>
 	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
 	           uri="antlib:org.apache.maven.artifact.ant"
-	           classpath="lib/build/maven-ant-tasks-2.1.3.jar" />
+	           classpath="build/maven-ant-tasks-2.1.3.jar" />
 
 	<target name="clean">
 		<delete dir="target" />
