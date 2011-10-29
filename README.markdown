@@ -171,7 +171,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### JRuby Blocks
 
-[LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.4.0/src/org/jruby/RubyProc.java). You need `jruby-1.5.3.jar` or later on your class path. Download from [jruby.org](http://www.jruby.org/download).
+[LambdaJRuby](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/jruby/LambdaJRuby.java) allows you to create lambdas extending [RubyProc](http://github.com/jruby/jruby/blob/1.6.5/src/org/jruby/RubyProc.java). The tests run against `jruby-1.6.5.jar`. Download from [jruby.org](http://www.jruby.org/download).
 
 ### JavaScript Functions (for Java 6)
 

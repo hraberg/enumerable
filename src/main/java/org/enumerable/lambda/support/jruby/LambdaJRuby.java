@@ -1,6 +1,9 @@
 package org.enumerable.lambda.support.jruby;
 
+import static org.enumerable.lambda.exception.UncheckedException.*;
 import static org.jruby.javasupport.JavaEmbedUtils.*;
+
+import java.lang.reflect.Method;
 
 import org.enumerable.lambda.Fn0;
 import org.enumerable.lambda.Fn1;
@@ -18,13 +21,15 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 /**
- * This is class is similar {@link org.enumerable.lambda.Lambda}, but instead of creating
- * lambdas inheriting from {@link org.enumerable.lambda.Fn0} it creates lambdas extending
- * {@link RubyProc} to be used together with JRuby.
+ * This is class is similar {@link org.enumerable.lambda.Lambda}, but instead of
+ * creating lambdas inheriting from {@link org.enumerable.lambda.Fn0} it creates
+ * lambdas extending {@link RubyProc} to be used together with JRuby.
  */
 @SuppressWarnings("serial")
 public class LambdaJRuby {
     public abstract static class RubyProcFnBase extends RubyProc {
+        private Method setup;
+
         class FnBlockCallback implements BlockCallback {
             public IRubyObject call(ThreadContext context, IRubyObject[] args, Block block) {
                 args = getNormalArgumentsFromCallBlocksSingleRestArg(context, args);
@@ -55,9 +60,21 @@ public class LambdaJRuby {
 
         public RubyProcFnBase(Ruby runtime) {
             super(runtime, runtime.getProc(), Block.Type.LAMBDA);
-            ThreadContext context = getRuntime().getThreadService().getCurrentContext();
-            initialize(context, CallBlock.newCallClosure(this, getType(), getArityFromInstance(),
-                    new FnBlockCallback(), context));
+            try {
+                ThreadContext context = getRuntime().getThreadService().getCurrentContext();
+                setup().invoke(this, CallBlock.newCallClosure(this, getType(), getArityFromInstance(),
+                        new FnBlockCallback(), context));
+            } catch (Exception e) {
+                throw uncheck(e);
+            }
+        }
+
+        private Method setup() throws NoSuchMethodException {
+            if (setup == null) {
+                setup = RubyProc.class.getDeclaredMethod("setup", Block.class);
+                setup.setAccessible(true);
+            }
+            return setup;
         }
 
         Arity getArityFromInstance() {

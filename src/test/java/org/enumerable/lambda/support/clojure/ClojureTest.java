@@ -280,7 +280,7 @@ public class ClojureTest {
     public void interactingWithGroovy() throws Exception {
         ScriptEngine groovy = GroovyTest.getGroovyEngine();
 
-        Closure closure = (Closure) groovy.eval("{ n, m -> n * m }");
+        Closure<?> closure = (Closure<?>) groovy.eval("{ n, m -> n * m }");
         IFn times = toIFn(LambdaGroovy.toFn2(closure));
 
         assertEquals(6, times.invoke(2, 3));

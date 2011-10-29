@@ -124,7 +124,7 @@ public class JavaScriptTest {
     public void interactingWithGroovy() throws Exception {
         ScriptEngine groovy = GroovyTest.getGroovyEngine();
 
-        Closure closure = (Closure) groovy.eval("{ n, m -> n * m }");
+        Closure<?> closure = (Closure<?>) groovy.eval("{ n, m -> n * m }");
         FunctionFn2 f = toFunction(LambdaGroovy.toFn2(closure));
 
         js.put("f", f);

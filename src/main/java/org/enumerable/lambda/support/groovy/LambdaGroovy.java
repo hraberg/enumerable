@@ -17,7 +17,7 @@ import sun.org.mozilla.javascript.internal.Function;
  */
 @SuppressWarnings("serial")
 public class LambdaGroovy {
-    public static abstract class ClosureFn0 extends Closure {
+    public static abstract class ClosureFn0 extends Closure<Object> {
         public ClosureFn0() {
             super(LambdaGroovy.class);
             Fn0.getAndCheckArityForMethod(getImplementingClass(), getMethod());
@@ -107,7 +107,7 @@ public class LambdaGroovy {
     /**
      * Wraps the {@link Function} in a {@link Fn0}.
      */
-    public static Fn0<Object> toFn0(final Closure closure) {
+    public static Fn0<Object> toFn0(final Closure<?> closure) {
         return new Fn0<Object>() {
             public Object call() {
                 return closure.call();
@@ -118,7 +118,7 @@ public class LambdaGroovy {
     /**
      * Wraps the {@link Function} in a {@link Fn1}.
      */
-    public static Fn1<Object, Object> toFn1(final Closure closure) {
+    public static Fn1<Object, Object> toFn1(final Closure<?> closure) {
         return new Fn1<Object, Object>() {
             public Object call(Object a1) {
                 return closure.call(new Object[] { a1 });
@@ -129,7 +129,7 @@ public class LambdaGroovy {
     /**
      * Wraps the {@link Function} in a {@link Fn2}.
      */
-    public static Fn2<Object, Object, Object> toFn2(final Closure closure) {
+    public static Fn2<Object, Object, Object> toFn2(final Closure<?> closure) {
         return new Fn2<Object, Object, Object>() {
             public Object call(Object a1, Object a2) {
                 return closure.call(new Object[] { a1, a2 });
@@ -140,7 +140,7 @@ public class LambdaGroovy {
     /**
      * Wraps the {@link Function} in a {@link Fn3}.
      */
-    public static Fn3<Object, Object, Object, Object> toFn3(final Closure closure) {
+    public static Fn3<Object, Object, Object, Object> toFn3(final Closure<?> closure) {
         return new Fn3<Object, Object, Object, Object>() {
             public Object call(Object a1, Object a2, Object a3) {
                 return closure.call(new Object[] { a1, a2, a3 });

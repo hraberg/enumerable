@@ -1,5 +1,7 @@
 package org.enumerable.lambda.enumerable.jruby;
 
+import javax.script.ScriptException;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -99,5 +101,11 @@ public class EnumerableRubyTestTest extends JRubyTestBase {
     public void tc_zip() throws Exception {
         testUnit("test/externals/ruby_test/test/core/Enumerable/instance/tc_zip",
                 "TC_Enumerable_Zip_InstanceMethod");
+    }
+
+    // Not sure what's going on here, the tests work on their own, did put this hack in for the suite
+    protected void beforeRunningTestUnit() throws ScriptException {
+        eval("class Test::Unit::TestResult; def single_character_display; end end");
+        eval("class Test::Unit::TestResult; def long_display; end end");
     }
 }

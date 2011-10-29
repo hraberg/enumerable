@@ -124,7 +124,7 @@ public class ScalaTest {
     public void interactingWithGroovy() throws Exception {
         ScriptEngine groovy = GroovyTest.getGroovyEngine();
 
-        Closure closure = (Closure) groovy.eval("{ n, m -> n * m }");
+        Closure<?> closure = (Closure<?>) groovy.eval("{ n, m -> n * m }");
         Function2<Object, Object, Object> times = toFunction(LambdaGroovy.toFn2(closure));
 
         assertEquals(6, times.apply(2, 3));

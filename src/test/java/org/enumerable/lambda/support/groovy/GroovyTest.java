@@ -66,31 +66,31 @@ public class GroovyTest {
 
     @Test
     public void convertFnToClosure() throws ScriptException {
-        Closure closure = toClosure(Lambda.λ(s, s.toUpperCase()));
+        Closure<?> closure = toClosure(Lambda.λ(s, s.toUpperCase()));
         assertEquals("HELLO", closure.call(new Object[] { "hello" }));
     }
 
     @Test
     public void convertFnToClosureKeepsDefaultValues() throws ScriptException {
-        Closure closure = toClosure(Lambda.λ(s = "world", s.toUpperCase()));
+        Closure<?> closure = toClosure(Lambda.λ(s = "world", s.toUpperCase()));
         assertEquals("WORLD", closure.call(new Object[0]));
     }
 
     @Test(expected = NullPointerException.class)
     public void convertedClosureThrowsExceptionWhenCalledWithTooFewArguments() throws ScriptException {
-        Closure closure = toClosure(Lambda.λ(s, s.toUpperCase()));
+        Closure<?> closure = toClosure(Lambda.λ(s, s.toUpperCase()));
         closure.call(new Object[0]);
     }
 
     @Test(expected = MissingMethodException.class)
     public void convertedClosureThrowsExceptionWhenCalledWithTooManyArguments() throws ScriptException {
-        Closure closure = toClosure(Lambda.λ(s, s.toUpperCase()));
+        Closure<?> closure = toClosure(Lambda.λ(s, s.toUpperCase()));
         closure.call(new Object[] { "hello", "world" });
     }
 
     @Test
     public void convertClosureToFn() throws ScriptException {
-        Closure closure = (Closure) groovy.eval("{ it -> it.toUpperCase() }");
+        Closure<?> closure = (Closure<?>) groovy.eval("{ it -> it.toUpperCase() }");
         assertEquals("HELLO", toFn1(closure).call("hello"));
     }
 
@@ -103,14 +103,14 @@ public class GroovyTest {
     @Test
     public void interactingWithEnumerableJava() throws Exception {
         List<Integer> list = asList(1, 2, 3);
-        Fn1<Object, Object> block = toFn1((Closure) groovy.eval("{ n -> n * 2 }"));
+        Fn1<Object, Object> block = toFn1((Closure<?>) groovy.eval("{ n -> n * 2 }"));
         assertEquals(asList(2, 4, 6), Enumerable.collect(list, block));
     }
 
     @Test
     public void interactingWithClojure() throws Exception {
         IFn star = (IFn) ClojureTest.getClojureEngine().eval("*");
-        Closure closure = toClosure(LambdaClojure.toFn2(star));
+        Closure<?> closure = toClosure(LambdaClojure.toFn2(star));
 
         groovy.put("f", closure);
         assertEquals(6L, groovy.eval("f(2, 3)"));
@@ -121,7 +121,7 @@ public class GroovyTest {
         ScriptEngine rb = JRubyTest.getJRubyEngine();
 
         RubyProc proc = (RubyProc) rb.eval(":*.to_proc");
-        Closure closure = toClosure(LambdaJRuby.toFn2(proc));
+        Closure<?> closure = toClosure(LambdaJRuby.toFn2(proc));
 
         groovy.put("f", closure);
         assertEquals(6L, groovy.eval("f(2, 3)"));
@@ -146,7 +146,7 @@ public class GroovyTest {
         ScalaInterpreter scala = ScalaTest.getScalaInterpreter();
 
         Function2<Integer, Integer, Integer> f = (Function2<Integer, Integer, Integer>) scala.eval("(n: Int, m: Int) => n * m");
-        Closure closure = toClosure(LambdaScala.toFn2(f));
+        Closure<?> closure = toClosure(LambdaScala.toFn2(f));
 
         groovy.put("closure", closure);
         assertEquals(120, groovy.eval("[1, 2, 3, 4, 5].inject(1, closure)"));

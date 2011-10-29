@@ -58,6 +58,7 @@ public class JRubyTestBase {
         try {
             require(file);
             require("test/unit/ui/console/testrunner");
+            beforeRunningTestUnit();
             eval("r = Test::Unit::UI::Console::TestRunner.run(" + testClass + ")");
             eval("raise r.to_s unless r.passed?");
 
@@ -69,6 +70,9 @@ public class JRubyTestBase {
         } finally {
             rb.getContext().setWriter(originalWriter);
         }
+    }
+
+    protected void beforeRunningTestUnit() throws ScriptException {
     }
 
     public static void debug(String msg) {

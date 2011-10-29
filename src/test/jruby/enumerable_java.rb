@@ -58,8 +58,8 @@ module Enumerable
       JRubyTestBase.debug "caught ArgumentError, trying again with implicit block"
       begin
         result = java_object.send java_name, Fn1.identity
-      rescue
-        raise e
+      rescue Exception
+        raise
       end
     rescue NoMethodError, TypeError
       raise

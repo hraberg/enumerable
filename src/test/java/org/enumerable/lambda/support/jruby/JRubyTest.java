@@ -12,7 +12,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-
 import org.enumerable.lambda.Fn1;
 import org.enumerable.lambda.Lambda;
 import org.enumerable.lambda.enumerable.Enumerable;
@@ -175,7 +174,7 @@ public class JRubyTest {
         Ruby ruby = Ruby.getGlobalRuntime();
         ScriptEngine groovy = GroovyTest.getGroovyEngine();
 
-        Closure closure = (Closure) groovy.eval("{ n, m -> n * m }");
+        Closure<?> closure = (Closure<?>) groovy.eval("{ n, m -> n * m }");
         RubyProc proc = toProc(LambdaGroovy.toFn2(closure));
 
         assertEquals(ruby.newFixnum(6), proc.call(ruby.getThreadService().getCurrentContext(), new IRubyObject[] {
