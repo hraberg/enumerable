@@ -5,7 +5,6 @@ package org.enumerable.lambda;
  */
 @SuppressWarnings("serial")
 public abstract class Fn2<A1, A2, R> extends Fn1<A1, R> {
-    public final int arity = 2;
 
     public abstract R call(A1 a1, A2 a2);
 
@@ -19,7 +18,7 @@ public abstract class Fn2<A1, A2, R> extends Fn1<A1, R> {
 
     @SuppressWarnings("unchecked")
     public R apply(Object... args) {
-        if (args.length >= arity)
+        if (args.length >= 2)
             return call((A1) args[0], (A2) args[1]);
         return super.apply(args);
     }
@@ -59,5 +58,9 @@ public abstract class Fn2<A1, A2, R> extends Fn1<A1, R> {
                 return isFalseOrNull(Fn2.this.call(a1, a2));
             }
         };
+    }
+
+    public int arity() {
+        return 2;
     }
 }

@@ -16,8 +16,6 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
         };
     }
 
-    public final int arity = 1;
-
     public abstract R call(A1 a1);
 
     public R call() {
@@ -30,7 +28,7 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
 
     @SuppressWarnings("unchecked")
     public R apply(Object... args) {
-        if (args.length >= arity)
+        if (args.length >= 1)
             return call((A1) args[0]);
         return super.apply(args);
     }
@@ -101,5 +99,9 @@ public abstract class Fn1<A1, R> extends Fn0<R> {
                 return isFalseOrNull(Fn1.this.call(a1));
             }
         };
+    }
+
+    public int arity() {
+        return 1;
     }
 }

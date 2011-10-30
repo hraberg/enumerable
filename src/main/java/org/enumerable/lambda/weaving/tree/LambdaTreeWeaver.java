@@ -521,6 +521,8 @@ class LambdaTreeWeaver implements Opcodes {
                 lambda.visit(V1_5, ACC_FINAL | ACC_SYNTHETIC | ACC_PUBLIC, lambdaClass(), null, getSuperType()
                         .getInternalName(), getLambdaInterfaces());
 
+                lambda.visitSource(c.sourceFile, null);
+
                 createLambdaConstructor();
                 createSAMethod();
 
@@ -848,8 +850,15 @@ class LambdaTreeWeaver implements Opcodes {
                         .getDescriptor(), null, null);
                 addLambdaParameterAnnotations();
                 saMn.visitCode();
+                insertLineNumber();
 
                 convertMethodArgumentsToLambdaParameterTypes();
+            }
+
+            void insertLineNumber() {
+                Label lineLabel = new Label();
+                saMn.visitLabel(lineLabel);
+                saMn.visitLineNumber(line, lineLabel);
             }
 
             void addLambdaParameterAnnotations() {

@@ -1,35 +1,5 @@
 package org.enumerable.lambda;
 
-import static java.lang.Thread.*;
-import static org.enumerable.lambda.Lambda.*;
-import static org.enumerable.lambda.Parameters.*;
-import static org.enumerable.lambda.primitives.LambdaPrimitives.*;
-import static org.junit.Assert.*;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EventObject;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Callable;
-
-import javax.swing.JButton;
-
-
-import org.enumerable.lambda.Fn0;
-import org.enumerable.lambda.Fn1;
-import org.enumerable.lambda.Fn2;
-import org.enumerable.lambda.Fn3;
-import org.enumerable.lambda.Parameters;
 import org.enumerable.lambda.annotation.LambdaLocal;
 import org.enumerable.lambda.annotation.LambdaParameter;
 import org.enumerable.lambda.annotation.NewLambda;
@@ -37,6 +7,25 @@ import org.enumerable.lambda.exception.LambdaWeavingNotEnabledException;
 import org.enumerable.lambda.primitives.Fn1ItoB;
 import org.enumerable.lambda.primitives.Fn1ItoI;
 import org.junit.Test;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.Timer;
+import java.util.concurrent.Callable;
+
+import static java.lang.Thread.sleep;
+import static org.enumerable.lambda.Lambda.delegate;
+import static org.enumerable.lambda.Lambda.λ;
+import static org.enumerable.lambda.Parameters.*;
+import static org.enumerable.lambda.primitives.LambdaPrimitives.λ;
+import static org.junit.Assert.*;
 
 public class LambdaTest extends TestBase {
     @Test
@@ -254,11 +243,11 @@ public class LambdaTest extends TestBase {
 
     @Test
     public void arities() throws Exception {
-        assertEquals(0, λ().arity);
-        assertEquals(0, λ(null).arity);
-        assertEquals(1, λ(n, null).arity);
-        assertEquals(2, λ(n, m, null).arity);
-        assertEquals(3, λ(n, m, s, null).arity);
+        assertEquals(0, λ().arity());
+        assertEquals(0, λ(null).arity());
+        assertEquals(1, λ(n, null).arity());
+        assertEquals(2, λ(n, m, null).arity());
+        assertEquals(3, λ(n, m, s, null).arity());
     }
 
     @Test

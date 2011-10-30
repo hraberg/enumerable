@@ -70,8 +70,6 @@ public abstract class Fn0<R> implements Serializable {
         getAndCheckArityForMethod(getClass(), "call");
     }
 
-    public final int arity = 0;
-
     public abstract R call();
 
     /**
@@ -101,6 +99,10 @@ public abstract class Fn0<R> implements Serializable {
     public <I> I as(Class<I> anInterface, String regex, Class<?>... parameterTypes) {
         return (I) Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[] { anInterface },
                 new ApplyMethodInvocationHandler(regex, parameterTypes));
+    }
+
+    public int arity() {
+        return 0;
     }
 
     class ApplyMethodInvocationHandler implements InvocationHandler {
@@ -266,6 +268,10 @@ public abstract class Fn0<R> implements Serializable {
         if (methods.length != 1)
             throw new IllegalArgumentException(aClass.getName() + " has more than one declared method");
         return methods[0];
+    }
+
+    public Method getLambdaMethod() {
+        return getLambdaMethod(getClass());
     }
 
     public LambdaLocal[] getParameters() {
