@@ -4,6 +4,7 @@ import org.enumerable.lambda.Fn0;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 
 import static org.enumerable.lambda.exception.UncheckedException.uncheck;
 
@@ -16,6 +17,14 @@ public class LambdaMethodHandle {
     public static MethodHandle bind(Object fn) {
         try {
             return MethodHandles.lookup().unreflect(Fn0.getLambdaMethod(fn.getClass())).bindTo(fn);
+        } catch (Exception e) {
+            throw uncheck(e);
+        }
+    }
+
+    public static MethodHandle bind(Fn0<?> fn) {
+        try {
+            return MethodHandles.lookup().bind(fn, "call", MethodType.genericMethodType(fn.arity()));
         } catch (Exception e) {
             throw uncheck(e);
         }
