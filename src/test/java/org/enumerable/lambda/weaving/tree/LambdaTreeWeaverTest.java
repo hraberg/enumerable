@@ -2,6 +2,7 @@ package org.enumerable.lambda.weaving.tree;
 
 import static org.enumerable.lambda.Lambda.*;
 import static org.enumerable.lambda.Parameters.*;
+import static org.enumerable.lambda.weaving.ClassFilter.createClassFilter;
 import static org.junit.Assert.*;
 import static org.objectweb.asm.Type.*;
 
@@ -19,7 +20,6 @@ import org.enumerable.lambda.primitives.Fn1DtoI;
 import org.enumerable.lambda.primitives.Fn2DDtoD;
 import org.enumerable.lambda.primitives.Fn2LLtoL;
 import org.enumerable.lambda.primitives.LambdaPrimitives;
-import org.enumerable.lambda.weaving.tree.LambdaTreeWeaver;
 import org.enumerable.lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer;
 import org.enumerable.lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 import org.junit.After;
@@ -638,7 +638,7 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
         return methodIn(aClass).lambdas.get(0);
     }
 
-    MethodAnalyzer methodIn(Class<?> aClass) throws IOException, Exception {
+    MethodAnalyzer methodIn(Class<?> aClass) throws Exception {
         return analyze(aClass).methods.get(1);
     }
 
@@ -650,9 +650,9 @@ public class LambdaTreeWeaverTest extends TestBase implements Opcodes {
     LambdaTreeWeaver weaver;
     Type object = getType(Object.class);
 
-    LambdaTreeWeaver analyze(Class<?> aClass) throws IOException, Exception {
+    LambdaTreeWeaver analyze(Class<?> aClass) throws Exception {
         ClassReader cr = new ClassReader(aClass.getName());
-        weaver = new LambdaTreeWeaver(cr);
+        weaver = new LambdaTreeWeaver(aClass.getClassLoader(), createClassFilter(), cr);
         weaver.analyze();
         return weaver;
     }

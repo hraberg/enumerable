@@ -3,6 +3,7 @@ package org.enumerable.lambda.weaving.tree;
 import org.enumerable.lambda.annotation.LambdaLocal;
 import org.enumerable.lambda.annotation.LambdaParameter;
 import org.enumerable.lambda.annotation.NewLambda;
+import org.enumerable.lambda.weaving.ClassFilter;
 import org.enumerable.lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Method;
@@ -40,9 +41,13 @@ class LambdaTreeWeaver implements Opcodes {
     Map<String, MethodNode> staticAccessMethodsByFieldName = new HashMap<String, MethodNode>();
     Map<String, MethodNode> staticAccessMethodsByMethodNameAndDesc = new HashMap<String, MethodNode>();
 
+    ClassLoader loader;
+    ClassFilter filter;
     ClassReader cr;
 
-    LambdaTreeWeaver(ClassReader cr) {
+    LambdaTreeWeaver(ClassLoader loader, ClassFilter filter, ClassReader cr) {
+        this.loader = loader;
+        this.filter = filter;
         this.cr = cr;
     }
 
@@ -277,7 +282,7 @@ class LambdaTreeWeaver implements Opcodes {
                     return i;
                 }
             }
-            throw new IllegalStateException("Could not find previous stack depth of " + depth + " at line " + line);
+            throw new IllegalStateException("Could not find previous stack depth of " + depth + " at " + sourceAndLine());
         }
 
         int resolveBranches(int end, LabelNode label) {
@@ -1220,7 +1225,7 @@ class LambdaTreeWeaver implements Opcodes {
                 if (sam != null)
                     devDebug("    SAM is: " + sam);
                 else
-                    throw new IllegalStateException("Found no potential abstract method to override" + " at line " + line);
+                    throw new IllegalStateException("Found no potential abstract method to override" + " at " + sourceAndLine());
 
                 devDebug("    parameters: " + parameters.keySet());
                 devDebug("    method parameter types: " + newLambdaParameterTypes);
@@ -1233,7 +1238,7 @@ class LambdaTreeWeaver implements Opcodes {
 
                 if (newLambdaParameterTypes.size() != parameters.size())
                     throw new IllegalStateException("Got " + parameters.keySet() + " as parameters need exactly "
-                            + newLambdaParameterTypes.size()  + " at line " + line);
+                            + newLambdaParameterTypes.size()  + " at " + sourceAndLine());
             }
 
             void devDebugPrintInstructionHeader() {
@@ -1287,7 +1292,7 @@ class LambdaTreeWeaver implements Opcodes {
                         if (!resolveParameter(fin))
                             throw new IllegalStateException("Tried to define extra parameter, " + f.name
                                     + ", arity is " + newLambdaParameterTypes.size() + ", defined parameters are "
-                                    + parameters.keySet() + " at line " + line);
+                                    + parameters.keySet() + " at " + sourceAndLine());
                         return;
                     }
 
@@ -1449,7 +1454,7 @@ class LambdaTreeWeaver implements Opcodes {
             if (hasAnnotation) {
                 if (hasAccess(m, ACC_STATIC))
                     return true;
-                throw new IllegalStateException("Tried to call non static new lambda method " + m.name  + " at line " + line);
+                throw new IllegalStateException("Tried to call non static new lambda method " + m.name  + " at " + sourceAndLine());
             }
             return false;
         }
@@ -1462,9 +1467,13 @@ class LambdaTreeWeaver implements Opcodes {
             if (hasAnnotation) {
                 if (hasAccess(f, ACC_STATIC))
                     return true;
-                throw new IllegalStateException("Tried to define non static lambda parameter " + f.name  + " at line " + line);
+                throw new IllegalStateException("Tried to define non static lambda parameter " + f.name  + " at " + sourceAndLine());
             }
             return false;
+        }
+
+        String sourceAndLine() {
+            return c.sourceFile != null ? "(" + c.sourceFile + ":" + line + ")" : "(Unknown Source)";
         }
     }
 
@@ -1515,7 +1524,7 @@ class LambdaTreeWeaver implements Opcodes {
         String className = getObjectType(in).getClassName();
         if (isEnum(className))
             return cn;
-        try {            
+        try {
             new ClassReader(className).accept(cn, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
         } catch (IOException ignore) {
         }

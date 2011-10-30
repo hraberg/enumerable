@@ -1,5 +1,6 @@
 package org.enumerable.lambda.weaving.tree;
 
+import org.enumerable.lambda.weaving.ClassFilter;
 import org.enumerable.lambda.weaving.ClassInjector;
 import org.enumerable.lambda.weaving.InMemoryCompiler;
 import org.enumerable.lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
@@ -29,7 +30,7 @@ public class LambdaTreeTransformer implements Opcodes {
         return lambdasByClassName;
     }
 
-    public byte[] transform(ClassLoader loader, String name, InputStream in) throws Exception {
+    public byte[] transform(ClassLoader loader, ClassFilter filter, String name, InputStream in) throws Exception {
         if (lambdasByClassName.containsKey(name)) {
             debug("generated lambda requested by the class loader " + name);
             return lambdasByClassName.get(name);
@@ -38,7 +39,7 @@ public class LambdaTreeTransformer implements Opcodes {
         ClassReader cr = new ClassReader(in);
         name = cr.getClassName();
 
-        LambdaTreeWeaver weaver = new LambdaTreeWeaver(cr);
+        LambdaTreeWeaver weaver = new LambdaTreeWeaver(loader, filter, cr);
         ClassNode cn = weaver.analyze().transform();
 
         if (!weaver.hasLambdas())

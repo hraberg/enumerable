@@ -204,6 +204,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" scope="PROVIDED" name="RVM: jruby-1.6.4 facet library" level="application" />
+    <orderEntry type="library" name="build" level="project" />
   </component>
 </module>
 

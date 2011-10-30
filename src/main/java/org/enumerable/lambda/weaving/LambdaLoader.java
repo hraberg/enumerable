@@ -16,6 +16,7 @@ import java.security.ProtectionDomain;
 import static java.lang.System.*;
 import static java.lang.Thread.currentThread;
 import static org.enumerable.lambda.exception.UncheckedException.uncheck;
+import static org.enumerable.lambda.weaving.ClassFilter.createClassFilter;
 import static org.enumerable.lambda.weaving.Debug.debug;
 import static org.enumerable.lambda.weaving.Version.getVersionString;
 
@@ -102,11 +103,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         debug("[main] " + getVersionString());
         isEnabled = true;
 
-        Class<?> c = new LambdaLoader(
-                new ClassFilter(getProperty("lambda.weaving.skipped.packages", ""),
-                                getProperty("lambda.weaving.included.packages", ""),
-                                getProperty("lambda.weaving.exclude.pattern", ""))
-                ).loadClass(className);
+        Class<?> c = new LambdaLoader(createClassFilter()).loadClass(className);
 
         Method m = c.getMethod("main", String[].class);        
         return m.invoke(null, new Object[] { args });
@@ -150,7 +147,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         try {
             if (!filter.isToBeInstrumented(name) || transformationFailed)
                 return null;
-            return transformer.transform(loader, name, in);
+            return transformer.transform(loader, filter, name, in);
         } catch (Throwable t) {
             transformationFailed = true;
             weavingNotEnabledMessage = t.getMessage();
@@ -161,17 +158,19 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         }
     }
 
-
-
     public static void premain(String agentArgs, Instrumentation instrumentation) {
         debug("[premain] " + getVersionString());
         isEnabled = true;
 
-        instrumentation.addTransformer(new LambdaLoader(
-                new ClassFilter(getProperty("lambda.weaving.skipped.packages", ""),
-                                getProperty("lambda.weaving.included.packages", ""),
-                                getProperty("lambda.weaving.exclude.pattern", "")
-                )));
+        instrumentation.addTransformer(new LambdaLoader(createClassFilter()));
+    }
+
+    @SuppressWarnings({"UnusedDeclaration"})
+    public static void agentmain(String agentArgs, Instrumentation instrumentation) {
+        debug("[agentmain] " + getVersionString());
+        isEnabled = true;
+
+        instrumentation.addTransformer(new LambdaLoader(createClassFilter()));
     }
 
     public static void main(String[] args) throws Throwable {

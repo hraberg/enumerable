@@ -12,6 +12,7 @@ import java.util.jar.JarOutputStream;
 import static java.lang.System.exit;
 import static java.lang.System.out;
 import static org.enumerable.lambda.exception.UncheckedException.uncheck;
+import static org.enumerable.lambda.weaving.ClassFilter.createClassFilter;
 import static org.enumerable.lambda.weaving.Debug.debug;
 import static org.enumerable.lambda.weaving.Version.getVersionString;
 
@@ -91,7 +92,7 @@ public class LambdaCompiler {
         FileOutputStream out = null;
         try {
             in = new FileInputStream(file);
-            byte[] bs = transformer.transform(null, null, in);
+            byte[] bs = transformer.transform(null, createClassFilter(), null, in);
             in.close();
             if (bs != null) {
                 out = new FileOutputStream(file);

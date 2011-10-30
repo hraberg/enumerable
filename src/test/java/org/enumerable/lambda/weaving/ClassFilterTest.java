@@ -1,6 +1,5 @@
 package org.enumerable.lambda.weaving;
 
-import org.enumerable.lambda.weaving.ClassFilter;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertFalse;

@@ -55,7 +55,7 @@
 		</scalac>
 		<javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
 			<compilerarg value="-Xlint:-options"/>
-			<compilerarg value="-XDignore.symbol.file"/>			
+			<compilerarg value="-XDignore.symbol.file"/>
 			<src path="src/main/java" />
 			<classpath refid="enumerable.classpath" />
 		</javac>
@@ -77,7 +77,7 @@
 			<classpath refid="enumerable.test.classpath" />
 		</scalac>
 		<javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
-			<compilerarg value="-XDignore.symbol.file"/>			
+			<compilerarg value="-XDignore.symbol.file"/>
 			<compilerarg value="-Xlint:-options"/>
 			<src path="src/test/java" />
 			<classpath refid="enumerable.test.classpath" />
@@ -113,6 +113,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
 				<attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
+				<attribute name="Agent-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
 				<attribute name="Can-Retransform-Classes" value="true" />
 			</manifest>
 		</jarjar>
@@ -136,6 +137,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
 				<attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
+				<attribute name="Agent-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
 				<attribute name="Can-Retransform-Classes" value="true" />
 			</manifest>
 		</jarjar>
@@ -155,6 +157,7 @@
 				<fileset dir="src/test/java">
 					<include name="**/*Test.java" />
 					<include name="**/functionaljava/*_*.java" />
+					<exclude name="**/AgentMainTest.java" />
 					<exclude name="**/CoreEnumerableRubySpecSuiteTest.java" />
 				</fileset>
 			</batchtest>
@@ -183,6 +186,22 @@
 			</fileset>
 		</jar>
 	</target>
+
+    <target name="test-agentmain" depends="agent-jar">
+        <mkdir dir="target/junit-agentmain" />
+        <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
+            <classpath refid="enumerable.test.classpath" />
+            <classpath path="target/enumerable-java-${enumerable.version}.jar" />
+            <test name="org.enumerable.lambda.weaving.AgentMainTest" todir="target/junit-agentmain" />
+            <formatter type="xml" />
+            <formatter type="plain" />
+        </junit>
+        <fail if="tests.failed" message="Agent Main smoke tests failed" />
+    </target>
 
 	<target name="aot-compile-tests" depends="test-jar">
 		<java fork="yes" classname="org.enumerable.lambda.weaving.LambdaCompiler" failonerror="yes">
@@ -323,7 +342,7 @@
 		</tar>
 	</target>
 
-	<target name="dist" depends="dist-no-test, tests, rubyspec, example-with-loader, aot-tests, microbench, install">
+	<target name="dist" depends="dist-no-test, tests, rubyspec, example-with-loader, test-agentmain, aot-tests, microbench, install">
 		<echo message="Ensuring that the example project in ${enumerable.dist.name}.tgz works" />
 		<delete dir="target/${enumerable.dist.name}" />
 		<untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />
@@ -340,7 +359,7 @@
 
 	<target name="javadoc" unless="javadoc.notRequired" depends="javadoc-uptodate">
 		<javadoc sourcepath="src/main/java" destdir="target/apidocs" charset="UTF-8" Encoding="UTF-8" classpathref="enumerable.classpath" source="1.5" windowtitle="Enumerable.java API ${enumerable.version}">
-			<arg value="-XDignore.symbol.file"/>			
+			<arg value="-XDignore.symbol.file"/>
 			<doctitle>
 				<![CDATA[<h1>Enumerable.java API ${enumerable.version}</h1>]]>
             </doctitle>
@@ -349,7 +368,7 @@
 	        </bottom>
 		</javadoc>
 	</target>
-	
+
 	<target name="download-dependencies" depends="pom">
 		<artifact:dependencies filesetId="dependency.fileset" sourcesFilesetId="sources.dependency.fileset" pomrefid="enumerable-java-pom" />
 
@@ -372,7 +391,7 @@
 			<license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php" distribution="repo"/>
 
 			<remoterepository id="clojars" url="http://clojars.org/repo"/>
-			<remoterepository id="javaparser-release" url="https://javaparser.googlecode.com/svn/maven2"/>		
+			<remoterepository id="javaparser-release" url="https://javaparser.googlecode.com/svn/maven2"/>
 
 			<dependency groupId="asm" artifactId="asm-all" version="${asm.version}" scope="provided"/>
 			<dependency groupId="asm" artifactId="asm-debug-all" version="${asm.version}" scope="test"/>

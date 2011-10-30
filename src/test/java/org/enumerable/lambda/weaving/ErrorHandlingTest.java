@@ -1,20 +1,14 @@
 package org.enumerable.lambda.weaving;
 
-import static org.junit.Assert.*;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Field;
-
-
-import org.enumerable.lambda.weaving.InMemoryCompiler;
-import org.enumerable.lambda.weaving.LambdaLoader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.*;
+import java.lang.reflect.Field;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class ErrorHandlingTest {
     InMemoryCompiler compiler = new InMemoryCompiler();
@@ -34,7 +28,7 @@ public class ErrorHandlingTest {
     }
     
     @After
-    public void forgetTrasformationFailed() throws Exception {
+    public void forgetTransformationFailed() throws Exception {
         Field transformationFailed = LambdaLoader.class.getDeclaredField("transformationFailed");
         transformationFailed.setAccessible(true);
         transformationFailed.set(null, false);
@@ -57,8 +51,8 @@ public class ErrorHandlingTest {
         out.println("}");
         out.close();
 
-        assertNotNull((Class<?>) compiler.compile(className, writer.toString()));
-        assertErrContains("IllegalStateException: Tried to define non static lambda parameter instance at line ");
+        assertNotNull(compiler.compile(className, writer.toString()));
+        assertErrContains("IllegalStateException: Tried to define non static lambda parameter instance");
     }
 
     @Test
@@ -78,7 +72,7 @@ public class ErrorHandlingTest {
         out.close();
 
         assertNotNull(compiler.compile(className, writer.toString()));
-        assertErrContains("IllegalStateException: Got [] as parameters need exactly 1 at line ");
+        assertErrContains("IllegalStateException: Got [] as parameters need exactly 1 at ");
     }
 
     @Test
@@ -98,7 +92,7 @@ public class ErrorHandlingTest {
         out.close();
 
         assertNotNull(compiler.compile(className, writer.toString()));
-        assertErrContains("IllegalStateException: Got [] as parameters need exactly 1 at line ");
+        assertErrContains("IllegalStateException: Got [] as parameters need exactly 1");
     }
 
     @Test
@@ -121,8 +115,8 @@ public class ErrorHandlingTest {
         out.close();
 
         
-        assertNotNull((Class<?>) compiler.compile(className, writer.toString()));
-        assertErrContains("IllegalStateException: Tried to call non static new lambda method instance at line ");
+        assertNotNull(compiler.compile(className, writer.toString()));
+        assertErrContains("IllegalStateException: Tried to call non static new lambda method instance");
     }
     
     @Test
@@ -141,15 +135,16 @@ public class ErrorHandlingTest {
         out.close();
 
         compiler.debugInfo(false);
-        assertNotNull((Class<?>) compiler.compile(className, writer.toString()));
+        assertNotNull(compiler.compile(className, writer.toString()));
         assertErrContains("IllegalStateException: Debug information is needed to close over local variables or parameters, please recompile with -g.");
     }
     
-    void assertErrContains(String message) {
+    void assertErrContains(String message) throws IOException {
+        err.flush();
         if (!err.toString().contains(message)) {
             restoreStdErr();
             System.err.println(err.toString());
-            fail();
+            fail(err.toString());
         }
     }
 }

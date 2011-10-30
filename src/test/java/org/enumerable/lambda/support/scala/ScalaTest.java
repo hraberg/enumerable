@@ -1,21 +1,7 @@
 package org.enumerable.lambda.support.scala;
 
-import static java.util.Arrays.*;
-import static org.enumerable.lambda.Parameters.*;
-import static org.enumerable.lambda.support.scala.LambdaScala.*;
-import static org.junit.Assert.*;
-
+import clojure.lang.IFn;
 import groovy.lang.Closure;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.PrintStream;
-import java.util.List;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-
-
 import org.enumerable.lambda.Fn1;
 import org.enumerable.lambda.Lambda;
 import org.enumerable.lambda.enumerable.Enumerable;
@@ -27,17 +13,25 @@ import org.enumerable.lambda.support.javascript.JavaScriptTest;
 import org.enumerable.lambda.support.javascript.LambdaJavaScript;
 import org.enumerable.lambda.support.jruby.JRubyTest;
 import org.enumerable.lambda.support.jruby.LambdaJRuby;
-import org.enumerable.lambda.support.scala.EnumerableJavaScalaTest;
-import org.enumerable.lambda.support.scala.FunctionFn1;
 import org.jruby.RubyProc;
 import org.junit.Test;
-
 import scala.Function1;
 import scala.Function2;
 import scala.tools.nsc.Interpreter;
 import scala.tools.nsc.Settings;
 import sun.org.mozilla.javascript.internal.Function;
-import clojure.lang.IFn;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.PrintStream;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.enumerable.lambda.Parameters.*;
+import static org.enumerable.lambda.support.scala.LambdaScala.*;
+import static org.junit.Assert.*;
 
 @SuppressWarnings({ "unchecked", "deprecation" })
 public class ScalaTest {

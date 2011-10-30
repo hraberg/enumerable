@@ -1,10 +1,7 @@
 package org.enumerable.lambda;
 
-import static java.lang.Math.*;
-import static org.enumerable.lambda.Lambda.*;
-import static org.enumerable.lambda.Parameters.*;
-import static org.enumerable.lambda.primitives.LambdaPrimitives.*;
-import static org.junit.Assert.*;
+import org.enumerable.lambda.annotation.LambdaParameter;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.NotSerializableException;
@@ -14,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-
-import org.enumerable.lambda.Fn0;
-import org.enumerable.lambda.Fn1;
-import org.enumerable.lambda.Fn2;
-import org.enumerable.lambda.annotation.LambdaParameter;
-import org.junit.Test;
+import static java.lang.Math.PI;
+import static org.enumerable.lambda.Lambda.delegate;
+import static org.enumerable.lambda.Lambda.λ;
+import static org.enumerable.lambda.Parameters.*;
+import static org.enumerable.lambda.primitives.LambdaPrimitives.λ;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("serial")
 public class ClosureTest extends TestBase implements Serializable {
@@ -36,14 +33,14 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closeOverLocalPrimitiveVarible() throws Exception {
+    public void closeOverLocalPrimitiveVariable() throws Exception {
         int i = 0;
         λ(n, i += n).call(10);
         assertEquals(10, i);
     }
 
     @Test
-    public void closeOverLocalDoubleVaribleWithoutModification() throws Exception {
+    public void closeOverLocalDoubleVariableWithoutModification() throws Exception {
         double i = 0;
         assertEquals(3.14, λ(d, i + d).call(3.14), 0);
     }
@@ -56,7 +53,7 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closeOverLocalLongVaribleWithoutModification() throws Exception {
+    public void closeOverLocalLongVariableWithoutModification() throws Exception {
         long i = 0;
         assertEquals(10, (long) λ(l, i + l).call(10L));
     }
@@ -69,7 +66,7 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closeOverLocalReferenceVarible() throws Exception {
+    public void closeOverLocalReferenceVariable() throws Exception {
         String hello = "hello";
         λ(s, hello += s).call(" world");
         assertEquals("hello world", hello);
@@ -77,7 +74,7 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closeOverLocalArrayVarible() throws Exception {
+    public void closeOverLocalArrayVariable() throws Exception {
         String[] hello = new String[] { "hello" };
         String[] original = hello;
         λ(s, hello[0] += s).call(" world");
@@ -86,7 +83,7 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closeOverLocalArrayVaribleWhichCanBeSet() throws Exception {
+    public void closeOverLocalArrayVariableWhichCanBeSet() throws Exception {
         String[] hello = new String[] { "hello" };
         String[] original = hello;
         λ(s, hello = new String[] { s }).call("world");
@@ -95,13 +92,13 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closeOverLocalFinalPrimitiveVarible() throws Exception {
+    public void closeOverLocalFinalPrimitiveVariable() throws Exception {
         final int i = 10;
         assertEquals(20, (int) λ(n, i + n).call(10));
     }
 
     @Test
-    public void closeOverLocalFinalReferenceVarible() throws Exception {
+    public void closeOverLocalFinalReferenceVariable() throws Exception {
         final String hello = "hello";
         assertEquals("hello world", λ(s, hello + s).call(" world"));
     }
@@ -133,21 +130,21 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closingOverLocalVaribleDoesNotChangeIt() throws Exception {
+    public void closingOverLocalVariableDoesNotChangeIt() throws Exception {
         int i = 0;
         λ(n, i += n);
         assertEquals(0, i);
     }
 
     @Test
-    public void closeOverLocalVaribleAndRunInDifferentMethod() throws Exception {
+    public void closeOverLocalVariableAndRunInDifferentMethod() throws Exception {
         int i = 0;
         otherMethod(λ(n, i += n), 10);
         assertEquals(10, i);
     }
 
     @Test
-    public void closingOverLocalPrimitveVaribleCanStillIncrementOutsideClosure() throws Exception {
+    public void closingOverLocalPrimitveVariableCanStillIncrementOutsideClosure() throws Exception {
         int i = 0;
         Fn1<Integer, Integer> add = λ(n, i += n);
         i += 10;
@@ -159,7 +156,7 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closingOverLocalReferenceVaribleWorksLikeNormalOutsideClosure() throws Exception {
+    public void closingOverLocalReferenceVariableWorksLikeNormalOutsideClosure() throws Exception {
         String string = "hello";
         Fn1<String, String> toUpCase = λ(s, s.toUpperCase());
         string += " world";
@@ -174,7 +171,7 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closingOverLocalVaribleSeesChangesToLocalVariable() throws Exception {
+    public void closingOverLocalVariableSeesChangesToLocalVariable() throws Exception {
         int i = 0;
         Fn1<Integer, Integer> plus = λ(n, i += n);
         plus.call(1);
@@ -186,7 +183,7 @@ public class ClosureTest extends TestBase implements Serializable {
     }
 
     @Test
-    public void closingOverLocalVaribleAfterMethodReturn() throws Exception {
+    public void closingOverLocalVariableAfterMethodReturn() throws Exception {
         Fn1<Integer, Integer> plus = methodReturn();
         assertEquals(2, (int) plus.call(1));
         assertEquals(3, (int) plus.call(1));

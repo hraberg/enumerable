@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static java.lang.System.getProperty;
+
 /**
  * Filters the classes to be instrumented, based on a blacklist or a white list
  * and a regexp pattern.
@@ -40,6 +42,12 @@ public class ClassFilter {
         if (!"".equals(excludePatternString.trim())) {
             this.excludePattern = Pattern.compile(excludePatternString);
         }
+    }
+
+    public static ClassFilter createClassFilter() {
+        return new ClassFilter(getProperty("lambda.weaving.skipped.packages", ""),
+                        getProperty("lambda.weaving.included.packages", ""),
+                        getProperty("lambda.weaving.exclude.pattern", ""));
     }
 
     private void addIncludedPackages(String agentArgs) {
