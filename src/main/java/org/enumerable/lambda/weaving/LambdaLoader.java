@@ -121,7 +121,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         InputStream in = getResourceAsStream(name.replace('.', '/') + ".class");
         try {
-            byte[] b = transformClass(name, in);
+            byte[] b = transformClass(this, name, in);
             if (b == null)
                 return super.loadClass(name, resolve);
             return defineClass(name, b, 0, b.length);
@@ -139,18 +139,18 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
             ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         try {
-            return transformClass(className.replace('/', '.'), new ByteArrayInputStream(classfileBuffer));
+            return transformClass(loader, className.replace('/', '.'), new ByteArrayInputStream(classfileBuffer));
         } catch (Throwable t) {
             t.printStackTrace();
             return null;
         }
     }
 
-    byte[] transformClass(String name, InputStream in) {
+    byte[] transformClass(ClassLoader loader, String name, InputStream in) {
         try {
             if (!filter.isToBeInstrumented(name) || transformationFailed)
                 return null;
-            return transformer.transform(name, in);
+            return transformer.transform(loader, name, in);
         } catch (Throwable t) {
             transformationFailed = true;
             weavingNotEnabledMessage = t.getMessage();
