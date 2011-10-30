@@ -29,8 +29,10 @@ import static org.objectweb.asm.Type.*;
 import static org.objectweb.asm.tree.AbstractInsnNode.*;
 
 class LambdaTreeWeaver implements Opcodes {
-    static Type newLambdaAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.newlambda", NewLambda.class.getName());
-    static Type lambdaParameterAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdaparameter", LambdaParameter.class.getName());
+    static Type newLambdaAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.newlambda", NewLambda.class.getName(), false);
+    static Type lambdaParameterAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdaparameter", LambdaParameter.class.getName(), false);
+    static Type lambdaLocalAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdalocal", LambdaLocal.class.getName(), true);
+
 
     ClassNode c;
     int currentLambdaId = 1;
@@ -851,9 +853,10 @@ class LambdaTreeWeaver implements Opcodes {
             }
 
             void addLambdaParameterAnnotations() {
+                if (lambdaLocalAnnotation == null) return;
                 int i = 0;
                 for (String parameter : parameters.keySet()) {
-                    AnnotationVisitor annotation = saMn.visitParameterAnnotation(i++, getType(LambdaLocal.class)
+                    AnnotationVisitor annotation = saMn.visitParameterAnnotation(i++, lambdaLocalAnnotation
                             .getDescriptor(), true);
                     annotation.visit("name", parameter);
                     annotation.visit("parameterClass", getObjectType(parameterOwners.get(parameter)).getClassName());
@@ -1093,8 +1096,9 @@ class LambdaTreeWeaver implements Opcodes {
             }
 
             void addLambdaLocalAnnotation(String local, FieldVisitor fieldVisitor) {
+                if (lambdaLocalAnnotation == null) return;
                 AnnotationVisitor annotationVisitor = fieldVisitor.visitAnnotation(
-                        getDescriptor(LambdaLocal.class), true);
+                        lambdaLocalAnnotation.getDescriptor(), true);
                 annotationVisitor.visit("isReadOnly", !methodMutableLocals.containsKey(local));
                 annotationVisitor.visit("name", local);
                 annotationVisitor.visitEnd();
@@ -1571,7 +1575,12 @@ class LambdaTreeWeaver implements Opcodes {
         pw.flush();
     }
 
-    static Type getConfigurableAnnotationType(String property, String name) {
-        return getType("L" + getProperty(property, name).replace('.', '/') + ";");
+    static Type getConfigurableAnnotationType(String property, String defaultValue, boolean nullable) {
+        String value = getProperty(property, defaultValue);
+        debug(property + ": " + value);
+        boolean notSet = value == null || value.trim().length() == 0;
+        if (notSet && nullable) return null;
+        if (notSet) throw new IllegalStateException(property + " cannot be null");
+        return getType("L" + value.replace('.', '/') + ";");
     }
 }
