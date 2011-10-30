@@ -33,6 +33,7 @@
 	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
 	           uri="antlib:org.apache.maven.artifact.ant"
 	           classpath="build/maven-ant-tasks-2.1.3.jar" />
+    <taskdef resource="aQute/bnd/ant/taskdef.properties" classpath="build/biz.aQute.bnd.jar"/>
 
 	<target name="clean">
 		<delete dir="target" />
@@ -122,27 +123,18 @@
 				<include name="org/enumerable/lambda/support/scala/**/*.class" />
 			</fileset>
 		</jar>
+        <echo file="target/enumerable.bnd">
+            Bundle-Version: ${enumerable.version}
+            Export-Package: !org.enumerable.lambda.asm.*,!org.enumerable.lambda.weaving.*,org.enumerable.lambda.*;version=${enumerable.version}
+        </echo>
+        <java jar="build/biz.aQute.bnd.jar" fork="true">
+            <arg value="wrap"/>
+            <arg value="-properties"/>
+            <arg value="target/enumerable.bnd"/>
+            <arg value="target/enumerable-java-${enumerable.version}.jar"/>
+        </java>
+        <move file="target/enumerable-java-${enumerable.version}.bar" tofile="target/enumerable-java-${enumerable.version}.jar" />
 	</target>
-
-	<target name="agent-jar-slim" unless="jarjar.notRequired" depends="agent-jar">
-		<jarjar jarfile="target/enumerable-java-slim-${enumerable.version}.jar">
-			<fileset dir="target/classes">
-				<exclude name="org/enumerable/lambda/*.class" />
-				<exclude name="org/enumerable/lambda/support/**/*.class" />
-				<exclude name="org/enumerable/lambda/enumerable/**/*.class" />
-				<exclude name="org/enumerable/lambda/primitives/**/*.class" />
-			</fileset>
-			<zipfileset src="lib/asm-all-${asm.version}.jar" />
-			<rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.asm.@1" />
-			<manifest>
-				<attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
-				<attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
-				<attribute name="Agent-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
-				<attribute name="Can-Retransform-Classes" value="true" />
-			</manifest>
-		</jarjar>
-	</target>
-
 
 	<target name="tests" depends="agent-jar">
 		<mkdir dir="target/junit" />
@@ -310,7 +302,7 @@
 		</jar>
 	</target>
 
-	<target name="jars" depends="agent-jar, agent-jar-slim, source-jar, test-source-jar, javadoc-jar" />
+	<target name="jars" depends="agent-jar, source-jar, test-source-jar, javadoc-jar" />
 
 	<property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}" />
 
@@ -384,7 +376,7 @@
 
 	<target name="pom">
 		<mkdir dir="target" />
-		<artifact:pom id="enumerable-java-pom" groupId="org.enumerable" artifactId="enumerable-java" version="${enumerable.version}" name="Enumerable.java"
+		<artifact:pom id="enumerable-java-pom" groupId="org.enumerable" artifactId="enumerable-java" version="${enumerable.version}" name="Enumerable.java" inceptionyear="2010"
 				url="http://www.enumerable.org" description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.">
 			<scm url="https://github.com/hraberg/enumerable" connection="scm:git@github.com:hraberg/enumerable.git" developerConnection="scm:git@github.com:hraberg/enumerable.git"/>
 			<developer name="Håkan Råberg" email="hakan.raberg@gmail.com" timezone="0"/>
@@ -408,6 +400,7 @@
 			<dependency groupId="org.jruby" artifactId="jruby-complete" version="1.6.5" scope="compile" optional="true"/>
 			<dependency groupId="org.scala-lang" artifactId="scala-library" version="${scala.version}" scope="compile" optional="true"/>
 			<dependency groupId="org.scala-lang" artifactId="scala-compiler" version="${scala.version}" scope="compile" optional="true"/>
+            <dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.0.1"/>
 		</artifact:pom>
 		<artifact:writepom pomRefId="enumerable-java-pom" file="target/pom.xml"/>
 	</target>
