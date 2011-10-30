@@ -15,6 +15,7 @@ import org.objectweb.asm.util.ASMifierClassVisitor;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -1517,16 +1518,24 @@ class LambdaTreeWeaver implements Opcodes {
         return null;
     }
 
-    ClassNode readClassNoCode(String in) throws IOException {
-        if (in.equals(c.name))
+    ClassNode readClassNoCode(String internalName) throws IOException {
+        if (internalName.equals(c.name))
             return c;
         ClassNode cn = new ClassNode();
-        String className = getObjectType(in).getClassName();
+        String className = getObjectType(internalName).getClassName();
         if (isEnum(className))
             return cn;
+
+        InputStream in = null;
         try {
-            new ClassReader(className).accept(cn, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
+            in = loader.getResourceAsStream(className.replace(".", "/") + ".class");
+            if (in == null)
+                debug("could not read: " + className + " for ASM reflection when transforming " + c.name);
+            new ClassReader(in).accept(cn, SKIP_CODE | SKIP_DEBUG | SKIP_FRAMES);
         } catch (IOException ignore) {
+        } finally {
+            if (in != null)
+                in.close();
         }
         return cn;
     }

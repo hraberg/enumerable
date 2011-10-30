@@ -136,7 +136,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
             ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         try {
-            return transformClass(loader, className.replace('/', '.'), new ByteArrayInputStream(classfileBuffer));
+            return transformClass(loader != null ? loader : ClassLoader.getSystemClassLoader(), className.replace('/', '.'), new ByteArrayInputStream(classfileBuffer));
         } catch (Throwable t) {
             t.printStackTrace();
             return null;
