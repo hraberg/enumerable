@@ -9,8 +9,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 
-import static java.lang.System.exit;
-import static java.lang.System.out;
+import static java.lang.System.*;
 import static org.enumerable.lambda.exception.UncheckedException.uncheck;
 import static org.enumerable.lambda.weaving.ClassFilter.createClassFilter;
 import static org.enumerable.lambda.weaving.Debug.debug;
@@ -73,6 +72,7 @@ public class LambdaCompiler {
         }
         aotCompiledMarker.getParentFile().mkdir();
         aotCompiledMarker.createNewFile();
+        ensureCreated(aotCompiledMarker);
 
         compileDirectory(file);
         debug("writing generated lambdas in " + file);
@@ -126,6 +126,7 @@ public class LambdaCompiler {
             File aotCompiledMarker = new File(tempDir, AOT_COMPILED_MARKER);
             aotCompiledMarker.getParentFile().mkdir();
             aotCompiledMarker.createNewFile();
+            ensureCreated(aotCompiledMarker);
 
             compileDirectory(tempDir);
             debug("writing generated lambdas in " + jar);
@@ -133,8 +134,12 @@ public class LambdaCompiler {
 
             File newJar = jar(tempDir);
 
-            jar.delete();
-            newJar.renameTo(jar);
+            File bak = new File(jar.getAbsolutePath() + ".bak");
+            rename(jar, bak);
+            ensureCreated(bak);
+            rename(newJar, jar);
+            ensureCreated(jar);
+            delete(bak);
 
             delete(tempDir);
         } catch (Exception e) {
@@ -142,11 +147,23 @@ public class LambdaCompiler {
         }
     }
 
+    private void rename(File from, File to) {
+        if (!from.renameTo(to)) throw new IllegalStateException("Could not rename " + from + " to " + to);
+    }
+
     void delete(File file) {
         if (file.isDirectory())
             for (File child : file.listFiles())
                 delete(child);
         file.delete();
+    }
+
+    void ensureCreated(File file) {
+        if (!file.isFile()) throw new IllegalStateException("Could not create " + file);
+    }
+
+    void ensureDirCreated(File dir) throws IOException {
+        if (!dir.mkdir()) throw new IOException("Could not create directory " + dir);
     }
 
     void writeGeneratedLambdas(File tempDir) throws IOException {
@@ -164,12 +181,12 @@ public class LambdaCompiler {
         }
     }
 
-    File jar(File tempDir) throws Exception {
-        File newJar = new File(tempDir.getAbsolutePath() + ".jar");
+    File jar(File dir) throws Exception {
+        File newJar = new File(dir.getAbsolutePath() + ".jar");
         JarOutputStream out = null;
         try {
             out = new JarOutputStream(new FileOutputStream(newJar));
-            addDirToJar(tempDir, tempDir, out);
+            addDirToJar(dir, dir, out);
         } finally {
             if (out != null)
                 out.close();
@@ -177,8 +194,8 @@ public class LambdaCompiler {
         return newJar;
     }
 
-    void addDirToJar(File baseDir, File tempDir, JarOutputStream out) throws IOException {
-        for (File file : tempDir.listFiles()) {
+    void addDirToJar(File baseDir, File dir, JarOutputStream out) throws IOException {
+        for (File file : dir.listFiles()) {
             String nameInJar = file.getPath().substring(baseDir.getPath().length() + 1).replace(File.separatorChar,
                     '/');
 
@@ -213,9 +230,8 @@ public class LambdaCompiler {
         InputStream in = null;
         OutputStream out = null;
 
-        File tempDir = File.createTempFile("lambda.compiler.jar", "");
-        tempDir.delete();
-        tempDir.mkdir();
+        File tempDir = new File(getProperty("java.io.tmpdir"), new File(jarFile.getName()).getName() + "-" + currentTimeMillis());
+        ensureDirCreated(tempDir);
 
         try {
             Enumeration<JarEntry> entries = jarFile.entries();
