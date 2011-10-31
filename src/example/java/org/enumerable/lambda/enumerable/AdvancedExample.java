@@ -1,9 +1,9 @@
 package org.enumerable.lambda.enumerable;
 
+import org.enumerable.lambda.Version;
 import org.enumerable.lambda.annotation.LambdaParameter;
 import org.enumerable.lambda.enumerable.collection.EList;
 import org.enumerable.lambda.weaving.LambdaLoader;
-import org.enumerable.lambda.weaving.Version;
 
 import java.util.Map;
 

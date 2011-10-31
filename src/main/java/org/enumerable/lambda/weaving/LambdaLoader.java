@@ -1,5 +1,6 @@
 package org.enumerable.lambda.weaving;
 
+import org.enumerable.lambda.Version;
 import org.enumerable.lambda.exception.LambdaWeavingNotEnabledException;
 import org.enumerable.lambda.weaving.tree.LambdaTreeTransformer;
 
@@ -18,7 +19,7 @@ import static java.lang.Thread.currentThread;
 import static org.enumerable.lambda.exception.UncheckedException.uncheck;
 import static org.enumerable.lambda.weaving.ClassFilter.createClassFilter;
 import static org.enumerable.lambda.weaving.Debug.debug;
-import static org.enumerable.lambda.weaving.Version.getVersionString;
+import static org.enumerable.lambda.Version.getVersionString;
 
 
 public class LambdaLoader extends ClassLoader implements ClassFileTransformer {

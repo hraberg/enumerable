@@ -1,14 +1,12 @@
 package org.enumerable.lambda.enumerable;
 
-import static java.lang.System.*;
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-
-import org.enumerable.lambda.enumerable.EnumerableExample;
-import org.junit.Test;
+import static java.lang.System.getProperty;
+import static org.junit.Assert.assertEquals;
 
 public class EnumerableRegressionTest {
     String expected = ""

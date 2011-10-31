@@ -1,4 +1,4 @@
-package org.enumerable.lambda.weaving;
+package org.enumerable.lambda;
 
 import java.io.IOException;
 import java.io.InputStream;

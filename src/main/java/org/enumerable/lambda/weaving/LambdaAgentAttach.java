@@ -56,7 +56,7 @@ public class LambdaAgentAttach {
 
     private static Enumeration<URL> potentialClasspathEntries() {
         try {
-            return LambdaAgentAttach.class.getClassLoader().getResources("org/enumerable/lambda/weaving/version.properties");
+            return LambdaAgentAttach.class.getClassLoader().getResources("org/enumerable/lambda/version.properties");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

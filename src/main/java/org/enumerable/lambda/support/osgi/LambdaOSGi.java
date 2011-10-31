@@ -1,6 +1,6 @@
 package org.enumerable.lambda.support.osgi;
 
-import org.enumerable.lambda.weaving.Version;
+import org.enumerable.lambda.Version;
 
 import static org.enumerable.lambda.Lambda.λ;
 import static org.enumerable.lambda.Parameters.s;

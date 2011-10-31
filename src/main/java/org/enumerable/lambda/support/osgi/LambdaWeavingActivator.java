@@ -1,7 +1,7 @@
 package org.enumerable.lambda.support.osgi;
 
+import org.enumerable.lambda.Version;
 import org.enumerable.lambda.weaving.LambdaLoader;
-import org.enumerable.lambda.weaving.Version;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -23,8 +23,6 @@ public class LambdaWeavingActivator implements BundleActivator, WeavingHook {
 
         loader = new LambdaLoader();
         weavingHook = bundleContext.registerService(WeavingHook.class, this, new Hashtable<String, Object>());
-
-        new LambdaOSGi().run();
     }
 
     public void stop(BundleContext bundleContext) throws Exception {

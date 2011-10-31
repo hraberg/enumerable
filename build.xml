@@ -90,7 +90,7 @@
 		</copy>
 
 		<property name="enumerable.git.commit" value="&lt;git commit info not available&gt;" />
-		<echo file="target/classes/org/enumerable/lambda/weaving/version.properties">
+		<echo file="target/classes/org/enumerable/lambda/version.properties">
         	enumerable.version=${enumerable.version}
         	enumerable.build.date=${DSTAMP}
         	enumerable.git.commit=${enumerable.git.commit}
@@ -111,7 +111,7 @@
 				<exclude name="org/enumerable/lambda/support/scala/**/*.class" />
 			</fileset>
 			<zipfileset src="lib/asm-all-${asm.version}.jar" />
-			<rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.asm.@1" />
+			<rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.weaving.asm.@1" />
 			<manifest>
 				<attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
 				<attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
@@ -129,9 +129,9 @@
             Bundle-Name: Enumerable.java
             Bundle-SymbolicName: org.enumerable.java
             Bundle-Activator: org.enumerable.lambda.support.osgi.LambdaWeavingActivator
-            Bundle-Description: Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to
-            capture expressions as closures.
-            Export-Package: !org.enumerable.lambda.asm.*,!org.enumerable.lambda.weaving.*,org.enumerable.lambda.*;version=${enumerable.osgi.version}
+            Bundle-Description: Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
+            Export-Package: !org.enumerable.lambda.weaving.*,*;version=${enumerable.osgi.version}
+            DynamicImport-Package: *
         </echo>
         <java jar="build/biz.aQute.bnd.jar" fork="true">
             <arg value="wrap"/>
@@ -156,6 +156,7 @@
 					<include name="**/*Test.java" />
 					<include name="**/functionaljava/*_*.java" />
 					<exclude name="**/AgentMainTest.java" />
+					<exclude name="**/LambdaOSGiTest.java" />
 					<exclude name="**/CoreEnumerableRubySpecSuiteTest.java" />
 				</fileset>
 			</batchtest>
@@ -182,6 +183,13 @@
 			<fileset dir="target/example-classes">
 				<include name="**/EnumerableExample.class" />
 			</fileset>
+            <manifest>
+                <attribute name="Bundle-ManifestVersion" value="2"/>
+                <attribute name="Bundle-Version" value="${enumerable.osgi.version}"/>
+                <attribute name="Bundle-SymbolicName" value="org.enumerable.java.test"/>
+                <attribute name="Bundle-Activator" value="org.enumerable.lambda.support.osgi.LambdaOSGiTest"/>
+                <attribute name="Import-Package" value="org.enumerable.*,org.osgi.framework"/>
+            </manifest>
 		</jar>
 	</target>
 
@@ -199,6 +207,17 @@
             <formatter type="plain" />
         </junit>
         <fail if="tests.failed" message="Agent Main smoke tests failed" />
+    </target>
+
+    <target name="test-osgi" depends="agent-jar, test-jar">
+        <mkdir dir="target/junit-osgi" />
+        <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="specs.failed">
+            <classpath refid="enumerable.test.classpath" />
+            <test name="org.enumerable.lambda.support.osgi.LambdaOSGiTest" todir="target/junit-osgi" />
+            <formatter type="xml" />
+            <formatter type="plain" />
+        </junit>
+        <fail if="specs.failed" message="OSGi smoke tests failed" />
     </target>
 
 	<target name="aot-compile-tests" depends="test-jar">
@@ -340,7 +359,7 @@
 		</tar>
 	</target>
 
-	<target name="dist" depends="dist-no-test, tests, rubyspec, example-with-loader, test-agentmain, aot-tests, microbench, install">
+	<target name="dist" depends="dist-no-test, tests, rubyspec, example-with-loader, test-agentmain, test-osgi, aot-tests, microbench, install">
 		<echo message="Ensuring that the example project in ${enumerable.dist.name}.tgz works" />
 		<delete dir="target/${enumerable.dist.name}" />
 		<untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />
@@ -406,7 +425,7 @@
 			<dependency groupId="org.jruby" artifactId="jruby-complete" version="1.6.5" scope="compile" optional="true"/>
 			<dependency groupId="org.scala-lang" artifactId="scala-library" version="${scala.version}" scope="compile" optional="true"/>
 			<dependency groupId="org.scala-lang" artifactId="scala-compiler" version="${scala.version}" scope="compile" optional="true"/>
-            <dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.0.1"/>
+            <dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.0.1"  scope="provided" optional="true"/>
 		</artifact:pom>
 		<artifact:writepom pomRefId="enumerable-java-pom" file="target/pom.xml"/>
 	</target>
