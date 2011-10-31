@@ -430,7 +430,7 @@
 			<arg value="-Durl=${maven-staging-repository-url}" />
 			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
 			<arg value="-DpomFile=target/pom.xml" />
-			<arg value="-Dfile=enumerable-java-${enumerable.version}.jar" />
+			<arg value="-Dfile=target/enumerable-java-${enumerable.version}.jar" />
             <arg value="-Pgpg" />
 		</artifact:mvn>
 
@@ -439,7 +439,7 @@
 			<arg value="-Durl=${maven-staging-repository-url}" />
 			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
 			<arg value="-DpomFile=target/pom.xml" />
-			<arg value="-Dfile=enumerable-java-${enumerable.version}-sources.jar" />
+			<arg value="-Dfile=target/enumerable-java-${enumerable.version}-sources.jar" />
 			<arg value="-Dclassifier=sources" />
             <arg value="-Pgpg" />
 		</artifact:mvn>
@@ -449,7 +449,7 @@
 			<arg value="-Durl=${maven-staging-repository-url}" />
 			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
 			<arg value="-DpomFile=target/pom.xml" />
-			<arg value="-Dfile=enumerable-java-${enumerable.version}-javadoc.jar" />
+			<arg value="-Dfile=target/enumerable-java-${enumerable.version}-javadoc.jar" />
 			<arg value="-Dclassifier=javadoc" />
             <arg value="-Pgpg" />
 		</artifact:mvn>
@@ -461,7 +461,7 @@
 			<arg value="-Durl=${maven-snapshots-repository-url}" />
 			<arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
 			<arg value="-DpomFile=target/pom.xml" />
-			<arg value="-Dfile==enumerable-java-${enumerable.version}.jar" />
+			<arg value="-Dfile=target/enumerable-java-${enumerable.version}.jar" />
 		</artifact:mvn>
      </target>
  </project>
