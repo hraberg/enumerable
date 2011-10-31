@@ -143,7 +143,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         }
     }
 
-    byte[] transformClass(ClassLoader loader, String name, InputStream in) {
+    public byte[] transformClass(ClassLoader loader, String name, InputStream in) {
         try {
             if (!filter.isToBeInstrumented(name) || transformationFailed)
                 return null;
