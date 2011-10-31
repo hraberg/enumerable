@@ -17,7 +17,7 @@ import static org.enumerable.lambda.weaving.Debug.debug;
 
 public class LambdaWeavingActivator implements BundleActivator, WeavingHook {
     private LambdaLoader loader;
-    private ServiceRegistration<WeavingHook> weavingHook;
+    private ServiceRegistration weavingHook;
 
     public void start(BundleContext bundleContext) throws Exception {
         debug("[osgi]" + Version.getVersionString());
