@@ -181,9 +181,11 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
     public static void main(String[] args) throws Throwable {
         try {
             if (args.length == 0) {
-                out.println("Usage: class [args...]");
+                System.out.println("[launcher] " + getVersionString());
+                out.println("Usage: class [ARGS]...");
                 return;
-            }
+            } else
+                debug("[launcher] " + getVersionString());
 
             String[] argsCopy = new String[args.length - 1];
             arraycopy(args, 1, argsCopy, 0, args.length - 1);
