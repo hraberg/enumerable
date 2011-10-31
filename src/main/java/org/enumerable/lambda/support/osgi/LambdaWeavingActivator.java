@@ -20,10 +20,12 @@ public class LambdaWeavingActivator implements BundleActivator, WeavingHook {
     private ServiceRegistration weavingHook;
 
     public void start(BundleContext bundleContext) throws Exception {
-        debug("[osgi]" + Version.getVersionString());
+        debug("[osgi] " + Version.getVersionString());
 
         loader = new LambdaLoader(createClassFilter());
         weavingHook = bundleContext.registerService(WeavingHook.class, this, new Hashtable<String, Object>());
+
+        new LambdaOSGi().run();
     }
 
     public void stop(BundleContext bundleContext) throws Exception {
@@ -31,9 +33,9 @@ public class LambdaWeavingActivator implements BundleActivator, WeavingHook {
     }
 
     public void weave(WovenClass wovenClass) {
-        System.out.println(wovenClass.getClassName());
         BundleWiring wiring = wovenClass.getBundleWiring();
         ByteArrayInputStream in = new ByteArrayInputStream(wovenClass.getBytes());
-        wovenClass.setBytes(loader.transformClass(wiring.getClassLoader(), wovenClass.getClassName(), in));
+        byte[] newBytes = loader.transformClass(wiring.getClassLoader(), wovenClass.getClassName(), in);
+        if (newBytes != null) wovenClass.setBytes(newBytes);
     }
 }

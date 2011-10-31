@@ -25,6 +25,9 @@ public class ClassFilter {
             add("clojure.");
             add("org.jruby.");
             add("org.codehaus.groovy.");
+            add("org.osgi.");
+            add("org.enumerable.lambda.weaving.");
+            add("org.enumerable.lambda.asm.");
             add("groovy.");
             add("scala.");
             add("Script");
