@@ -20,8 +20,11 @@ import static org.enumerable.lambda.Lambda.λ;
 import static org.junit.Assert.assertEquals;
 
 public class LambdaOSGiTest implements BundleActivator {
-    // This is the method under test, it runs and gets woven inside the OSGi container
     public void start(BundleContext context) throws Exception {
+        methodInsideOSGiContainerToBeWovenByWeavingHook(context);
+    }
+
+    private void methodInsideOSGiContainerToBeWovenByWeavingHook(BundleContext context) {
         context.registerService(Callable.class, λ("Hello OSGi World").as(Callable.class), new Hashtable<String, Object>());
     }
 
