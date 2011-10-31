@@ -12,7 +12,6 @@ import org.osgi.framework.wiring.BundleWiring;
 import java.io.ByteArrayInputStream;
 import java.util.Hashtable;
 
-import static org.enumerable.lambda.weaving.ClassFilter.createClassFilter;
 import static org.enumerable.lambda.weaving.Debug.debug;
 
 public class LambdaWeavingActivator implements BundleActivator, WeavingHook {
@@ -22,7 +21,7 @@ public class LambdaWeavingActivator implements BundleActivator, WeavingHook {
     public void start(BundleContext bundleContext) throws Exception {
         debug("[osgi] " + Version.getVersionString());
 
-        loader = new LambdaLoader(createClassFilter());
+        loader = new LambdaLoader();
         weavingHook = bundleContext.registerService(WeavingHook.class, this, new Hashtable<String, Object>());
 
         new LambdaOSGi().run();

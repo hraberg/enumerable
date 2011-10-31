@@ -32,7 +32,11 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         isEnabled = LambdaLoader.class.getClassLoader().getResource(LambdaCompiler.AOT_COMPILED_MARKER) != null;
     }
 
-    public LambdaLoader(ClassFilter filter){
+    public LambdaLoader() {
+        this(createClassFilter());
+    }
+
+    public LambdaLoader(ClassFilter filter) {
         this.filter = filter;
     }
 
@@ -103,7 +107,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         debug("[main] " + getVersionString());
         isEnabled = true;
 
-        Class<?> c = new LambdaLoader(createClassFilter()).loadClass(className);
+        Class<?> c = new LambdaLoader().loadClass(className);
 
         Method m = c.getMethod("main", String[].class);        
         return m.invoke(null, new Object[] { args });
@@ -162,7 +166,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         debug("[premain] " + getVersionString());
         isEnabled = true;
 
-        instrumentation.addTransformer(new LambdaLoader(createClassFilter()));
+        instrumentation.addTransformer(new LambdaLoader());
     }
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -170,7 +174,7 @@ public class LambdaLoader extends ClassLoader implements ClassFileTransformer {
         debug("[agentmain] " + getVersionString());
         isEnabled = true;
 
-        instrumentation.addTransformer(new LambdaLoader(createClassFilter()));
+        instrumentation.addTransformer(new LambdaLoader());
     }
 
     public static void main(String[] args) throws Throwable {
