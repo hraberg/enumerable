@@ -4,7 +4,8 @@
 		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
 	</description>
 
-	<property name="enumerable.version" value="0.3.1-SNAPSHOT" />
+    <property name="enumerable.osgi.version" value="0.3.1" />
+	<property name="enumerable.version" value="${enumerable.osgi.version}-SNAPSHOT" />
 	<property name="asm.version" value="3.3.1" />
 	<property name="scala.version" value="2.9.1" />
 	<property file="lambda.weaving.properties" />
@@ -124,14 +125,13 @@
 			</fileset>
 		</jar>
         <echo file="target/enumerable.bnd">
-            Bundle-Version: ${enumerable.version}
+            Bundle-Version: ${enumerable.osgi.version}
             Bundle-Name: Enumerable.java
             Bundle-SymbolicName: org.enumerable.java
             Bundle-Activator: org.enumerable.lambda.support.osgi.LambdaWeavingActivator
             Bundle-Description: Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to
             capture expressions as closures.
-            Export-Package:
-            !org.enumerable.lambda.asm.*,!org.enumerable.lambda.weaving.*,org.enumerable.lambda.*;version=${enumerable.version}
+            Export-Package: !org.enumerable.lambda.asm.*,!org.enumerable.lambda.weaving.*,org.enumerable.lambda.*;version=${enumerable.osgi.version}
         </echo>
         <java jar="build/biz.aQute.bnd.jar" fork="true">
             <arg value="wrap"/>
