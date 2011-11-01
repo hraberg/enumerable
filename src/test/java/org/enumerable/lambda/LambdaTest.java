@@ -545,9 +545,14 @@ public class LambdaTest extends TestBase {
         assertEquals(1, fn1Call.invoke(addToI, 1));
         assertEquals(1, i);
 
-        LambdaLocal annotation = (LambdaLocal) fn1Call.getParameterAnnotations()[0][0];
+        LambdaLocal annotation = addToI.getParameters().get(0);
         assertEquals("n", annotation.name());
         assertEquals(Parameters.class.getName(), annotation.parameterClass());
+
+        Field lambdaParameterField = addToI.getParameterFields().get(0);
+        assertEquals("n", lambdaParameterField.getName());
+        assertEquals(int.class, lambdaParameterField.getType());
+        assertEquals(Parameters.class, lambdaParameterField.getDeclaringClass());
 
         Class<?> addToIClass = addToI.getClass();
         assertTrue(addToIClass.isSynthetic());

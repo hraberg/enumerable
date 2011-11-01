@@ -1,19 +1,6 @@
 package org.enumerable.lambda.support.expression;
 
-import static org.enumerable.lambda.exception.UncheckedException.*;
-import static org.objectweb.asm.Type.*;
 import japa.parser.ast.expr.Expression;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-
-
 import org.enumerable.lambda.Fn0;
 import org.enumerable.lambda.Fn1;
 import org.enumerable.lambda.Fn2;
@@ -28,6 +15,18 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.util.ASMifierMethodVisitor;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+
+import static org.enumerable.lambda.exception.UncheckedException.uncheck;
+import static org.objectweb.asm.Type.*;
 
 public class LambdaExpressionTrees {
     static int expressionId = 1;
@@ -123,10 +122,10 @@ public class LambdaExpressionTrees {
         if (fn.getClass().getDeclaredFields().length > 0)
             throw new IllegalArgumentException("Turning Closures into Expressions isn't supported");
 
-        LambdaLocal[] parameters = fn.getParameters();
-        String[] parameterNames = new String[parameters.length];
-        for (int i = 0; i < parameters.length; i++)
-            parameterNames[i] = parameters[i].name();
+        List<LambdaLocal> parameters = fn.getParameters();
+        String[] parameterNames = new String[parameters.size()];
+        for (int i = 0; i < parameters.size(); i++)
+            parameterNames[i] = parameters.get(i).name();
 
         return (R) parseExpressionFromSingleMethodClass(fn.getClass(), parameterNames);
     }

@@ -3,7 +3,10 @@ package org.enumerable.lambda;
 import org.enumerable.lambda.annotation.LambdaLocal;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -274,12 +277,25 @@ public abstract class Fn0<R> implements Serializable {
         return getLambdaMethod(getClass());
     }
 
-    public LambdaLocal[] getParameters() {
+    public List<LambdaLocal> getParameters() {
         Method lambdaMethod = Fn0.getLambdaMethod(getClass());
     
-        LambdaLocal[] parameters = new LambdaLocal[lambdaMethod.getParameterTypes().length];
-        for (int i = 0; i < parameters.length; i++)
-            parameters[i] = ((LambdaLocal) lambdaMethod.getParameterAnnotations()[i][0]);
+        List<LambdaLocal> parameters = new ArrayList<LambdaLocal>();
+        Annotation[][] annotations = lambdaMethod.getParameterAnnotations();
+        for (Annotation[] annotation : annotations)
+            parameters.add((LambdaLocal) annotation[0]);
         return parameters;
+    }
+
+    public List<Field> getParameterFields() {
+        try {
+            List<Field> result = new ArrayList<Field>();
+            ClassLoader classLoader = getClass().getClassLoader();
+            for (LambdaLocal parameter : getParameters())
+                result.add(classLoader.loadClass(parameter.parameterClass()).getField(parameter.name()));
+            return result;
+        } catch (Exception e) {
+            throw uncheck(e);
+        }
     }
 }

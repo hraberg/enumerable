@@ -70,7 +70,7 @@ public class LambdaOSGiTest {
 
     @SuppressWarnings({"unchecked"})
     private <T> T service(Class<T> aClass) {
-        return context.getService(context.getServiceReference(aClass));
+        return (T) context.getService(context.getServiceReference(aClass));
     }
 
     private void installAndStart(String bundle) throws BundleException {
