@@ -188,8 +188,8 @@
                 <attribute name="Bundle-ManifestVersion" value="2"/>
                 <attribute name="Bundle-Version" value="${enumerable.osgi.version}"/>
                 <attribute name="Bundle-SymbolicName" value="org.enumerable.java.test"/>
-                <attribute name="Bundle-Activator" value="org.enumerable.lambda.support.osgi.LambdaOSGiTest"/>
-                <attribute name="Import-Package" value="org.enumerable.*,org.osgi.framework"/>
+                <attribute name="Bundle-Activator" value="org.enumerable.lambda.support.osgi.LambdaOSGiTest$TestActivator"/>
+                <attribute name="Import-Package" value="org.enumerable.lambda;version=&quot;${enumerable.osgi.version}&quot;,org.osgi.framework,org.osgi.framework.launch"/>
             </manifest>
 		</jar>
 	</target>
@@ -426,7 +426,8 @@
 			<dependency groupId="org.jruby" artifactId="jruby-complete" version="1.6.5" scope="compile" optional="true"/>
 			<dependency groupId="org.scala-lang" artifactId="scala-library" version="${scala.version}" scope="compile" optional="true"/>
 			<dependency groupId="org.scala-lang" artifactId="scala-compiler" version="${scala.version}" scope="compile" optional="true"/>
-            <dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.0.1"  scope="provided" optional="true"/>
+			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.0.1"  scope="provided" optional="true"/>
+			<dependency groupId="org.eclipse.tycho" artifactId="org.eclipse.osgi" version="3.7.0.v20110613"/>
 		</artifact:pom>
 		<artifact:writepom pomRefId="enumerable-java-pom" file="target/pom.xml"/>
 	</target>
