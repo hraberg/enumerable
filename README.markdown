@@ -12,7 +12,7 @@ http://github.com/hraberg/enumerable/
 
 Enumerable allows you to write blocks in valid Java like this:
 
-    Fn1 square = fn(n, n * n);
+    Fn1 square = λ( n, n * n);
     List<Integer> result = collect(integers, square);
 
   
@@ -29,7 +29,7 @@ Which is expanded using the [ASM Toolkit for Bytecode Manipulation](http://asm.o
 Closure works as expected, by transforming local variables to arrays:
 
     int i = 0;
-    fn(n, i += n).call(10);
+    λ( n, i += n).call(10);
     assert i == 10;
 
     
@@ -139,11 +139,11 @@ Once created, a lambda can be turned into an invocation handler for a proxy like
 
     // ...
 
-    KeyListener listener = fn(event, out.printf(event + "\n")).as(KeyListener.class);
+    KeyListener listener = λ( event, out.printf(event + "\n")).as(KeyListener.class);
 
 The version above forwards all calls to the lambda. You can also limit the calls to be forwarded like this:
 
-    KeyListener keyTyped = fn(event, out.printf(event + "\n")).as(KeyListener.class, ".*Typed", EventObject.class);
+    KeyListener keyTyped = λ( event, out.printf(event + "\n")).as(KeyListener.class, ".*Typed", EventObject.class);
 
 Now only calls matching the regular expression and the specidifed argument types will be forwarded.
 
@@ -151,7 +151,7 @@ Now only calls matching the regular expression and the specidifed argument types
 
 Parameters to Fn1, Fn2 and Fn3 can have default values:
 
-    Fn2<Double, Double, Double> nTimesMorPI = fn(n, m = Math.PI, n * m);
+    Fn2<Double, Double, Double> nTimesMorPI = λ( n, m = Math.PI, n * m);
     assert 2.0 * Math.PI == nTimesMorPI.call(2.0);
 
 The default value expression is captured as the expression assigned to the static field marked with *@LambdaParameter*, and can be more complex than just accessing a constant value like in this example.
@@ -226,7 +226,7 @@ Take this block:
 
     // ...
 
-    each(strings, fn(s, out.printf("Country: %s\n", s)));
+    each(strings, λ( s, out.printf("Country: %s\n", s)));
     
 The first pass starts by looking for any static fields marked with the *@LambdaParameter* annotation. Once it sees access to one, *s* in this case, it will start moving the code into a new *Fn1* (or *Fn2*) implementation. A block ends with a call to a static method marked with *@NewLambda*: *fn*. (Remember when reading the code that all arguments are (obviously) evaluated before the method call, so *s* is accessed first, and *fn* called last.)
 
@@ -304,3 +304,4 @@ Scala: Copyright (c) 2002-2010 EPFL, Lausanne, unless otherwise specified. Relea
 
 Functional Java: Copyright (c) 2008-2011, Tony Morris, Runar Bjarnason, Tom Adams, Brad Clow, Ricky Clarkson, Jason Zaugg
 All rights reserved. Released under an open source [BSD license](https://github.com/functionaljava/functionaljava/blob/master/etc/LICENCE)
+
