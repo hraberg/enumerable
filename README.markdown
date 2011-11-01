@@ -191,7 +191,7 @@ The *LambdaOps* class is an example of a collection of static factory methods ma
 
 ### Google Collections
 
-[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Guava (a superset of Google Collections)](http://code.google.com/p/guava-libraries/). The tests run against `guava-10.0.1.jar` on your class path. Download from [Guava](http://code.google.com/p/guava-libraries/downloads/list).
+[LambdaGoogleCollections](http://github.com/hraberg/enumerable/blob/master/src/main/java/org/enumerable/lambda/support/googlecollect/LambdaGoogleCollections.java) allows you to create lambdas implementing [Function](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Function.html), [Predicate](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html) and [Supplier](http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/base/Supplier.html) from [Guava (a superset of Google Collections)](http://code.google.com/p/guava-libraries/). The tests run against `guava-10.0.1.jar`. Download from [Guava](http://code.google.com/p/guava-libraries/downloads/list).
 
 ### Functional Java
 
