@@ -130,7 +130,8 @@
             Bundle-SymbolicName: org.enumerable.java
             Bundle-Activator: org.enumerable.lambda.support.osgi.LambdaWeavingActivator
             Bundle-Description: Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
-            Export-Package: !org.enumerable.lambda.weaving.*,*;version=${enumerable.osgi.version}
+            Export-Package: !org.enumerable.lambda.weaving.*,*;version="${enumerable.osgi.version}"
+            Import-Package: org.osgi.framework.hooks.weaving;version="[1.0.0,2.0.0)",org.osgi.framework;version="[1.6,2.0)"
             DynamicImport-Package: *
         </echo>
         <java jar="build/biz.aQute.bnd.jar" fork="true">
