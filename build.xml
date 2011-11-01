@@ -143,6 +143,18 @@
         <move file="target/enumerable-java-${enumerable.version}.bar" tofile="target/enumerable-java-${enumerable.version}.jar" />
 	</target>
 
+    <target name="agent-slim-jar" depends="agent-jar">
+        <jar destfile="target/enumerable-java-${enumerable.version}-slim.jar">
+            <zipfileset src="target/enumerable-java-${enumerable.version}.jar">
+                <include name="org/enumerable/lambda/annotation/**/*.class" />
+                <include name="org/enumerable/lambda/exception/**/*.class" />
+                <include name="org/enumerable/lambda/weaving/**/*.class" />
+                <include name="org/enumerable/lambda/Version.class" />
+                <include name="org/enumerable/lambda/version.properties" />
+            </zipfileset>
+        </jar>
+    </target>
+
 	<target name="tests" depends="agent-jar">
 		<mkdir dir="target/junit" />
 		<junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
@@ -328,7 +340,7 @@
 		</jar>
 	</target>
 
-	<target name="jars" depends="agent-jar, source-jar, test-source-jar, javadoc-jar" />
+	<target name="jars" depends="agent-jar, agent-slim-jar, test-jar, source-jar, test-source-jar, javadoc-jar" />
 
 	<property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}" />
 
@@ -404,7 +416,7 @@
 		<mkdir dir="target" />
 		<artifact:pom id="enumerable-java-pom" groupId="org.enumerable" artifactId="enumerable-java" version="${enumerable.version}" name="Enumerable.java" inceptionyear="2010"
 				url="http://www.enumerable.org" description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.">
-			<scm url="https://github.com/hraberg/enumerable" connection="scm:git@github.com:hraberg/enumerable.git" developerConnection="scm:git@github.com:hraberg/enumerable.git"/>
+			<scm url="https://github.com/hraberg/enumerable" connection="scm:git:git@github.com:hraberg/enumerable.git" developerConnection="scm:git:git@github.com:hraberg/enumerable.git"/>
 			<developer name="Håkan Råberg" email="hakan.raberg@gmail.com" timezone="0"/>
 			<license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php" distribution="repo"/>
 

@@ -278,7 +278,7 @@ public abstract class Fn0<R> implements Serializable {
     }
 
     public List<LambdaLocal> getParameters() {
-        Method lambdaMethod = Fn0.getLambdaMethod(getClass());
+        Method lambdaMethod = getLambdaMethod(getClass());
     
         List<LambdaLocal> parameters = new ArrayList<LambdaLocal>();
         Annotation[][] annotations = lambdaMethod.getParameterAnnotations();
