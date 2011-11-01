@@ -23,6 +23,7 @@
 	<classpathentry kind="lib" path="lib/scala-compiler-2.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/scala-library-2.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/functionaljava-3.0.jar" sourcepath="lib/src/functionaljava-3.0-sources.jar"/>
-	<classpathentry kind="lib" path="lib/org.apache.felix.framework-4.0.1.jar" sourcepath="lib/src/org.apache.felix.framework-4.0.1.jar-sources.jar"/>
+	<classpathentry kind="lib" path="lib/org.apache.felix.framework-4.0.1.jar" sourcepath="lib/src/org.apache.felix.framework-4.0.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi-3.7.0.v20110613.jar" sourcepath="lib/src/org.eclipse.osgi-3.7.0.v20110613-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
