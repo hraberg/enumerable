@@ -1,20 +1,20 @@
 package org.enumerable.lambda.support.googlecollect;
 
-import static com.google.common.collect.Collections2.*;
-import static org.enumerable.lambda.Parameters.*;
-import static org.enumerable.lambda.support.googlecollect.LambdaGoogleCollections.*;
-import static org.junit.Assert.*;
-
-import java.util.Collection;
-
-
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
 import org.enumerable.lambda.Lambda;
 import org.enumerable.lambda.TestBase;
 import org.junit.Test;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
+import java.util.Collection;
+
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Collections2.transform;
+import static org.enumerable.lambda.Parameters.n;
+import static org.enumerable.lambda.Parameters.s;
+import static org.enumerable.lambda.support.googlecollect.LambdaGoogleCollections.*;
+import static org.junit.Assert.*;
 
 public class GoogleCollectionsTest extends TestBase {
     @Test
@@ -33,7 +33,7 @@ public class GoogleCollectionsTest extends TestBase {
     }
 
     @Test
-    public void convertFunctionnToFn1() {
+    public void convertFunctionToFn1() {
         Function<Integer, Integer> square = function(n, n * n);
         assertEquals(9, (int) toFn1(square).call(3));
     }
