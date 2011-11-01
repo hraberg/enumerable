@@ -92,7 +92,7 @@ Open *org.enumerable.lambda.enumerable.EnumerableExample* to get started. The ex
 * `lambda.weaving.exclude.pattern` - is regexp to prevent transformation of classes based on the complete class name rather than by package prefix. This is applied after the package level filtering.
 * `lambda.weaving.annotation.newlambda` - an annotation with target method used to trigger lambda macro expansion. Not needed at runtime. Defaults to *@NewLambda*.
 * `lambda.weaving.annotation.lambdaparameter` - an annotation with target field used to mark static fields as placeholders for parameters in lambdas. Not needed at runtime. Defaults to *@LambdaParameter*.
-* `lambda.weaving.annotation.lambdalocal` - an annotation that with target field or parameter that is used to add runtime meta data to created lambdas. If empty, no meta data will be added. and the annotation is not needed at runtime. Defaults to *@LambdaLocal*
+* `lambda.weaving.annotation.lambdalocal` - an annotation that with target field or parameter that is used to add runtime meta data to created lambdas. If empty, no meta data will be added, and the annotation won't be needed at runtime. Defaults to *@LambdaLocal*
 
 
 ### LambdaParameter
