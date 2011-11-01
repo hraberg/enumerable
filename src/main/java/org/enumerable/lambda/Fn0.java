@@ -290,9 +290,8 @@ public abstract class Fn0<R> implements Serializable {
     public List<Field> getParameterFields() {
         try {
             List<Field> result = new ArrayList<Field>();
-            ClassLoader classLoader = getClass().getClassLoader();
             for (LambdaLocal parameter : getParameters())
-                result.add(classLoader.loadClass(parameter.parameterClass()).getField(parameter.name()));
+                result.add(getClass().getClassLoader().loadClass(parameter.parameterClass()).getField(parameter.name()));
             return result;
         } catch (Exception e) {
             throw uncheck(e);
