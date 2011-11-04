@@ -1,8 +1,5 @@
 package org.enumerable.lambda.weaving.tree;
 
-import org.enumerable.lambda.annotation.LambdaLocal;
-import org.enumerable.lambda.annotation.LambdaParameter;
-import org.enumerable.lambda.annotation.NewLambda;
 import org.enumerable.lambda.weaving.ClassFilter;
 import org.enumerable.lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 import org.objectweb.asm.*;
@@ -29,9 +26,9 @@ import static org.objectweb.asm.Type.*;
 import static org.objectweb.asm.tree.AbstractInsnNode.*;
 
 class LambdaTreeWeaver implements Opcodes {
-    static Type newLambdaAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.newlambda", NewLambda.class.getName(), false);
-    static Type lambdaParameterAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdaparameter", LambdaParameter.class.getName(), false);
-    static Type lambdaLocalAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdalocal", LambdaLocal.class.getName(), true);
+    static Type newLambdaAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.newlambda", "org.enumerable.lambda.annotation.NewLambda", false);
+    static Type lambdaParameterAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdaparameter", "org.enumerable.lambda.annotation.LambdaParameter", false);
+    static Type lambdaLocalAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdalocal", "org.enumerable.lambda.annotation.LambdaLocal", true);
 
 
     ClassNode c;

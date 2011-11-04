@@ -146,7 +146,6 @@
     <target name="agent-weaver-jar" depends="agent-jar">
         <jar destfile="target/enumerable-java-weaver-${enumerable.version}.jar">
             <zipfileset src="target/enumerable-java-${enumerable.version}.jar">
-                <include name="org/enumerable/lambda/annotation/**/*.class" />
                 <include name="org/enumerable/lambda/exception/**/*.class" />
                 <include name="org/enumerable/lambda/weaving/**/*.class" />
             </zipfileset>
