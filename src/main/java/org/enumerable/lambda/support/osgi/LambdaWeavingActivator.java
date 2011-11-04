@@ -1,6 +1,6 @@
 package org.enumerable.lambda.support.osgi;
 
-import org.enumerable.lambda.Version;
+import org.enumerable.lambda.weaving.Version;
 import org.enumerable.lambda.weaving.LambdaLoader;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

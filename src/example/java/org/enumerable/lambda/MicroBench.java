@@ -4,6 +4,7 @@ import org.enumerable.lambda.enumerable.primitives.EnumerableInts;
 import org.enumerable.lambda.primitives.Fn1ItoI;
 import org.enumerable.lambda.primitives.LambdaPrimitives;
 import org.enumerable.lambda.weaving.LambdaLoader;
+import org.enumerable.lambda.weaving.Version;
 
 import java.util.ArrayList;
 import java.util.List;

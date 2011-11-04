@@ -90,7 +90,7 @@
 		</copy>
 
 		<property name="enumerable.git.commit" value="&lt;git commit info not available&gt;" />
-		<echo file="target/classes/org/enumerable/lambda/version.properties">
+		<echo file="target/classes/org/enumerable/lambda/weaving/version.properties">
         	enumerable.version=${enumerable.version}
         	enumerable.build.date=${DSTAMP}
         	enumerable.git.commit=${enumerable.git.commit}
@@ -143,14 +143,12 @@
         <move file="target/enumerable-java-${enumerable.version}.bar" tofile="target/enumerable-java-${enumerable.version}.jar" />
 	</target>
 
-    <target name="agent-slim-jar" depends="agent-jar">
-        <jar destfile="target/enumerable-java-${enumerable.version}-slim.jar">
+    <target name="agent-weaver-jar" depends="agent-jar">
+        <jar destfile="target/enumerable-java-weaver-${enumerable.version}.jar">
             <zipfileset src="target/enumerable-java-${enumerable.version}.jar">
                 <include name="org/enumerable/lambda/annotation/**/*.class" />
                 <include name="org/enumerable/lambda/exception/**/*.class" />
                 <include name="org/enumerable/lambda/weaving/**/*.class" />
-                <include name="org/enumerable/lambda/Version.class" />
-                <include name="org/enumerable/lambda/version.properties" />
             </zipfileset>
         </jar>
     </target>
@@ -323,6 +321,10 @@
 			<fileset dir="src/main/java" />
 			<fileset dir="src/main/scala" />
 		</jar>
+        <jar jarfile="target/enumerable-java-weaver-${enumerable.version}-sources.jar" encoding="UTF-8">
+            <fileset dir="src/main/java/org/enumerable/lambda/exception" />
+            <fileset dir="src/main/java/org/enumerable/lambda/weaving" />
+        </jar>
 	</target>
 
 	<target name="test-source-jar">
@@ -338,9 +340,10 @@
 		<jar jarfile="target/enumerable-java-${enumerable.version}-javadoc.jar" encoding="UTF-8">
 			<fileset dir="target/apidocs" />
 		</jar>
+        <copy file="target/enumerable-java-${enumerable.version}-javadoc.jar" tofile="target/enumerable-java-weaver-${enumerable.version}-javadoc.jar"/>
 	</target>
 
-	<target name="jars" depends="agent-jar, agent-slim-jar, test-jar, source-jar, test-source-jar, javadoc-jar" />
+	<target name="jars" depends="agent-jar, agent-weaver-jar, test-jar, source-jar, test-source-jar, javadoc-jar" />
 
 	<property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}" />
 
@@ -349,6 +352,8 @@
 			<tarfileset dir="target" prefix="${enumerable.dist.name}">
 				<include name="enumerable-java-${enumerable.version}*.jar" />
 				<exclude name="enumerable-java-${enumerable.version}-test-sources.jar" />
+                <include name="enumerable-java-weaver-${enumerable.version}*.jar" />
+                <exclude name="enumerable-java-weaver-${enumerable.version}-test-sources.jar" />
 			</tarfileset>
 
 			<tarfileset dir="src/example/java" prefix="${enumerable.dist.name}/example/src">
@@ -382,7 +387,7 @@
 	</target>
 
 	<target name="javadoc-uptodate">
-		<uptodate property="javadoc.notRequired" targetfile="target/enumerable-javadoc-${enumerable.version}.jar">
+		<uptodate property="javadoc.notRequired" targetfile="target/enumerable-java-${enumerable.version}-javadoc.jar">
 			<srcfiles dir="src/main/java" includes="**/*" />
 		</uptodate>
 	</target>
@@ -444,12 +449,31 @@
 		<artifact:writepom pomRefId="enumerable-java-pom" file="target/pom.xml"/>
 	</target>
 
-	<target name="install" depends="dist-no-test, pom">
+    <target name="pom-weaver">
+        <mkdir dir="target" />
+        <artifact:pom id="enumerable-java-weaver-pom" groupId="org.enumerable" artifactId="enumerable-java-weaver" version="${enumerable.version}" name="Enumerable.java weaver" inceptionyear="2010"
+                url="http://www.enumerable.org" description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures. Standalone weaver for embedding.">
+            <scm url="https://github.com/hraberg/enumerable" connection="scm:git:git@github.com:hraberg/enumerable.git" developerConnection="scm:git:git@github.com:hraberg/enumerable.git"/>
+            <developer name="Håkan Råberg" email="hakan.raberg@gmail.com" timezone="0"/>
+            <license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php" distribution="repo"/>
+
+            <dependency groupId="asm" artifactId="asm-all" version="${asm.version}" scope="provided"/>
+            <dependency groupId="asm" artifactId="asm-debug-all" version="${asm.version}" scope="test"/>
+        </artifact:pom>
+        <artifact:writepom pomRefId="enumerable-java-weaver-pom" file="target/pom-weaver.xml"/>
+    </target>
+
+	<target name="install" depends="dist-no-test, pom, pom-weaver">
 		<artifact:install file="target/enumerable-java-${enumerable.version}.jar">
 			<pom refid="enumerable-java-pom" file="target/pom.xml"/>
 			<attach file="${basedir}/target/enumerable-java-${enumerable.version}-sources.jar" type="jar" classifier="sources" />
 			<attach file="${basedir}/target/enumerable-java-${enumerable.version}-javadoc.jar" type="jar" classifier="javadoc" />
 		</artifact:install>
+        <artifact:install file="target/enumerable-java-weaver-${enumerable.version}.jar">
+            <pom refid="enumerable-java-weaver-pom" file="target/pom-weaver.xml"/>
+            <attach file="${basedir}/target/enumerable-java-weaver-${enumerable.version}-sources.jar" type="jar" classifier="sources" />
+            <attach file="${basedir}/target/enumerable-java-weaver-${enumerable.version}-javadoc.jar" type="jar" classifier="javadoc" />
+        </artifact:install>
 	</target>
 
 	<property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
@@ -486,6 +510,35 @@
 			<arg value="-Dclassifier=javadoc" />
             <arg value="-Pgpg" />
 		</artifact:mvn>
+
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+            <arg value="-Durl=${maven-staging-repository-url}" />
+            <arg value="-DrepositoryId=${maven-staging-repository-id}" />
+            <arg value="-DpomFile=target/pom-weaver.xml" />
+            <arg value="-Dfile=target/enumerable-java-weaver-${enumerable.version}.jar" />
+            <arg value="-Pgpg" />
+        </artifact:mvn>
+
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+            <arg value="-Durl=${maven-staging-repository-url}" />
+            <arg value="-DrepositoryId=${maven-staging-repository-id}" />
+            <arg value="-DpomFile=target/pom-weaver.xml" />
+            <arg value="-Dfile=target/enumerable-java-weaver-${enumerable.version}-sources.jar" />
+            <arg value="-Dclassifier=sources" />
+            <arg value="-Pgpg" />
+        </artifact:mvn>
+
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
+            <arg value="-Durl=${maven-staging-repository-url}" />
+            <arg value="-DrepositoryId=${maven-staging-repository-id}" />
+            <arg value="-DpomFile=target/pom-weaver.xml" />
+            <arg value="-Dfile=target/enumerable-java-weaver${enumerable.version}-javadoc.jar" />
+            <arg value="-Dclassifier=javadoc" />
+            <arg value="-Pgpg" />
+        </artifact:mvn>
 	</target>
 
 	<target name="deploy" depends="install" description="deploy snapshot version to Maven snapshot repository">
@@ -496,5 +549,12 @@
 			<arg value="-DpomFile=target/pom.xml" />
 			<arg value="-Dfile=target/enumerable-java-${enumerable.version}.jar" />
 		</artifact:mvn>
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
+            <arg value="-Durl=${maven-snapshots-repository-url}" />
+            <arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
+            <arg value="-DpomFile=target/pom-weaver.xml" />
+            <arg value="-Dfile=target/enumerable-java-weaver-${enumerable.version}.jar" />
+        </artifact:mvn>
      </target>
  </project>
