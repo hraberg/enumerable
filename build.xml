@@ -1,137 +1,146 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project basedir="." default="build" name="enumerable" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
-	<description>
-		Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
-	</description>
+    <description>
+        Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as
+        closures.
+    </description>
 
-    <property name="enumerable.osgi.version" value="0.3.1" />
-	<property name="enumerable.version" value="${enumerable.osgi.version}-SNAPSHOT" />
-	<property name="asm.version" value="3.3.1" />
-	<property name="scala.version" value="2.9.1" />
-	<property file="lambda.weaving.properties" />
-	<tstamp />
+    <property name="enumerable.osgi.version" value="0.3.1"/>
+    <property name="enumerable.version" value="${enumerable.osgi.version}-SNAPSHOT"/>
+    <property name="asm.version" value="3.3.1"/>
+    <property name="scala.version" value="2.9.1"/>
+    <property file="lambda.weaving.properties"/>
+    <tstamp/>
 
-	<path id="enumerable.classpath">
-		<pathelement location="target/classes" />
-		<fileset dir="lib" includes="*.jar" />
-	</path>
-	<path id="enumerable.example.classpath">
-		<pathelement location="target/example-classes" />
-		<path refid="enumerable.classpath" />
-	</path>
-	<path id="enumerable.test.classpath">
-		<pathelement location="target/test-classes" />
-		<path refid="enumerable.example.classpath" />
-	</path>
+    <path id="enumerable.classpath">
+        <pathelement location="target/classes"/>
+        <fileset dir="lib" includes="*.jar"/>
+    </path>
+    <path id="enumerable.example.classpath">
+        <pathelement location="target/example-classes"/>
+        <path refid="enumerable.classpath"/>
+    </path>
+    <path id="enumerable.test.classpath">
+        <pathelement location="target/test-classes"/>
+        <path refid="enumerable.example.classpath"/>
+    </path>
 
-	<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="build/jarjar-0.6.jar" />
-	<taskdef resource="scala/tools/ant/antlib.xml">
-		<classpath>
-			<pathelement location="lib/scala-compiler-${scala.version}.jar" />
-			<pathelement location="lib/scala-library-${scala.version}.jar" />
-		</classpath>
-	</taskdef>
-	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
-	           uri="antlib:org.apache.maven.artifact.ant"
-	           classpath="build/maven-ant-tasks-2.1.3.jar" />
+    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="build/jarjar-0.6.jar"/>
+    <taskdef resource="scala/tools/ant/antlib.xml">
+        <classpath>
+            <pathelement location="lib/scala-compiler-${scala.version}.jar"/>
+            <pathelement location="lib/scala-library-${scala.version}.jar"/>
+        </classpath>
+    </taskdef>
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+             uri="antlib:org.apache.maven.artifact.ant"
+             classpath="build/maven-ant-tasks-2.1.3.jar"/>
     <taskdef resource="aQute/bnd/ant/taskdef.properties" classpath="build/biz.aQute.bnd.jar"/>
 
-	<target name="clean">
-		<delete dir="target" />
-	</target>
+    <target name="clean">
+        <delete dir="target"/>
+    </target>
 
-	<available file=".git" property="git.is.avaiable" />
+    <available file=".git" property="git.is.avaiable"/>
 
-	<target name="read-git-commit" if="git.is.avaiable">
-		<exec executable="git" outputproperty="enumerable.git.commit" failifexecutionfails="false" timeout="5000">
-			<arg line="rev-parse HEAD" />
-		</exec>
-	</target>
+    <target name="read-git-commit" if="git.is.avaiable">
+        <exec executable="git" outputproperty="enumerable.git.commit" failifexecutionfails="false" timeout="5000">
+            <arg line="rev-parse HEAD"/>
+        </exec>
+    </target>
 
-	<target name="build" depends="read-git-commit">
-		<mkdir dir="target/classes" />
-		<scalac srcdir="src/main" destdir="target/classes" target="jvm-1.5" encoding="UTF-8">
-			<include name="scala/**/*.scala" />
-			<include name="java/**/*.java" />
-			<classpath refid="enumerable.classpath" />
-		</scalac>
-		<javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
-			<compilerarg value="-Xlint:-options"/>
-			<compilerarg value="-XDignore.symbol.file"/>
-			<src path="src/main/java" />
-			<classpath refid="enumerable.classpath" />
-		</javac>
-		<mkdir dir="target/example-classes" />
-		<javac debug="true" destdir="target/example-classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
-			<compilerarg value="-Xlint:-options"/>
-			<src path="src/example/java" />
-			<classpath refid="enumerable.example.classpath" />
-		</javac>
-		<filter token="enumerable.version" value="${enumerable.version}" />
-		<copy todir="target/example-classes" filtering="true">
-			<fileset dir="src/example/project" includes="**/*" />
-		</copy>
+    <target name="build" depends="read-git-commit">
+        <mkdir dir="target/classes"/>
+        <scalac srcdir="src/main" destdir="target/classes" target="jvm-1.5" encoding="UTF-8">
+            <include name="scala/**/*.scala"/>
+            <include name="java/**/*.java"/>
+            <classpath refid="enumerable.classpath"/>
+        </scalac>
+        <javac debug="true" destdir="target/classes" source="1.5" target="1.5" encoding="UTF-8"
+               includeantruntime="false">
+            <compilerarg value="-Xlint:-options"/>
+            <compilerarg value="-XDignore.symbol.file"/>
+            <src path="src/main/java"/>
+            <classpath refid="enumerable.classpath"/>
+        </javac>
+        <copy todir="target/classes">
+            <fileset dir="src/main/java" includes="**/*.properties"/>
+        </copy>
+        <mkdir dir="target/example-classes"/>
+        <javac debug="true" destdir="target/example-classes" source="1.5" target="1.5" encoding="UTF-8"
+               includeantruntime="false">
+            <compilerarg value="-Xlint:-options"/>
+            <src path="src/example/java"/>
+            <classpath refid="enumerable.example.classpath"/>
+        </javac>
+        <filter token="enumerable.version" value="${enumerable.version}"/>
+        <copy todir="target/example-classes" filtering="true">
+            <fileset dir="src/example/project" includes="**/*"/>
+        </copy>
 
-		<mkdir dir="target/test-classes" />
-		<scalac srcdir="src/test" destdir="target/test-classes" target="jvm-1.5" encoding="UTF-8">
-			<include name="scala/**/*.scala" />
-			<include name="java/**/*.java" />
-			<classpath refid="enumerable.test.classpath" />
-		</scalac>
-		<javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8" includeantruntime="false">
-			<compilerarg value="-XDignore.symbol.file"/>
-			<compilerarg value="-Xlint:-options"/>
-			<src path="src/test/java" />
-			<classpath refid="enumerable.test.classpath" />
-		</javac>
-		<copy todir="target/test-classes">
-			<fileset dir="src/test/jruby" includes="**/*" />
-			<fileset dir="src/test/rubyspec" includes="**/*" />
-		</copy>
+        <mkdir dir="target/test-classes"/>
+        <scalac srcdir="src/test" destdir="target/test-classes" target="jvm-1.5" encoding="UTF-8">
+            <include name="scala/**/*.scala"/>
+            <include name="java/**/*.java"/>
+            <classpath refid="enumerable.test.classpath"/>
+        </scalac>
+        <javac debug="true" destdir="target/test-classes" source="1.5" target="1.5" encoding="UTF-8"
+               includeantruntime="false">
+            <compilerarg value="-XDignore.symbol.file"/>
+            <compilerarg value="-Xlint:-options"/>
+            <src path="src/test/java"/>
+            <classpath refid="enumerable.test.classpath"/>
+        </javac>
+        <copy todir="target/test-classes">
+            <fileset dir="src/test/jruby" includes="**/*"/>
+            <fileset dir="src/test/rubyspec" includes="**/*"/>
+        </copy>
 
-		<property name="enumerable.git.commit" value="&lt;git commit info not available&gt;" />
-		<echo file="target/classes/org/enumerable/lambda/weaving/version.properties">
-        	enumerable.version=${enumerable.version}
-        	enumerable.build.date=${DSTAMP}
-        	enumerable.git.commit=${enumerable.git.commit}
-    	</echo>
-	</target>
-	<target name="compile" depends="build" />
+        <property name="enumerable.git.commit" value="&lt;git commit info not available&gt;"/>
+        <echo file="target/classes/org/enumerable/lambda/weaving/version.properties">
+            enumerable.version=${enumerable.version}
+            enumerable.build.date=${DSTAMP}
+            enumerable.git.commit=${enumerable.git.commit}
+        </echo>
+    </target>
+    <target name="compile" depends="build"/>
 
-	<target name="agent-jar-uptodate">
-		<uptodate property="jarjar.notRequired" targetfile="target/enumerable-java-${enumerable.version}.jar">
-			<srcfiles dir="src/main/java" includes="**/*" />
-			<srcfiles dir="src/main/scala" includes="**/*" />
-		</uptodate>
-	</target>
+    <target name="agent-jar-uptodate">
+        <uptodate property="jarjar.notRequired" targetfile="target/enumerable-java-${enumerable.version}.jar">
+            <srcfiles dir="src/main/java" includes="**/*"/>
+            <srcfiles dir="src/main/scala" includes="**/*"/>
+        </uptodate>
+    </target>
 
-	<target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
-		<jarjar jarfile="target/enumerable-java-${enumerable.version}.jar">
-			<fileset dir="target/classes">
-				<exclude name="org/enumerable/lambda/support/scala/**/*.class" />
-			</fileset>
-			<zipfileset src="lib/asm-all-${asm.version}.jar" />
-			<rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.weaving.asm.@1" />
-			<manifest>
-				<attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
-				<attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
-				<attribute name="Agent-Class" value="org.enumerable.lambda.weaving.LambdaLoader" />
-				<attribute name="Can-Retransform-Classes" value="true" />
-			</manifest>
-		</jarjar>
-		<jar jarfile="target/enumerable-java-${enumerable.version}.jar" update="true" encoding="UTF-8">
-			<fileset dir="target/classes">
-				<include name="org/enumerable/lambda/support/scala/**/*.class" />
-			</fileset>
-		</jar>
+    <target name="agent-jar" unless="jarjar.notRequired" depends="build,agent-jar-uptodate">
+        <jarjar jarfile="target/enumerable-java-${enumerable.version}.jar">
+            <fileset dir="target/classes">
+                <exclude name="org/enumerable/lambda/support/scala/**/*.class"/>
+            </fileset>
+            <zipfileset src="lib/asm-all-${asm.version}.jar"/>
+            <rule pattern="org.objectweb.asm.**" result="org.enumerable.lambda.weaving.asm.@1"/>
+            <manifest>
+                <attribute name="Main-Class" value="org.enumerable.lambda.weaving.LambdaLoader"/>
+                <attribute name="Premain-Class" value="org.enumerable.lambda.weaving.LambdaLoader"/>
+                <attribute name="Agent-Class" value="org.enumerable.lambda.weaving.LambdaLoader"/>
+                <attribute name="Can-Retransform-Classes" value="true"/>
+            </manifest>
+        </jarjar>
+        <jar jarfile="target/enumerable-java-${enumerable.version}.jar" update="true" encoding="UTF-8">
+            <fileset dir="target/classes">
+                <include name="org/enumerable/lambda/support/scala/**/*.class"/>
+            </fileset>
+        </jar>
         <echo file="target/enumerable.bnd">
             Bundle-Version: ${enumerable.osgi.version}
             Bundle-Name: Enumerable.java
             Bundle-SymbolicName: org.enumerable.java
             Bundle-Activator: org.enumerable.lambda.support.osgi.LambdaWeavingActivator
-            Bundle-Description: Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.
+            Bundle-Description: Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to
+            capture expressions as closures.
             Export-Package: !org.enumerable.lambda.weaving.*,*;version="${enumerable.osgi.version}"
-            Import-Package: org.osgi.framework.hooks.weaving;version="[1.0.0,2.0.0)",org.osgi.framework;version="[1.6,2.0)"
+            Import-Package:
+            org.osgi.framework.hooks.weaving;version="[1.0.0,2.0.0)",org.osgi.framework;version="[1.6,2.0)"
             DynamicImport-Package: *
         </echo>
         <java jar="build/biz.aQute.bnd.jar" fork="true">
@@ -140,321 +149,350 @@
             <arg value="target/enumerable.bnd"/>
             <arg value="target/enumerable-java-${enumerable.version}.jar"/>
         </java>
-        <move file="target/enumerable-java-${enumerable.version}.bar" tofile="target/enumerable-java-${enumerable.version}.jar" />
-	</target>
+        <move file="target/enumerable-java-${enumerable.version}.bar"
+              tofile="target/enumerable-java-${enumerable.version}.jar"/>
+    </target>
 
     <target name="agent-weaver-jar" depends="agent-jar">
         <jar destfile="target/enumerable-java-weaver-${enumerable.version}.jar">
             <zipfileset src="target/enumerable-java-${enumerable.version}.jar">
-                <include name="org/enumerable/lambda/exception/**/*.class" />
-                <include name="org/enumerable/lambda/weaving/**/*.class" />
+                <include name="org/enumerable/lambda/exception/**/*.class"/>
+                <include name="org/enumerable/lambda/weaving/**/*.class"/>
+                <include name="org/enumerable/lambda/weaving/version.properties"/>
             </zipfileset>
         </jar>
     </target>
 
-	<target name="tests" depends="agent-jar">
-		<mkdir dir="target/junit" />
-		<junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
-			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
-			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
-			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
-			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
-			<sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-			<classpath refid="enumerable.test.classpath" />
-			<batchtest todir="target/junit">
-				<fileset dir="src/test/java">
-					<include name="**/*Test.java" />
-					<include name="**/functionaljava/*_*.java" />
-					<exclude name="**/AgentMainTest.java" />
-					<exclude name="**/LambdaOSGiTest.java" />
-					<exclude name="**/CoreEnumerableRubySpecSuiteTest.java" />
-				</fileset>
-			</batchtest>
-			<formatter type="xml" />
-			<formatter type="plain" />
-		</junit>
-		<fail if="tests.failed" message="unit tests failed" />
-	</target>
+    <target name="tests" depends="agent-jar">
+        <mkdir dir="target/junit"/>
+        <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
+            <jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar"/>
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}"/>
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
+            <classpath refid="enumerable.test.classpath"/>
+            <batchtest todir="target/junit">
+                <fileset dir="src/test/java">
+                    <include name="**/*Test.java"/>
+                    <include name="**/functionaljava/*_*.java"/>
+                    <exclude name="**/AgentMainTest.java"/>
+                    <exclude name="**/LambdaOSGiTest.java"/>
+                    <exclude name="**/CoreEnumerableRubySpecSuiteTest.java"/>
+                </fileset>
+            </batchtest>
+            <formatter type="xml"/>
+            <formatter type="plain"/>
+        </junit>
+        <fail if="tests.failed" message="unit tests failed"/>
+    </target>
 
-	<target name="rubyspec" depends="agent-jar">
-		<mkdir dir="target/rubyspec" />
-		<junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="specs.failed">
-			<classpath refid="enumerable.test.classpath" />
-			<test name="org.enumerable.lambda.enumerable.jruby.CoreEnumerableRubySpecSuiteTest" todir="target/rubyspec" />
-			<formatter type="xml" />
-			<formatter type="plain" />
-		</junit>
-		<fail if="specs.failed" message="RubySpecs failed" />
-	</target>
+    <target name="rubyspec" depends="agent-jar">
+        <mkdir dir="target/rubyspec"/>
+        <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="specs.failed">
+            <classpath refid="enumerable.test.classpath"/>
+            <test name="org.enumerable.lambda.enumerable.jruby.CoreEnumerableRubySpecSuiteTest"
+                  todir="target/rubyspec"/>
+            <formatter type="xml"/>
+            <formatter type="plain"/>
+        </junit>
+        <fail if="specs.failed" message="RubySpecs failed"/>
+    </target>
 
-	<target name="test-jar" depends="build">
-		<jar jarfile="target/enumerable-java-${enumerable.version}-test.jar" encoding="UTF-8">
-			<fileset dir="target/test-classes" />
-			<fileset dir="target/example-classes">
-				<include name="**/EnumerableExample.class" />
-			</fileset>
+    <target name="test-jar" depends="build">
+        <jar jarfile="target/enumerable-java-${enumerable.version}-test.jar" encoding="UTF-8">
+            <fileset dir="target/test-classes"/>
+            <fileset dir="target/example-classes">
+                <include name="**/EnumerableExample.class"/>
+            </fileset>
             <manifest>
                 <attribute name="Bundle-ManifestVersion" value="2"/>
                 <attribute name="Bundle-Version" value="${enumerable.osgi.version}"/>
                 <attribute name="Bundle-SymbolicName" value="org.enumerable.java.test"/>
-                <attribute name="Bundle-Activator" value="org.enumerable.lambda.support.osgi.LambdaOSGiTest$TestActivator"/>
-                <attribute name="Import-Package" value="org.enumerable.lambda;version=&quot;${enumerable.osgi.version}&quot;,org.osgi.framework,org.osgi.framework.launch"/>
+                <attribute name="Bundle-Activator"
+                           value="org.enumerable.lambda.support.osgi.LambdaOSGiTest$TestActivator"/>
+                <attribute name="Import-Package"
+                           value="org.enumerable.lambda;version=&quot;${enumerable.osgi.version}&quot;,org.osgi.framework,org.osgi.framework.launch"/>
             </manifest>
-		</jar>
-	</target>
+        </jar>
+    </target>
 
     <target name="test-agentmain" depends="agent-jar">
-        <mkdir dir="target/junit-agentmain" />
+        <mkdir dir="target/junit-agentmain"/>
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
-            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
-            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
-            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
-            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-            <classpath refid="enumerable.test.classpath" />
-            <classpath path="target/enumerable-java-${enumerable.version}.jar" />
-            <test name="org.enumerable.lambda.weaving.AgentMainTest" todir="target/junit-agentmain" />
-            <formatter type="xml" />
-            <formatter type="plain" />
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}"/>
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
+            <classpath refid="enumerable.test.classpath"/>
+            <classpath path="target/enumerable-java-${enumerable.version}.jar"/>
+            <test name="org.enumerable.lambda.weaving.AgentMainTest" todir="target/junit-agentmain"/>
+            <formatter type="xml"/>
+            <formatter type="plain"/>
         </junit>
-        <fail if="tests.failed" message="Agent Main smoke tests failed" />
+        <fail if="tests.failed" message="Agent Main smoke tests failed"/>
     </target>
 
     <target name="test-osgi" depends="agent-jar, test-jar">
-        <mkdir dir="target/junit-osgi" />
+        <mkdir dir="target/junit-osgi"/>
         <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="specs.failed">
-            <classpath refid="enumerable.test.classpath" />
-            <test name="org.enumerable.lambda.support.osgi.LambdaOSGiTest" todir="target/junit-osgi" />
-            <formatter type="xml" />
-            <formatter type="plain" />
+            <classpath refid="enumerable.test.classpath"/>
+            <test name="org.enumerable.lambda.support.osgi.LambdaOSGiTest" todir="target/junit-osgi"/>
+            <formatter type="xml"/>
+            <formatter type="plain"/>
         </junit>
-        <fail if="specs.failed" message="OSGi smoke tests failed" />
+        <fail if="specs.failed" message="OSGi smoke tests failed"/>
     </target>
 
-	<target name="aot-compile-tests" depends="test-jar">
-		<java fork="yes" classname="org.enumerable.lambda.weaving.LambdaCompiler" failonerror="yes">
-			<arg value="target/enumerable-java-${enumerable.version}-test.jar" />
-			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
-			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
-			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
-			<sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-			<classpath refid="enumerable.test.classpath" />
-		</java>
-	</target>
+    <target name="aot-compile-tests" depends="test-jar">
+        <java fork="yes" classname="org.enumerable.lambda.weaving.LambdaCompiler" failonerror="yes">
+            <arg value="target/enumerable-java-${enumerable.version}-test.jar"/>
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}"/>
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
+            <classpath refid="enumerable.test.classpath"/>
+        </java>
+    </target>
 
-	<target name="aot-tests" depends="agent-jar, aot-compile-tests">
-		<mkdir dir="target/junit-aot" />
-		<junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
-			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
-			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
-			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
-			<sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-			<classpath refid="enumerable.classpath" />
-			<classpath location="target/enumerable-java-${enumerable.version}-test.jar" />
-			<classpath location="lib/junit-4.7.jar" />
-			<classpath location="lib/scala-compiler-${scala.version}.jar" />
-			<batchtest todir="target/junit-aot">
-				<fileset dir="src/test/java">
-					<include name="**/*Test.java" />
-					<include name="**/functionaljava/*_*.java" />
-					<exclude name="**/weaving/**/*Test.java" />
-					<exclude name="**/CoreEnumerableRubySpecSuiteTest.java" />
-				</fileset>
-			</batchtest>
-			<formatter type="xml" />
-			<formatter type="plain" />
-		</junit>
-		<fail if="tests.failed" message="AOT unit tests failed" />
-	</target>
+    <target name="aot-tests" depends="agent-jar, aot-compile-tests">
+        <mkdir dir="target/junit-aot"/>
+        <junit fork="yes" forkmode="once" printsummary="withOutAndErr" failureproperty="tests.failed">
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}"/>
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
+            <classpath refid="enumerable.classpath"/>
+            <classpath location="target/enumerable-java-${enumerable.version}-test.jar"/>
+            <classpath location="lib/junit-4.7.jar"/>
+            <classpath location="lib/scala-compiler-${scala.version}.jar"/>
+            <batchtest todir="target/junit-aot">
+                <fileset dir="src/test/java">
+                    <include name="**/*Test.java"/>
+                    <include name="**/functionaljava/*_*.java"/>
+                    <exclude name="**/weaving/**/*Test.java"/>
+                    <exclude name="**/CoreEnumerableRubySpecSuiteTest.java"/>
+                </fileset>
+            </batchtest>
+            <formatter type="xml"/>
+            <formatter type="plain"/>
+        </junit>
+        <fail if="tests.failed" message="AOT unit tests failed"/>
+    </target>
 
-	<target name="example" depends="example-with-agent" />
+    <target name="example" depends="example-with-agent"/>
 
-	<target name="example-with-agent" depends="agent-jar">
-		<java fork="yes" classname="org.enumerable.lambda.enumerable.EnumerableExample" failonerror="yes">
-			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
-			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
-			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
-			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
-			<sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-			<classpath location="target/example-classes" />
-		</java>
-	</target>
+    <target name="example-with-agent" depends="agent-jar">
+        <java fork="yes" classname="org.enumerable.lambda.enumerable.EnumerableExample" failonerror="yes">
+            <jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar"/>
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}"/>
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
+            <classpath location="target/example-classes"/>
+        </java>
+    </target>
 
-	<target name="example-with-verifier" depends="agent-jar">
-		<java fork="yes" classname="org.enumerable.lambda.enumerable.EnumerableExample" failonerror="yes">
-			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
-			<sysproperty key="lambda.weaving.debug" value="true" />
-			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
-			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
-			<sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-			<classpath location="target/example-classes" />
-			<classpath>
-				<pathelement location="lib/asm-all-${asm.version}.jar" />
-			</classpath>
-		</java>
-	</target>
+    <target name="example-with-verifier" depends="agent-jar">
+        <java fork="yes" classname="org.enumerable.lambda.enumerable.EnumerableExample" failonerror="yes">
+            <jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar"/>
+            <sysproperty key="lambda.weaving.debug" value="true"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}"/>
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
+            <classpath location="target/example-classes"/>
+            <classpath>
+                <pathelement location="lib/asm-all-${asm.version}.jar"/>
+            </classpath>
+        </java>
+    </target>
 
-	<target name="example-with-loader" depends="agent-jar">
-		<java fork="yes" classname="org.enumerable.lambda.weaving.LambdaLoader" failonerror="yes">
-			<arg value="org.enumerable.lambda.enumerable.EnumerableExample" />
-			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
-			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
-			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
-			<sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-			<classpath refid="enumerable.example.classpath" />
-		</java>
-	</target>
+    <target name="example-with-loader" depends="agent-jar">
+        <java fork="yes" classname="org.enumerable.lambda.weaving.LambdaLoader" failonerror="yes">
+            <arg value="org.enumerable.lambda.enumerable.EnumerableExample"/>
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}"/>
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
+            <classpath refid="enumerable.example.classpath"/>
+        </java>
+    </target>
 
-	<target name="microbench" depends="agent-jar">
-		<java fork="yes" classname="org.enumerable.lambda.MicroBench" failonerror="yes">
-			<jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar" />
-			<sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}" />
-			<sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}" />
-			<sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}" />
-			<sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}" />
-			<classpath refid="enumerable.example.classpath" />
-		</java>
-	</target>
+    <target name="microbench" depends="agent-jar">
+        <java fork="yes" classname="org.enumerable.lambda.MicroBench" failonerror="yes">
+            <jvmarg value="-javaagent:target/enumerable-java-${enumerable.version}.jar"/>
+            <sysproperty key="lambda.weaving.debug" value="${lambda.weaving.debug}"/>
+            <sysproperty key="lambda.weaving.debug.classes.dir" value="${lambda.weaving.debug.classes.dir}"/>
+            <sysproperty key="lambda.weaving.debug.dev" value="${lambda.weaving.debug.dev}"/>
+            <sysproperty key="lambda.weaving.skipped.packages" value="${lambda.weaving.skipped.packages}"/>
+            <classpath refid="enumerable.example.classpath"/>
+        </java>
+    </target>
 
-	<target name="source-jar">
-		<jar jarfile="target/enumerable-java-${enumerable.version}-sources.jar" encoding="UTF-8">
-			<fileset dir="src/main/java" />
-			<fileset dir="src/main/scala" />
-		</jar>
-        <jar jarfile="target/enumerable-java-weaver-${enumerable.version}-sources.jar" encoding="UTF-8">
-            <fileset dir="src/main/java/org/enumerable/lambda/exception" />
-            <fileset dir="src/main/java/org/enumerable/lambda/weaving" />
+    <target name="source-jar">
+        <jar jarfile="target/enumerable-java-${enumerable.version}-sources.jar" encoding="UTF-8">
+            <fileset dir="src/main/java"/>
+            <fileset dir="src/main/scala"/>
         </jar>
-	</target>
+        <jar jarfile="target/enumerable-java-weaver-${enumerable.version}-sources.jar" encoding="UTF-8">
+            <fileset dir="src/main/java/org/enumerable/lambda/exception"/>
+            <fileset dir="src/main/java/org/enumerable/lambda/weaving"/>
+        </jar>
+    </target>
 
-	<target name="test-source-jar">
-		<jar jarfile="target/enumerable-java-${enumerable.version}-test-sources.jar" encoding="UTF-8">
-			<fileset dir="src/test/java" />
-			<fileset dir="src/test/jruby" />
-			<fileset dir="src/test/rubyspec" />
-			<fileset dir="src/test/scala" />
-		</jar>
-	</target>
+    <target name="test-source-jar">
+        <jar jarfile="target/enumerable-java-${enumerable.version}-test-sources.jar" encoding="UTF-8">
+            <fileset dir="src/test/java"/>
+            <fileset dir="src/test/jruby"/>
+            <fileset dir="src/test/rubyspec"/>
+            <fileset dir="src/test/scala"/>
+        </jar>
+    </target>
 
-	<target name="javadoc-jar" depends="javadoc">
-		<jar jarfile="target/enumerable-java-${enumerable.version}-javadoc.jar" encoding="UTF-8">
-			<fileset dir="target/apidocs" />
-		</jar>
-        <copy file="target/enumerable-java-${enumerable.version}-javadoc.jar" tofile="target/enumerable-java-weaver-${enumerable.version}-javadoc.jar"/>
-	</target>
+    <target name="javadoc-jar" depends="javadoc">
+        <jar jarfile="target/enumerable-java-${enumerable.version}-javadoc.jar" encoding="UTF-8">
+            <fileset dir="target/apidocs"/>
+        </jar>
+        <copy file="target/enumerable-java-${enumerable.version}-javadoc.jar"
+              tofile="target/enumerable-java-weaver-${enumerable.version}-javadoc.jar"/>
+    </target>
 
-	<target name="jars" depends="agent-jar, agent-weaver-jar, test-jar, source-jar, test-source-jar, javadoc-jar" />
+    <target name="jars" depends="agent-jar, agent-weaver-jar, test-jar, source-jar, test-source-jar, javadoc-jar"/>
 
-	<property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}" />
+    <property name="enumerable.dist.name" value="enumerable-java-${enumerable.version}-${DSTAMP}"/>
 
-	<target name="dist-no-test" depends="jars">
-		<tar destfile="target/${enumerable.dist.name}.tgz" compression="gzip">
-			<tarfileset dir="target" prefix="${enumerable.dist.name}">
-				<include name="enumerable-java-${enumerable.version}*.jar" />
-				<exclude name="enumerable-java-${enumerable.version}-test-sources.jar" />
-                <include name="enumerable-java-weaver-${enumerable.version}*.jar" />
-                <exclude name="enumerable-java-weaver-${enumerable.version}-test-sources.jar" />
-			</tarfileset>
+    <target name="dist-no-test" depends="jars">
+        <tar destfile="target/${enumerable.dist.name}.tgz" compression="gzip">
+            <tarfileset dir="target" prefix="${enumerable.dist.name}">
+                <include name="enumerable-java-${enumerable.version}*.jar"/>
+                <exclude name="enumerable-java-${enumerable.version}-test-sources.jar"/>
+                <include name="enumerable-java-weaver-${enumerable.version}*.jar"/>
+                <exclude name="enumerable-java-weaver-${enumerable.version}-test-sources.jar"/>
+            </tarfileset>
 
-			<tarfileset dir="src/example/java" prefix="${enumerable.dist.name}/example/src">
-				<include name="**/*" />
-			</tarfileset>
-			<tarfileset dir="target/example-classes" prefix="${enumerable.dist.name}">
-				<include name=".*/**" />
-				<exclude name="**/build.xml" />
-			</tarfileset>
-			<tarfileset dir="target/example-classes" prefix="${enumerable.dist.name}/example">
-				<include name="**/build.xml" />
-			</tarfileset>
+            <tarfileset dir="src/example/java" prefix="${enumerable.dist.name}/example/src">
+                <include name="**/*"/>
+            </tarfileset>
+            <tarfileset dir="target/example-classes" prefix="${enumerable.dist.name}">
+                <include name=".*/**"/>
+                <exclude name="**/build.xml"/>
+            </tarfileset>
+            <tarfileset dir="target/example-classes" prefix="${enumerable.dist.name}/example">
+                <include name="**/build.xml"/>
+            </tarfileset>
 
-			<tarfileset dir="lib" prefix="${enumerable.dist.name}">
-				<include name="asm-${asm.version}.license" />
-			</tarfileset>
-			<tarfileset dir="." prefix="${enumerable.dist.name}">
-				<include name="README.markdown" />
-				<include name="epl-v10.html" />
-			</tarfileset>
-		</tar>
-	</target>
+            <tarfileset dir="lib" prefix="${enumerable.dist.name}">
+                <include name="asm-${asm.version}.license"/>
+            </tarfileset>
+            <tarfileset dir="." prefix="${enumerable.dist.name}">
+                <include name="README.markdown"/>
+                <include name="epl-v10.html"/>
+            </tarfileset>
+        </tar>
+    </target>
 
-	<target name="dist" depends="dist-no-test, tests, rubyspec, example-with-loader, test-agentmain, test-osgi, aot-tests, microbench, install">
-		<echo message="Ensuring that the example project in ${enumerable.dist.name}.tgz works" />
-		<delete dir="target/${enumerable.dist.name}" />
-		<untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip" />
-		<ant dir="target/${enumerable.dist.name}/example" inheritall="false" />
-		<ant dir="target/${enumerable.dist.name}/example" target="microbench" inheritall="false" />
-		<ant dir="target/${enumerable.dist.name}/example" target="aot-example" inheritall="false" />
-	</target>
+    <target name="dist"
+            depends="dist-no-test, tests, rubyspec, example-with-loader, test-agentmain, test-osgi, aot-tests, microbench, install">
+        <echo message="Ensuring that the example project in ${enumerable.dist.name}.tgz works"/>
+        <delete dir="target/${enumerable.dist.name}"/>
+        <untar src="target/${enumerable.dist.name}.tgz" dest="target" compression="gzip"/>
+        <ant dir="target/${enumerable.dist.name}/example" inheritall="false"/>
+        <ant dir="target/${enumerable.dist.name}/example" target="microbench" inheritall="false"/>
+        <ant dir="target/${enumerable.dist.name}/example" target="aot-example" inheritall="false"/>
+    </target>
 
-	<target name="javadoc-uptodate">
-		<uptodate property="javadoc.notRequired" targetfile="target/enumerable-java-${enumerable.version}-javadoc.jar">
-			<srcfiles dir="src/main/java" includes="**/*" />
-		</uptodate>
-	</target>
+    <target name="javadoc-uptodate">
+        <uptodate property="javadoc.notRequired" targetfile="target/enumerable-java-${enumerable.version}-javadoc.jar">
+            <srcfiles dir="src/main/java" includes="**/*"/>
+        </uptodate>
+    </target>
 
-	<target name="javadoc" unless="javadoc.notRequired" depends="javadoc-uptodate">
-		<javadoc sourcepath="src/main/java" destdir="target/apidocs" charset="UTF-8" Encoding="UTF-8" classpathref="enumerable.classpath" source="1.5" windowtitle="Enumerable.java API ${enumerable.version}">
-			<arg value="-XDignore.symbol.file"/>
-			<doctitle>
-				<![CDATA[<h1>Enumerable.java API ${enumerable.version}</h1>]]>
+    <target name="javadoc" unless="javadoc.notRequired" depends="javadoc-uptodate">
+        <javadoc sourcepath="src/main/java" destdir="target/apidocs" charset="UTF-8" Encoding="UTF-8"
+                 classpathref="enumerable.classpath" source="1.5"
+                 windowtitle="Enumerable.java API ${enumerable.version}">
+            <arg value="-XDignore.symbol.file"/>
+            <doctitle>
+                <![CDATA[<h1>Enumerable.java API ${enumerable.version}</h1>]]>
             </doctitle>
-			<bottom>
-				<![CDATA[<i>Copyright &#169; 2010-2011 Håkan Råberg</i>]]>
-	        </bottom>
-		</javadoc>
-	</target>
+            <bottom>
+                <![CDATA[<i>Copyright &#169; 2010-2011 Håkan Råberg</i>]]>
+            </bottom>
+        </javadoc>
+    </target>
 
-	<target name="download-dependencies" depends="pom">
-		<artifact:dependencies filesetId="dependency.fileset" sourcesFilesetId="sources.dependency.fileset" pomrefid="enumerable-java-pom" />
+    <target name="download-dependencies" depends="pom">
+        <artifact:dependencies filesetId="dependency.fileset" sourcesFilesetId="sources.dependency.fileset"
+                               pomrefid="enumerable-java-pom"/>
 
-		<delete dir="lib" />
-		<mkdir dir="lib/src" />
-		<copy todir="lib" flatten="true">
-		  <fileset refid="dependency.fileset" />
-		</copy>
-		<copy todir="lib/src" flatten="true">
-		  <fileset refid="sources.dependency.fileset" />
-		</copy>
-	</target>
+        <delete dir="lib"/>
+        <mkdir dir="lib/src"/>
+        <copy todir="lib" flatten="true">
+            <fileset refid="dependency.fileset"/>
+        </copy>
+        <copy todir="lib/src" flatten="true">
+            <fileset refid="sources.dependency.fileset"/>
+        </copy>
+    </target>
 
-	<target name="pom">
-		<mkdir dir="target" />
-		<artifact:pom id="enumerable-java-pom" groupId="org.enumerable" artifactId="enumerable-java" version="${enumerable.version}" name="Enumerable.java" inceptionyear="2010"
-				url="http://www.enumerable.org" description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.">
-			<scm url="https://github.com/hraberg/enumerable" connection="scm:git:git@github.com:hraberg/enumerable.git" developerConnection="scm:git:git@github.com:hraberg/enumerable.git"/>
-			<developer name="Håkan Råberg" email="hakan.raberg@gmail.com" timezone="0"/>
-			<license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php" distribution="repo"/>
+    <target name="pom">
+        <mkdir dir="target"/>
+        <artifact:pom id="enumerable-java-pom" groupId="org.enumerable" artifactId="enumerable-java"
+                      version="${enumerable.version}" name="Enumerable.java" inceptionyear="2010"
+                      url="http://www.enumerable.org"
+                      description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures.">
+            <scm url="https://github.com/hraberg/enumerable" connection="scm:git:git@github.com:hraberg/enumerable.git"
+                 developerConnection="scm:git:git@github.com:hraberg/enumerable.git"/>
+            <developer name="Håkan Råberg" email="hakan.raberg@gmail.com" timezone="0"/>
+            <license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php"
+                     distribution="repo"/>
 
-			<remoterepository id="clojars" url="http://clojars.org/repo"/>
-			<remoterepository id="javaparser-release" url="https://javaparser.googlecode.com/svn/maven2"/>
+            <remoterepository id="clojars" url="http://clojars.org/repo"/>
+            <remoterepository id="javaparser-release" url="https://javaparser.googlecode.com/svn/maven2"/>
 
-			<dependency groupId="asm" artifactId="asm-all" version="${asm.version}" scope="provided"/>
-			<dependency groupId="asm" artifactId="asm-debug-all" version="${asm.version}" scope="test"/>
-			<dependency groupId="junit" artifactId="junit" version="4.7" scope="test"/>
-			<dependency groupId="org.clojure" artifactId="clojure" version="1.3.0" scope="compile" optional="true"/>
-			<dependency groupId="clojure-jsr223" artifactId="clojure-jsr223" version="1.0" scope="compile" optional="true"/>
-			<dependency groupId="org.eclipse.jdt.core.compiler" artifactId="ecj" version="3.7.1" scope="compile" optional="true"/>
-			<dependency groupId="org.codehaus.jsr166-mirror" artifactId="extra166y" version="1.7.0" scope="compile" optional="true"/>
-			<dependency groupId="org.codehaus.jsr166-mirror" artifactId="jsr166y" version="1.7.0" scope="compile" optional="true"/>
-			<dependency groupId="org.functionaljava" artifactId="functionaljava" version="3.0" scope="compile" optional="true"/>
-			<dependency groupId="org.codehaus.groovy" artifactId="groovy-all" version="1.8.3" scope="compile" optional="true"/>
-			<dependency groupId="com.google.guava" artifactId="guava" version="10.0.1" scope="compile" optional="true"/>
-			<dependency groupId="com.google.code.javaparser" artifactId="javaparser" version="1.0.8" scope="compile" optional="true"/>
-			<dependency groupId="org.jruby" artifactId="jruby-complete" version="1.6.5" scope="compile" optional="true"/>
-			<dependency groupId="org.scala-lang" artifactId="scala-library" version="${scala.version}" scope="compile" optional="true"/>
-			<dependency groupId="org.scala-lang" artifactId="scala-compiler" version="${scala.version}" scope="compile" optional="true"/>
-			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.0.1"  scope="provided" optional="true"/>
-			<dependency groupId="org.eclipse.tycho" artifactId="org.eclipse.osgi" version="3.7.0.v20110613"/>
-		</artifact:pom>
-		<artifact:writepom pomRefId="enumerable-java-pom" file="target/pom.xml"/>
-	</target>
+            <dependency groupId="asm" artifactId="asm-all" version="${asm.version}" scope="provided"/>
+            <dependency groupId="asm" artifactId="asm-debug-all" version="${asm.version}" scope="test"/>
+            <dependency groupId="junit" artifactId="junit" version="4.7" scope="test"/>
+            <dependency groupId="org.clojure" artifactId="clojure" version="1.3.0" scope="compile" optional="true"/>
+            <dependency groupId="clojure-jsr223" artifactId="clojure-jsr223" version="1.0" scope="compile"
+                        optional="true"/>
+            <dependency groupId="org.eclipse.jdt.core.compiler" artifactId="ecj" version="3.7.1" scope="compile"
+                        optional="true"/>
+            <dependency groupId="org.codehaus.jsr166-mirror" artifactId="extra166y" version="1.7.0" scope="compile"
+                        optional="true"/>
+            <dependency groupId="org.codehaus.jsr166-mirror" artifactId="jsr166y" version="1.7.0" scope="compile"
+                        optional="true"/>
+            <dependency groupId="org.functionaljava" artifactId="functionaljava" version="3.0" scope="compile"
+                        optional="true"/>
+            <dependency groupId="org.codehaus.groovy" artifactId="groovy-all" version="1.8.3" scope="compile"
+                        optional="true"/>
+            <dependency groupId="com.google.guava" artifactId="guava" version="10.0.1" scope="compile" optional="true"/>
+            <dependency groupId="com.google.code.javaparser" artifactId="javaparser" version="1.0.8" scope="compile"
+                        optional="true"/>
+            <dependency groupId="org.jruby" artifactId="jruby-complete" version="1.6.5" scope="compile"
+                        optional="true"/>
+            <dependency groupId="org.scala-lang" artifactId="scala-library" version="${scala.version}" scope="compile"
+                        optional="true"/>
+            <dependency groupId="org.scala-lang" artifactId="scala-compiler" version="${scala.version}" scope="compile"
+                        optional="true"/>
+            <dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.0.1"
+                        scope="provided" optional="true"/>
+            <dependency groupId="org.eclipse.tycho" artifactId="org.eclipse.osgi" version="3.7.0.v20110613"/>
+        </artifact:pom>
+        <artifact:writepom pomRefId="enumerable-java-pom" file="target/pom.xml"/>
+    </target>
 
     <target name="pom-weaver">
-        <mkdir dir="target" />
-        <artifact:pom id="enumerable-java-weaver-pom" groupId="org.enumerable" artifactId="enumerable-java-weaver" version="${enumerable.version}" name="Enumerable.java weaver" inceptionyear="2010"
-                url="http://www.enumerable.org" description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures. Standalone weaver for embedding.">
-            <scm url="https://github.com/hraberg/enumerable" connection="scm:git:git@github.com:hraberg/enumerable.git" developerConnection="scm:git:git@github.com:hraberg/enumerable.git"/>
+        <mkdir dir="target"/>
+        <artifact:pom id="enumerable-java-weaver-pom" groupId="org.enumerable" artifactId="enumerable-java-weaver"
+                      version="${enumerable.version}" name="Enumerable.java weaver" inceptionyear="2010"
+                      url="http://www.enumerable.org"
+                      description="Ruby/Smalltalk style internal iterators for Java 5 using bytecode transformation to capture expressions as closures. Standalone weaver for embedding.">
+            <scm url="https://github.com/hraberg/enumerable" connection="scm:git:git@github.com:hraberg/enumerable.git"
+                 developerConnection="scm:git:git@github.com:hraberg/enumerable.git"/>
             <developer name="Håkan Råberg" email="hakan.raberg@gmail.com" timezone="0"/>
-            <license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php" distribution="repo"/>
+            <license name="Eclipse Public License 1.0" url="http://opensource.org/licenses/eclipse-1.0.php"
+                     distribution="repo"/>
 
             <dependency groupId="asm" artifactId="asm-all" version="${asm.version}" scope="provided"/>
             <dependency groupId="asm" artifactId="asm-debug-all" version="${asm.version}" scope="test"/>
@@ -462,98 +500,103 @@
         <artifact:writepom pomRefId="enumerable-java-weaver-pom" file="target/pom-weaver.xml"/>
     </target>
 
-	<target name="install" depends="dist-no-test, pom, pom-weaver">
-		<artifact:install file="target/enumerable-java-${enumerable.version}.jar">
-			<pom refid="enumerable-java-pom" file="target/pom.xml"/>
-			<attach file="${basedir}/target/enumerable-java-${enumerable.version}-sources.jar" type="jar" classifier="sources" />
-			<attach file="${basedir}/target/enumerable-java-${enumerable.version}-javadoc.jar" type="jar" classifier="javadoc" />
-		</artifact:install>
+    <target name="install" depends="dist-no-test, pom, pom-weaver">
+        <artifact:install file="target/enumerable-java-${enumerable.version}.jar">
+            <pom refid="enumerable-java-pom" file="target/pom.xml"/>
+            <attach file="${basedir}/target/enumerable-java-${enumerable.version}-sources.jar" type="jar"
+                    classifier="sources"/>
+            <attach file="${basedir}/target/enumerable-java-${enumerable.version}-javadoc.jar" type="jar"
+                    classifier="javadoc"/>
+        </artifact:install>
         <artifact:install file="target/enumerable-java-weaver-${enumerable.version}.jar">
             <pom refid="enumerable-java-weaver-pom" file="target/pom-weaver.xml"/>
-            <attach file="${basedir}/target/enumerable-java-weaver-${enumerable.version}-sources.jar" type="jar" classifier="sources" />
-            <attach file="${basedir}/target/enumerable-java-weaver-${enumerable.version}-javadoc.jar" type="jar" classifier="javadoc" />
+            <attach file="${basedir}/target/enumerable-java-weaver-${enumerable.version}-sources.jar" type="jar"
+                    classifier="sources"/>
+            <attach file="${basedir}/target/enumerable-java-weaver-${enumerable.version}-javadoc.jar" type="jar"
+                    classifier="javadoc"/>
         </artifact:install>
-	</target>
+    </target>
 
-	<property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
-	<property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots/" />
-	<property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
-	<property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+    <property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots"/>
+    <property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots/"/>
+    <property name="maven-staging-repository-id" value="sonatype-nexus-staging"/>
+    <property name="maven-staging-repository-url"
+              value="https://oss.sonatype.org/service/local/staging/deploy/maven2/"/>
 
-	<target name="stage" depends="dist, install">
-		<artifact:mvn>
-			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-			<arg value="-Durl=${maven-staging-repository-url}" />
-			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
-			<arg value="-DpomFile=target/pom.xml" />
-			<arg value="-Dfile=target/enumerable-java-${enumerable.version}.jar" />
-            <arg value="-Pgpg" />
-		</artifact:mvn>
-
-		<artifact:mvn>
-			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-			<arg value="-Durl=${maven-staging-repository-url}" />
-			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
-			<arg value="-DpomFile=target/pom.xml" />
-			<arg value="-Dfile=target/enumerable-java-${enumerable.version}-sources.jar" />
-			<arg value="-Dclassifier=sources" />
-            <arg value="-Pgpg" />
-		</artifact:mvn>
-
-		<artifact:mvn>
-			<arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-			<arg value="-Durl=${maven-staging-repository-url}" />
-			<arg value="-DrepositoryId=${maven-staging-repository-id}" />
-			<arg value="-DpomFile=target/pom.xml" />
-			<arg value="-Dfile=target/enumerable-java-${enumerable.version}-javadoc.jar" />
-			<arg value="-Dclassifier=javadoc" />
-            <arg value="-Pgpg" />
-		</artifact:mvn>
-
+    <target name="stage" depends="dist, install">
         <artifact:mvn>
-            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-            <arg value="-Durl=${maven-staging-repository-url}" />
-            <arg value="-DrepositoryId=${maven-staging-repository-id}" />
-            <arg value="-DpomFile=target/pom-weaver.xml" />
-            <arg value="-Dfile=target/enumerable-java-weaver-${enumerable.version}.jar" />
-            <arg value="-Pgpg" />
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file"/>
+            <arg value="-Durl=${maven-staging-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-staging-repository-id}"/>
+            <arg value="-DpomFile=target/pom.xml"/>
+            <arg value="-Dfile=target/enumerable-java-${enumerable.version}.jar"/>
+            <arg value="-Pgpg"/>
         </artifact:mvn>
 
         <artifact:mvn>
-            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-            <arg value="-Durl=${maven-staging-repository-url}" />
-            <arg value="-DrepositoryId=${maven-staging-repository-id}" />
-            <arg value="-DpomFile=target/pom-weaver.xml" />
-            <arg value="-Dfile=target/enumerable-java-weaver-${enumerable.version}-sources.jar" />
-            <arg value="-Dclassifier=sources" />
-            <arg value="-Pgpg" />
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file"/>
+            <arg value="-Durl=${maven-staging-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-staging-repository-id}"/>
+            <arg value="-DpomFile=target/pom.xml"/>
+            <arg value="-Dfile=target/enumerable-java-${enumerable.version}-sources.jar"/>
+            <arg value="-Dclassifier=sources"/>
+            <arg value="-Pgpg"/>
         </artifact:mvn>
 
         <artifact:mvn>
-            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
-            <arg value="-Durl=${maven-staging-repository-url}" />
-            <arg value="-DrepositoryId=${maven-staging-repository-id}" />
-            <arg value="-DpomFile=target/pom-weaver.xml" />
-            <arg value="-Dfile=target/enumerable-java-weaver${enumerable.version}-javadoc.jar" />
-            <arg value="-Dclassifier=javadoc" />
-            <arg value="-Pgpg" />
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file"/>
+            <arg value="-Durl=${maven-staging-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-staging-repository-id}"/>
+            <arg value="-DpomFile=target/pom.xml"/>
+            <arg value="-Dfile=target/enumerable-java-${enumerable.version}-javadoc.jar"/>
+            <arg value="-Dclassifier=javadoc"/>
+            <arg value="-Pgpg"/>
         </artifact:mvn>
-	</target>
 
-	<target name="deploy" depends="install" description="deploy snapshot version to Maven snapshot repository">
-		<artifact:mvn>
-			<arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
-			<arg value="-Durl=${maven-snapshots-repository-url}" />
-			<arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
-			<arg value="-DpomFile=target/pom.xml" />
-			<arg value="-Dfile=target/enumerable-java-${enumerable.version}.jar" />
-		</artifact:mvn>
         <artifact:mvn>
-            <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
-            <arg value="-Durl=${maven-snapshots-repository-url}" />
-            <arg value="-DrepositoryId=${maven-snapshots-repository-id}" />
-            <arg value="-DpomFile=target/pom-weaver.xml" />
-            <arg value="-Dfile=target/enumerable-java-weaver-${enumerable.version}.jar" />
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file"/>
+            <arg value="-Durl=${maven-staging-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-staging-repository-id}"/>
+            <arg value="-DpomFile=target/pom-weaver.xml"/>
+            <arg value="-Dfile=target/enumerable-java-weaver-${enumerable.version}.jar"/>
+            <arg value="-Pgpg"/>
         </artifact:mvn>
-     </target>
- </project>
+
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file"/>
+            <arg value="-Durl=${maven-staging-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-staging-repository-id}"/>
+            <arg value="-DpomFile=target/pom-weaver.xml"/>
+            <arg value="-Dfile=target/enumerable-java-weaver-${enumerable.version}-sources.jar"/>
+            <arg value="-Dclassifier=sources"/>
+            <arg value="-Pgpg"/>
+        </artifact:mvn>
+
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file"/>
+            <arg value="-Durl=${maven-staging-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-staging-repository-id}"/>
+            <arg value="-DpomFile=target/pom-weaver.xml"/>
+            <arg value="-Dfile=target/enumerable-java-weaver${enumerable.version}-javadoc.jar"/>
+            <arg value="-Dclassifier=javadoc"/>
+            <arg value="-Pgpg"/>
+        </artifact:mvn>
+    </target>
+
+    <target name="deploy" depends="install" description="deploy snapshot version to Maven snapshot repository">
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file"/>
+            <arg value="-Durl=${maven-snapshots-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-snapshots-repository-id}"/>
+            <arg value="-DpomFile=target/pom.xml"/>
+            <arg value="-Dfile=target/enumerable-java-${enumerable.version}.jar"/>
+        </artifact:mvn>
+        <artifact:mvn>
+            <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file"/>
+            <arg value="-Durl=${maven-snapshots-repository-url}"/>
+            <arg value="-DrepositoryId=${maven-snapshots-repository-id}"/>
+            <arg value="-DpomFile=target/pom-weaver.xml"/>
+            <arg value="-Dfile=target/enumerable-java-weaver-${enumerable.version}.jar"/>
+        </artifact:mvn>
+    </target>
+</project>

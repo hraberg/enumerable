@@ -1,6 +1,7 @@
 package org.enumerable.lambda.weaving.tree;
 
 import org.enumerable.lambda.weaving.ClassFilter;
+import org.enumerable.lambda.weaving.LambdaWeavingProperties;
 import org.enumerable.lambda.weaving.tree.LambdaTreeWeaver.MethodAnalyzer.LambdaAnalyzer;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.Method;
@@ -16,7 +17,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.*;
 
-import static java.lang.System.getProperty;
 import static java.lang.System.out;
 import static java.util.Arrays.asList;
 import static org.enumerable.lambda.exception.UncheckedException.uncheck;
@@ -26,9 +26,9 @@ import static org.objectweb.asm.Type.*;
 import static org.objectweb.asm.tree.AbstractInsnNode.*;
 
 class LambdaTreeWeaver implements Opcodes {
-    static Type newLambdaAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.newlambda", "org.enumerable.lambda.annotation.NewLambda", false);
-    static Type lambdaParameterAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdaparameter", "org.enumerable.lambda.annotation.LambdaParameter", false);
-    static Type lambdaLocalAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdalocal", "org.enumerable.lambda.annotation.LambdaLocal", true);
+    static Type newLambdaAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.newlambda", false);
+    static Type lambdaParameterAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdaparameter", false);
+    static Type lambdaLocalAnnotation = getConfigurableAnnotationType("lambda.weaving.annotation.lambdalocal", true);
 
 
     ClassNode c;
@@ -1581,12 +1581,7 @@ class LambdaTreeWeaver implements Opcodes {
         pw.flush();
     }
 
-    static Type getConfigurableAnnotationType(String property, String defaultValue, boolean nullable) {
-        String value = getProperty(property, defaultValue);
-        debug(property + ": " + value);
-        boolean notSet = value == null || value.trim().length() == 0;
-        if (notSet && nullable) return null;
-        if (notSet) throw new IllegalStateException(property + " cannot be null");
-        return getType("L" + value.replace('.', '/') + ";");
+    static Type getConfigurableAnnotationType(String property, boolean nullable) {
+        return getType("L" + LambdaWeavingProperties.get(property, nullable).replace('.', '/') + ";");
     }
 }
