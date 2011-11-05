@@ -5,9 +5,9 @@
         closures.
     </description>
 
-    <property name="enumerable.osgi.version" value="0.4.0"/>
-    <property name="enumerable.version" value="${enumerable.osgi.version}"/>
-    <property name="asm.version" value="4.0"/>
+    <property name="enumerable.osgi.version" value="0.4.1"/>
+    <property name="enumerable.version" value="${enumerable.osgi.version}-SNAPSHOT"/>
+    <property name="asm.version" value="3.3.1"/>
     <property name="scala.version" value="2.9.1"/>
     <property file="lambda.weaving.properties"/>
     <tstamp/>
