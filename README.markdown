@@ -290,7 +290,7 @@ http://code.google.com/p/lambdaj/
 
 Enumerable.java is released under the [EPL license](http://www.eclipse.org/legal/epl-v10.html).
 
-ASM 3.3: Copyright (c) 2000-2005 INRIA, France Telecom, see [asm-3.2.license](http://github.com/hraberg/enumerable/blob/master/lib/asm-3.3.license) or [ASM License](http://asm.ow2.org/license.html).
+ASM 3.3: Copyright (c) 2000-2005 INRIA, France Telecom, see [ASM License](http://asm.ow2.org/license.html).
 
 jsr166y and extra166y:
 Written by Doug Lea with assistance from members of JCP JSR-166 Expert Group and released to the public domain, as explained at http://creativecommons.org/licenses/publicdomain
