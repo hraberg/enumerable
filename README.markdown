@@ -59,7 +59,7 @@ Block parameters are defined using annotated static fields. For more examples se
 
 ## Usage
 
-Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (org.enumerable.lambda.asm).
+Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (org.enumerable.lambda.weaving.asm).
 
     java -javaagent:enumerable-java-<version>.jar [...]
 
