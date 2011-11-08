@@ -48,6 +48,15 @@ Block parameters are defined using annotated static fields. For more examples se
 
 **Note: The actual blocks are limited to one expression.** 
 
+## Maven
+
+    <dependency>
+      <groupId>org.enumerable</groupId>
+      <artifactId>enumerable-java</artifactId>
+      <version>0.4.0</version>
+      <scope>compile</scope>
+    </dependency>
+
 ## Usage
 
 Enumerable.java is packaged as a [java agent](http://java.sun.com/javase/6/docs/api/java/lang/instrument/package-summary.html). ASM has been moved to a local package (org.enumerable.lambda.asm).
