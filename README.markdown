@@ -54,7 +54,6 @@ Block parameters are defined using annotated static fields. For more examples se
       <groupId>org.enumerable</groupId>
       <artifactId>enumerable-java</artifactId>
       <version>0.4.0</version>
-      <scope>compile</scope>
     </dependency>
 
 ## Usage
