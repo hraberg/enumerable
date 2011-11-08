@@ -42,6 +42,7 @@ import org.enumerable.lambda.enumerable.collection.IEnumerable;
  * This class is as a facade for the implementation of the in
  * {@link EnumerableModule} and {@link EMap}.
  */
+@SuppressWarnings({"unchecked"})
 public class Enumerable {
     /**
      * Passes each element of the collection to the given block. The method
@@ -121,7 +122,7 @@ public class Enumerable {
      * block is not false. If no object matches, it returns null.
      */
     public static <E> E detect(Iterable<E> collection, Fn1<? super E, Boolean> block) {
-        return extend(collection).detect(block);
+        return (E) extend(collection).detect(block);
     }
 
     /**
@@ -129,7 +130,7 @@ public class Enumerable {
      * block is not false. If no object matches, it returns ifNone.
      */
     public static <E> E detect(Iterable<E> collection, Fn0<E> ifNone, Fn1<? super E, Boolean> block) {
-        return extend(collection).detect(ifNone, block);
+        return (E) extend(collection).detect(ifNone, block);
     }
 
     /**
@@ -244,7 +245,7 @@ public class Enumerable {
      * item in collection.
      */
     public static <E, M, R> M eachWithObject(Iterable<E> collection, M memo, Fn2<? super E, M, R> block) {
-        return extend(collection).eachWithObject(memo, block);
+        return (M) extend(collection).eachWithObject(memo, block);
     }
 
     /**
@@ -258,14 +259,14 @@ public class Enumerable {
      * @see #detect(Iterable, Fn1)
      */
     public static <E> E find(Iterable<E> collection, Fn1<? super E, Boolean> block) {
-        return extend(collection).find(block);
+        return (E) extend(collection).find(block);
     }
 
     /**
      * @see #detect(Iterable, Fn0, Fn1)
      */
     public static <E> E find(Iterable<E> collection, Fn0<E> ifNone, Fn1<? super E, Boolean> block) {
-        return extend(collection).find(ifNone, block);
+        return (E) extend(collection).find(ifNone, block);
     }
 
     /**
@@ -287,7 +288,7 @@ public class Enumerable {
      * Returns the first item of collection or null.
      */
     public static <E> E first(Iterable<E> collection) {
-        return extend(collection).first();
+        return (E) extend(collection).first();
     }
 
     /**
@@ -362,7 +363,7 @@ public class Enumerable {
      * iterating).
      */
     public static <E> E inject(Iterable<E> collection, Fn2<? super E, ? super E, ? extends E> block) {
-        return extend(collection).inject(block);
+        return (E) extend(collection).inject(block);
     }
 
     /**
@@ -372,7 +373,7 @@ public class Enumerable {
      * initial value for memo.
      */
     public static <E, R> R inject(Iterable<E> collection, R initial, Fn2<? super R, ? super E, ? extends R> block) {
-        return extend(collection).inject(initial, block);
+        return (R) extend(collection).inject(initial, block);
     }
 
     /**
@@ -387,7 +388,7 @@ public class Enumerable {
      * assumes all objects implement {@link Comparable}
      */
     public static <E extends Object & Comparable<? super E>> E max(Iterable<E> collection) {
-        return extend(collection).max();
+        return (E) extend(collection).max();
     }
 
     /**
@@ -395,7 +396,7 @@ public class Enumerable {
      * the block to {@link Comparator#compare}.
      */
     public static <E> E max(Iterable<E> collection, Fn2<? super E, ? super E, Integer> block) {
-        return extend(collection).max(block);
+        return (E) extend(collection).max(block);
     }
 
     /**
@@ -404,7 +405,7 @@ public class Enumerable {
      */
     public static <E, R extends Object & Comparable<? super R>> E maxBy(Iterable<E> collection,
             Fn1<? super E, R> block) {
-        return extend(collection).maxBy(block);
+        return (E) extend(collection).maxBy(block);
     }
 
     /**
@@ -420,7 +421,7 @@ public class Enumerable {
      * assumes all objects implement {@link Comparable}.
      */
     public static <E extends Object & Comparable<? super E>> E min(Iterable<E> collection) {
-        return extend(collection).min();
+        return (E) extend(collection).min();
     }
 
     /**
@@ -428,7 +429,7 @@ public class Enumerable {
      * the block to {@link Comparator#compare}.
      */
     public static <E> E min(Iterable<E> collection, Fn2<? super E, ? super E, Integer> block) {
-        return extend(collection).min(block);
+        return (E) extend(collection).min(block);
     }
 
     /**
@@ -437,7 +438,7 @@ public class Enumerable {
      */
     public static <E, R extends Object & Comparable<? super R>> E minBy(Iterable<E> collection,
             Fn1<? super E, R> block) {
-        return extend(collection).minBy(block);
+        return (E) extend(collection).minBy(block);
     }
 
     /**
@@ -528,14 +529,14 @@ public class Enumerable {
      * @see #inject(Iterable, Fn2)
      */
     public static <E> E reduce(Iterable<E> collection, Fn2<? super E, ? super E, ? extends E> block) {
-        return extend(collection).reduce(block);
+        return (E) extend(collection).reduce(block);
     }
 
     /**
      * @see #inject(Iterable, Object, Fn2)
      */
     public static <E, R> R reduce(Iterable<E> collection, R initial, Fn2<? super R, ? super E, ? extends R> block) {
-        return extend(collection).reduce(initial, block);
+        return (R) extend(collection).reduce(initial, block);
     }
 
     /**
